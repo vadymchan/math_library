@@ -3,6 +3,7 @@ static math library for computer graphics. Uses SIMD set instructions
 
 ## tree hirerarchy
 
+```
 math_library/
 │
 ├── src/
@@ -22,3 +23,4 @@ math_library/
 │
 └── CMakeLists.txt
 
+```
