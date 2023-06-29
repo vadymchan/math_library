@@ -1,32 +1,58 @@
-# Prerequisites
-*.d
+# .gitignore
 
-# Compiled Object files
-*.slo
-*.lo
+# Ignore build directory
+build/
+
+#ignore the third_party (the folder third_party stays)
+/third_party/*
+
+
+
+# Build results
+[Dd]ebug/
+[Dd]ebugPublic/
+[Rr]elease/
+[Rr]eleases/
+x64/
+x86/
+[Ww][Ii][Nn]32/
+[Aa][Rr][Mm]/
+[Aa][Rr][Mm]64/
+bld/
+[Bb]in/
+[Oo]bj/
+[Oo]ut/
+[Ll]og/
+[Ll]ogs/
+out/
+
+# Ignore CMake generated files
+CMakeCache.txt
+CMakeFiles/
+CMakeScripts/
+cmake_install.cmake
+
+# Ignore other generated files
 *.o
 *.obj
-
-# Precompiled Headers
-*.gch
-*.pch
-
-# Compiled Dynamic libraries
-*.so
-*.dylib
-*.dll
-
-# Fortran module files
-*.mod
-*.smod
-
-# Compiled Static libraries
-*.lai
-*.la
-*.a
-*.lib
-
-# Executables
 *.exe
-*.out
-*.app
+*.lib
+*.dll
+*.so
+*.a
+*.dylib
+
+# Ignore Visual Studio generated files
+.vs/
+*.sln
+*.suo
+*.vcxproj
+*.vcxproj.filters
+*.vcxproj.user
+
+# Ignore other common files
+*.log
+*.swp
+*.bak
+*.tmp
+*.orig
