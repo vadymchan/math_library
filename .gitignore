@@ -3,7 +3,8 @@
 # Ignore build directory
 build/
 
-
+#ignore the third_party (the folder third_party stays)
+/third_party/*
 
 # Build results
 [Dd]ebug/

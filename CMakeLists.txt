@@ -1,28 +1,68 @@
 cmake_minimum_required(VERSION 3.10)
 project(math_library)
-
-# Set C++ standard
 set(CMAKE_CXX_STANDARD 14)
 
 #-------- lib ----------------------------------------
 
-# Get all source and header files for the library
 file(GLOB_RECURSE LIB_SOURCES "src/lib/*.cpp")
 file(GLOB_RECURSE HEADERS "include/*.h")
 
-# Create the library
 add_library(math_library STATIC ${HEADERS} ${LIB_SOURCES})
 
 #-------- exe ----------------------------------------
 
-# Get all source files for the executable
-file(GLOB_RECURSE EXE_SOURCES "src/exe/*.cpp")
+option(INCLUDE_G_TEST "Include the G_TEST library" ON)
+option(INCLUDE_SPDLOG "Include the SPDLOG library" OFF)
+option(INCLUDE_G_BENCHMARK "Include the G_BENCHMARK library" OFF)
 
-# Add include directories
+file(GLOB_RECURSE EXE_SOURCES "src/exe/*.cpp")
 include_directories(${PROJECT_SOURCE_DIR}/include)
 
-# Create the executable
 add_executable(math_library_exe ${EXE_SOURCES})
 
-# Link the library to the executable
 target_link_libraries(math_library_exe math_library)
+
+include(FetchContent)
+set(FETCHCONTENT_BASE_DIR ${CMAKE_SOURCE_DIR}/third_party)
+
+if(INCLUDE_SPDLOG)
+    message(STATUS "Fetching SPDLOG...")
+    FetchContent_Declare(
+        spdlog
+        GIT_REPOSITORY https://github.com/gabime/spdlog.git
+        GIT_TAG v1.9.2
+    )
+    FetchContent_MakeAvailable(spdlog)
+    target_link_libraries(math_library_exe spdlog)
+endif()
+
+if(INCLUDE_G_TEST)
+    message(STATUS "Fetching Google Test...")
+    FetchContent_Declare(
+        googletest
+        GIT_REPOSITORY https://github.com/google/googletest.git
+        GIT_TAG v1.13.0
+    )
+    FetchContent_MakeAvailable(googletest)
+    target_link_libraries(math_library_exe gtest gtest_main)
+endif()
+
+
+if(INCLUDE_G_BENCHMARK)
+    message(STATUS "Fetching Google Benchmark...")
+    FetchContent_Declare(
+        benchmark
+        GIT_REPOSITORY https://github.com/google/benchmark.git
+        GIT_TAG v1.5.0
+    )
+    FetchContent_MakeAvailable(benchmark)
+    target_link_libraries(math_library_exe benchmark)
+endif()
+
+if(MSVC)
+    set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /MTd")
+    set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /MT")
+endif()
+
+
+set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT math_library_exe)
