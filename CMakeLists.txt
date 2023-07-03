@@ -13,7 +13,7 @@ add_library(math_library STATIC ${HEADERS} ${LIB_SOURCES})
 
 option(INCLUDE_G_TEST "Include the G_TEST library" ON)
 option(INCLUDE_SPDLOG "Include the SPDLOG library" OFF)
-option(INCLUDE_G_BENCHMARK "Include the G_BENCHMARK library" OFF)
+option(INCLUDE_G_BENCHMARK "Include the G_BENCHMARK library" ON)
 
 file(GLOB_RECURSE EXE_SOURCES "src/exe/*.cpp")
 include_directories(${PROJECT_SOURCE_DIR}/include)
@@ -47,6 +47,11 @@ if(INCLUDE_G_TEST)
     target_link_libraries(math_library_exe gtest gtest_main)
 endif()
 
+#set to compile the gtest using Multi-threaded Debug /MTd runtime library
+if(MSVC) 
+    set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /MTd")
+    set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /MT")
+endif()
 
 if(INCLUDE_G_BENCHMARK)
     message(STATUS "Fetching Google Benchmark...")
@@ -55,13 +60,13 @@ if(INCLUDE_G_BENCHMARK)
         GIT_REPOSITORY https://github.com/google/benchmark.git
         GIT_TAG v1.5.0
     )
-    FetchContent_MakeAvailable(benchmark)
+    FetchContent_GetProperties(benchmark)
+    if(NOT benchmark_POPULATED)
+        FetchContent_Populate(benchmark)
+        set(BENCHMARK_ENABLE_TESTING OFF CACHE BOOL "" FORCE)  # Disable benchmark's tests
+        add_subdirectory(${benchmark_SOURCE_DIR} ${benchmark_BINARY_DIR})
+    endif()
     target_link_libraries(math_library_exe benchmark)
-endif()
-
-if(MSVC)
-    set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /MTd")
-    set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /MT")
 endif()
 
 
