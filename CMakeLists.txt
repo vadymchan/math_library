@@ -7,7 +7,16 @@ set(CMAKE_CXX_STANDARD 14)
 file(GLOB_RECURSE LIB_SOURCES "src/lib/*.cpp")
 file(GLOB_RECURSE HEADERS "include/*.h")
 
-add_library(math_library STATIC ${HEADERS} ${LIB_SOURCES})
+if(LIB_SOURCES) 
+    message(STATUS "Build math library as static library")
+    add_library(math_library STATIC ${HEADERS} ${LIB_SOURCES})
+    target_include_directories(math_library PUBLIC include)
+else()
+    #Header Only
+    message(STATUS "Build math library as header only library")
+    add_library(math_library INTERFACE ${HEADERS})
+    target_include_directories(math_library INTERFACE include)
+endif()
 
 #-------- exe ----------------------------------------
 
