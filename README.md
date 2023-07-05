@@ -1,6 +1,42 @@
 # math_library
 static math library for computer graphics. Uses SIMD set instructions
 
+---
+## TODO:
+### Matrix:
+- [ ] basic operations:
+  - [ ] addition (scalar, matrix by matrix)
+  - [ ] substraction (scalar, matrix by matrix)
+  - [ ] multiplication (scalar, matrix by matrix)
+  - [ ] division (scalar, )
+  - [ ] transposition
+  - [ ] finding determinant
+  - [ ] inverse
+  - [ ] rank 
+- [ ] alias for the most common matrix size (2x2, 3x3, 4x4)
+- [ ] support for both row-major and column-major storage
+- [ ] SIMD optimizations (AVX and SSE) for operations where applicable
+- [ ] support for different numerical types (float, double, etc.)
+
+### Vector:
+- [ ] Basic operations:
+  - [ ] addition (scalar, vector by vector)
+  - [ ] subtraction (scalar, vector by vector)
+  - [ ] multiplication (scalar, dot product, cross product)
+  - [ ] division (scalar)
+  - [ ] magnitude (length)
+  - [ ] normalization
+- [ ] alias for the most common vector sizes (2D, 3D, 4D)
+
+
+### General:
+- [ ] Comprehensive test suite to verify correctness of operations
+- [ ] Performance benchmarks to measure speed of operations
+- [ ] Documentation for all classes and functions (it's in my dreams =) )
+- [ ] Examples and tutorials for users
+- [ ] Continuous integration setup for automated testing
+
+---
 ## tree hirerarchy
 
 ```
