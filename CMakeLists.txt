@@ -25,7 +25,7 @@ option(INCLUDE_SPDLOG "Include the SPDLOG library" OFF)
 option(INCLUDE_G_BENCHMARK "Include the G_BENCHMARK library" ON)
 
 file(GLOB_RECURSE EXE_SOURCES "src/exe/*.cpp")
-include_directories(${PROJECT_SOURCE_DIR}/include)
+include_directories(${PROJECT_SOURCE_DIR}/include ${CMAKE_BINARY_DIR})
 
 add_executable(math_library_exe ${EXE_SOURCES})
 
@@ -33,6 +33,23 @@ target_link_libraries(math_library_exe math_library)
 
 include(FetchContent)
 set(FETCHCONTENT_BASE_DIR ${CMAKE_SOURCE_DIR}/third_party)
+
+#-------- generate_defines ----------------------------------------
+
+add_executable(generate_SIMD_defines scripts/GenerateSIMDdefines.cpp)
+
+add_custom_command(
+    OUTPUT include/SIMDdefines.h
+    COMMAND generate_SIMD_defines
+    DEPENDS generate_SIMD_defines
+)
+
+add_custom_target(
+    run_generate_defines ALL
+    DEPENDS include/SIMDdefines.h
+)
+
+#-------- fetch content ----------------------------------------
 
 if(INCLUDE_SPDLOG)
     message(STATUS "Fetching SPDLOG...")
@@ -77,6 +94,5 @@ if(INCLUDE_G_BENCHMARK)
     endif()
     target_link_libraries(math_library_exe benchmark)
 endif()
-
 
 set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT math_library_exe)
