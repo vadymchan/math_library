@@ -18,12 +18,6 @@ int main() {
     } else {
         std::cout << "Successfully opened " << defines_file_path << " for writing\n";
     }
-    //std::ofstream defines("../include/SIMDdefines.h");
-
-    if (!defines) {
-        std::cerr << "Failed to open defines.h for writing\n";
-        return 1;
-    }
 
 #ifdef _MSC_VER
     int cpuInfo[4];
