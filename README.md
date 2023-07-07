@@ -72,7 +72,7 @@ math_library/
 | Member Variables | `m_` prefix + camelCase | `m_position` |
 | Private Member Variables | `m_` prefix + camelCase + `_` postfix | `m_position_` | 
 | Private Methods | camelCase + `_` postfix | `updatePosition_()` | 
-| Constants | `k` prefix + PascalCase | `kMaxPlayers` | - i've seen it in Google's C++ style guide
+| Constants (const and constexpr) | `k` prefix + PascalCase | `kMaxPlayers` | - i've seen it in Google's C++ style guide
 | Enums | PascalCase for type, UPPER_CASE_WITH_UNDERSCORES for values | `enum class Difficulty { EASY, MEDIUM, HARD };` |
 | Namespaces | lowercase with underscores | `game_logic` |
 | Interface Classes | `I` prefix + PascalCase | `ICollidable` |
