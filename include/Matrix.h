@@ -12,36 +12,45 @@ namespace math
 	class Matrix
 	{
 	public:
+
+		static const bool UseHeap = sizeof(T) * Rows * Columns > STACK_ALLOCATION_LIMIT;
+
 		Matrix()
 		{
-			if constexpr (UseHeap) {
+			if constexpr (UseHeap) 
+			{
 				m_data_ = new T[Rows * Columns];
 			}
 		}
 
 		~Matrix()
 		{
-			if constexpr (UseHeap) {
+			if constexpr (UseHeap) 
+			{
 				delete[] m_data_;
 			}
 		}
 
 		T& operator()(unsigned int row, unsigned int col)
 		{
-			if constexpr (Option == Options::ROW_MAJOR) {
+			if constexpr (Option == Options::ROW_MAJOR) 
+			{
 				return m_data_[row * Columns + col];
 			}
-			else {
+			else 
+			{
 				return m_data_[col * Rows + row];
 			}
 		}
 
 		const T& operator()(unsigned int row, unsigned int col) const
 		{
-			if constexpr (Option == Options::ROW_MAJOR) {
+			if constexpr (Option == Options::ROW_MAJOR) 
+			{
 				return m_data_[row * Columns + col];
 			}
-			else {
+			else 
+			{
 				return m_data_[col * Rows + row];
 			}
 		}

@@ -2,13 +2,15 @@
 #include <benchmark/benchmark.h>
 #include "All.h"
 
-TEST(MatrixTest, ConstructorDestructor) {
-    math::Matrix<int, 2, 2> matrix;
+TEST(MatrixTest, ConstructorDestructor) 
+{
+    math::Matrix<float, 2, 2> matrix;
     // If the constructor and destructor work correctly, this test will pass
 }
 
-TEST(MatrixTest, ElementAccess) {
-    math::Matrix<int, 2, 2> matrix;
+TEST(MatrixTest, ElementAccess) 
+{
+    math::Matrix<float, 2, 2> matrix;
     matrix.coeffRef(0, 0) = 1; matrix.coeffRef(0, 1) = 2;
     matrix.coeffRef(1, 0) = 3; matrix.coeffRef(1, 1) = 4;
     EXPECT_EQ(matrix.coeff(0, 0), 1);
@@ -17,14 +19,16 @@ TEST(MatrixTest, ElementAccess) {
     EXPECT_EQ(matrix.coeff(1, 1), 4);
 }
 
-TEST(MatrixTest, ConstructorDestructorFailure) {
-    math::Matrix<int, 2, 2> matrix;
+TEST(MatrixTest, ConstructorDestructorFailure) 
+{
+    math::Matrix<float, 2, 2> matrix;
     // This test will pass because the matrix is not null after construction
     EXPECT_NE(&matrix, nullptr);
 }
 
-TEST(MatrixTest, ElementAccessFailure) {
-    math::Matrix<int, 2, 2> matrix;
+TEST(MatrixTest, ElementAccessFailure) 
+{
+    math::Matrix<float, 2, 2> matrix;
     matrix.coeffRef(0, 0) = 1; matrix.coeffRef(0, 1) = 2;
     matrix.coeffRef(1, 0) = 3; matrix.coeffRef(1, 1) = 4;
     // These tests will pass because the expected values match the actual values
@@ -34,38 +38,43 @@ TEST(MatrixTest, ElementAccessFailure) {
     EXPECT_NE(matrix.coeff(1, 1), 3);
 }
 
-TEST(MatrixTest, ElementModification) {
-    math::Matrix<int, 2, 2> matrix;
+TEST(MatrixTest, ElementModification) 
+{
+    math::Matrix<float, 2, 2> matrix;
     matrix.coeffRef(0, 0) = 1;
     EXPECT_EQ(matrix.coeff(0, 0), 1);
     matrix.coeffRef(0, 0) = 2;
     EXPECT_EQ(matrix.coeff(0, 0), 2);
 }
 
-TEST(MatrixTest, ElementModificationFailure) {
-    math::Matrix<int, 2, 2> matrix;
+TEST(MatrixTest, ElementModificationFailure) 
+{
+    math::Matrix<float, 2, 2> matrix;
     matrix.coeffRef(0, 0) = 1;
     EXPECT_NE(matrix.coeff(0, 0), 2);
     matrix.coeffRef(0, 0) = 2;
     EXPECT_NE(matrix.coeff(0, 0), 1);
 }
 
-TEST(MatrixTest, OutOfBoundsAccess) {
-    math::Matrix<int, 2, 2> matrix;
+TEST(MatrixTest, OutOfBoundsAccess) 
+{
+    math::Matrix<float, 2, 2> matrix;
     EXPECT_DEATH(matrix.coeff(2, 2), "Index out of bounds");
     EXPECT_DEATH(matrix.coeffRef(2, 2), "Index out of bounds");
 }
 
-TEST(MatrixTest, OperatorAccess) {
-    math::Matrix<int, 2, 2> matrix;
+TEST(MatrixTest, OperatorAccess) 
+{
+    math::Matrix<float, 2, 2> matrix;
     matrix(0, 0) = 1;
     EXPECT_EQ(matrix(0, 0), 1);
     matrix(0, 0) = 2;
     EXPECT_EQ(matrix(0, 0), 2);
 }
 
-TEST(MatrixTest, OperatorAccessConst) {
-    math::Matrix<int, 2, 2> matrix;
+TEST(MatrixTest, OperatorAccessConst) 
+{
+    math::Matrix<float, 2, 2> matrix;
     matrix(0, 0) = 1;
     const auto& const_matrix = matrix;
     EXPECT_EQ(const_matrix(0, 0), 1);
@@ -73,8 +82,9 @@ TEST(MatrixTest, OperatorAccessConst) {
     EXPECT_TRUE((std::is_const_v<std::remove_reference_t<decltype(const_matrix(0, 0))>>));
 }
 
-TEST(MatrixTest, CoeffAccessConst) {
-    math::Matrix<int, 2, 2> matrix;
+TEST(MatrixTest, CoeffAccessConst) 
+{
+    math::Matrix<float, 2, 2> matrix;
     matrix.coeffRef(0, 0) = 1;
     const auto& const_matrix = matrix;
     EXPECT_EQ(const_matrix.coeff(0, 0), 1);
@@ -82,22 +92,89 @@ TEST(MatrixTest, CoeffAccessConst) {
     EXPECT_TRUE((std::is_const_v<std::remove_reference_t<decltype(const_matrix.coeff(0, 0))>>));
 }
 
-static void BM_MatrixElementAccess(benchmark::State& state) {
-    math::Matrix<int, 2, 2> matrix;
-    matrix.coeffRef(0, 0) = 1; matrix.coeffRef(0, 1) = 2;
-    matrix.coeffRef(1, 0) = 3; matrix.coeffRef(1, 1) = 4;
-    for (auto _ : state) {
-        auto val = matrix.coeff(1, 1);
+TEST(MatrixTest, StackAllocation) 
+{
+    // This matrix should be small enough to be allocated on the stack
+    math::Matrix<float, 2, 2> matrix;
+    EXPECT_FALSE(matrix.UseHeap);
+}
+
+TEST(MatrixTest, HeapAllocation) 
+{
+    // This matrix should be large enough to be allocated on the heap
+    math::Matrix<float, 100, 100> matrix;
+    EXPECT_TRUE(matrix.UseHeap);
+}
+static void BM_MatrixCreationStack(benchmark::State& state) 
+{
+    for (auto _ : state) 
+{
+        math::Matrix<float, 2, 2> matrix;
+        benchmark::DoNotOptimize(matrix);
+    }
+}
+BENCHMARK(BM_MatrixCreationStack);
+
+static void BM_MatrixCreationHeap(benchmark::State& state) 
+{
+    for (auto _ : state) 
+{
+        math::Matrix<float, 100, 100> matrix;
+        benchmark::DoNotOptimize(matrix);
+    }
+}
+BENCHMARK(BM_MatrixCreationHeap);
+
+static void BM_MatrixElementAccess(benchmark::State& state) 
+{
+    math::Matrix<float, 100, 100> matrix;
+    for (auto _ : state) 
+{
+        auto val = matrix.coeff(50, 50);
         benchmark::DoNotOptimize(val);
     }
 }
+BENCHMARK(BM_MatrixElementAccess);
+
+static void BM_MatrixElementAccessRef(benchmark::State& state) 
+{
+    math::Matrix<float, 100, 100> matrix;
+    for (auto _ : state) 
+{
+        matrix.coeffRef(50, 50) = 1;
+    }
+}
+BENCHMARK(BM_MatrixElementAccessRef);
+
+static void BM_MatrixOperatorAccess(benchmark::State& state) 
+{
+    math::Matrix<float, 100, 100> matrix;
+    for (auto _ : state) 
+{
+        auto val = matrix(50, 50);
+        benchmark::DoNotOptimize(val);
+    }
+}
+BENCHMARK(BM_MatrixOperatorAccess);
+
+static void BM_MatrixOperatorAccessRef(benchmark::State& state) 
+{
+    math::Matrix<float, 100, 100> matrix;
+    for (auto _ : state) 
+{
+        matrix(50, 50) = 1;
+    }
+}
+BENCHMARK(BM_MatrixOperatorAccessRef);
 
 BENCHMARK(BM_MatrixElementAccess);
 
-int main(int argc, char** argv) {
+int main(int argc, char** argv) 
+{
     ::testing::InitGoogleTest(&argc, argv);
     int test_result = RUN_ALL_TESTS();
-    if (test_result != 0) {
+    if (test_result != 0) 
+{
         return test_result;
     }
 
