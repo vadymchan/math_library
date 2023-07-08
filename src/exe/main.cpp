@@ -154,6 +154,51 @@ TEST(MatrixTest, AdditionFailure)
         }
     }
 }
+
+TEST(MatrixTest, ScalarAddition)
+{
+    math::Matrix<float, 4, 4> matrix1;
+
+    // Populate matrix1 with some values
+    for (int i = 0; i < 4; ++i) {
+        for (int j = 0; j < 4; ++j) {
+            matrix1.coeffRef(i, j) = i * 4 + j + 1;
+        }
+    }
+
+    math::Matrix<float, 4, 4> matrix2 = matrix1 + 10;
+
+    // Check that each element of the result is the corresponding element of matrix1 plus 10
+    for (int i = 0; i < 4; ++i) {
+        for (int j = 0; j < 4; ++j) {
+            EXPECT_EQ(matrix2.coeff(i, j), matrix1.coeff(i, j) + 10);
+        }
+    }
+}
+
+TEST(MatrixTest, ScalarAdditionFailure)
+{
+    math::Matrix<float, 4, 4> matrix1;
+
+    // Populate matrix1 with some values
+    for (int i = 0; i < 4; ++i) {
+        for (int j = 0; j < 4; ++j) {
+            matrix1.coeffRef(i, j) = i * 4 + j + 1;
+        }
+    }
+
+    math::Matrix<float, 4, 4> matrix2 = matrix1 + 10;
+
+    // Check that each element of the result is not the corresponding element of matrix1 plus 11
+    for (int i = 0; i < 4; ++i) {
+        for (int j = 0; j < 4; ++j) {
+            EXPECT_NE(matrix2.coeff(i, j), matrix1.coeff(i, j) + 11);
+        }
+    }
+}
+
+
+
 static void BM_MatrixCreationStack(benchmark::State& state) 
 {
     for (auto _ : state) 
@@ -216,7 +261,32 @@ static void BM_MatrixOperatorAccessRef(benchmark::State& state)
 }
 BENCHMARK(BM_MatrixOperatorAccessRef);
 
-BENCHMARK(BM_MatrixElementAccess);
+
+
+//int main() {
+//    // Define the size of your matrices
+//    constexpr size_t Rows = 2;
+//    constexpr size_t Columns = 2;
+//
+//    // Initialize arrays
+//    float m_data1[Rows * Columns] = {  5.0f, 6.0f, 7.0f, 8.0f};
+//    float m_data2[Rows * Columns] = { 16.0f, 15.0f, 14.0f, 13.0f };
+//    float result[Rows * Columns] = { 0.0f };  // initializing all elements to zero
+//
+//    // Get add function
+//    auto addFunc = InstructionSet::getAddFunc();
+//
+//    // Perform the addition operations
+//    addFunc(result, m_data1, Rows * Columns);
+//    addFunc(result, m_data2, Rows * Columns);
+//
+//    // Print the result
+//    for (size_t i = 0; i < Rows * Columns; i++) {
+//        std::cout << "Element " << i << ": " << result[i] << std::endl;
+//    }
+//
+//    return 0;
+//}
 
 int main(int argc, char** argv) 
 {
