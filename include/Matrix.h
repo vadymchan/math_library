@@ -51,6 +51,20 @@ namespace math
 			}
 		}
 
+		Matrix& operator=(const Matrix& other)
+		{
+			if (this != &other)  
+			{
+				if constexpr (UseHeap)
+				{
+					delete[] m_data_;
+					m_data_ = new T[Rows * Columns];
+				}
+				std::copy_n(other.m_data_, Rows * Columns, m_data_);
+			}
+			return *this;
+		}
+
 		T& operator()(unsigned int row, unsigned int col)
 		{
 			if constexpr (Option == Options::ROW_MAJOR) 
