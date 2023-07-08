@@ -3,6 +3,7 @@
 #include <type_traits>
 #include <cassert>
 #include "Options.h"
+#include "InstructionSet.h"
 
 constexpr unsigned int STACK_ALLOCATION_LIMIT = 16;
 
@@ -101,6 +102,21 @@ namespace math
 			return operator()(row, col);
 		}
 
+		Matrix operator+(const Matrix& other) const
+		{
+			Matrix result = Matrix(0);
+			auto addFunc = InstructionSet::getAddFunc();
+			addFunc(result.m_data_, this->m_data_, Rows * Columns);
+			addFunc(result.m_data_, other.m_data_, Rows * Columns);
+			return result;
+		}
+
+		Matrix& operator+=(const Matrix& other)
+		{
+			auto addFunc = InstructionSet::getAddFunc();
+			addFunc(m_data_, other.m_data_, Rows * Columns);
+			return *this;
+		}
 	private:
 		static const bool UseHeap = sizeof(T) * Rows * Columns > STACK_ALLOCATION_LIMIT;
 		using DataType = typename std::conditional<UseHeap, T*, T[Rows * Columns]>::type;
