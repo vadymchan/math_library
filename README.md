@@ -5,7 +5,7 @@ static math library for computer graphics. Uses SIMD set instructions
 ## TODO:
 ### Matrix:
 - [ ] basic operations:
-  - [ ] addition (scalar, matrix by matrix)
+  - [ X ] addition (scalar, matrix by matrix)
   - [ ] substraction (scalar, matrix by matrix)
   - [ ] multiplication (scalar, matrix by matrix)
   - [ ] division (scalar, )
