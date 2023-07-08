@@ -105,6 +105,55 @@ TEST(MatrixTest, HeapAllocation)
     math::Matrix<float, 100, 100> matrix;
     EXPECT_TRUE(matrix.UseHeap);
 }
+
+TEST(MatrixTest, Addition)
+{
+    constexpr int kRows = 2;
+    constexpr int kColumns = 2;
+
+    math::Matrix<float, kRows, kColumns> matrix1;
+    math::Matrix<float, kRows, kColumns> matrix2;
+
+    // Populate matrix1 and matrix2 with some values
+    for (int i = 0; i < kRows; ++i) {
+        for (int j = 0; j < kColumns; ++j) {
+            matrix1.coeffRef(i, j) = i * 4 + j + 1;
+            matrix2.coeffRef(i, j) = (i * 4 + j + 1) * 2;
+        }
+    }
+
+    math::Matrix<float, kRows, kColumns> matrix3 = matrix1 + matrix2;
+
+    // Check that each element of the result is the sum of the corresponding elements of matrix1 and matrix2
+    for (int i = 0; i < kRows; ++i) {
+        for (int j = 0; j < kColumns; ++j) {
+            EXPECT_EQ(matrix3.coeff(i, j), matrix1.coeff(i, j) + matrix2.coeff(i, j));
+        }
+    }
+}
+
+TEST(MatrixTest, AdditionFailure)
+{
+    math::Matrix<float, 4, 4> matrix1;
+    math::Matrix<float, 4, 4> matrix2;
+
+    // Populate matrix1 and matrix2 with some values
+    for (int i = 0; i < 4; ++i) {
+        for (int j = 0; j < 4; ++j) {
+            matrix1.coeffRef(i, j) = i * 4 + j + 1;
+            matrix2.coeffRef(i, j) = (i * 4 + j + 1) * 2;
+        }
+    }
+
+    math::Matrix<float, 4, 4> matrix3 = matrix1 + matrix2;
+
+    // Check that each element of the result is not the sum of the corresponding elements of matrix1 and matrix2 plus 1
+    for (int i = 0; i < 4; ++i) {
+        for (int j = 0; j < 4; ++j) {
+            EXPECT_NE(matrix3.coeff(i, j), matrix1.coeff(i, j) + matrix2.coeff(i, j) + 1);
+        }
+    }
+}
 static void BM_MatrixCreationStack(benchmark::State& state) 
 {
     for (auto _ : state) 
