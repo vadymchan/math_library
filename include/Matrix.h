@@ -23,6 +23,26 @@ namespace math
 			}
 		}
 
+		Matrix(const T& element)
+		{
+			if constexpr (UseHeap)
+			{
+				m_data_ = new T[Rows * Columns];
+			}
+			std::fill_n(m_data_, Rows * Columns, element);
+		}
+
+		Matrix(const Matrix& other)
+		{
+			if constexpr (UseHeap)
+			{
+				m_data_ = new T[Rows * Columns];
+			}
+
+			std::copy_n(other.m_data_, Rows * Columns, m_data_);
+		}
+
+
 		~Matrix()
 		{
 			if constexpr (UseHeap) 
