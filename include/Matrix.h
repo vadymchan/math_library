@@ -117,8 +117,25 @@ namespace math
 			addFunc(m_data_, other.m_data_, Rows * Columns);
 			return *this;
 		}
+
+		Matrix operator+(const T& scalar) const
+		{
+			Matrix result = *this;
+			auto addScalarFunc = InstructionSet::getAddScalarFunc();
+			addScalarFunc(result.m_data_, scalar, Rows * Columns);
+			return result;
+		}
+
+		Matrix& operator+=(const T& scalar)
+		{
+			auto addScalarFunc = InstructionSet::getAddScalarFunc();
+			addScalarFunc(m_data_, scalar, Rows * Columns);
+			return *this;
+		}
+
+
 	private:
-		static const bool UseHeap = sizeof(T) * Rows * Columns > STACK_ALLOCATION_LIMIT;
+		
 		using DataType = typename std::conditional<UseHeap, T*, T[Rows * Columns]>::type;
 		DataType m_data_;
 	};
