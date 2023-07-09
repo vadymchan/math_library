@@ -134,8 +134,8 @@ TEST(MatrixTest, Addition)
 
 TEST(MatrixTest, AdditionFailure)
 {
-    math::Matrix<float, 4, 4> matrix1;
-    math::Matrix<float, 4, 4> matrix2;
+    math::Matrix<float, 4, 4, math::Options::COLUMN_MAJOR> matrix1;
+    math::Matrix<float, 4, 4, math::Options::COLUMN_MAJOR> matrix2;
 
     // Populate matrix1 and matrix2 with some values
     for (int i = 0; i < 4; ++i) {
@@ -145,7 +145,7 @@ TEST(MatrixTest, AdditionFailure)
         }
     }
 
-    math::Matrix<float, 4, 4> matrix3 = matrix1 + matrix2;
+    math::Matrix<float, 4, 4, math::Options::COLUMN_MAJOR> matrix3 = matrix1 + matrix2;
 
     // Check that each element of the result is not the sum of the corresponding elements of matrix1 and matrix2 plus 1
     for (int i = 0; i < 4; ++i) {
@@ -157,7 +157,7 @@ TEST(MatrixTest, AdditionFailure)
 
 TEST(MatrixTest, ScalarAddition)
 {
-    math::Matrix<float, 4, 4> matrix1;
+    math::Matrix<float, 4, 4, math::Options::ROW_MAJOR> matrix1;
 
     // Populate matrix1 with some values
     for (int i = 0; i < 4; ++i) {
@@ -166,7 +166,7 @@ TEST(MatrixTest, ScalarAddition)
         }
     }
 
-    math::Matrix<float, 4, 4> matrix2 = matrix1 + 10;
+    math::Matrix<float, 4, 4, math::Options::ROW_MAJOR> matrix2 = matrix1 + 10;
 
     // Check that each element of the result is the corresponding element of matrix1 plus 10
     for (int i = 0; i < 4; ++i) {
