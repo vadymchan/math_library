@@ -48,10 +48,56 @@ public:
 #endif
 	}
 
+	using MultiplyFunc = void(*)(float*, const float*, const float*, size_t);
+
+	static MultiplyFunc getMultiplyFunc()
+	{
+#ifdef SUPPORTS_AVX2
+		return multiply_avx2;
+#elif defined(SUPPORTS_AVX)
+		return multiply_avx;
+#elif defined(SUPPORTS_SSE4_2)
+		return multiply_sse4_2;
+#elif defined(SUPPORTS_SSE4_1)
+		return multiply_sse4_1;
+#elif defined(SUPPORTS_SSSE3)
+		return multiply_ssse3;
+#elif defined(SUPPORTS_SSE3)
+		return multiply_sse3;
+#else
+		return multiply_fallback;
+#endif
+	}
+
+	using MulScalarFunc = void(*)(float*, float, size_t);
+
+	static MulScalarFunc getMulScalarFunc()
+	{
+#ifdef SUPPORTS_AVX2
+		return mul_scalar_avx2;
+#elif defined(SUPPORTS_AVX)
+		return mul_scalar_avx;
+#elif defined(SUPPORTS_SSE4_2)
+		return mul_scalar_sse4_2;
+#elif defined(SUPPORTS_SSE4_1)
+		return mul_scalar_sse4_1;
+#elif defined(SUPPORTS_SSSE3)
+		return mul_scalar_ssse3;
+#elif defined(SUPPORTS_SSE3)
+		return mul_scalar_sse3;
+#else
+		return mul_scalar_fallback;
+#endif
+	}
+
+
 
 private:
 
 	static constexpr size_t AVX_SIMD_WIDTH = 8;
+
+	//BEGIN: add two arrays
+	//----------------------------------------------------------------------------
 
 	static void add_avx2(float* a, const float* b, size_t size)
 	{
@@ -91,6 +137,12 @@ private:
 	{
 	}
 
+	//END: add two arrays
+	//----------------------------------------------------------------------------
+
+	//BEGIN: add scalar
+	//----------------------------------------------------------------------------
+
 	static void add_scalar_avx2(float* a, float scalar, size_t size)
 	{
 		__m256 ymm0 = _mm256_set1_ps(scalar);
@@ -109,27 +161,27 @@ private:
 
 	static void add_scalar_avx(float* a, float scalar, size_t size)
 	{
-		
+
 	}
 
 	static void add_scalar_sse4_2(float* a, float scalar, size_t size)
 	{
-		
+
 	}
 
 	static void add_scalar_sse4_1(float* a, float scalar, size_t size)
 	{
-		
+
 	}
 
 	static void add_scalar_ssse3(float* a, float scalar, size_t size)
 	{
-		
+
 	}
 
 	static void add_scalar_sse3(float* a, float scalar, size_t size)
 	{
-		
+
 	}
 
 	static void add_scalar_fallback(float* a, float scalar, size_t size)
@@ -138,4 +190,79 @@ private:
 		for (size_t i = 0; i < size; ++i)
 			a[i] += scalar;
 	}
+
+	//END: add scalar
+	//----------------------------------------------------------------------------
+
+
+	//BEGIN: multiplication array
+	//----------------------------------------------------------------------------
+
+	static void multiply_avx2(float* result, const float* a, const float* b, size_t size)
+	{
+	}
+
+	static void multiply_avx(float* result, const float* a, const float* b, size_t size)
+	{
+	}
+
+	static void multiply_sse4_2(float* result, const float* a, const float* b, size_t size)
+	{
+	}
+
+	static void multiply_sse4_1(float* result, const float* a, const float* b, size_t size)
+	{
+	}
+
+	static void multiply_ssse3(float* result, const float* a, const float* b, size_t size)
+	{
+	}
+
+	static void multiply_sse3(float* result, const float* a, const float* b, size_t size)
+	{
+	}
+
+	static void multiply_fallback(float* result, const float* a, const float* b, size_t size)
+	{
+	}
+
+	//END: multiplication array
+	//----------------------------------------------------------------------------
+
+
+
+	//BEGIN: multiplication scalar
+	//----------------------------------------------------------------------------
+
+	static void mul_scalar_avx2(float* a, float scalar, size_t size)
+	{
+	}
+
+	static void mul_scalar_avx(float* a, float scalar, size_t size)
+	{
+	}
+
+	static void mul_scalar_sse4_2(float* a, float scalar, size_t size)
+	{
+	}
+
+	static void mul_scalar_sse4_1(float* a, float scalar, size_t size)
+	{
+	}
+
+	static void mul_scalar_ssse3(float* a, float scalar, size_t size)
+	{
+	}
+
+	static void mul_scalar_sse3(float* a, float scalar, size_t size)
+	{
+	}
+
+	static void mul_scalar_fallback(float* a, float scalar, size_t size)
+	{
+	}
+
+	//END: multiplication scalar
+	//----------------------------------------------------------------------------
+
 };
