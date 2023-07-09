@@ -262,31 +262,56 @@ static void BM_MatrixOperatorAccessRef(benchmark::State& state)
 BENCHMARK(BM_MatrixOperatorAccessRef);
 
 
+//BEGIN: addition benchmark
+//---------------------------------------------------------------------------
 
-//int main() {
-//    // Define the size of your matrices
-//    constexpr size_t Rows = 2;
-//    constexpr size_t Columns = 2;
-//
-//    // Initialize arrays
-//    float m_data1[Rows * Columns] = {  5.0f, 6.0f, 7.0f, 8.0f};
-//    float m_data2[Rows * Columns] = { 16.0f, 15.0f, 14.0f, 13.0f };
-//    float result[Rows * Columns] = { 0.0f };  // initializing all elements to zero
-//
-//    // Get add function
-//    auto addFunc = InstructionSet::getAddFunc();
-//
-//    // Perform the addition operations
-//    addFunc(result, m_data1, Rows * Columns);
-//    addFunc(result, m_data2, Rows * Columns);
-//
-//    // Print the result
-//    for (size_t i = 0; i < Rows * Columns; i++) {
-//        std::cout << "Element " << i << ": " << result[i] << std::endl;
-//    }
-//
-//    return 0;
-//}
+static void BM_MatrixAddition(benchmark::State& state)
+{
+    math::Matrix<float, 100, 100> matrix1;
+    math::Matrix<float, 100, 100> matrix2;
+    for (auto _ : state)
+    {
+        auto matrix3 = matrix1 + matrix2;
+        benchmark::DoNotOptimize(matrix3);
+    }
+}
+BENCHMARK(BM_MatrixAddition);
+
+static void BM_MatrixAdditionInPlace(benchmark::State& state)
+{
+    math::Matrix<float, 100, 100> matrix1;
+    math::Matrix<float, 100, 100> matrix2;
+    for (auto _ : state)
+    {
+        matrix1 += matrix2;
+    }
+}
+BENCHMARK(BM_MatrixAdditionInPlace);
+
+static void BM_MatrixScalarAddition(benchmark::State& state)
+{
+    math::Matrix<float, 100, 100> matrix;
+    for (auto _ : state)
+    {
+        auto matrix2 = matrix + 1.0f;
+        benchmark::DoNotOptimize(matrix2);
+    }
+}
+BENCHMARK(BM_MatrixScalarAddition);
+
+static void BM_MatrixScalarAdditionInPlace(benchmark::State& state)
+{
+    math::Matrix<float, 100, 100> matrix;
+    for (auto _ : state)
+    {
+        matrix += 1.0f;
+    }
+}
+BENCHMARK(BM_MatrixScalarAdditionInPlace);
+
+
+//END: addition benchmark
+//---------------------------------------------------------------------------
 
 int main(int argc, char** argv) 
 {
