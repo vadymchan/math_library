@@ -106,7 +106,6 @@ namespace math
 		{
 			Matrix result = *this;
 			auto addFunc = InstructionSet::getAddFunc();
-			addFunc(result.m_data_, this->m_data_, Rows * Columns);
 			addFunc(result.m_data_, other.m_data_, Rows * Columns);
 			return result;
 		}
@@ -132,6 +131,48 @@ namespace math
 			addScalarFunc(m_data_, scalar, Rows * Columns);
 			return *this;
 		}
+
+
+		Matrix operator*(const Matrix& other) const
+		{
+			Matrix result;
+			auto multiplyFunc = InstructionSet::getMultiplyFunc();
+			for (unsigned int i = 0; i < Rows; ++i)
+			{
+				for (unsigned int j = 0; j < Columns; ++j)
+				{
+					for (unsigned int k = 0; k < Columns; ++k)
+					{
+						multiplyFunc(&result(i, j), &this->operator()(i, k), &other(k, j), 1);
+					}
+				}
+			}
+			return result;
+		}
+
+		Matrix& operator*=(const Matrix& other)
+		{
+			static_assert(Columns == Rows, "Matrix dimensions must agree for multiplication");
+			Matrix temp = *this * other;
+			*this = temp;
+			return *this;
+		}
+
+		Matrix operator*(const T& scalar) const
+		{
+			Matrix result = *this;
+			auto mulScalarFunc = InstructionSet::getMulScalarFunc();
+			mulScalarFunc(result.m_data_, scalar, Rows * Columns);
+			return result;
+		}
+
+		Matrix& operator*=(const T& scalar)
+		{
+			auto mulScalarFunc = InstructionSet::getMulScalarFunc();
+			mulScalarFunc(m_data_, scalar, Rows * Columns);
+			return *this;
+		}
+
 
 
 	private:
