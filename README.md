@@ -30,6 +30,7 @@ static math library for computer graphics. Uses SIMD set instructions
 
 
 ### General:
+- [ ] OpenMP / TBB (Intel Threading Building Blocks) support for parallelization
 - [ ] Comprehensive test suite to verify correctness of operations
 - [ ] Performance benchmarks to measure speed of operations
 - [ ] Documentation for all classes and functions (it's in my dreams =) )
