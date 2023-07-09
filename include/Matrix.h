@@ -104,7 +104,7 @@ namespace math
 
 		Matrix operator+(const Matrix& other) const
 		{
-			Matrix result = Matrix(0);
+			Matrix result = *this;
 			auto addFunc = InstructionSet::getAddFunc();
 			addFunc(result.m_data_, this->m_data_, Rows * Columns);
 			addFunc(result.m_data_, other.m_data_, Rows * Columns);
