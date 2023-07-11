@@ -3,9 +3,18 @@ static math library for computer graphics. Uses SIMD set instructions
 
 ---
 ## TODO:
+
+### Current:
+- [ ] instruction set.h - separate them
+- [ ] [[#instruction set - templated]]
+- [ ] add implementation for matrix multiplication (naive and unpolished solution)
+
 ### Matrix:
 - [ ] basic operations:
-  - [X] addition (scalar, matrix by matrix)
+  - [x] addition (scalar, matrix by matrix)
+   - [x] base and naive
+   - [ ] with bounding cases (column / row)
+   - [ ] optimised (performance)
   - [ ] substraction (scalar, matrix by matrix)
   - [ ] multiplication (scalar, matrix by matrix)
   - [ ] division (scalar, )
@@ -17,6 +26,8 @@ static math library for computer graphics. Uses SIMD set instructions
 - [ ] support for both row-major and column-major storage
 - [ ] SIMD optimizations (AVX and SSE) for operations where applicable
 - [ ] support for different numerical types (float, double, etc.)
+- [ ] view matrix
+- [ ] projection matrix
 
 ### Vector:
 - [ ] Basic operations:
@@ -36,7 +47,6 @@ static math library for computer graphics. Uses SIMD set instructions
 - [ ] Documentation for all classes and functions (it's in my dreams =) )
 - [ ] Examples and tutorials for users
 - [ ] Continuous integration setup for automated testing
-
 ---
 ## tree hirerarchy
 
