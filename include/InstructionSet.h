@@ -1,3 +1,9 @@
+/**
+ * @file InstructionSet.h
+ */
+
+
+
 //#pragma once
 //
 //#include "SIMDdefines.h"
@@ -269,6 +275,8 @@
 
 
 // InstructionSet.h
+
+
 #pragma once
 
 #include "SIMDdefines.h"
@@ -277,35 +285,118 @@
 namespace math
 {
 
-    template <typename T>
-    class InstructionSet
-    {
-    public:
-        using AddFunc = void(*)(T*, const T*, size_t);
-        static AddFunc getAddFunc();
+	template <typename T>
+	class InstructionSet
+	{
+	public:
+		using AddFunc = void(*)(T*, const T*, size_t);
+		static AddFunc getAddFunc();
 
-        using AddScalarFunc = void(*)(T*, T, size_t);
-        static AddScalarFunc getAddScalarFunc();
+		using AddScalarFunc = void(*)(T*, T, size_t);
+		static AddScalarFunc getAddScalarFunc();
 
-        using MultiplyFunc = void(*)(T*, const T*, const T*, size_t);
-        static MultiplyFunc getMultiplyFunc();
+		using MultiplyFunc = void(*)(T*, const T*, const T*, size_t);
+		static MultiplyFunc getMultiplyFunc();
 
-        using MulScalarFunc = void(*)(T*, T, size_t);
-        static MulScalarFunc getMulScalarFunc();
+		using MulScalarFunc = void(*)(T*, T, size_t);
+		static MulScalarFunc getMulScalarFunc();
 
-    private:
-        static constexpr size_t AVX_SIMD_WIDTH = 8;
+	private:
+		static constexpr size_t AVX_SIMD_WIDTH = 8;
 
-        // Function declarations for addition, scalar addition, multiplication, scalar multiplication
-        // The definitions will be in separate files
-        static void add_avx2(T* a, const T* b, size_t size);
-        // ... other function declarations ...
-    };
 
-#include "AddFuncs.h"
-#include "AddScalarFuncs.h"
-#include "MultiplyFuncs.h"
-#include "MulScalarFuncs.h"
+		//BEGIN: add two arrays
+		//----------------------------------------------------------------------------
+		//static void add_avx2(float* a, const float* b, size_t size);
+		//static void add_avx(float* a, const float* b, size_t size);
+		//static void add_sse4_2(float* a, const float* b, size_t size);
+		//static void add_sse4_1(float* a, const float* b, size_t size);
+		//static void add_ssse3(float* a, const float* b, size_t size);
+		//static void add_sse3(float* a, const float* b, size_t size);
+		//static void add_fallback(float* a, const float* b, size_t size);
+
+		static void add_avx2(T* a, const T* b, size_t size)
+		{}
+		static void add_avx(T* a, const T* b, size_t size)
+		{}
+		static void add_sse4_2(T* a, const T* b, size_t size)
+		{}
+		static void add_sse4_1(T* a, const T* b, size_t size)
+		{}
+		static void add_ssse3(T* a, const T* b, size_t size)
+		{}
+		static void add_sse3(T* a, const T* b, size_t size)
+		{}
+		static void add_fallback(T* a, const T* b, size_t size)
+		{}
+		//END: add two arrays
+		//----------------------------------------------------------------------------
+
+		//BEGIN: add scalar
+		//----------------------------------------------------------------------------
+		static void add_scalar_avx2(T* a, T scalar, size_t size)
+		{}
+		static void add_scalar_avx(T* a, T scalar, size_t size)
+		{}
+		static void add_scalar_sse4_2(T* a, T scalar, size_t size)
+		{}
+		static void add_scalar_sse4_1(T* a, T scalar, size_t size)
+		{}
+		static void add_scalar_ssse3(T* a, T scalar, size_t size)
+		{}
+		static void add_scalar_sse3(T* a, T scalar, size_t size)
+		{}
+		static void add_scalar_fallback(T* a, T scalar, size_t size)
+		{}
+		//END: add scalar
+		//----------------------------------------------------------------------------
+
+		//BEGIN: multiplication array
+		//----------------------------------------------------------------------------
+		static void multiply_avx2(T* result, const T* a, const T* b, size_t size)
+		{}
+		static void multiply_avx(T* result, const T* a, const T* b, size_t size)
+		{}
+		static void multiply_sse4_2(T* result, const T* a, const T* b, size_t size)
+		{}
+		static void multiply_sse4_1(T* result, const T* a, const T* b, size_t size)
+		{}
+		static void multiply_ssse3(T* result, const T* a, const T* b, size_t size)
+		{}
+		static void multiply_sse3(T* result, const T* a, const T* b, size_t size)
+		{}
+		static void multiply_fallback(T* result, const T* a, const T* b, size_t size)
+		{}
+		//END: multiplication array
+		//----------------------------------------------------------------------------
+
+		//BEGIN: multiplication scalar
+		//----------------------------------------------------------------------------
+		static void mul_scalar_avx2(T* a, T scalar, size_t size)
+		{}
+		static void mul_scalar_avx(T* a, T scalar, size_t size)
+		{}
+		static void mul_scalar_sse4_2(T* a, T scalar, size_t size)
+		{}
+		static void mul_scalar_sse4_1(T* a, T scalar, size_t size)
+		{}
+		static void mul_scalar_ssse3(T* a, T scalar, size_t size)
+		{}
+		static void mul_scalar_sse3(T* a, T scalar, size_t size)
+		{}
+		static void mul_scalar_fallback(T* a, T scalar, size_t size)
+		{}
+		//END: multiplication scalar
+		//----------------------------------------------------------------------------
+	};
+
+	extern template InstructionSet<float>::AddFunc InstructionSet<float>::getAddFunc();
+	extern template void InstructionSet<float>::add_avx2(float* a, const float* b, size_t size);
+
+	//#include "AddFuncs.h"
+	//#include "AddScalarFuncs.h"
+	//#include "MultiplyFuncs.h"
+	//#include "MulScalarFuncs.h"
 
 
 }

@@ -1,3 +1,8 @@
+/**
+ * @file Matrix.h
+ */
+
+
 #pragma once
 
 #include <type_traits>
@@ -105,14 +110,14 @@ namespace math
 		Matrix operator+(const Matrix& other) const
 		{
 			Matrix result = *this;
-			auto addFunc = InstructionSet::getAddFunc();
+			auto addFunc = InstructionSet<T>::getAddFunc();
 			addFunc(result.m_data_, other.m_data_, Rows * Columns);
 			return result;
 		}
 
 		Matrix& operator+=(const Matrix& other)
 		{
-			auto addFunc = InstructionSet::getAddFunc();
+			auto addFunc = InstructionSet<T>::getAddFunc();
 			addFunc(m_data_, other.m_data_, Rows * Columns);
 			return *this;
 		}
@@ -120,14 +125,14 @@ namespace math
 		Matrix operator+(const T& scalar) const
 		{
 			Matrix result = *this;
-			auto addScalarFunc = InstructionSet::getAddScalarFunc();
+			auto addScalarFunc = InstructionSet<T>::getAddScalarFunc();
 			addScalarFunc(result.m_data_, scalar, Rows * Columns);
 			return result;
 		}
 
 		Matrix& operator+=(const T& scalar)
 		{
-			auto addScalarFunc = InstructionSet::getAddScalarFunc();
+			auto addScalarFunc = InstructionSet<T>::getAddScalarFunc();
 			addScalarFunc(m_data_, scalar, Rows * Columns);
 			return *this;
 		}
@@ -136,7 +141,7 @@ namespace math
 		Matrix operator*(const Matrix& other) const
 		{
 			Matrix result;
-			auto multiplyFunc = InstructionSet::getMultiplyFunc();
+			auto multiplyFunc = InstructionSet<T>::getMultiplyFunc();
 			for (unsigned int i = 0; i < Rows; ++i)
 			{
 				for (unsigned int j = 0; j < Columns; ++j)
@@ -161,14 +166,14 @@ namespace math
 		Matrix operator*(const T& scalar) const
 		{
 			Matrix result = *this;
-			auto mulScalarFunc = InstructionSet::getMulScalarFunc();
+			auto mulScalarFunc = InstructionSet<T>::getMulScalarFunc();
 			mulScalarFunc(result.m_data_, scalar, Rows * Columns);
 			return result;
 		}
 
 		Matrix& operator*=(const T& scalar)
 		{
-			auto mulScalarFunc = InstructionSet::getMulScalarFunc();
+			auto mulScalarFunc = InstructionSet<T>::getMulScalarFunc();
 			mulScalarFunc(m_data_, scalar, Rows * Columns);
 			return *this;
 		}
