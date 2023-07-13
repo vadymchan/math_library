@@ -15,6 +15,12 @@ namespace math {
 	class InstructionSet
 	{
 	public:
+
+		static_assert( std::is_same<T, int>::value 
+			|| std::is_same<T, float>::value 
+			|| std::is_same<T, double>::value
+			,  "InstructionSet supports only int, float, and double types");
+
 		using AddFunc = void(*)(T*, const T*, size_t);
 
 		static AddFunc getAddFunc()
