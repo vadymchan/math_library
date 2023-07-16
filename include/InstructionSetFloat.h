@@ -85,6 +85,27 @@ namespace math
 #endif
 		}
 
+		using MulFunc = void(*)(float*, const float*, const float*, size_t);
+
+		static MulFunc getMulFunc()
+		{
+#ifdef SUPPORTS_AVX2
+			return mul_avx2;
+#elif defined(SUPPORTS_AVX)
+			return mul_avx;
+#elif defined(SUPPORTS_SSE4_2)
+			return mul_sse4_2;
+#elif defined(SUPPORTS_SSE4_1)
+			return mul_sse4_1;
+#elif defined(SUPPORTS_SSSE3)
+			return mul_ssse3;
+#elif defined(SUPPORTS_SSE3)
+			return mul_sse3;
+#else
+			return mul_fallback;
+#endif
+		}
+
 		using MulScalarFunc = void(*)(float*, float, size_t);
 
 		static MulScalarFunc getMulScalarFunc()
@@ -214,31 +235,31 @@ namespace math
 		//BEGIN: multiplication array
 		//----------------------------------------------------------------------------
 
-		static void multiply_avx2(float* result, const float* a, const float* b, size_t size)
+		static void mul_avx2(float* result, const float* a, const float* b, size_t size)
 		{
 		}
 
-		static void multiply_avx(float* result, const float* a, const float* b, size_t size)
+		static void mul_avx(float* result, const float* a, const float* b, size_t size)
 		{
 		}
 
-		static void multiply_sse4_2(float* result, const float* a, const float* b, size_t size)
+		static void mul_sse4_2(float* result, const float* a, const float* b, size_t size)
 		{
 		}
 
-		static void multiply_sse4_1(float* result, const float* a, const float* b, size_t size)
+		static void mul_sse4_1(float* result, const float* a, const float* b, size_t size)
 		{
 		}
 
-		static void multiply_ssse3(float* result, const float* a, const float* b, size_t size)
+		static void mul_ssse3(float* result, const float* a, const float* b, size_t size)
 		{
 		}
 
-		static void multiply_sse3(float* result, const float* a, const float* b, size_t size)
+		static void mul_sse3(float* result, const float* a, const float* b, size_t size)
 		{
 		}
 
-		static void multiply_fallback(float* result, const float* a, const float* b, size_t size)
+		static void mul_fallback(float* result, const float* a, const float* b, size_t size)
 		{
 		}
 
@@ -252,6 +273,8 @@ namespace math
 
 		static void mul_scalar_avx2(float* a, float scalar, size_t size)
 		{
+			
+			mul_scalar_avx(a, scalar, size);
 		}
 
 		static void mul_scalar_avx(float* a, float scalar, size_t size)

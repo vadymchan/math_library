@@ -84,6 +84,27 @@ namespace math {
 #endif
 		}
 
+		using MulFunc = void(*)(T*, const T*, const T*, size_t);
+
+		static MulFunc getMulFunc()
+		{
+#ifdef SUPPORTS_AVX2
+			return mul_avx2;
+#elif defined(SUPPORTS_AVX)
+			return mul_avx;
+#elif defined(SUPPORTS_SSE4_2)
+			return mul_sse4_2;
+#elif defined(SUPPORTS_SSE4_1)
+			return mul_sse4_1;
+#elif defined(SUPPORTS_SSSE3)
+			return mul_ssse3;
+#elif defined(SUPPORTS_SSE3)
+			return mul_sse3;
+#else
+			return mul_fallback;
+#endif
+		}
+
 		using MulScalarFunc = void(*)(T*, T, size_t);
 
 		static MulScalarFunc getMulScalarFunc()
@@ -116,6 +137,7 @@ namespace math {
 
 		static void add_avx2(T* a, const T* b, size_t size)
 		{
+			add_fallback(a, b, size);
 
 		}
 
@@ -206,37 +228,37 @@ namespace math {
 		//BEGIN: multiplication array
 		//----------------------------------------------------------------------------
 
-		static void multiply_avx2(T* result, const T* a, const T* b, size_t size)
+		static void mul_avx2(T* result, const T* a, const T* b, size_t size)
 		{
-			multiply_fallback(result, a, b, size)
+			mul_fallback(result, a, b, size)
 		}
 
-		static void multiply_avx(T* result, const T* a, const T* b, size_t size)
+		static void mul_avx(T* result, const T* a, const T* b, size_t size)
 		{
-			multiply_fallback(result, a, b, size);
+			mul_fallback(result, a, b, size);
 		}
 
-		static void multiply_sse4_2(T* result, const T* a, const T* b, size_t size)
+		static void mul_sse4_2(T* result, const T* a, const T* b, size_t size)
 		{
-			multiply_fallback(result, a, b, size);
+			mul_fallback(result, a, b, size);
 		}
 
-		static void multiply_sse4_1(T* result, const T* a, const T* b, size_t size)
+		static void mul_sse4_1(T* result, const T* a, const T* b, size_t size)
 		{
-			multiply_fallback(result, a, b, size);
+			mul_fallback(result, a, b, size);
 		}
 
-		static void multiply_ssse3(T* result, const T* a, const T* b, size_t size)
+		static void mul_ssse3(T* result, const T* a, const T* b, size_t size)
 		{
-			multiply_fallback(result, a, b, size);
+			mul_fallback(result, a, b, size);
 		}
 
-		static void multiply_sse3(T* result, const T* a, const T* b, size_t size)
+		static void mul_sse3(T* result, const T* a, const T* b, size_t size)
 		{
-			multiply_fallback(result, a, b, size);
+			mul_fallback(result, a, b, size);
 		}
 
-		static void multiply_fallback(T* result, const T* a, const T* b, size_t size)
+		static void mul_fallback(T* result, const T* a, const T* b, size_t size)
 		{
 			for (size_t i = 0; i < size; ++i) {
 				result[i] = a[i] * b[i];
@@ -290,6 +312,9 @@ namespace math {
 				a[i] *= scalar;
 			}
 		}
+
+		//END: multiplication scalar
+		//----------------------------------------------------------------------------
 
 	};
 
