@@ -208,26 +208,32 @@ namespace math {
 
 		static void multiply_avx2(T* result, const T* a, const T* b, size_t size)
 		{
+			multiply_fallback(result, a, b, size)
 		}
 
 		static void multiply_avx(T* result, const T* a, const T* b, size_t size)
 		{
+			multiply_fallback(result, a, b, size);
 		}
 
 		static void multiply_sse4_2(T* result, const T* a, const T* b, size_t size)
 		{
+			multiply_fallback(result, a, b, size);
 		}
 
 		static void multiply_sse4_1(T* result, const T* a, const T* b, size_t size)
 		{
+			multiply_fallback(result, a, b, size);
 		}
 
 		static void multiply_ssse3(T* result, const T* a, const T* b, size_t size)
 		{
+			multiply_fallback(result, a, b, size);
 		}
 
 		static void multiply_sse3(T* result, const T* a, const T* b, size_t size)
 		{
+			multiply_fallback(result, a, b, size);
 		}
 
 		static void multiply_fallback(T* result, const T* a, const T* b, size_t size)
@@ -247,6 +253,8 @@ namespace math {
 
 		static void mul_scalar_avx2(T* a, T scalar, size_t size)
 		{
+			mul_scalar_fallback(a, scalar, size);
+
 		}
 
 		static void mul_scalar_avx(T* a, T scalar, size_t size)
@@ -255,18 +263,25 @@ namespace math {
 
 		static void mul_scalar_sse4_2(T* a, T scalar, size_t size)
 		{
+			mul_scalar_fallback(a, scalar, size);
+
 		}
 
 		static void mul_scalar_sse4_1(T* a, T scalar, size_t size)
 		{
+			mul_scalar_fallback(a, scalar, size);
+
 		}
 
 		static void mul_scalar_ssse3(T* a, T scalar, size_t size)
 		{
+			mul_scalar_fallback(a, scalar, size);
+
 		}
 
 		static void mul_scalar_sse3(T* a, T scalar, size_t size)
 		{
+			mul_scalar_fallback(a, scalar, size);
 		}
 
 		static void mul_scalar_fallback(T* a, T scalar, size_t size)
