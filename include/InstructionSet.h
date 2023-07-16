@@ -121,18 +121,27 @@ namespace math {
 
 		static void add_avx(T* a, const T* b, size_t size)
 		{
+			add_fallback(a, b, size);
+
 		}
 		static void add_sse4_2(T* a, const T* b, size_t size)
 		{
+			add_fallback(a, b, size);
+
 		}
 		static void add_sse4_1(T* a, const T* b, size_t size)
 		{
+			add_fallback(a, b, size);
+
 		}
 		static void add_ssse3(T* a, const T* b, size_t size)
 		{
+			add_fallback(a, b, size);
+
 		}
 		static void add_sse3(T* a, const T* b, size_t size)
 		{
+			add_fallback(a, b, size);
 		}
 
 		static void add_fallback(T* a, const T* b, size_t size)
@@ -150,32 +159,37 @@ namespace math {
 
 		static void add_scalar_avx2(T* a, T scalar, size_t size)
 		{
+			add_scalar_fallback(a, scalar, size);
 
 		}
 
 		static void add_scalar_avx(T* a, T scalar, size_t size)
 		{
+			add_scalar_fallback(a, scalar, size);
 
 		}
 
 		static void add_scalar_sse4_2(T* a, T scalar, size_t size)
 		{
+			add_scalar_fallback(a, scalar, size);
 
 		}
 
 		static void add_scalar_sse4_1(T* a, T scalar, size_t size)
 		{
+			add_scalar_fallback(a, scalar, size);
 
 		}
 
 		static void add_scalar_ssse3(T* a, T scalar, size_t size)
 		{
+			add_scalar_fallback(a, scalar, size);
 
 		}
 
 		static void add_scalar_sse3(T* a, T scalar, size_t size)
 		{
-
+			add_scalar_fallback(a, scalar, size);
 		}
 
 		static void add_scalar_fallback(T* a, T scalar, size_t size)
