@@ -74,6 +74,7 @@ math_library/
 
 ## naming conventions for this project:
  
+
 | Code Element | Naming Convention | Example |
 | --- | --- | --- |
 | Classes | PascalCase | `GameEngine` |
@@ -84,7 +85,7 @@ math_library/
 | Private Member Variables | `m_` prefix + camelCase + `_` postfix | `m_position_` | 
 | Private Methods | camelCase + `_` postfix | `updatePosition_()` | 
 | Constants (const and constexpr) | `k` prefix + PascalCase | `kMaxPlayers` | - i've seen it in Google's C++ style guide
-| Enums | PascalCase for type, UPPER_CASE_WITH_UNDERSCORES for values | `enum class Difficulty { EASY, MEDIUM, HARD };` |
+| Enums | PascalCase for type and values | `enum class Difficulty { Easy, Medium, Hard };` |
 | Namespaces | lowercase with underscores | `game_logic` |
 | Interface Classes | `I` prefix + PascalCase | `ICollidable` |
 | Boolean Variables | `is` or `has` prefix + camelCase | `isVisible`, `hasPowerUp` |
