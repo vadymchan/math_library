@@ -182,6 +182,20 @@ namespace math
 			return *this;
 		}
 
+		Matrix operator/(const T& scalar) const
+		{
+			Matrix result = *this;
+			auto divScalarFunc = InstructionSet<T>::getDivScalarFunc();
+			divScalarFunc(result.m_data_, scalar, Rows * Columns);
+			return result;
+		}
+
+		Matrix& operator/=(const T& scalar)
+		{
+			auto divScalarFunc = InstructionSet<T>::getDivScalarFunc();
+			divScalarFunc(m_data_, scalar, Rows * Columns);
+			return *this;
+		}
 
 
 	private:

@@ -199,6 +199,25 @@ TEST(MatrixTest, ScalarAdditionFailure)
 
 
 
+    // Populate matrix1 and matrix2 with some values
+    for (int i = 0; i < kRows; ++i) {
+        for (int j = 0; j < kColumns; ++j) {
+            matrix1.coeffRef(i, j) = i * 4 + j + 1;
+            matrix2.coeffRef(i, j) = (i * 4 + j + 1) * 2;
+        }
+    }
+
+    math::Matrix<int, kRows, kColumns> matrix3 = matrix1 - matrix2;
+
+    // Check that each element of the result is the difference of the corresponding elements of matrix1 and matrix2
+    for (int i = 0; i < kRows; ++i) {
+        for (int j = 0; j < kColumns; ++j) {
+            EXPECT_EQ(matrix3.coeff(i, j), matrix1.coeff(i, j) - matrix2.coeff(i, j));
+        }
+    }
+}
+
+//========================================= BENCHMARKING =========================================
 static void BM_MatrixCreationStack(benchmark::State& state) 
 {
     for (auto _ : state) 
@@ -319,7 +338,14 @@ int main(int argc, char** argv)
     int test_result = RUN_ALL_TESTS();
     if (test_result != 0) 
 {
-        return test_result;
+    math::Matrix<float, 100, 100> matrix1;
+    math::Matrix<float, 100, 100> matrix2;
+    for (auto _ : state)
+    {
+        matrix1 -= matrix2;
+    }
+}
+BENCHMARK(BM_MatrixSubtractionInPlace);
     }
 
     ::benchmark::Initialize(&argc, argv);

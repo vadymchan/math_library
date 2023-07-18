@@ -127,6 +127,26 @@ namespace math
 #endif
 		}
 
+		using DivScalarFunc = void(*)(float*, float, size_t);
+
+		static DivScalarFunc getDivScalarFunc()
+		{
+#ifdef SUPPORTS_AVX2
+			return div_scalar_avx2;
+#elif defined(SUPPORTS_AVX)
+			return div_scalar_avx;
+#elif defined(SUPPORTS_SSE4_2)
+			return div_scalar_sse4_2;
+#elif defined(SUPPORTS_SSE4_1)
+			return div_scalar_sse4_1;
+#elif defined(SUPPORTS_SSSE3)
+			return div_scalar_ssse3;
+#elif defined(SUPPORTS_SSE3)
+			return div_scalar_sse3;
+#else
+			return div_scalar_fallback;
+#endif
+		}
 
 
 	private:
@@ -426,6 +446,72 @@ namespace math
 
 		//END: multiplication scalar
 		//----------------------------------------------------------------------------
+
+		//BEGIN: division scalar
+		//----------------------------------------------------------------------------
+
+		static void div_scalar_avx2(float* a, float scalar, size_t size)
+		{
+			div_scalar_avx(a, scalar, size);
+		}
+
+		static void div_scalar_avx(float* a, float scalar, size_t size)
+		{
+			__m256 ymm0 = _mm256_set1_ps(scalar);
+			size_t i = 0;
+
+			for (; i < size; i += AVX_SIMD_WIDTH) {
+				__m256 ymm1 = _mm256_loadu_ps(a + i);
+				ymm1 = _mm256_div_ps(ymm1, ymm0);
+				_mm256_storeu_ps(a + i, ymm1);
+			}
+
+			for (; i < size; ++i) {
+				a[i] /= scalar;
+			}
+		}
+
+		static void div_scalar_sse4_2(float* a, float scalar, size_t size)
+		{
+			div_scalar_sse3(a, scalar, size);
+		}
+
+		static void div_scalar_sse4_1(float* a, float scalar, size_t size)
+		{
+			div_scalar_sse3(a, scalar, size);
+		}
+
+		static void div_scalar_ssse3(float* a, float scalar, size_t size)
+		{
+			div_scalar_sse3(a, scalar, size);
+		}
+
+		static void div_scalar_sse3(float* a, float scalar, size_t size)
+		{
+			__m128 xmm0 = _mm_set1_ps(scalar);
+			size_t i = 0;
+
+			for (; i < size; i += SSE_SIMD_WIDTH) {
+				__m128 xmm1 = _mm_loadu_ps(a + i);
+				xmm1 = _mm_div_ps(xmm1, xmm0);
+				_mm_storeu_ps(a + i, xmm1);
+			}
+
+			for (; i < size; ++i) {
+				a[i] /= scalar;
+			}
+		}
+
+		static void div_scalar_fallback(float* a, float scalar, size_t size)
+		{
+			for (size_t i = 0; i < size; ++i) {
+				a[i] /= scalar;
+			}
+		}
+
+		//END: division scalar
+		//----------------------------------------------------------------------------
+
 
 	};
 
