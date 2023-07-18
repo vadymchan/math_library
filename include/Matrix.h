@@ -137,21 +137,25 @@ namespace math
 			return *this;
 		}
 
+		Matrix operator-(const Matrix& other) const
+		{
+			Matrix result = *this;
+			auto subFunc = InstructionSet<T>::getSubFunc();
+			subFunc(result.m_data_, other.m_data_, Rows * Columns);
+			return result;
+		}
+
+		Matrix& operator-=(const Matrix& other)
+		{
+			auto subFunc = InstructionSet<T>::getSubFunc();
+			subFunc(m_data_, other.m_data_, Rows * Columns);
+			return *this;
+		}
 
 		Matrix operator*(const Matrix& other) const
 		{
 			Matrix result;
-			auto multiplyFunc = InstructionSet<T>::getMultiplyFunc();
-			for (unsigned int i = 0; i < Rows; ++i)
-			{
-				for (unsigned int j = 0; j < Columns; ++j)
-				{
-					for (unsigned int k = 0; k < Columns; ++k)
-					{
-						multiplyFunc(&result(i, j), &this->operator()(i, k), &other(k, j), 1);
-					}
-				}
-			}
+			
 			return result;
 		}
 

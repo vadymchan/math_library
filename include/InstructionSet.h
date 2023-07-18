@@ -63,7 +63,26 @@ namespace math {
 #endif
 		}
 
-		using MultiplyFunc = void(*)(T*, const T*, const T*, size_t);
+		using SubFunc = void(*)(T*, const T*, size_t);
+
+		static SubFunc getSubFunc()
+		{
+#ifdef SUPPORTS_AVX2
+			return sub_avx2;
+#elif defined(SUPPORTS_AVX)
+			return sub_avx;
+#elif defined(SUPPORTS_SSE4_2)
+			return sub_sse4_2;
+#elif defined(SUPPORTS_SSE4_1)
+			return sub_sse4_1;
+#elif defined(SUPPORTS_SSSE3)
+			return sub_ssse3;
+#elif defined(SUPPORTS_SSE3)
+			return sub_sse3;
+#else
+			return sub_fallback;
+#endif
+		}
 
 		static MultiplyFunc getMultiplyFunc()
 		{
@@ -224,6 +243,49 @@ namespace math {
 		//END: add scalar
 		//----------------------------------------------------------------------------
 
+
+		//BEGIN: subtraction array
+		//----------------------------------------------------------------------------
+
+		static void sub_avx2(T* a, const T* b, size_t size)
+		{
+			sub_fallback(a, b, size);
+		}
+
+		static void sub_avx(T* a, const T* b, size_t size)
+		{
+			sub_fallback(a, b, size);
+		}
+
+		static void sub_sse4_2(T* a, const T* b, size_t size)
+		{
+			sub_fallback(a, b, size);
+		}
+
+		static void sub_sse4_1(T* a, const T* b, size_t size)
+		{
+			sub_fallback(a, b, size);
+		}
+
+		static void sub_ssse3(T* a, const T* b, size_t size)
+		{
+			sub_fallback(a, b, size);
+		}
+
+		static void sub_sse3(T* a, const T* b, size_t size)
+		{
+			sub_fallback(a, b, size);
+		}
+
+		static void sub_fallback(T* a, const T* b, size_t size)
+		{
+			for (size_t i = 0; i < size; ++i) {
+				a[i] -= b[i];
+			}
+		}
+
+		//END: subtraction array
+		//----------------------------------------------------------------------------
 
 		//BEGIN: multiplication array
 		//----------------------------------------------------------------------------
