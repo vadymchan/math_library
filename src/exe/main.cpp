@@ -217,6 +217,48 @@ TEST(MatrixTest, ScalarAdditionFailure)
     }
 }
 
+TEST(MatrixTest, ScalarDivision)
+{
+    math::Matrix<float, 4, 4, math::Options::ROW_MAJOR> matrix1;
+
+    // Populate matrix1 with some values
+    for (int i = 0; i < 4; ++i) {
+        for (int j = 0; j < 4; ++j) {
+            matrix1.coeffRef(i, j) = i * 4 + j + 1;
+        }
+    }
+
+    math::Matrix<float, 4, 4, math::Options::ROW_MAJOR> matrix2 = matrix1 / 10;
+
+    // Check that each element of the result is the corresponding element of matrix1 divided by 10
+    for (int i = 0; i < 4; ++i) {
+        for (int j = 0; j < 4; ++j) {
+            EXPECT_EQ(matrix2.coeff(i, j), matrix1.coeff(i, j) / 10);
+        }
+    }
+}
+
+TEST(MatrixTest, ScalarDivisionFailure)
+{
+    math::Matrix<float, 4, 4> matrix1;
+
+    // Populate matrix1 with some values
+    for (int i = 0; i < 4; ++i) {
+        for (int j = 0; j < 4; ++j) {
+            matrix1.coeffRef(i, j) = i * 4 + j + 1;
+        }
+    }
+
+    math::Matrix<float, 4, 4> matrix2 = matrix1 / 10;
+
+    // Check that each element of the result is not the corresponding element of matrix1 divided by 11
+    for (int i = 0; i < 4; ++i) {
+        for (int j = 0; j < 4; ++j) {
+            EXPECT_NE(matrix2.coeff(i, j), matrix1.coeff(i, j) / 11);
+        }
+    }
+}
+
 //========================================= BENCHMARKING =========================================
 static void BM_MatrixCreationStack(benchmark::State& state) 
 {
@@ -346,6 +388,33 @@ int main(int argc, char** argv)
     }
 }
 BENCHMARK(BM_MatrixSubtractionInPlace);
+//BEGIN: division benchmark
+//---------------------------------------------------------------------------
+
+static void BM_MatrixScalarDivision(benchmark::State& state)
+{
+    math::Matrix<float, 100, 100> matrix;
+    for (auto _ : state)
+    {
+        auto matrix2 = matrix / 1.0f;
+        benchmark::DoNotOptimize(matrix2);
+    }
+}
+BENCHMARK(BM_MatrixScalarDivision);
+
+static void BM_MatrixScalarDivisionInPlace(benchmark::State& state)
+{
+    math::Matrix<float, 100, 100> matrix;
+    for (auto _ : state)
+    {
+        matrix /= 1.0f;
+    }
+}
+BENCHMARK(BM_MatrixScalarDivisionInPlace);
+
+//END: division benchmark
+//---------------------------------------------------------------------------
+
     }
 
     ::benchmark::Initialize(&argc, argv);
