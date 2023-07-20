@@ -415,6 +415,161 @@ BENCHMARK(BM_MatrixScalarDivisionInPlace);
 //END: division benchmark
 //---------------------------------------------------------------------------
 
+//int main(int argc, char** argv) 
+//{
+//    ::testing::InitGoogleTest(&argc, argv);
+//    int test_result = RUN_ALL_TESTS();
+//    if (test_result != 0) 
+//{
+//        return test_result;
+//    }
+//
+//    ::benchmark::Initialize(&argc, argv);
+//    ::benchmark::RunSpecifiedBenchmarks();
+//    return 0;
+//}
+//    return 0;
+
+//}
+//}
+
+#define COLUMN_MAJOR_TRANSPOSED
+
+
+void mul_avx_row_major(float* result, const float* a, const float* b, size_t size) {
+    for (size_t i = 0; i < size; ++i) {
+        for (size_t j = 0; j < size; ++j) {
+            __m256 sum = _mm256_setzero_ps();
+            size_t k = 0;
+            for (; k + 7 < size; k += 8) {
+                __m256 a_vec = _mm256_set_ps(a[i * size + k], a[i * size + k + 1], a[i * size + k + 2], a[i * size + k + 3],
+                    a[i * size + k + 4], a[i * size + k + 5], a[i * size + k + 6], a[i * size + k + 7]);
+                __m256 b_vec = _mm256_set_ps(b[k * size + j], b[(k + 1) * size + j], b[(k + 2) * size + j], b[(k + 3) * size + j],
+                    b[(k + 4) * size + j], b[(k + 5) * size + j], b[(k + 6) * size + j], b[(k + 7) * size + j]);
+                sum = _mm256_fmadd_ps(a_vec, b_vec, sum);
+            }
+            sum = _mm256_hadd_ps(sum, sum);
+            sum = _mm256_hadd_ps(sum, sum);
+            __m128 vlow = _mm256_castps256_ps128(sum);
+            __m128 vhigh = _mm256_extractf128_ps(sum, 1);
+            vlow = _mm_add_ps(vlow, vhigh);
+            float tail_sum = 0;
+            for (; k < size; ++k) {
+                tail_sum += a[i * size + k] * b[k * size + j];
+            }
+            result[i * size + j] = _mm_cvtss_f32(vlow) + tail_sum;
+        }
+    }
+}
+
+#ifdef COLUMN_MAJOR_TRANSPOSED
+
+
+
+void mul_avx_col_major(float* result, const float* a, const float* b, size_t size) {
+    for (size_t i = 0; i < size; ++i) {
+        for (size_t j = 0; j < size; ++j) {
+            __m256 sum = _mm256_setzero_ps();
+            size_t k = 0;
+            for (; k + 7 < size; k += 8) {
+                __m256 a_vec = _mm256_set_ps(a[k * size + i], a[(k + 1) * size + i], a[(k + 2) * size + i], a[(k + 3) * size + i],
+                    a[(k + 4) * size + i], a[(k + 5) * size + i], a[(k + 6) * size + i], a[(k + 7) * size + i]);
+                __m256 b_vec = _mm256_set_ps(b[j * size + k], b[j * size + k + 1], b[j * size + k + 2], b[j * size + k + 3],
+                    b[j * size + k + 4], b[j * size + k + 5], b[j * size + k + 6], b[j * size + k + 7]);
+                sum = _mm256_fmadd_ps(a_vec, b_vec, sum);
+            }
+            sum = _mm256_hadd_ps(sum, sum);
+            sum = _mm256_hadd_ps(sum, sum);
+            __m128 vlow = _mm256_castps256_ps128(sum);
+            __m128 vhigh = _mm256_extractf128_ps(sum, 1);
+            vlow = _mm_add_ps(vlow, vhigh);
+            float tail_sum = 0;
+            for (; k < size; ++k) {
+                tail_sum += a[k * size + i] * b[j * size + k];
+            }
+            result[i * size + j] = _mm_cvtss_f32(vlow) + tail_sum;
+        }
+    }
+}
+
+#else
+
+
+void mul_avx_col_major(float* result, const float* a, const float* b, size_t size) {
+    for (size_t i = 0; i < size; ++i) {
+        for (size_t j = 0; j < size; ++j) {
+            __m256 sum = _mm256_setzero_ps();
+            size_t k = 0;
+            for (; k + 7 < size; k += 8) {
+                __m256 a_vec = _mm256_set_ps(a[k * size + i], a[(k + 1) * size + i], a[(k + 2) * size + i], a[(k + 3) * size + i],
+                    a[(k + 4) * size + i], a[(k + 5) * size + i], a[(k + 6) * size + i], a[(k + 7) * size + i]);
+                __m256 b_vec = _mm256_set_ps(b[j * size + k], b[j * size + k + 1], b[j * size + k + 2], b[j * size + k + 3],
+                    b[j * size + k + 4], b[j * size + k + 5], b[j * size + k + 6], b[j * size + k + 7]);
+                sum = _mm256_fmadd_ps(a_vec, b_vec, sum);
+            }
+            sum = _mm256_hadd_ps(sum, sum);
+            sum = _mm256_hadd_ps(sum, sum);
+            __m128 vlow = _mm256_castps256_ps128(sum);
+            __m128 vhigh = _mm256_extractf128_ps(sum, 1);
+            vlow = _mm_add_ps(vlow, vhigh);
+            float tail_sum = 0;
+            for (; k < size; ++k) {
+                tail_sum += a[k * size + i] * b[j * size + k];
+            }
+            result[j * size + i] = _mm_cvtss_f32(vlow) + tail_sum;
+        }
+    }
+}
+
+#endif // COLUMN_MAJOR_TRANSPOSED
+
+int main() {
+    const size_t size = 11;
+    float a[size * size];
+    for (size_t i = 0; i < size * size; ++i) {
+        a[i] = i + 1;
+    }
+
+    float result[size * size];
+    float expected[size * size];
+
+    // Calculate expected result
+    for (size_t i = 0; i < size; ++i) {
+        for (size_t j = 0; j < size; ++j) {
+            expected[i * size + j] = 0;
+            for (size_t k = 0; k < size; ++k) {
+                expected[i * size + j] += a[i * size + k] * a[k * size + j];
+            }
+        }
+    }
+
+    mul_avx_row_major(result, a, a, size);
+
+    std::cout << "Row-major result:" << std::endl;
+    for (size_t i = 0; i < size; ++i) {
+        for (size_t j = 0; j < size; ++j) {
+            std::cout << result[i * size + j] << ' ';
+        }
+        std::cout << std::endl;
+    }
+
+    // Expected output:
+    std::cout << "Expected result:" << std::endl;
+    for (size_t i = 0; i < size; ++i) {
+        for (size_t j = 0; j < size; ++j) {
+            std::cout << expected[i * size + j] << ' ';
+        }
+        std::cout << std::endl;
+    }
+
+    mul_avx_col_major(result, a, a, size);
+
+    std::cout << "Column-major result:" << std::endl;
+    for (size_t i = 0; i < size; ++i) {
+        for (size_t j = 0; j < size; ++j) {
+            std::cout << result[i * size + j] << ' ';
+        }
+        std::cout << std::endl;
     }
 
     ::benchmark::Initialize(&argc, argv);
