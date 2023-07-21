@@ -587,7 +587,17 @@ void mul_avx_col_major(float* result, const float* a, const float* b, size_t siz
     }
 }
 
+
+
 #endif // COLUMN_MAJOR_TRANSPOSED
+
+void transpose(float* a, size_t size) {
+    for (size_t i = 0; i < size; ++i) {
+        for (size_t j = i + 1; j < size; ++j) {
+            std::swap(a[i * size + j], a[j * size + i]);
+        }
+    }
+}
 
 int main() {
     const size_t size = 11;
@@ -627,6 +637,9 @@ int main() {
         }
         std::cout << std::endl;
     }
+
+    // Transpose the matrix
+    transpose(a, size);
 
     mul_avx_col_major(result, a, a, size);
 
