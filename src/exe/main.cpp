@@ -2,13 +2,13 @@
 #include <benchmark/benchmark.h>
 #include "All.h"
 
-TEST(MatrixTest, ConstructorDestructor) 
+TEST(MatrixTest, ConstructorDestructorFloat) 
 {
     math::Matrix<float, 2, 2> matrix;
     // If the constructor and destructor work correctly, this test will pass
 }
 
-TEST(MatrixTest, ElementAccess) 
+TEST(MatrixTest, ElementAccessFloat) 
 {
     math::Matrix<float, 2, 2> matrix;
     matrix.coeffRef(0, 0) = 1; matrix.coeffRef(0, 1) = 2;
@@ -19,14 +19,14 @@ TEST(MatrixTest, ElementAccess)
     EXPECT_EQ(matrix.coeff(1, 1), 4);
 }
 
-TEST(MatrixTest, ConstructorDestructorFailure) 
+TEST(MatrixTest, ConstructorDestructorFailureFloat) 
 {
     math::Matrix<float, 2, 2> matrix;
     // This test will pass because the matrix is not null after construction
     EXPECT_NE(&matrix, nullptr);
 }
 
-TEST(MatrixTest, ElementAccessFailure) 
+TEST(MatrixTest, ElementAccessFailureFloat) 
 {
     math::Matrix<float, 2, 2> matrix;
     matrix.coeffRef(0, 0) = 1; matrix.coeffRef(0, 1) = 2;
@@ -38,7 +38,7 @@ TEST(MatrixTest, ElementAccessFailure)
     EXPECT_NE(matrix.coeff(1, 1), 3);
 }
 
-TEST(MatrixTest, ElementModification) 
+TEST(MatrixTest, ElementModificationFloat) 
 {
     math::Matrix<float, 2, 2> matrix;
     matrix.coeffRef(0, 0) = 1;
@@ -47,7 +47,7 @@ TEST(MatrixTest, ElementModification)
     EXPECT_EQ(matrix.coeff(0, 0), 2);
 }
 
-TEST(MatrixTest, ElementModificationFailure) 
+TEST(MatrixTest, ElementModificationFailureFloat) 
 {
     math::Matrix<float, 2, 2> matrix;
     matrix.coeffRef(0, 0) = 1;
@@ -56,14 +56,14 @@ TEST(MatrixTest, ElementModificationFailure)
     EXPECT_NE(matrix.coeff(0, 0), 1);
 }
 
-TEST(MatrixTest, OutOfBoundsAccess) 
+TEST(MatrixTest, OutOfBoundsAccessFloat) 
 {
     math::Matrix<float, 2, 2> matrix;
     EXPECT_DEATH(matrix.coeff(2, 2), "Index out of bounds");
     EXPECT_DEATH(matrix.coeffRef(2, 2), "Index out of bounds");
 }
 
-TEST(MatrixTest, OperatorAccess) 
+TEST(MatrixTest, OperatorAccessFloat) 
 {
     math::Matrix<float, 2, 2> matrix;
     matrix(0, 0) = 1;
@@ -72,7 +72,7 @@ TEST(MatrixTest, OperatorAccess)
     EXPECT_EQ(matrix(0, 0), 2);
 }
 
-TEST(MatrixTest, OperatorAccessConst) 
+TEST(MatrixTest, OperatorAccessConstFloat) 
 {
     math::Matrix<float, 2, 2> matrix;
     matrix(0, 0) = 1;
@@ -82,7 +82,7 @@ TEST(MatrixTest, OperatorAccessConst)
     EXPECT_TRUE((std::is_const_v<std::remove_reference_t<decltype(const_matrix(0, 0))>>));
 }
 
-TEST(MatrixTest, CoeffAccessConst) 
+TEST(MatrixTest, CoeffAccessConstFloat) 
 {
     math::Matrix<float, 2, 2> matrix;
     matrix.coeffRef(0, 0) = 1;
@@ -92,21 +92,21 @@ TEST(MatrixTest, CoeffAccessConst)
     EXPECT_TRUE((std::is_const_v<std::remove_reference_t<decltype(const_matrix.coeff(0, 0))>>));
 }
 
-TEST(MatrixTest, StackAllocation) 
+TEST(MatrixTest, StackAllocationFloat) 
 {
     // This matrix should be small enough to be allocated on the stack
     math::Matrix<float, 2, 2> matrix;
     EXPECT_FALSE(matrix.UseHeap);
 }
 
-TEST(MatrixTest, HeapAllocation) 
+TEST(MatrixTest, HeapAllocationFloat) 
 {
     // This matrix should be large enough to be allocated on the heap
     math::Matrix<float, 100, 100> matrix;
     EXPECT_TRUE(matrix.UseHeap);
 }
 
-TEST(MatrixTest, Addition)
+TEST(MatrixTest, AdditionFloat)
 {
     constexpr int kRows = 2;
     constexpr int kColumns = 2;
@@ -132,7 +132,7 @@ TEST(MatrixTest, Addition)
     }
 }
 
-TEST(MatrixTest, AdditionFailure)
+TEST(MatrixTest, AdditionFailureFloat)
 {
     math::Matrix<float, 4, 4, math::Options::COLUMN_MAJOR> matrix1;
     math::Matrix<float, 4, 4, math::Options::COLUMN_MAJOR> matrix2;
@@ -155,7 +155,7 @@ TEST(MatrixTest, AdditionFailure)
     }
 }
 
-TEST(MatrixTest, ScalarAddition)
+TEST(MatrixTest, ScalarAdditionFloat)
 {
     math::Matrix<float, 4, 4, math::Options::ROW_MAJOR> matrix1;
 
@@ -176,7 +176,7 @@ TEST(MatrixTest, ScalarAddition)
     }
 }
 
-TEST(MatrixTest, ScalarAdditionFailure)
+TEST(MatrixTest, ScalarAdditionFailureFloat)
 {
     math::Matrix<float, 4, 4> matrix1;
 
@@ -197,7 +197,13 @@ TEST(MatrixTest, ScalarAdditionFailure)
     }
 }
 
+TEST(MatrixTest, SubtractionFloat)
+{
+    constexpr int kRows = 2;
+    constexpr int kColumns = 2;
 
+    math::Matrix<int, kRows, kColumns> matrix1;
+    math::Matrix<int, kRows, kColumns> matrix2;
 
     // Populate matrix1 and matrix2 with some values
     for (int i = 0; i < kRows; ++i) {
@@ -217,7 +223,28 @@ TEST(MatrixTest, ScalarAdditionFailure)
     }
 }
 
-TEST(MatrixTest, ScalarDivision)
+TEST(MatrixTest, ScalarSubtractionFloat)
+{
+    math::Matrix<float, 4, 4, math::Options::ROW_MAJOR> matrix1;
+
+    // Populate matrix1 with some values
+    for (int i = 0; i < 4; ++i) {
+        for (int j = 0; j < 4; ++j) {
+            matrix1.coeffRef(i, j) = i * 4 + j + 1;
+        }
+    }
+
+    math::Matrix<float, 4, 4, math::Options::ROW_MAJOR> matrix2 = matrix1 - 10;
+
+    // Check that each element of the result is the corresponding element of matrix1 minus 10
+    for (int i = 0; i < 4; ++i) {
+        for (int j = 0; j < 4; ++j) {
+            EXPECT_EQ(matrix2.coeff(i, j), matrix1.coeff(i, j) - 10);
+        }
+    }
+}
+
+TEST(MatrixTest, ScalarDivisionFloat)
 {
     math::Matrix<float, 4, 4, math::Options::ROW_MAJOR> matrix1;
 
@@ -238,7 +265,7 @@ TEST(MatrixTest, ScalarDivision)
     }
 }
 
-TEST(MatrixTest, ScalarDivisionFailure)
+TEST(MatrixTest, ScalarDivisionFailureFloat)
 {
     math::Matrix<float, 4, 4> matrix1;
 
@@ -374,11 +401,22 @@ BENCHMARK(BM_MatrixScalarAdditionInPlace);
 //END: addition benchmark
 //---------------------------------------------------------------------------
 
-int main(int argc, char** argv) 
+//BEGIN: subtraction benchmark
+//---------------------------------------------------------------------------
+
+static void BM_MatrixSubtraction(benchmark::State& state)
 {
-    ::testing::InitGoogleTest(&argc, argv);
-    int test_result = RUN_ALL_TESTS();
-    if (test_result != 0) 
+    math::Matrix<float, 100, 100> matrix1;
+    math::Matrix<float, 100, 100> matrix2;
+    for (auto _ : state)
+    {
+        auto matrix3 = matrix1 - matrix2;
+        benchmark::DoNotOptimize(matrix3);
+    }
+}
+BENCHMARK(BM_MatrixSubtraction);
+
+static void BM_MatrixSubtractionInPlace(benchmark::State& state)
 {
     math::Matrix<float, 100, 100> matrix1;
     math::Matrix<float, 100, 100> matrix2;
@@ -388,6 +426,31 @@ int main(int argc, char** argv)
     }
 }
 BENCHMARK(BM_MatrixSubtractionInPlace);
+
+static void BM_MatrixScalarSubtraction(benchmark::State& state)
+{
+    math::Matrix<float, 100, 100> matrix;
+    for (auto _ : state)
+    {
+        auto matrix2 = matrix - 1.0f;
+        benchmark::DoNotOptimize(matrix2);
+    }
+}
+BENCHMARK(BM_MatrixScalarSubtraction);
+
+static void BM_MatrixScalarSubtractionInPlace(benchmark::State& state)
+{
+    math::Matrix<float, 100, 100> matrix;
+    for (auto _ : state)
+    {
+        matrix -= 1.0f;
+    }
+}
+BENCHMARK(BM_MatrixScalarSubtractionInPlace);
+
+//END: subtraction benchmark
+//---------------------------------------------------------------------------
+
 //BEGIN: division benchmark
 //---------------------------------------------------------------------------
 
@@ -411,6 +474,11 @@ static void BM_MatrixScalarDivisionInPlace(benchmark::State& state)
     }
 }
 BENCHMARK(BM_MatrixScalarDivisionInPlace);
+
+//END: division benchmark
+//---------------------------------------------------------------------------
+
+//========================================= END::BENCHMARKING =========================================
 
 //END: division benchmark
 //---------------------------------------------------------------------------
