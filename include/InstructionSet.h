@@ -84,22 +84,24 @@ namespace math {
 #endif
 		}
 
-		static MultiplyFunc getMultiplyFunc()
+		using SubScalarFunc = void(*)(T*, T, size_t);
+
+		static SubScalarFunc getSubScalarFunc()
 		{
 #ifdef SUPPORTS_AVX2
-			return multiply_avx2;
+			return sub_scalar_avx2;
 #elif defined(SUPPORTS_AVX)
-			return multiply_avx;
+			return sub_scalar_avx;
 #elif defined(SUPPORTS_SSE4_2)
-			return multiply_sse4_2;
+			return sub_scalar_sse4_2;
 #elif defined(SUPPORTS_SSE4_1)
-			return multiply_sse4_1;
+			return sub_scalar_sse4_1;
 #elif defined(SUPPORTS_SSSE3)
-			return multiply_ssse3;
+			return sub_scalar_ssse3;
 #elif defined(SUPPORTS_SSE3)
-			return multiply_sse3;
+			return sub_scalar_sse3;
 #else
-			return multiply_fallback;
+			return sub_scalar_fallback;
 #endif
 		}
 
@@ -305,6 +307,49 @@ namespace math {
 		}
 
 		//END: subtraction array
+		//----------------------------------------------------------------------------
+
+		//BEGIN: subtraction scalar
+		//----------------------------------------------------------------------------
+
+		static void sub_scalar_avx2(T* a, T scalar, size_t size)
+		{
+			sub_scalar_fallback(a, scalar, size);
+		}
+
+		static void sub_scalar_avx(T* a, T scalar, size_t size)
+		{
+			sub_scalar_fallback(a, scalar, size);
+		}
+
+		static void sub_scalar_sse4_2(T* a, T scalar, size_t size)
+		{
+			sub_scalar_fallback(a, scalar, size);
+		}
+
+		static void sub_scalar_sse4_1(T* a, T scalar, size_t size)
+		{
+			sub_scalar_fallback(a, scalar, size);
+		}
+
+		static void sub_scalar_ssse3(T* a, T scalar, size_t size)
+		{
+			sub_scalar_fallback(a, scalar, size);
+		}
+
+		static void sub_scalar_sse3(T* a, T scalar, size_t size)
+		{
+			sub_scalar_fallback(a, scalar, size);
+		}
+
+		static void sub_scalar_fallback(T* a, T scalar, size_t size)
+		{
+			for (size_t i = 0; i < size; ++i) {
+				a[i] -= scalar;
+			}
+		}
+
+		//END: subtraction scalar
 		//----------------------------------------------------------------------------
 
 		//BEGIN: multiplication array

@@ -152,6 +152,21 @@ namespace math
 			return *this;
 		}
 
+		Matrix operator-(const T& scalar) const
+		{
+			Matrix result = *this;
+			auto subScalarFunc = InstructionSet<T>::getSubScalarFunc();
+			subScalarFunc(result.m_data_, scalar, Rows * Columns);
+			return result;
+		}
+
+		Matrix& operator-=(const T& scalar)
+		{
+			auto subScalarFunc = InstructionSet<T>::getSubScalarFunc();
+			subScalarFunc(m_data_, scalar, Rows * Columns);
+			return *this;
+		}
+
 		Matrix operator*(const Matrix& other) const
 		{
 			Matrix result;

@@ -433,7 +433,6 @@ BENCHMARK(BM_MatrixScalarDivisionInPlace);
 //}
 //}
 
-#define COLUMN_MAJOR_TRANSPOSED
 //#define COLUMN_MAJOR_TRANSPOSED
 
 
