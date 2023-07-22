@@ -169,18 +169,21 @@ namespace math
 
 		Matrix operator*(const Matrix& other) const
 		{
+			//static_assert(Columns == other.Rows, "Matrix dimensions must agree for multiplication");
 			Matrix result;
-			
+			auto mulFunc = InstructionSet<T>::getMulFunc<Option>();
+			mulFunc(result.m_data_, m_data_, other.m_data_, Rows);
 			return result;
 		}
 
 		Matrix& operator*=(const Matrix& other)
 		{
-			static_assert(Columns == Rows, "Matrix dimensions must agree for multiplication");
+			//static_assert(Columns == other.Rows, "Matrix dimensions must agree for multiplication");
 			Matrix temp = *this * other;
 			*this = temp;
 			return *this;
 		}
+
 
 		Matrix operator*(const T& scalar) const
 		{

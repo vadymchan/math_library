@@ -106,24 +106,27 @@ namespace math
 #endif
 		}
 
+		template<Options Option>
 		using MulFunc = void(*)(float*, const float*, const float*, size_t);
 
-		static MulFunc getMulFunc()
+		template<Options Option>
+		static MulFunc<Option> getMulFunc()
 		{
+
 #ifdef SUPPORTS_AVX2
-			return mul_avx2;
+			return mul_avx2<Option>;
 #elif defined(SUPPORTS_AVX)
-			return mul_avx;
+			return mul_avx<Option>;
 #elif defined(SUPPORTS_SSE4_2)
-			return mul_sse4_2;
+			return mul_sse4_2<Option>;
 #elif defined(SUPPORTS_SSE4_1)
-			return mul_sse4_1;
+			return mul_sse4_1<Option>;
 #elif defined(SUPPORTS_SSSE3)
-			return mul_ssse3;
+			return mul_ssse3<Option>;
 #elif defined(SUPPORTS_SSE3)
-			return mul_sse3;
+			return mul_sse3<Option>;
 #else
-			return mul_fallback;
+			return mul_fallback<Option>;
 #endif
 		}
 
@@ -460,33 +463,118 @@ namespace math
 		//BEGIN: multiplication array
 		//----------------------------------------------------------------------------
 
+		template<Options Option>
 		static void mul_avx2(float* result, const float* a, const float* b, size_t size)
 		{
+			mul_avx<Option>(result, a, b, size);
 		}
 
+		template<math::Options Option>
 		static void mul_avx(float* result, const float* a, const float* b, size_t size)
 		{
+			if constexpr (Option == math::Options::ROW_MAJOR) {
+				for (size_t i = 0; i < size; ++i) {
+					for (size_t j = 0; j < size; ++j) {
+						__m256 sum = _mm256_setzero_ps();
+						size_t k = 0;
+						for (; k + 7 < size; k += 8) {
+							__m256 a_vec = _mm256_loadu_ps(&a[i * size + k]);
+							__m256 b_vec = _mm256_set_ps(b[(k + 7) * size + j], b[(k + 6) * size + j], b[(k + 5) * size + j], b[(k + 4) * size + j],
+								b[(k + 3) * size + j], b[(k + 2) * size + j], b[(k + 1) * size + j], b[k * size + j]);
+
+							sum = _mm256_fmadd_ps(a_vec, b_vec, sum);
+						}
+						sum = _mm256_hadd_ps(sum, sum);
+						sum = _mm256_hadd_ps(sum, sum);
+						__m128 vlow = _mm256_castps256_ps128(sum);
+						__m128 vhigh = _mm256_extractf128_ps(sum, 1);
+						vlow = _mm_add_ps(vlow, vhigh);
+						float tail_sum = 0;
+						for (; k < size; ++k) {
+							tail_sum += a[i * size + k] * b[k * size + j];
+						}
+						result[i * size + j] = _mm_cvtss_f32(vlow) + tail_sum;
+					}
+				}
+			}
+			else if constexpr (Option == math::Options::COLUMN_MAJOR) {
+				for (size_t i = 0; i < size; ++i) {
+					for (size_t j = 0; j < size; ++j) {
+						__m256 sum = _mm256_setzero_ps();
+						size_t k = 0;
+						for (; k + 7 < size; k += 8) {
+							__m256 a_vec = _mm256_set_ps(b[(k + 7) * size + i], b[(k + 6) * size + i], b[(k + 5) * size + i], b[(k + 4) * size + i],
+								b[(k + 3) * size + i], b[(k + 2) * size + i], b[(k + 1) * size + i], b[k * size + i]);
+							__m256 b_vec = _mm256_loadu_ps(&a[j * size + k]);
+							sum = _mm256_fmadd_ps(a_vec, b_vec, sum);
+						}
+						sum = _mm256_hadd_ps(sum, sum);
+						sum = _mm256_hadd_ps(sum, sum);
+						__m128 vlow = _mm256_castps256_ps128(sum);
+						__m128 vhigh = _mm256_extractf128_ps(sum, 1);
+						vlow = _mm_add_ps(vlow, vhigh);
+						float tail_sum = 0;
+						for (; k < size; ++k) {
+							tail_sum += a[k * size + i] * b[j * size + k];
+						}
+						result[j * size + i] = _mm_cvtss_f32(vlow) + tail_sum;
+					}
+				}
+			}
 		}
 
+
+		template<Options Option>
 		static void mul_sse4_2(float* result, const float* a, const float* b, size_t size)
 		{
+			mul_fallback<Option>(result, a, b, size);
 		}
 
+		template<Options Option>
 		static void mul_sse4_1(float* result, const float* a, const float* b, size_t size)
 		{
+			mul_fallback<Option>(result, a, b, size);
 		}
 
+		template<Options Option>
 		static void mul_ssse3(float* result, const float* a, const float* b, size_t size)
 		{
+			mul_fallback<Option>(result, a, b, size);
 		}
 
+		template<Options Option>
 		static void mul_sse3(float* result, const float* a, const float* b, size_t size)
 		{
+			mul_fallback<Option>(result, a, b, size);
 		}
 
-		static void mul_fallback(float* result, const float* a, const float* b, size_t size)
+		template<Options Option>
+		static void mul_fallback(float* result, const float* a, const float* b, size_t size, size_t dim)
 		{
+			if constexpr (Option == Options::COLUMN_MAJOR) {
+				for (size_t i = 0; i < dim; ++i) {
+					for (size_t j = 0; j < dim; ++j) {
+						float sum = 0;
+						for (size_t k = 0; k < dim; ++k) {
+							sum += a[i + k * dim] * b[k + j * dim];
+						}
+						result[i + j * dim] = sum;
+					}
+				}
+			}
+			else if constexpr (Option == Options::ROW_MAJOR) {
+				for (size_t i = 0; i < dim; ++i) {
+					for (size_t j = 0; j < dim; ++j) {
+						float sum = 0;
+						for (size_t k = 0; k < dim; ++k) {
+							sum += a[i * dim + k] * b[k * dim + j];
+						}
+						result[i * dim + j] = sum;
+					}
+				}
+			}
 		}
+
 
 		//END: multiplication array
 		//----------------------------------------------------------------------------
@@ -504,26 +592,57 @@ namespace math
 
 		static void mul_scalar_avx(float* a, float scalar, size_t size)
 		{
+			__m256 ymm0 = _mm256_set1_ps(scalar);
+			size_t i = 0;
+
+			for (; i < size; i += AVX_SIMD_WIDTH) {
+				__m256 ymm1 = _mm256_loadu_ps(a + i);
+				ymm1 = _mm256_mul_ps(ymm1, ymm0);
+				_mm256_storeu_ps(a + i, ymm1);
+			}
+
+			for (; i < size; ++i) {
+				a[i] *= scalar;
+			}
 		}
 
 		static void mul_scalar_sse4_2(float* a, float scalar, size_t size)
 		{
+			mul_scalar_sse3(a, scalar, size);
 		}
 
 		static void mul_scalar_sse4_1(float* a, float scalar, size_t size)
 		{
+			mul_scalar_sse3(a, scalar, size);
 		}
 
 		static void mul_scalar_ssse3(float* a, float scalar, size_t size)
 		{
+			mul_scalar_sse3(a, scalar, size);
 		}
 
 		static void mul_scalar_sse3(float* a, float scalar, size_t size)
 		{
+			
+			__m128 xmm0 = _mm_set1_ps(scalar);
+			size_t i = 0;
+
+			for (; i < size; i += SSE_SIMD_WIDTH) {
+				__m128 xmm1 = _mm_loadu_ps(a + i);
+				xmm1 = _mm_mul_ps(xmm1, xmm0);
+				_mm_storeu_ps(a + i, xmm1);
+			}
+
+			for (; i < size; ++i) {
+				a[i] *= scalar;
+			}
 		}
 
 		static void mul_scalar_fallback(float* a, float scalar, size_t size)
 		{
+			for (size_t i = 0; i < size; ++i) {
+				a[i] *= scalar;
+			}
 		}
 
 		//END: multiplication scalar

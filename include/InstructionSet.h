@@ -105,24 +105,27 @@ namespace math {
 #endif
 		}
 
+		template<Options Option>
 		using MulFunc = void(*)(T*, const T*, const T*, size_t);
 
-		static MulFunc getMulFunc()
+		template<Options Option>
+		static MulFunc<Option> getMulFunc()
 		{
+
 #ifdef SUPPORTS_AVX2
-			return mul_avx2;
+			return mul_avx2<Option>;
 #elif defined(SUPPORTS_AVX)
-			return mul_avx;
+			return mul_avx<Option>;
 #elif defined(SUPPORTS_SSE4_2)
-			return mul_sse4_2;
+			return mul_sse4_2<Option>;
 #elif defined(SUPPORTS_SSE4_1)
-			return mul_sse4_1;
+			return mul_sse4_1<Option>;
 #elif defined(SUPPORTS_SSSE3)
-			return mul_ssse3;
+			return mul_ssse3<Option>;
 #elif defined(SUPPORTS_SSE3)
-			return mul_sse3;
+			return mul_sse3<Option>;
 #else
-			return mul_fallback;
+			return mul_fallback<Option>;
 #endif
 		}
 
@@ -355,42 +358,70 @@ namespace math {
 		//BEGIN: multiplication array
 		//----------------------------------------------------------------------------
 
+		template<Options Option>
 		static void mul_avx2(T* result, const T* a, const T* b, size_t size)
 		{
-			mul_fallback(result, a, b, size)
+			mul_fallback<Option>(result, a, b, size);
 		}
 
+		template<Options Option>
 		static void mul_avx(T* result, const T* a, const T* b, size_t size)
 		{
-			mul_fallback(result, a, b, size);
+			mul_fallback<Option>(result, a, b, size);
 		}
 
+		template<Options Option>
 		static void mul_sse4_2(T* result, const T* a, const T* b, size_t size)
 		{
-			mul_fallback(result, a, b, size);
+			mul_fallback<Option>(result, a, b, size);
 		}
 
+		template<Options Option>
 		static void mul_sse4_1(T* result, const T* a, const T* b, size_t size)
 		{
-			mul_fallback(result, a, b, size);
+			mul_fallback<Option>(result, a, b, size);
 		}
 
+		template<Options Option>
 		static void mul_ssse3(T* result, const T* a, const T* b, size_t size)
 		{
-			mul_fallback(result, a, b, size);
+			mul_fallback<Option>(result, a, b, size);
 		}
 
+		template<Options Option>
 		static void mul_sse3(T* result, const T* a, const T* b, size_t size)
 		{
-			mul_fallback(result, a, b, size);
+			mul_fallback<Option>(result, a, b, size);
 		}
 
-		static void mul_fallback(T* result, const T* a, const T* b, size_t size)
+		template<Options Option>
+		static void mul_fallback(T* result, const T* a, const T* b, size_t size, size_t dim)
 		{
-			for (size_t i = 0; i < size; ++i) {
-				result[i] = a[i] * b[i];
+			if constexpr (Option == Options::COLUMN_MAJOR) {
+				for (size_t i = 0; i < dim; ++i) {
+					for (size_t j = 0; j < dim; ++j) {
+						T sum = 0;
+						for (size_t k = 0; k < dim; ++k) {
+							sum += a[i + k * dim] * b[k + j * dim];
+						}
+						result[i + j * dim] = sum;
+					}
+				}
+			}
+			else if constexpr (Option == Options::ROW_MAJOR) {
+				for (size_t i = 0; i < dim; ++i) {
+					for (size_t j = 0; j < dim; ++j) {
+						T sum = 0;
+						for (size_t k = 0; k < dim; ++k) {
+							sum += a[i * dim + k] * b[k * dim + j];
+						}
+						result[i * dim + j] = sum;
+					}
+				}
 			}
 		}
+
+
 
 		//END: multiplication array
 		//----------------------------------------------------------------------------
