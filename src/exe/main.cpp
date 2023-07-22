@@ -244,6 +244,140 @@ TEST(MatrixTest, ScalarSubtractionFloat)
     }
 }
 
+
+TEST(MatrixTest, MultiplicationRowMajorFloat)
+{
+    constexpr int kRows = 2;
+    constexpr int kColumns = 2;
+
+    math::Matrix<float, kRows, kColumns, math::Options::ROW_MAJOR> matrix1;
+    math::Matrix<float, kRows, kColumns, math::Options::ROW_MAJOR> matrix2;
+
+    // Populate matrix1 and matrix2 with some values
+    for (int i = 0; i < kRows; ++i) {
+        for (int j = 0; j < kColumns; ++j) {
+            matrix1.coeffRef(i, j) = i * 4 + j + 1;
+            matrix2.coeffRef(i, j) = (i * 4 + j + 1) * 2;
+        }
+    }
+
+    // Print initial matrices
+    std::cout << "Matrix 1:\n" << matrix1 << "\nMatrix 2:\n" << matrix2 << std::endl;
+
+    math::Matrix<float, kRows, kColumns, math::Options::ROW_MAJOR> matrix3 = matrix1 * matrix2;
+
+    // Print result matrix
+    std::cout << "Result Matrix:\n" << matrix3 << std::endl;
+
+    // Check that each element of the result is the correct multiplication of the corresponding rows and columns of matrix1 and matrix2
+    for (int i = 0; i < kRows; ++i) {
+        for (int j = 0; j < kColumns; ++j) {
+            float expected_value = 0;
+            for (int k = 0; k < kColumns; ++k) {
+                expected_value += matrix1.coeff(i, k) * matrix2.coeff(k, j);
+            }
+            EXPECT_EQ(matrix3.coeff(i, j), expected_value);
+        }
+    }
+}
+
+TEST(MatrixTest, MultiplicationColumnMajorFloat)
+{
+    constexpr int kRows = 2;
+    constexpr int kColumns = 2;
+
+    math::Matrix<float, kRows, kColumns, math::Options::COLUMN_MAJOR> matrix1;
+    math::Matrix<float, kRows, kColumns, math::Options::COLUMN_MAJOR> matrix2;
+
+    // Populate matrix1 and matrix2 with some values
+    for (int i = 0; i < kRows; ++i) {
+        for (int j = 0; j < kColumns; ++j) {
+            matrix1.coeffRef(i, j) = i * 4 + j + 1;
+            matrix2.coeffRef(i, j) = (i * 4 + j + 1) * 2;
+        }
+    }
+
+    // Print initial matrices
+    std::cout << "Matrix 1:\n" << matrix1 << "\nMatrix 2:\n" << matrix2 << std::endl;
+
+    math::Matrix<float, kRows, kColumns, math::Options::COLUMN_MAJOR> matrix3 = matrix1 * matrix2;
+
+    // Print result matrix
+    std::cout << "Result Matrix:\n" << matrix3 << std::endl;
+
+    // Check that each element of the result is the correct multiplication of the corresponding rows and columns of matrix1 and matrix2
+    for (int i = 0; i < kRows; ++i) {
+        for (int j = 0; j < kColumns; ++j) {
+            float expected_value = 0;
+            for (int k = 0; k < kColumns; ++k) {
+                expected_value += matrix1.coeff(i, k) * matrix2.coeff(k, j);
+            }
+            EXPECT_EQ(matrix3.coeff(i, j), expected_value);
+        }
+    }
+}
+
+//TEST(MatrixTest, MultiplicationRowMajorFloat)
+//{
+//    constexpr int kRows = 2;
+//    constexpr int kColumns = 2;
+//
+//    math::Matrix<float, kRows, kColumns, math::Options::ROW_MAJOR> matrix1;
+//    math::Matrix<float, kRows, kColumns, math::Options::ROW_MAJOR> matrix2;
+//
+//    // Populate matrix1 and matrix2 with some values
+//    for (int i = 0; i < kRows; ++i) {
+//        for (int j = 0; j < kColumns; ++j) {
+//            matrix1.coeffRef(i, j) = i * 4 + j + 1;
+//            matrix2.coeffRef(i, j) = (i * 4 + j + 1) * 2;
+//        }
+//    }
+//
+//    math::Matrix<float, kRows, kColumns, math::Options::ROW_MAJOR> matrix3 = matrix1 * matrix2;
+//
+//    // Check that each element of the result is the correct multiplication of the corresponding rows and columns of matrix1 and matrix2
+//    for (int i = 0; i < kRows; ++i) {
+//        for (int j = 0; j < kColumns; ++j) {
+//            float expected_value = 0;
+//            for (int k = 0; k < kColumns; ++k) {
+//                expected_value += matrix1.coeff(i, k) * matrix2.coeff(k, j);
+//            }
+//            EXPECT_EQ(matrix3.coeff(i, j), expected_value);
+//        }
+//    }
+//}
+//
+//TEST(MatrixTest, MultiplicationColumnMajorFloat)
+//{
+//    constexpr int kRows = 2;
+//    constexpr int kColumns = 2;
+//
+//    math::Matrix<float, kRows, kColumns, math::Options::COLUMN_MAJOR> matrix1;
+//    math::Matrix<float, kRows, kColumns, math::Options::COLUMN_MAJOR> matrix2;
+//
+//    // Populate matrix1 and matrix2 with some values
+//    for (int i = 0; i < kRows; ++i) {
+//        for (int j = 0; j < kColumns; ++j) {
+//            matrix1.coeffRef(i, j) = i * 4 + j + 1;
+//            matrix2.coeffRef(i, j) = (i * 4 + j + 1) * 2;
+//        }
+//    }
+//
+//    math::Matrix<float, kRows, kColumns, math::Options::COLUMN_MAJOR> matrix3 = matrix1 * matrix2;
+//
+//    // Check that each element of the result is the correct multiplication of the corresponding rows and columns of matrix1 and matrix2
+//    for (int i = 0; i < kRows; ++i) {
+//        for (int j = 0; j < kColumns; ++j) {
+//            float expected_value = 0;
+//            for (int k = 0; k < kColumns; ++k) {
+//                expected_value += matrix1.coeff(i, k) * matrix2.coeff(k, j);
+//            }
+//            EXPECT_EQ(matrix3.coeff(i, j), expected_value);
+//        }
+//    }
+//}
+
+
 TEST(MatrixTest, ScalarDivisionFloat)
 {
     math::Matrix<float, 4, 4, math::Options::ROW_MAJOR> matrix1;
@@ -478,6 +612,57 @@ BENCHMARK(BM_MatrixScalarDivisionInPlace);
 //END: division benchmark
 //---------------------------------------------------------------------------
 
+//BEGIN: multiplication benchmark
+//---------------------------------------------------------------------------
+
+static void BM_MatrixMultiplication(benchmark::State& state)
+{
+    math::Matrix<float, 100, 100> matrix1;
+    math::Matrix<float, 100, 100> matrix2;
+    for (auto _ : state)
+    {
+        auto matrix3 = matrix1 * matrix2;
+        benchmark::DoNotOptimize(matrix3);
+    }
+}
+BENCHMARK(BM_MatrixMultiplication);
+
+static void BM_MatrixMultiplicationInPlace(benchmark::State& state)
+{
+    math::Matrix<float, 100, 100> matrix1;
+    math::Matrix<float, 100, 100> matrix2;
+    for (auto _ : state)
+    {
+        matrix1 *= matrix2;
+    }
+}
+BENCHMARK(BM_MatrixMultiplicationInPlace);
+
+static void BM_MatrixScalarMultiplication(benchmark::State& state)
+{
+    math::Matrix<float, 100, 100> matrix;
+    for (auto _ : state)
+    {
+        auto matrix2 = matrix * 2.0f;
+        benchmark::DoNotOptimize(matrix2);
+    }
+}
+BENCHMARK(BM_MatrixScalarMultiplication);
+
+static void BM_MatrixScalarMultiplicationInPlace(benchmark::State& state)
+{
+    math::Matrix<float, 100, 100> matrix;
+    for (auto _ : state)
+    {
+        matrix *= 2.0f;
+    }
+}
+BENCHMARK(BM_MatrixScalarMultiplicationInPlace);
+
+//END: multiplication benchmark
+//---------------------------------------------------------------------------
+
+
 //========================================= END::BENCHMARKING =========================================
 
 //END: division benchmark
@@ -500,6 +685,28 @@ BENCHMARK(BM_MatrixScalarDivisionInPlace);
 
 //}
 //}
+
+
+
+
+
+
+
+int main(int argc, char** argv) 
+{
+    ::testing::InitGoogleTest(&argc, argv);
+    int test_result = RUN_ALL_TESTS();
+    if (test_result != 0) 
+{
+        return test_result;
+    }
+
+    ::benchmark::Initialize(&argc, argv);
+    ::benchmark::RunSpecifiedBenchmarks();
+    return 0;
+}
+
+//============================================================================
 
 //#define COLUMN_MAJOR_TRANSPOSED
 
@@ -599,57 +806,57 @@ void transpose(float* a, size_t size) {
     }
 }
 
-int main() {
-    const size_t size = 11;
-    float a[size * size];
-    for (size_t i = 0; i < size * size; ++i) {
-        a[i] = i + 1;
-    }
-
-    float result[size * size];
-    float expected[size * size];
-
-    // Calculate expected result
-    for (size_t i = 0; i < size; ++i) {
-        for (size_t j = 0; j < size; ++j) {
-            expected[i * size + j] = 0;
-            for (size_t k = 0; k < size; ++k) {
-                expected[i * size + j] += a[i * size + k] * a[k * size + j];
-            }
-        }
-    }
-
-    mul_avx_row_major(result, a, a, size);
-
-    std::cout << "Row-major result:" << std::endl;
-    for (size_t i = 0; i < size; ++i) {
-        for (size_t j = 0; j < size; ++j) {
-            std::cout << result[i * size + j] << ' ';
-        }
-        std::cout << std::endl;
-    }
-
-    // Expected output:
-    std::cout << "Expected result:" << std::endl;
-    for (size_t i = 0; i < size; ++i) {
-        for (size_t j = 0; j < size; ++j) {
-            std::cout << expected[i * size + j] << ' ';
-        }
-        std::cout << std::endl;
-    }
-
-    // Transpose the matrix
-    transpose(a, size);
-
-    mul_avx_col_major(result, a, a, size);
-
-    std::cout << "Column-major result:" << std::endl;
-    for (size_t i = 0; i < size; ++i) {
-        for (size_t j = 0; j < size; ++j) {
-            std::cout << result[i * size + j] << ' ';
-        }
-        std::cout << std::endl;
-    }
-
-    return 0;
-}
+//int main() {
+//    const size_t size = 11;
+//    float a[size * size];
+//    for (size_t i = 0; i < size * size; ++i) {
+//        a[i] = i + 1;
+//    }
+//
+//    float result[size * size];
+//    float expected[size * size];
+//
+//    // Calculate expected result
+//    for (size_t i = 0; i < size; ++i) {
+//        for (size_t j = 0; j < size; ++j) {
+//            expected[i * size + j] = 0;
+//            for (size_t k = 0; k < size; ++k) {
+//                expected[i * size + j] += a[i * size + k] * a[k * size + j];
+//            }
+//        }
+//    }
+//
+//    mul_avx_row_major(result, a, a, size);
+//
+//    std::cout << "Row-major result:" << std::endl;
+//    for (size_t i = 0; i < size; ++i) {
+//        for (size_t j = 0; j < size; ++j) {
+//            std::cout << result[i * size + j] << ' ';
+//        }
+//        std::cout << std::endl;
+//    }
+//
+//    // Expected output:
+//    std::cout << "Expected result:" << std::endl;
+//    for (size_t i = 0; i < size; ++i) {
+//        for (size_t j = 0; j < size; ++j) {
+//            std::cout << expected[i * size + j] << ' ';
+//        }
+//        std::cout << std::endl;
+//    }
+//
+//    // Transpose the matrix
+//    transpose(a, size);
+//
+//    mul_avx_col_major(result, a, a, size);
+//
+//    std::cout << "Column-major result:" << std::endl;
+//    for (size_t i = 0; i < size; ++i) {
+//        for (size_t j = 0; j < size; ++j) {
+//            std::cout << result[i * size + j] << ' ';
+//        }
+//        std::cout << std::endl;
+//    }
+//
+//    return 0;
+//}
