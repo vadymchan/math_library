@@ -859,4 +859,44 @@ void transpose(float* a, size_t size) {
 //    }
 //
 //    return 0;
-//}
+#include <iostream>
+using namespace std;
+
+void transpose_avx(float* src, float* dst, const int n, const int m) {
+    for (int i = 0; i < n; ++i) {
+        for (int j = 0; j < m; ++j) {
+            dst[j * n + i] = src[i * m + j];
+        }
+    }
+}
+
+
+
+void printMatrix(float* matrix, int rows, int cols) {
+    for (int i = 0; i < rows; ++i) {
+        for (int j = 0; j < cols; ++j) {
+            cout << matrix[i * cols + j] << " ";
+        }
+        cout << endl;
+    }
+}
+
+int main() {
+    int n = 2;
+    int m = 3;
+    float* src = new float[n * m] {1.0, 2.0, 3.0, 4.0, 5.0, 6.0};  // This is a 3x2 matrix
+
+    cout << "Original matrix:" << endl;
+    printMatrix(src, n, m);
+
+    float* dst = new float[n * m];
+    transpose_avx(src, dst, n, m);
+
+    cout << "Transposed matrix:" << endl;
+    printMatrix(dst, m, n);  // The transposed matrix is 2x3
+
+    delete[] src;
+    delete[] dst;
+
+    return 0;
+}
