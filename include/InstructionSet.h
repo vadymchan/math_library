@@ -527,4 +527,6 @@ namespace math {
 }
 
 #include "InstructionSetFloat.h"
+#include "InstructionSetDouble.h"
+#include "InstructionSetInt.h"
 
