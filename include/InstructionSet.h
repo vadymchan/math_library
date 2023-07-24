@@ -175,7 +175,6 @@ namespace math {
 
 	private:
 
-		static constexpr size_t AVX_SIMD_WIDTH = 8;
 
 		//BEGIN: add two arrays
 		//----------------------------------------------------------------------------
