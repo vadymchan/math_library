@@ -6,8 +6,8 @@
 
 #pragma once
 
-#include "SIMDdefines.h"
-#include "Options.h"
+#include "../precompiled/SIMDdefines.h"
+#include "../../options/Options.h"
 #include <immintrin.h>
 
 namespace math {

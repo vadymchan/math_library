@@ -6,7 +6,7 @@
 
 #pragma once
 
-
+#include "../../options/Options.h"
 #include <immintrin.h>
 
 
@@ -204,7 +204,6 @@ namespace math
 			for (; i < size; ++i) {
 				a[i] += b[i];
 			}
-		}
 
 			
 
@@ -281,11 +280,6 @@ namespace math
 			for (; i < size; ++i) {
 				a[i] += scalar;
 			}
-		}
-
-		static void add_scalar_avx(float* a, float scalar, size_t size)
-		{
-
 		}
 
 		static void add_scalar_sse4_2(float* a, float scalar, size_t size)

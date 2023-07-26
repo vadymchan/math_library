@@ -1,21 +1,23 @@
 cmake_minimum_required(VERSION 3.10)
 project(math_library)
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 20)
 
 #-------- lib ----------------------------------------
 
 file(GLOB_RECURSE LIB_SOURCES "src/lib/*.cpp")
-file(GLOB_RECURSE HEADERS "include/*.h")
+file(GLOB_RECURSE PUBLIC_HEADERS "include/*.h")
+file(GLOB_RECURSE PRIVATE_HEADERS "src/lib/**/*.h")
 
 if(LIB_SOURCES) 
     message(STATUS "Build math library as static library")
-    add_library(math_library STATIC ${HEADERS} ${LIB_SOURCES})
+    add_library(math_library STATIC ${PUBLIC_HEADERS} ${LIB_SOURCES})
     target_include_directories(math_library PUBLIC include)
+    target_include_directories(math_library PRIVATE src/lib)
 else()
     #Header Only
     message(STATUS "Build math library as header only library")
-    add_library(math_library INTERFACE ${HEADERS})
-    target_include_directories(math_library INTERFACE include)
+    add_library(math_library INTERFACE ${PUBLIC_HEADERS} ${PRIVATE_HEADERS})
+    target_include_directories(math_library INTERFACE include src/lib)
 endif()
 
 #-------- exe ----------------------------------------
