@@ -107,6 +107,19 @@ namespace math
 			return operator()(row, col);
 		}
 
+		T determinant() const
+		{
+			static_assert(Rows == Columns, "Determinant is only defined for square matrices");
+			//TODO: implement
+			return;
+		}
+
+		Matrix inverse() const
+		{
+			static_assert(Rows == Columns, "Inverse is only defined for square matrices");
+			//TODO: implement
+			return;
+		}
 		Matrix operator+(const Matrix& other) const
 		{
 			Matrix result = *this;
