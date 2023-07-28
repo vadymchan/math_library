@@ -9,7 +9,7 @@
 
 int main() {
     
-    std::string defines_file_path = "include/SIMDdefines.h";
+    std::string defines_file_path = "src/lib/simd/precompiled/SIMDdefines.h";
     std::ofstream defines(defines_file_path);
 
     if (!defines) {
