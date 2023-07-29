@@ -5,10 +5,14 @@
 
 #pragma once
 
-#include <type_traits>
+#include "../src/lib/options/Options.h"
+#include "../src/lib/simd/instruction_set/InstructionSet.h"
+
+#include <iterator>
 #include <cassert>
-#include "Options.h"
-#include "InstructionSet.h"
+#include <algorithm>
+#include <type_traits>
+#include <ranges>
 
 constexpr unsigned int STACK_ALLOCATION_LIMIT = 16;
 
