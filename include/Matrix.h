@@ -14,7 +14,7 @@
 #include <type_traits>
 #include <ranges>
 
-constexpr unsigned int STACK_ALLOCATION_LIMIT = 16;
+constexpr unsigned int STACK_ALLOCATION_LIMIT = 16; // 4 by 4 matrix
 
 namespace math
 {
