@@ -23,7 +23,7 @@ namespace math
 	{
 	public:
 
-		static const bool UseHeap = sizeof(T) * Rows * Columns > STACK_ALLOCATION_LIMIT;
+		static const bool UseHeap = Rows * Columns > STACK_ALLOCATION_LIMIT;
 
 		Matrix()
 		{
