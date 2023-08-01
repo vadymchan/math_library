@@ -27,16 +27,14 @@ namespace math
 
 		Matrix()
 		{
-			if constexpr (UseHeap) 
-			{
+			if constexpr (UseHeap) {
 				m_data_ = new T[Rows * Columns];
 			}
 		}
 
 		Matrix(const T& element)
 		{
-			if constexpr (UseHeap)
-			{
+			if constexpr (UseHeap) {
 				m_data_ = new T[Rows * Columns];
 			}
 			std::fill_n(m_data_, Rows * Columns, element);
@@ -44,8 +42,7 @@ namespace math
 
 		Matrix(const Matrix& other)
 		{
-			if constexpr (UseHeap)
-			{
+			if constexpr (UseHeap) {
 				m_data_ = new T[Rows * Columns];
 			}
 
@@ -77,24 +74,20 @@ namespace math
 
 		T& operator()(unsigned int row, unsigned int col)
 		{
-			if constexpr (Option == Options::ROW_MAJOR) 
-			{
+			if constexpr (Option == Options::ROW_MAJOR) {
 				return m_data_[row * Columns + col];
 			}
-			else 
-			{
+			else {
 				return m_data_[col * Rows + row];
 			}
 		}
 
 		const T& operator()(unsigned int row, unsigned int col) const
 		{
-			if constexpr (Option == Options::ROW_MAJOR) 
-			{
+			if constexpr (Option == Options::ROW_MAJOR) {
 				return m_data_[row * Columns + col];
 			}
-			else 
-			{
+			else {
 				return m_data_[col * Rows + row];
 			}
 		}
