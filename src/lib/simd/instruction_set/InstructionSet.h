@@ -6,21 +6,26 @@
 
 #pragma once
 
+
 #include "../precompiled/SIMDdefines.h"
 #include "../../options/Options.h"
 #include <immintrin.h>
+#include <type_traits>
 
 namespace math {
 
+	template<typename T>
+	concept SimdSupportedType = std::is_same<T, int>::value
+		|| std::is_same<T, float>::value
+		|| std::is_same<T, double>::value;
+
+	
 	template<typename T>
 	class InstructionSet
 	{
 	public:
 
-		static_assert(std::is_same<T, int>::value
-			|| std::is_same<T, float>::value
-			|| std::is_same<T, double>::value
-			, "InstructionSet supports only int, float, and double types");
+		static_assert(SimdSupportedType<T>, "InstructionSet supports only int, float, and double types");
 
 		using AddFunc = void(*)(T*, const T*, size_t);
 
