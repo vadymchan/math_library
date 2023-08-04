@@ -50,11 +50,14 @@ namespace math
 		}
 
 
-		~Matrix()
+		Matrix(Matrix&& other) noexcept
 		{
-			if constexpr (UseHeap) 
-			{
-				delete[] m_data_;
+			if constexpr (UseHeap) {
+				m_data_ = other.m_data_;
+				other.m_data_ = nullptr;
+			}
+			else {
+				std::move(std::begin(other.m_data_), std::end(other.m_data_), std::begin(m_data_));
 			}
 		}
 
