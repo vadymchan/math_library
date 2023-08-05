@@ -105,6 +105,14 @@ namespace math
 			}
 			return m;
 		}
+
+		~Matrix()
+		{
+			if constexpr (UseHeap) {
+				delete[] m_data_;
+			}
+		}
+
 		T& operator()(unsigned int row, unsigned int col)
 		{
 			if constexpr (Option == Options::ROW_MAJOR) {
