@@ -87,6 +87,15 @@ namespace math
 			return *this;
 		}
 
+		template <std::input_iterator InputIt>
+		Matrix(InputIt first, InputIt last)
+		{
+			assert(std::distance(first, last) == Rows * Columns);
+			if constexpr (UseHeap) {
+				m_data_ = new T[Rows * Columns];
+			}
+			std::copy(first, last, m_data_);
+		}
 		T& operator()(unsigned int row, unsigned int col)
 		{
 			if constexpr (Option == Options::ROW_MAJOR) {
