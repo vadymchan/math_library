@@ -145,6 +145,15 @@ namespace math
 			return operator()(row, col);
 		}
 
+		constexpr unsigned int getRows() const
+		{
+			return Rows;
+		}
+
+		constexpr unsigned int getColumns() const
+		{
+			return Columns;
+		}
 		T determinant() const
 		{
 			static_assert(Rows == Columns, "Determinant is only defined for square matrices");
