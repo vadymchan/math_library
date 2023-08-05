@@ -72,16 +72,17 @@ namespace math
 			}
 		}
 
-		Matrix& operator=(const Matrix& other)
+		Matrix& operator=(Matrix&& other) noexcept
 		{
-			if (this != &other)  
-			{
-				if constexpr (UseHeap)
-				{
+			if (this != &other) {
+				if constexpr (UseHeap) {
 					delete[] m_data_;
-					m_data_ = new T[Rows * Columns];
+					m_data_ = other.m_data_;
+					other.m_data_ = nullptr;
 				}
-				std::copy_n(other.m_data_, Rows * Columns, m_data_);
+				else {
+					std::move(std::begin(other.m_data_), std::end(other.m_data_), std::begin(m_data_));
+				}
 			}
 			return *this;
 		}
