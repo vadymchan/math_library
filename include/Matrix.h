@@ -96,6 +96,15 @@ namespace math
 			}
 			std::copy(first, last, m_data_);
 		}
+		static constexpr Matrix Identity()
+		{
+			Matrix m(0);
+			constexpr unsigned int kMin = std::min(Rows, Columns);
+			for (unsigned int i = 0; i < kMin; ++i) {
+				m(i, i) = 1;
+			}
+			return m;
+		}
 		T& operator()(unsigned int row, unsigned int col)
 		{
 			if constexpr (Option == Options::ROW_MAJOR) {
