@@ -182,23 +182,17 @@ namespace math
 
 		static void add_avx(int* a, const int* b, size_t size)
 		{
-
-			size_t aligned_size = (size / AVX_SIMD_WIDTH) * AVX_SIMD_WIDTH;
+			const size_t avx_limit = size - (size % AVX_SIMD_WIDTH); 
 			size_t i = 0;
 
-			for (i = 0; i < aligned_size; i += AVX_SIMD_WIDTH) {
+			for (; i < avx_limit; i += AVX_SIMD_WIDTH) {
 				__m256i ymm1 = _mm256_loadu_si256((__m256i const*)(a + i));
 				__m256i ymm2 = _mm256_loadu_si256((__m256i const*)(b + i));
 				ymm1 = _mm256_add_epi32(ymm1, ymm2);
 				_mm256_storeu_si256((__m256i*)(a + i), ymm1);
 			}
 
-			// Handling remaining elements
-			for (; i < size; ++i) {
-				a[i] += b[i];
-			}
-
-			// Handling remaining elements
+			// Handle any remainder
 			for (; i < size; ++i) {
 				a[i] += b[i];
 			}
@@ -221,18 +215,17 @@ namespace math
 
 		static void add_sse3(int* a, const int* b, size_t size)
 		{
-
-			size_t aligned_size = (size / SSE_SIMD_WIDTH) * SSE_SIMD_WIDTH;
+			const size_t sse_limit = size - (size % SSE_SIMD_WIDTH); 
 			size_t i = 0;
 
-			for (i = 0; i < aligned_size; i += SSE_SIMD_WIDTH) {
+			for (; i < sse_limit; i += SSE_SIMD_WIDTH) {
 				__m128i xmm1 = _mm_loadu_si128((__m128i const*)(a + i));
 				__m128i xmm2 = _mm_loadu_si128((__m128i const*)(b + i));
 				xmm1 = _mm_add_epi32(xmm1, xmm2);
 				_mm_storeu_si128((__m128i*)(a + i), xmm1);
 			}
 
-			// Handling remaining elements
+			// Handle any remainder
 			for (; i < size; ++i) {
 				a[i] += b[i];
 			}
@@ -260,14 +253,16 @@ namespace math
 		static void add_scalar_avx(int* a, int scalar, size_t size)
 		{
 			__m256i ymm0 = _mm256_set1_epi32(scalar);
+			const size_t avx_limit = size - (size % AVX_SIMD_WIDTH); 
 			size_t i = 0;
 
-			for (; i < size; i += AVX_SIMD_WIDTH) {
+			for (; i < avx_limit; i += AVX_SIMD_WIDTH) {
 				__m256i ymm1 = _mm256_loadu_si256((__m256i const*)(a + i));
 				ymm1 = _mm256_add_epi32(ymm1, ymm0);
 				_mm256_storeu_si256((__m256i*)(a + i), ymm1);
 			}
 
+			// Handle any remainder
 			for (; i < size; ++i) {
 				a[i] += scalar;
 			}
@@ -291,14 +286,16 @@ namespace math
 		static void add_scalar_sse3(int* a, int scalar, size_t size)
 		{
 			__m128i xmm0 = _mm_set1_epi32(scalar);
+			const size_t sse_limit = size - (size % SSE_SIMD_WIDTH); 
 			size_t i = 0;
 
-			for (; i < size; i += SSE_SIMD_WIDTH) {
+			for (; i < sse_limit; i += SSE_SIMD_WIDTH) {
 				__m128i xmm1 = _mm_loadu_si128((__m128i const*)(a + i));
 				xmm1 = _mm_add_epi32(xmm1, xmm0);
 				_mm_storeu_si128((__m128i*)(a + i), xmm1);
 			}
 
+			// Handle any remainder
 			for (; i < size; ++i) {
 				a[i] += scalar;
 			}
@@ -324,10 +321,10 @@ namespace math
 
 		static void sub_avx(int* a, const int* b, size_t size)
 		{
-			size_t aligned_size = (size / AVX_SIMD_WIDTH) * AVX_SIMD_WIDTH;
+			const size_t avx_limit = size - (size % AVX_SIMD_WIDTH); 
 			size_t i = 0;
 
-			for (i = 0; i < aligned_size; i += AVX_SIMD_WIDTH) {
+			for (; i < avx_limit; i += AVX_SIMD_WIDTH) {
 				__m256i ymm1 = _mm256_loadu_si256((__m256i const*)(a + i));
 				__m256i ymm2 = _mm256_loadu_si256((__m256i const*)(b + i));
 				ymm1 = _mm256_sub_epi32(ymm1, ymm2);
@@ -357,17 +354,17 @@ namespace math
 
 		static void sub_sse3(int* a, const int* b, size_t size)
 		{
-			size_t aligned_size = (size / SSE_SIMD_WIDTH) * SSE_SIMD_WIDTH;
+			const size_t sse_limit = size - (size % SSE_SIMD_WIDTH); 
 			size_t i = 0;
 
-			for (i = 0; i < aligned_size; i += SSE_SIMD_WIDTH) {
+			for (; i < sse_limit; i += SSE_SIMD_WIDTH) {
 				__m128i xmm1 = _mm_loadu_si128((__m128i const*)(a + i));
 				__m128i xmm2 = _mm_loadu_si128((__m128i const*)(b + i));
 				xmm1 = _mm_sub_epi32(xmm1, xmm2);
 				_mm_storeu_si128((__m128i*)(a + i), xmm1);
 			}
 
-			// Handling remaining elements
+			// Handle any remainder
 			for (; i < size; ++i) {
 				a[i] -= b[i];
 			}
@@ -391,18 +388,21 @@ namespace math
 		static void sub_scalar_avx(int* a, int scalar, size_t size)
 		{
 			__m256i ymm0 = _mm256_set1_epi32(scalar);
+			const size_t avx_limit = size - (size % AVX_SIMD_WIDTH); 
 			size_t i = 0;
 
-			for (; i < size; i += AVX_SIMD_WIDTH) {
+			for (; i < avx_limit; i += AVX_SIMD_WIDTH) {
 				__m256i ymm1 = _mm256_loadu_si256((__m256i const*)(a + i));
 				ymm1 = _mm256_sub_epi32(ymm1, ymm0);
 				_mm256_storeu_si256((__m256i*)(a + i), ymm1);
 			}
 
+			// Handle any remainder
 			for (; i < size; ++i) {
 				a[i] -= scalar;
 			}
 		}
+
 
 		static void sub_scalar_sse4_2(int* a, int scalar, size_t size)
 		{
@@ -422,14 +422,16 @@ namespace math
 		static void sub_scalar_sse3(int* a, int scalar, size_t size)
 		{
 			__m128i xmm0 = _mm_set1_epi32(scalar);
+			const size_t sse_limit = size - (size % SSE_SIMD_WIDTH); 
 			size_t i = 0;
 
-			for (; i < size; i += SSE_SIMD_WIDTH) {
+			for (; i < sse_limit; i += SSE_SIMD_WIDTH) {
 				__m128i xmm1 = _mm_loadu_si128((__m128i const*)(a + i));
 				xmm1 = _mm_sub_epi32(xmm1, xmm0);
 				_mm_storeu_si128((__m128i*)(a + i), xmm1);
 			}
 
+			// Handle any remainder
 			for (; i < size; ++i) {
 				a[i] -= scalar;
 			}
@@ -544,14 +546,16 @@ namespace math
 		static void mul_scalar_sse4_2(int* a, int scalar, size_t size)
 		{
 			__m128i xmm0 = _mm_set1_epi32(scalar);
+			const size_t sse_limit = size - (size % SSE_SIMD_WIDTH); 
 			size_t i = 0;
 
-			for (; i < size; i += SSE_SIMD_WIDTH) {
+			for (; i < sse_limit; i += SSE_SIMD_WIDTH) {
 				__m128i xmm1 = _mm_loadu_si128((__m128i const*)(a + i));
 				xmm1 = _mm_mullo_epi32(xmm1, xmm0);
 				_mm_storeu_si128((__m128i*)(a + i), xmm1);
 			}
 
+			// Handle any remainder
 			for (; i < size; ++i) {
 				a[i] *= scalar;
 			}
@@ -585,7 +589,7 @@ namespace math
 		//BEGIN: division scalar
 		//----------------------------------------------------------------------------
 
-		// Note: SIMD instructions do not support integer division. You will need to use a loop for this operation.
+		// Note: SIMD instructions do not support integer division. So we use a loop for this operation.
 
 		static void div_scalar_avx2(int* a, int scalar, size_t size)
 		{

@@ -182,18 +182,17 @@ namespace math
 
         static void add_avx(double* a, const double* b, size_t size)
         {
-
-            size_t aligned_size = (size / AVX_SIMD_WIDTH) * AVX_SIMD_WIDTH;
+            const size_t avx_limit = size - (size % AVX_SIMD_WIDTH); 
             size_t i = 0;
 
-            for (i = 0; i < aligned_size; i += AVX_SIMD_WIDTH) {
+            for (; i < avx_limit; i += AVX_SIMD_WIDTH) {
                 __m256d ymm1 = _mm256_loadu_pd(a + i);
                 __m256d ymm2 = _mm256_loadu_pd(b + i);
                 ymm1 = _mm256_add_pd(ymm1, ymm2);
                 _mm256_storeu_pd(a + i, ymm1);
             }
 
-            // Handling remaining elements
+            // Handle any remainder
             for (; i < size; ++i) {
                 a[i] += b[i];
             }
@@ -201,18 +200,17 @@ namespace math
 
         static void add_sse3(double* a, const double* b, size_t size)
         {
-
-            size_t aligned_size = (size / SSE_SIMD_WIDTH) * SSE_SIMD_WIDTH;
+            const size_t sse_limit = size - (size % SSE_SIMD_WIDTH);
             size_t i = 0;
 
-            for (i = 0; i < aligned_size; i += SSE_SIMD_WIDTH) {
+            for (; i < sse_limit; i += SSE_SIMD_WIDTH) {
                 __m128d xmm1 = _mm_loadu_pd(a + i);
                 __m128d xmm2 = _mm_loadu_pd(b + i);
                 xmm1 = _mm_add_pd(xmm1, xmm2);
                 _mm_storeu_pd(a + i, xmm1);
             }
 
-            // Handling remaining elements
+            // Handle any remainder
             for (; i < size; ++i) {
                 a[i] += b[i];
             }
@@ -239,14 +237,16 @@ namespace math
         static void add_scalar_avx(double* a, double scalar, size_t size)
         {
             __m256d ymm0 = _mm256_set1_pd(scalar);
+            const size_t avx_limit = size - (size % AVX_SIMD_WIDTH); 
             size_t i = 0;
 
-            for (; i < size; i += AVX_SIMD_WIDTH) {
+            for (; i < avx_limit; i += AVX_SIMD_WIDTH) {
                 __m256d ymm1 = _mm256_loadu_pd(a + i);
                 ymm1 = _mm256_add_pd(ymm1, ymm0);
                 _mm256_storeu_pd(a + i, ymm1);
             }
 
+            // Handle any remainder
             for (; i < size; ++i) {
                 a[i] += scalar;
             }
@@ -255,18 +255,22 @@ namespace math
         static void add_scalar_sse3(double* a, double scalar, size_t size)
         {
             __m128d xmm0 = _mm_set1_pd(scalar);
+            const size_t sse_limit = size - (size % SSE_SIMD_WIDTH); // Compute the limit for SSE3 loop
             size_t i = 0;
 
-            for (; i < size; i += SSE_SIMD_WIDTH) {
+            // Process full SSE3 widths
+            for (; i < sse_limit; i += SSE_SIMD_WIDTH) {
                 __m128d xmm1 = _mm_loadu_pd(a + i);
                 xmm1 = _mm_add_pd(xmm1, xmm0);
                 _mm_storeu_pd(a + i, xmm1);
             }
 
+            // Handle any remainder
             for (; i < size; ++i) {
                 a[i] += scalar;
             }
         }
+
 
         static void add_scalar_fallback(double* a, double scalar, size_t size)
         {
@@ -288,10 +292,10 @@ namespace math
 
         static void sub_avx(double* a, const double* b, size_t size)
         {
-            size_t aligned_size = (size / AVX_SIMD_WIDTH) * AVX_SIMD_WIDTH;
+            const size_t avx_limit = size - (size % AVX_SIMD_WIDTH);
             size_t i = 0;
 
-            for (i = 0; i < aligned_size; i += AVX_SIMD_WIDTH) {
+            for (; i < avx_limit; i += AVX_SIMD_WIDTH) {
                 __m256d ymm1 = _mm256_loadu_pd(a + i);
                 __m256d ymm2 = _mm256_loadu_pd(b + i);
                 ymm1 = _mm256_sub_pd(ymm1, ymm2);
@@ -306,10 +310,10 @@ namespace math
 
         static void sub_sse3(double* a, const double* b, size_t size)
         {
-            size_t aligned_size = (size / SSE_SIMD_WIDTH) * SSE_SIMD_WIDTH;
+            const size_t sse_limit = size - (size % SSE_SIMD_WIDTH);
             size_t i = 0;
 
-            for (i = 0; i < aligned_size; i += SSE_SIMD_WIDTH) {
+            for (; i < sse_limit; i += SSE_SIMD_WIDTH) {
                 __m128d xmm1 = _mm_loadu_pd(a + i);
                 __m128d xmm2 = _mm_loadu_pd(b + i);
                 xmm1 = _mm_sub_pd(xmm1, xmm2);
@@ -321,6 +325,7 @@ namespace math
                 a[i] -= b[i];
             }
         }
+
 
         static void sub_fallback(double* a, const double* b, size_t size)
         {
@@ -343,9 +348,10 @@ namespace math
         static void sub_scalar_avx(double* a, double scalar, size_t size)
         {
             __m256d ymm0 = _mm256_set1_pd(scalar);
+            const size_t avx_limit = size - (size % AVX_SIMD_WIDTH);
             size_t i = 0;
 
-            for (; i < size; i += AVX_SIMD_WIDTH) {
+            for (; i < avx_limit; i += AVX_SIMD_WIDTH) {
                 __m256d ymm1 = _mm256_loadu_pd(a + i);
                 ymm1 = _mm256_sub_pd(ymm1, ymm0);
                 _mm256_storeu_pd(a + i, ymm1);
@@ -359,9 +365,10 @@ namespace math
         static void sub_scalar_sse3(double* a, double scalar, size_t size)
         {
             __m128d xmm0 = _mm_set1_pd(scalar);
+            const size_t sse_limit = size - (size % SSE_SIMD_WIDTH);
             size_t i = 0;
 
-            for (; i < size; i += SSE_SIMD_WIDTH) {
+            for (; i < sse_limit; i += SSE_SIMD_WIDTH) {
                 __m128d xmm1 = _mm_loadu_pd(a + i);
                 xmm1 = _mm_sub_pd(xmm1, xmm0);
                 _mm_storeu_pd(a + i, xmm1);
@@ -462,15 +469,17 @@ namespace math
 
         static void mul_scalar_avx(double* a, double scalar, size_t size)
         {
+            const size_t avx_limit = size - (size % AVX_SIMD_WIDTH);
             __m256d ymm0 = _mm256_set1_pd(scalar);
             size_t i = 0;
 
-            for (; i < size; i += AVX_SIMD_WIDTH) {
+            for (; i < avx_limit; i += AVX_SIMD_WIDTH) {
                 __m256d ymm1 = _mm256_loadu_pd(a + i);
                 ymm1 = _mm256_mul_pd(ymm1, ymm0);
                 _mm256_storeu_pd(a + i, ymm1);
             }
 
+            // Handle any remainder
             for (; i < size; ++i) {
                 a[i] *= scalar;
             }
@@ -478,19 +487,22 @@ namespace math
 
         static void mul_scalar_sse3(double* a, double scalar, size_t size)
         {
+            const size_t sse_limit = size - (size % SSE_SIMD_WIDTH);
             __m128d xmm0 = _mm_set1_pd(scalar);
             size_t i = 0;
 
-            for (; i < size; i += SSE_SIMD_WIDTH) {
+            for (; i < sse_limit; i += SSE_SIMD_WIDTH) {
                 __m128d xmm1 = _mm_loadu_pd(a + i);
                 xmm1 = _mm_mul_pd(xmm1, xmm0);
                 _mm_storeu_pd(a + i, xmm1);
             }
 
+            // Handle any remainder
             for (; i < size; ++i) {
                 a[i] *= scalar;
             }
         }
+
 
         static void mul_scalar_fallback(double* a, double scalar, size_t size)
         {
@@ -512,15 +524,17 @@ namespace math
 
         static void div_scalar_avx(double* a, double scalar, size_t size)
         {
+            const size_t avx_limit = size - (size % AVX_SIMD_WIDTH);
             __m256d ymm0 = _mm256_set1_pd(scalar);
             size_t i = 0;
 
-            for (; i < size; i += AVX_SIMD_WIDTH) {
+            for (; i < avx_limit; i += AVX_SIMD_WIDTH) {
                 __m256d ymm1 = _mm256_loadu_pd(a + i);
                 ymm1 = _mm256_div_pd(ymm1, ymm0);
                 _mm256_storeu_pd(a + i, ymm1);
             }
 
+            // Handle any remainder
             for (; i < size; ++i) {
                 a[i] /= scalar;
             }
@@ -528,15 +542,17 @@ namespace math
 
         static void div_scalar_sse3(double* a, double scalar, size_t size)
         {
+            const size_t sse_limit = size - (size % SSE_SIMD_WIDTH);
             __m128d xmm0 = _mm_set1_pd(scalar);
             size_t i = 0;
 
-            for (; i < size; i += SSE_SIMD_WIDTH) {
+            for (; i < sse_limit; i += SSE_SIMD_WIDTH) {
                 __m128d xmm1 = _mm_loadu_pd(a + i);
                 xmm1 = _mm_div_pd(xmm1, xmm0);
                 _mm_storeu_pd(a + i, xmm1);
             }
 
+            // Handle any remainder
             for (; i < size; ++i) {
                 a[i] /= scalar;
             }

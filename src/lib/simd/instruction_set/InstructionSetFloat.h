@@ -189,29 +189,22 @@ namespace math
 
 		static void add_avx(float* a, const float* b, size_t size)
 		{
-
-			size_t aligned_size = (size / AVX_SIMD_WIDTH) * AVX_SIMD_WIDTH;
+			const size_t avx_limit = size - (size % AVX_SIMD_WIDTH); 
 			size_t i = 0;
 
-			for (i = 0; i < aligned_size; i += AVX_SIMD_WIDTH) {
+			for (; i < avx_limit; i += AVX_SIMD_WIDTH) {
 				__m256 ymm1 = _mm256_loadu_ps(a + i);
 				__m256 ymm2 = _mm256_loadu_ps(b + i);
 				ymm1 = _mm256_add_ps(ymm1, ymm2);
 				_mm256_storeu_ps(a + i, ymm1);
 			}
 
-			// Handling remaining elements
-			for (; i < size; ++i) {
-				a[i] += b[i];
-			}
-
-			
-
-			// Handling remaining elements
+			// Handle any remainder
 			for (; i < size; ++i) {
 				a[i] += b[i];
 			}
 		}
+
 
 		static void add_sse4_2(float* a, const float* b, size_t size)
 		{
@@ -220,7 +213,7 @@ namespace math
 
 		static void add_sse4_1(float* a, const float* b, size_t size)
 		{
-			add_sse3(a, b, size); 
+			add_sse3(a, b, size);
 		}
 
 		static void add_ssse3(float* a, const float* b, size_t size)
@@ -230,11 +223,10 @@ namespace math
 
 		static void add_sse3(float* a, const float* b, size_t size)
 		{
-
-			size_t aligned_size = (size / SSE_SIMD_WIDTH) * SSE_SIMD_WIDTH;
+			const size_t sse_limit = size - (size % SSE_SIMD_WIDTH); 
 			size_t i = 0;
 
-			for (i = 0; i < aligned_size; i += SSE_SIMD_WIDTH) {
+			for (; i < sse_limit; i += SSE_SIMD_WIDTH) {
 				__m128 xmm1 = _mm_loadu_ps(a + i);
 				__m128 xmm2 = _mm_loadu_ps(b + i);
 				xmm1 = _mm_add_ps(xmm1, xmm2);
@@ -246,6 +238,7 @@ namespace math
 				a[i] += b[i];
 			}
 		}
+
 
 		static void add_fallback(float* a, const float* b, size_t size)
 		{
@@ -269,18 +262,21 @@ namespace math
 		static void add_scalar_avx(float* a, float scalar, size_t size)
 		{
 			__m256 ymm0 = _mm256_set1_ps(scalar);
+			const size_t avx_limit = size - (size % AVX_SIMD_WIDTH);
 			size_t i = 0;
 
-			for (; i < size; i += AVX_SIMD_WIDTH) {
+			for (; i < avx_limit; i += AVX_SIMD_WIDTH) {
 				__m256 ymm1 = _mm256_loadu_ps(a + i);
 				ymm1 = _mm256_add_ps(ymm1, ymm0);
 				_mm256_storeu_ps(a + i, ymm1);
 			}
 
+			// Handle any remainder
 			for (; i < size; ++i) {
 				a[i] += scalar;
 			}
 		}
+
 
 		static void add_scalar_sse4_2(float* a, float scalar, size_t size)
 		{
@@ -300,18 +296,21 @@ namespace math
 		static void add_scalar_sse3(float* a, float scalar, size_t size)
 		{
 			__m128 xmm0 = _mm_set1_ps(scalar);
+			const size_t sse_limit = size - (size % SSE_SIMD_WIDTH);
 			size_t i = 0;
 
-			for (; i < size; i += SSE_SIMD_WIDTH) {
+			for (; i < sse_limit; i += SSE_SIMD_WIDTH) {
 				__m128 xmm1 = _mm_loadu_ps(a + i);
 				xmm1 = _mm_add_ps(xmm1, xmm0);
 				_mm_storeu_ps(a + i, xmm1);
 			}
 
+			// Handle any remainder
 			for (; i < size; ++i) {
 				a[i] += scalar;
 			}
 		}
+
 
 		static void add_scalar_fallback(float* a, float scalar, size_t size)
 		{
@@ -333,21 +332,22 @@ namespace math
 
 		static void sub_avx(float* a, const float* b, size_t size)
 		{
-			size_t aligned_size = (size / AVX_SIMD_WIDTH) * AVX_SIMD_WIDTH;
+			const size_t avx_limit = size - (size % AVX_SIMD_WIDTH); 
 			size_t i = 0;
 
-			for (i = 0; i < aligned_size; i += AVX_SIMD_WIDTH) {
+			for (; i < avx_limit; i += AVX_SIMD_WIDTH) {
 				__m256 ymm1 = _mm256_loadu_ps(a + i);
 				__m256 ymm2 = _mm256_loadu_ps(b + i);
 				ymm1 = _mm256_sub_ps(ymm1, ymm2);
 				_mm256_storeu_ps(a + i, ymm1);
 			}
 
-			// Handling remaining elements
+			// Handle any remainder
 			for (; i < size; ++i) {
 				a[i] -= b[i];
 			}
 		}
+
 
 		static void sub_sse4_2(float* a, const float* b, size_t size)
 		{
@@ -366,21 +366,22 @@ namespace math
 
 		static void sub_sse3(float* a, const float* b, size_t size)
 		{
-			size_t aligned_size = (size / SSE_SIMD_WIDTH) * SSE_SIMD_WIDTH;
+			const size_t sse_limit = size - (size % SSE_SIMD_WIDTH); 
 			size_t i = 0;
 
-			for (i = 0; i < aligned_size; i += SSE_SIMD_WIDTH) {
+			for (; i < sse_limit; i += SSE_SIMD_WIDTH) {
 				__m128 xmm1 = _mm_loadu_ps(a + i);
 				__m128 xmm2 = _mm_loadu_ps(b + i);
 				xmm1 = _mm_sub_ps(xmm1, xmm2);
 				_mm_storeu_ps(a + i, xmm1);
 			}
 
-			// Handling remaining elements
+			// Handle any remaining elements
 			for (; i < size; ++i) {
 				a[i] -= b[i];
 			}
 		}
+
 
 		static void sub_fallback(float* a, const float* b, size_t size)
 		{
@@ -400,18 +401,21 @@ namespace math
 		static void sub_scalar_avx(float* a, float scalar, size_t size)
 		{
 			__m256 ymm0 = _mm256_set1_ps(scalar);
+			const size_t avx_limit = size - (size % AVX_SIMD_WIDTH);
 			size_t i = 0;
 
-			for (; i < size; i += AVX_SIMD_WIDTH) {
+			for (; i < avx_limit; i += AVX_SIMD_WIDTH) {
 				__m256 ymm1 = _mm256_loadu_ps(a + i);
 				ymm1 = _mm256_sub_ps(ymm1, ymm0);
 				_mm256_storeu_ps(a + i, ymm1);
 			}
 
+			// Handle any remainder
 			for (; i < size; ++i) {
 				a[i] -= scalar;
 			}
 		}
+
 
 		static void sub_scalar_sse4_2(float* a, float scalar, size_t size)
 		{
@@ -431,18 +435,21 @@ namespace math
 		static void sub_scalar_sse3(float* a, float scalar, size_t size)
 		{
 			__m128 xmm0 = _mm_set1_ps(scalar);
+			const size_t sse_limit = size - (size % SSE_SIMD_WIDTH);
 			size_t i = 0;
 
-			for (; i < size; i += SSE_SIMD_WIDTH) {
+			for (; i < sse_limit; i += SSE_SIMD_WIDTH) {
 				__m128 xmm1 = _mm_loadu_ps(a + i);
 				xmm1 = _mm_sub_ps(xmm1, xmm0);
 				_mm_storeu_ps(a + i, xmm1);
 			}
 
+			// Handle any remainder
 			for (; i < size; ++i) {
 				a[i] -= scalar;
 			}
 		}
+
 
 		static void sub_scalar_fallback(float* a, float scalar, size_t size)
 		{
@@ -580,25 +587,28 @@ namespace math
 
 		static void mul_scalar_avx2(float* a, float scalar, size_t size)
 		{
-			
+
 			mul_scalar_avx(a, scalar, size);
 		}
 
 		static void mul_scalar_avx(float* a, float scalar, size_t size)
 		{
 			__m256 ymm0 = _mm256_set1_ps(scalar);
+			const size_t avx_limit = size - (size % AVX_SIMD_WIDTH);
 			size_t i = 0;
 
-			for (; i < size; i += AVX_SIMD_WIDTH) {
+			for (; i < avx_limit; i += AVX_SIMD_WIDTH) {
 				__m256 ymm1 = _mm256_loadu_ps(a + i);
 				ymm1 = _mm256_mul_ps(ymm1, ymm0);
 				_mm256_storeu_ps(a + i, ymm1);
 			}
 
+			// Handle any remainder
 			for (; i < size; ++i) {
 				a[i] *= scalar;
 			}
 		}
+
 
 		static void mul_scalar_sse4_2(float* a, float scalar, size_t size)
 		{
@@ -617,20 +627,22 @@ namespace math
 
 		static void mul_scalar_sse3(float* a, float scalar, size_t size)
 		{
-			
 			__m128 xmm0 = _mm_set1_ps(scalar);
+			const size_t sse_limit = size - (size % SSE_SIMD_WIDTH);
 			size_t i = 0;
 
-			for (; i < size; i += SSE_SIMD_WIDTH) {
+			for (; i < sse_limit; i += SSE_SIMD_WIDTH) {
 				__m128 xmm1 = _mm_loadu_ps(a + i);
 				xmm1 = _mm_mul_ps(xmm1, xmm0);
 				_mm_storeu_ps(a + i, xmm1);
 			}
 
+			// Handle any remainder
 			for (; i < size; ++i) {
 				a[i] *= scalar;
 			}
 		}
+
 
 		static void mul_scalar_fallback(float* a, float scalar, size_t size)
 		{
@@ -653,18 +665,21 @@ namespace math
 		static void div_scalar_avx(float* a, float scalar, size_t size)
 		{
 			__m256 ymm0 = _mm256_set1_ps(scalar);
+			const size_t avx_limit = size - (size % AVX_SIMD_WIDTH);
 			size_t i = 0;
 
-			for (; i < size; i += AVX_SIMD_WIDTH) {
+			for (; i < avx_limit; i += AVX_SIMD_WIDTH) {
 				__m256 ymm1 = _mm256_loadu_ps(a + i);
 				ymm1 = _mm256_div_ps(ymm1, ymm0);
 				_mm256_storeu_ps(a + i, ymm1);
 			}
 
+			// Handle any remainder
 			for (; i < size; ++i) {
 				a[i] /= scalar;
 			}
 		}
+
 
 		static void div_scalar_sse4_2(float* a, float scalar, size_t size)
 		{
@@ -684,18 +699,21 @@ namespace math
 		static void div_scalar_sse3(float* a, float scalar, size_t size)
 		{
 			__m128 xmm0 = _mm_set1_ps(scalar);
+			const size_t sse_limit = size - (size % SSE_SIMD_WIDTH);
 			size_t i = 0;
 
-			for (; i < size; i += SSE_SIMD_WIDTH) {
+			for (; i < sse_limit; i += SSE_SIMD_WIDTH) {
 				__m128 xmm1 = _mm_loadu_ps(a + i);
 				xmm1 = _mm_div_ps(xmm1, xmm0);
 				_mm_storeu_ps(a + i, xmm1);
 			}
 
+			// Handle any remainder
 			for (; i < size; ++i) {
 				a[i] /= scalar;
 			}
 		}
+
 
 		static void div_scalar_fallback(float* a, float scalar, size_t size)
 		{
