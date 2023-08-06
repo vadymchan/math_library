@@ -107,7 +107,7 @@ namespace math
 		}
 
 		template<Options Option>
-		using MulFunc = void(*)(float*, const float*, const float*, size_t);
+		using MulFunc = void(*)(float*, const float*, const float*, const size_t, const size_t, const size_t);
 
 		template<Options Option>
 		static MulFunc<Option> getMulFunc()
@@ -189,7 +189,7 @@ namespace math
 
 		static void add_avx(float* a, const float* b, size_t size)
 		{
-			const size_t avx_limit = size - (size % AVX_SIMD_WIDTH); 
+			const size_t avx_limit = size - (size % AVX_SIMD_WIDTH);
 			size_t i = 0;
 
 			for (; i < avx_limit; i += AVX_SIMD_WIDTH) {
@@ -223,7 +223,7 @@ namespace math
 
 		static void add_sse3(float* a, const float* b, size_t size)
 		{
-			const size_t sse_limit = size - (size % SSE_SIMD_WIDTH); 
+			const size_t sse_limit = size - (size % SSE_SIMD_WIDTH);
 			size_t i = 0;
 
 			for (; i < sse_limit; i += SSE_SIMD_WIDTH) {
@@ -332,7 +332,7 @@ namespace math
 
 		static void sub_avx(float* a, const float* b, size_t size)
 		{
-			const size_t avx_limit = size - (size % AVX_SIMD_WIDTH); 
+			const size_t avx_limit = size - (size % AVX_SIMD_WIDTH);
 			size_t i = 0;
 
 			for (; i < avx_limit; i += AVX_SIMD_WIDTH) {
@@ -366,7 +366,7 @@ namespace math
 
 		static void sub_sse3(float* a, const float* b, size_t size)
 		{
-			const size_t sse_limit = size - (size % SSE_SIMD_WIDTH); 
+			const size_t sse_limit = size - (size % SSE_SIMD_WIDTH);
 			size_t i = 0;
 
 			for (; i < sse_limit; i += SSE_SIMD_WIDTH) {
@@ -465,121 +465,157 @@ namespace math
 		//----------------------------------------------------------------------------
 
 		template<Options Option>
-		static void mul_avx2(float* result, const float* a, const float* b, size_t size)
+		static void mul_avx2(float* result, const float* a, const float* b, size_t rowsA, size_t colsA_rowsB, size_t colsB)
 		{
-			mul_avx<Option>(result, a, b, size);
+			mul_avx<Option>(result, a, b, rowsA, colsA_rowsB, colsB);
 		}
 
-		template<math::Options Option>
-		static void mul_avx(float* result, const float* a, const float* b, size_t size)
-		{
-			if constexpr (Option == math::Options::ROW_MAJOR) {
-				for (size_t i = 0; i < size; ++i) {
-					for (size_t j = 0; j < size; ++j) {
-						__m256 sum = _mm256_setzero_ps();
-						size_t k = 0;
-						for (; k + 7 < size; k += 8) {
-							__m256 a_vec = _mm256_loadu_ps(&a[i * size + k]);
-							__m256 b_vec = _mm256_set_ps(b[(k + 7) * size + j], b[(k + 6) * size + j], b[(k + 5) * size + j], b[(k + 4) * size + j],
-								b[(k + 3) * size + j], b[(k + 2) * size + j], b[(k + 1) * size + j], b[k * size + j]);
-
-							sum = _mm256_fmadd_ps(a_vec, b_vec, sum);
-						}
-						sum = _mm256_hadd_ps(sum, sum);
-						sum = _mm256_hadd_ps(sum, sum);
-						__m128 vlow = _mm256_castps256_ps128(sum);
-						__m128 vhigh = _mm256_extractf128_ps(sum, 1);
-						vlow = _mm_add_ps(vlow, vhigh);
-						float tail_sum = 0;
-						for (; k < size; ++k) {
-							tail_sum += a[i * size + k] * b[k * size + j];
-						}
-						result[i * size + j] = _mm_cvtss_f32(vlow) + tail_sum;
-					}
-				}
-			}
-			else if constexpr (Option == math::Options::COLUMN_MAJOR) {
-				for (size_t i = 0; i < size; ++i) {
-					for (size_t j = 0; j < size; ++j) {
-						__m256 sum = _mm256_setzero_ps();
-						size_t k = 0;
-						for (; k + 7 < size; k += 8) {
-							__m256 a_vec = _mm256_set_ps(b[(k + 7) * size + i], b[(k + 6) * size + i], b[(k + 5) * size + i], b[(k + 4) * size + i],
-								b[(k + 3) * size + i], b[(k + 2) * size + i], b[(k + 1) * size + i], b[k * size + i]);
-							__m256 b_vec = _mm256_loadu_ps(&a[j * size + k]);
-							sum = _mm256_fmadd_ps(a_vec, b_vec, sum);
-						}
-						sum = _mm256_hadd_ps(sum, sum);
-						sum = _mm256_hadd_ps(sum, sum);
-						__m128 vlow = _mm256_castps256_ps128(sum);
-						__m128 vhigh = _mm256_extractf128_ps(sum, 1);
-						vlow = _mm_add_ps(vlow, vhigh);
-						float tail_sum = 0;
-						for (; k < size; ++k) {
-							tail_sum += a[k * size + i] * b[j * size + k];
-						}
-						result[j * size + i] = _mm_cvtss_f32(vlow) + tail_sum;
-					}
-				}
-			}
-		}
-
+		//BEGIN: multiplication array utility functions
 
 		template<Options Option>
-		static void mul_sse4_2(float* result, const float* a, const float* b, size_t size)
-		{
-			mul_fallback<Option>(result, a, b, size);
-		}
-
-		template<Options Option>
-		static void mul_sse4_1(float* result, const float* a, const float* b, size_t size)
-		{
-			mul_fallback<Option>(result, a, b, size);
-		}
-
-		template<Options Option>
-		static void mul_ssse3(float* result, const float* a, const float* b, size_t size)
-		{
-			mul_fallback<Option>(result, a, b, size);
-		}
-
-		template<Options Option>
-		static void mul_sse3(float* result, const float* a, const float* b, size_t size)
-		{
-			mul_fallback<Option>(result, a, b, size);
-		}
-
-		template<Options Option>
-		static void mul_fallback(float* result, const float* a, const float* b, size_t size, size_t dim)
+		static inline size_t indexA(const size_t currentRowA, const size_t innerIndex, const size_t rowsA, const size_t colsA_rowsB)
 		{
 			if constexpr (Option == Options::COLUMN_MAJOR) {
-				for (size_t i = 0; i < dim; ++i) {
-					for (size_t j = 0; j < dim; ++j) {
-						float sum = 0;
-						for (size_t k = 0; k < dim; ++k) {
-							sum += a[i + k * dim] * b[k + j * dim];
-						}
-						result[i + j * dim] = sum;
-					}
-				}
+				return currentRowA + innerIndex * rowsA;
 			}
 			else if constexpr (Option == Options::ROW_MAJOR) {
-				for (size_t i = 0; i < dim; ++i) {
-					for (size_t j = 0; j < dim; ++j) {
-						float sum = 0;
-						for (size_t k = 0; k < dim; ++k) {
-							sum += a[i * dim + k] * b[k * dim + j];
-						}
-						result[i * dim + j] = sum;
+				return currentRowA * colsA_rowsB + innerIndex;
+			}
+		}
+
+		template<Options Option>
+		static inline size_t indexB(const size_t innerIndex, const size_t currentColB, const size_t colsB, const size_t colsA_rowsB)
+		{
+			if constexpr (Option == Options::COLUMN_MAJOR) {
+				return innerIndex + currentColB * colsA_rowsB;
+			}
+			else if constexpr (Option == Options::ROW_MAJOR) {
+				return innerIndex * colsB + currentColB;
+			}
+		}
+
+		template<Options Option>
+		static inline size_t indexResult(const size_t currentRowA, const size_t currentColB, const size_t rowsA, const size_t colsB)
+		{
+			if constexpr (Option == Options::COLUMN_MAJOR) {
+				return currentRowA + currentColB * rowsA;
+			}
+			else if constexpr (Option == Options::ROW_MAJOR) {
+				return currentRowA * colsB + currentColB;
+			}
+		}
+
+		template<Options Option>
+		static inline __m256 loadA(const float* a, const size_t currentRowA, const size_t innerIndex, const size_t rowsA, const size_t colsA_rowsB)
+		{
+			if constexpr (Option == Options::ROW_MAJOR) {
+				return _mm256_loadu_ps(&a[indexA<Option>(currentRowA, innerIndex, rowsA, colsA_rowsB)]);
+			}
+			else {
+				return _mm256_set_ps(
+					a[indexA<Option>(currentRowA, innerIndex + 7, rowsA, colsA_rowsB)],
+					a[indexA<Option>(currentRowA, innerIndex + 6, rowsA, colsA_rowsB)],
+					a[indexA<Option>(currentRowA, innerIndex + 5, rowsA, colsA_rowsB)],
+					a[indexA<Option>(currentRowA, innerIndex + 4, rowsA, colsA_rowsB)],
+					a[indexA<Option>(currentRowA, innerIndex + 3, rowsA, colsA_rowsB)],
+					a[indexA<Option>(currentRowA, innerIndex + 2, rowsA, colsA_rowsB)],
+					a[indexA<Option>(currentRowA, innerIndex + 1, rowsA, colsA_rowsB)],
+					a[indexA<Option>(currentRowA, innerIndex, rowsA, colsA_rowsB)]);
+			}
+		}
+
+		template<Options Option>
+		static inline __m256 loadB(const float* b, const size_t innerIndex, const size_t currentColB, const size_t colsB, const size_t colsA_rowsB)
+		{
+			if constexpr (Option == Options::ROW_MAJOR) {
+				return _mm256_set_ps(
+					b[indexB<Option>(innerIndex + 7, currentColB, colsB, colsA_rowsB)],
+					b[indexB<Option>(innerIndex + 6, currentColB, colsB, colsA_rowsB)],
+					b[indexB<Option>(innerIndex + 5, currentColB, colsB, colsA_rowsB)],
+					b[indexB<Option>(innerIndex + 4, currentColB, colsB, colsA_rowsB)],
+					b[indexB<Option>(innerIndex + 3, currentColB, colsB, colsA_rowsB)],
+					b[indexB<Option>(innerIndex + 2, currentColB, colsB, colsA_rowsB)],
+					b[indexB<Option>(innerIndex + 1, currentColB, colsB, colsA_rowsB)],
+					b[indexB<Option>(innerIndex, currentColB, colsB, colsA_rowsB)]);
+			}
+			else {
+				return _mm256_loadu_ps(&b[indexB<Option>(innerIndex, currentColB, colsB, colsA_rowsB)]);
+			}
+		}
+
+		//END: multiplication array utility functions
+
+		template<Options Option>
+		static void mul_avx(float* result, const float* a, const float* b, size_t rowsA, size_t colsA_rowsB, size_t colsB)
+		{
+			for (size_t currentRowA = 0; currentRowA < rowsA; ++currentRowA)
+			{
+				for (size_t currentColB = 0; currentColB < colsB; ++currentColB)
+				{
+					__m256 sum = _mm256_setzero_ps();
+					size_t innerIndex = 0;
+					for (; innerIndex + 7 < colsA_rowsB; innerIndex += 8)
+					{
+						__m256 a_vec = loadA<Option>(a, currentRowA, innerIndex, rowsA, colsA_rowsB);
+						__m256 b_vec = loadB<Option>(b, innerIndex, currentColB, colsB, colsA_rowsB);
+
+						sum = _mm256_fmadd_ps(a_vec, b_vec, sum);
 					}
+					float tmp[8];
+					_mm256_storeu_ps(tmp, sum);
+					float finalSum = 0.0f;
+					for (int i = 0; i < 8; ++i) {
+						finalSum += tmp[i];
+					}
+					for (; innerIndex < colsA_rowsB; ++innerIndex)
+					{
+						finalSum += a[indexA<Option>(currentRowA, innerIndex, rowsA, colsA_rowsB)] * b[indexB<Option>(innerIndex, currentColB, colsB, colsA_rowsB)];
+					}
+					result[indexResult<Option>(currentRowA, currentColB, rowsA, colsB)] = finalSum;
 				}
 			}
 		}
 
+		template<Options Option>
+		static void mul_sse4_2(float* result, const float* a, const float* b, const size_t rowsA, const size_t colsA_rowsB, const size_t colsB)
+		{
+			mul_fallback<Option>(result, a, b, rowsA, colsA_rowsB, colsB);
+		}
+
+		template<Options Option>
+		static void mul_sse4_1(float* result, const float* a, const float* b, const size_t rowsA, const size_t colsA_rowsB, const size_t colsB)
+		{
+			mul_fallback<Option>(result, a, b, rowsA, colsA_rowsB, colsB);
+		}
+
+		template<Options Option>
+		static void mul_ssse3(float* result, const float* a, const float* b, const size_t rowsA, const size_t colsA_rowsB, const size_t colsB)
+		{
+			mul_fallback<Option>(result, a, b, rowsA, colsA_rowsB, colsB);
+		}
+
+		template<Options Option>
+		static void mul_sse3(float* result, const float* a, const float* b, const size_t rowsA, const size_t colsA_rowsB, const size_t colsB)
+		{
+			mul_fallback<Option>(result, a, b, rowsA, colsA_rowsB, colsB);
+		}
+
+
+		template<Options Option>
+		static void mul_fallback(float* result, const float* a, const float* b, const size_t rowsA, const size_t colsA_rowsB, const size_t colsB) {
+			for (size_t i = 0; i < rowsA; ++i) {
+				for (size_t j = 0; j < colsB; ++j) {
+					float sum = 0;
+					for (size_t k = 0; k < colsA_rowsB; ++k) {
+						sum += a[indexA<Option>(i, k, rowsA, colsA_rowsB)] * b[indexB<Option>(k, j, colsB, colsA_rowsB)];
+					}
+					result[indexResult<Option>(i, j, rowsA, colsB)] = sum;
+				}
+			}
+		}
 
 		//END: multiplication array
 		//----------------------------------------------------------------------------
-
 
 
 		//BEGIN: multiplication scalar
