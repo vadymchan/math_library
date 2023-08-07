@@ -275,12 +275,12 @@ namespace math
 			return *this;
 		}
 
-		Matrix operator*(const Matrix& other) const
+		template<unsigned int ResultColumns>
+		Matrix<T, Rows, ResultColumns, Option> operator*(const Matrix<T, Columns, ResultColumns, Option>& other) const
 		{
-			//static_assert(Columns == other.Rows, "Matrix dimensions must agree for multiplication");
-			Matrix result;
-			auto mulFunc = InstructionSet<T>::getMulFunc<Option>();
-			mulFunc(result.m_data_, m_data_, other.m_data_, Rows);
+			Matrix<T, Rows, ResultColumns, Option> result;
+			auto mulFunc = InstructionSet<T>::template getMulFunc<Option>();
+			mulFunc(result.data(), m_data_, other.data(), Rows, ResultColumns, Columns);
 			return result;
 		}
 
