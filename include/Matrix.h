@@ -130,14 +130,15 @@ namespace math
 			}
 			std::copy(first, last, m_data_);
 		}
-		template <Iterable Container>
-		Matrix(const Container& container)
+
+		template <std::ranges::range Range>
+		Matrix(const Range& range)
 		{
-			assert(container.size() <= Rows * Columns);
+			assert(std::ranges::size(range) <= Rows * Columns);
 			if constexpr (UseHeap) {
 				m_data_ = new T[Rows * Columns];
 			}
-			std::copy_n(container.begin(), Rows * Columns, m_data_);
+			std::copy_n(range.begin(), Rows * Columns, m_data_);
 		}
 
 		static constexpr Matrix Identity()
