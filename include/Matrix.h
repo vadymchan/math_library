@@ -18,12 +18,24 @@ constexpr unsigned int STACK_ALLOCATION_LIMIT = 16; // 4 by 4 matrix
 
 namespace math
 {
+
+
 	template<typename T>
 	concept Iterable = requires(T a) {
 		{ a.begin() } -> std::input_iterator;
 		{ a.end() } -> std::input_iterator;
 		{ a.size() } -> std::convertible_to<std::size_t>;
 	};
+
+	template<typename U, typename... Args>
+	concept AllSameAs = (std::same_as<Args, U> && ...);
+
+	template<typename... Args>
+	concept AllNotIterable = (!Iterable<Args> && ...);
+
+	template<auto Count, typename... Args>
+	concept ArgsSizeGreaterThanCount = (sizeof...(Args) > Count);
+
 	template<typename T, unsigned int Rows, unsigned int Columns, Options Option = Options::ROW_MAJOR>
 	class Matrix
 	{
@@ -92,6 +104,22 @@ namespace math
 			}
 			return *this;
 		}
+
+
+		template<typename... Args> requires
+			AllSameAs<T, Args...> &&
+			AllNotIterable<Args...>&&
+			ArgsSizeGreaterThanCount<1, Args...>
+			Matrix(Args... args)
+		{
+			static_assert(sizeof...(Args) == Rows * Columns, "Incorrect number of arguments for Matrix initialization");
+			if constexpr (UseHeap) {
+				m_data_ = new T[Rows * Columns];
+			}
+			T arr[] = { args... };
+			std::copy(std::begin(arr), std::end(arr), m_data_);
+		}
+
 
 		template <std::input_iterator InputIt>
 		Matrix(InputIt first, InputIt last)
