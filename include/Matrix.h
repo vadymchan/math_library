@@ -178,12 +178,12 @@ namespace math
 			return operator()(row, col);
 		}
 
-		constexpr unsigned int getRows() const
+		static constexpr unsigned int getRows()
 		{
 			return Rows;
 		}
 
-		constexpr unsigned int getColumns() const
+		static constexpr unsigned int getColumns()
 		{
 			return Columns;
 		}
