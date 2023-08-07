@@ -19,19 +19,8 @@ constexpr unsigned int STACK_ALLOCATION_LIMIT = 16; // 4 by 4 matrix
 namespace math
 {
 
-
-	template<typename T>
-	concept Iterable = requires(T a) {
-		{ a.begin() } -> std::input_iterator;
-		{ a.end() } -> std::input_iterator;
-		{ a.size() } -> std::convertible_to<std::size_t>;
-	};
-
 	template<typename U, typename... Args>
 	concept AllSameAs = (std::same_as<Args, U> && ...);
-
-	template<typename... Args>
-	concept AllNotIterable = (!Iterable<Args> && ...);
 
 	template<auto Count, typename... Args>
 	concept ArgsSizeGreaterThanCount = (sizeof...(Args) > Count);
@@ -108,7 +97,6 @@ namespace math
 
 		template<typename... Args> requires
 			AllSameAs<T, Args...> &&
-			AllNotIterable<Args...>&&
 			ArgsSizeGreaterThanCount<1, Args...>
 			Matrix(Args... args)
 		{
