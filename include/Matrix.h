@@ -18,6 +18,12 @@ constexpr unsigned int STACK_ALLOCATION_LIMIT = 16; // 4 by 4 matrix
 
 namespace math
 {
+	template<typename T>
+	concept Iterable = requires(T a) {
+		{ a.begin() } -> std::input_iterator;
+		{ a.end() } -> std::input_iterator;
+		{ a.size() } -> std::convertible_to<std::size_t>;
+	};
 	template<typename T, unsigned int Rows, unsigned int Columns, Options Option = Options::ROW_MAJOR>
 	class Matrix
 	{
@@ -96,6 +102,16 @@ namespace math
 			}
 			std::copy(first, last, m_data_);
 		}
+		template <Iterable Container>
+		Matrix(const Container& container)
+		{
+			assert(container.size() <= Rows * Columns);
+			if constexpr (UseHeap) {
+				m_data_ = new T[Rows * Columns];
+			}
+			std::copy_n(container.begin(), Rows * Columns, m_data_);
+		}
+
 		static constexpr Matrix Identity()
 		{
 			Matrix m(0);
