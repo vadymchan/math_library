@@ -464,12 +464,6 @@ namespace math
 		//BEGIN: multiplication array
 		//----------------------------------------------------------------------------
 
-		template<Options Option>
-		static void mul_avx2(float* result, const float* a, const float* b, size_t rowsA, size_t colsA_rowsB, size_t colsB)
-		{
-			mul_avx<Option>(result, a, b, rowsA, colsA_rowsB, colsB);
-		}
-
 		//BEGIN: multiplication array utility functions
 
 		template<Options Option>
@@ -546,7 +540,13 @@ namespace math
 		//END: multiplication array utility functions
 
 		template<Options Option>
-		static void mul_avx(float* result, const float* a, const float* b, size_t rowsA, size_t colsA_rowsB, size_t colsB)
+		static void mul_avx2(float* result, const float* a, const float* b, size_t rowsA, size_t colsB, size_t colsA_rowsB)
+		{
+			mul_avx<Option>(result, a, b, rowsA, colsB, colsA_rowsB);
+		}
+
+		template<Options Option>
+		static void mul_avx(float* result, const float* a, const float* b, size_t rowsA, size_t colsB, size_t colsA_rowsB)
 		{
 			for (size_t currentRowA = 0; currentRowA < rowsA; ++currentRowA)
 			{
@@ -577,32 +577,32 @@ namespace math
 		}
 
 		template<Options Option>
-		static void mul_sse4_2(float* result, const float* a, const float* b, const size_t rowsA, const size_t colsA_rowsB, const size_t colsB)
+		static void mul_sse4_2(float* result, const float* a, const float* b, const size_t rowsA, const size_t colsB, const size_t colsA_rowsB)
 		{
-			mul_fallback<Option>(result, a, b, rowsA, colsA_rowsB, colsB);
+			mul_fallback<Option>(result, a, b, rowsA, colsB, colsA_rowsB);
 		}
 
 		template<Options Option>
-		static void mul_sse4_1(float* result, const float* a, const float* b, const size_t rowsA, const size_t colsA_rowsB, const size_t colsB)
+		static void mul_sse4_1(float* result, const float* a, const float* b, const size_t rowsA, const size_t colsB, const size_t colsA_rowsB)
 		{
-			mul_fallback<Option>(result, a, b, rowsA, colsA_rowsB, colsB);
+			mul_fallback<Option>(result, a, b, rowsA, colsB, colsA_rowsB);
 		}
 
 		template<Options Option>
-		static void mul_ssse3(float* result, const float* a, const float* b, const size_t rowsA, const size_t colsA_rowsB, const size_t colsB)
+		static void mul_ssse3(float* result, const float* a, const float* b, const size_t rowsA, const size_t colsB, const size_t colsA_rowsB)
 		{
-			mul_fallback<Option>(result, a, b, rowsA, colsA_rowsB, colsB);
+			mul_fallback<Option>(result, a, b, rowsA, colsB, colsA_rowsB);
 		}
 
 		template<Options Option>
-		static void mul_sse3(float* result, const float* a, const float* b, const size_t rowsA, const size_t colsA_rowsB, const size_t colsB)
+		static void mul_sse3(float* result, const float* a, const float* b, const size_t rowsA, const size_t colsB, const size_t colsA_rowsB)
 		{
-			mul_fallback<Option>(result, a, b, rowsA, colsA_rowsB, colsB);
+			mul_fallback<Option>(result, a, b, rowsA, colsB, colsA_rowsB);
 		}
 
 
 		template<Options Option>
-		static void mul_fallback(float* result, const float* a, const float* b, const size_t rowsA, const size_t colsA_rowsB, const size_t colsB) {
+		static void mul_fallback(float* result, const float* a, const float* b, const size_t rowsA, const size_t colsB, const size_t colsA_rowsB){
 			for (size_t i = 0; i < rowsA; ++i) {
 				for (size_t j = 0; j < colsB; ++j) {
 					float sum = 0;
