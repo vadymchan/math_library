@@ -284,11 +284,18 @@ namespace math
 			return result;
 		}
 
+		/**
+		* @brief Matrix multiplication-assignment operator
+		*
+		* This operator multiplies the current matrix with the given one.
+		* Note: This function only works when the matrices have the same dimensions and squared.
+		*
+		*/
 		Matrix& operator*=(const Matrix& other)
 		{
-			//static_assert(Columns == other.Rows, "Matrix dimensions must agree for multiplication");
-			Matrix temp = *this * other;
-			*this = temp;
+			static_assert(Columns == Rows, "For Matrix multiplication (*=), matrix dimensions must be squared");
+			assert(this != &other && "Cannot perform operation on the same matrix instance");
+			*this = *this * other;
 			return *this;
 		}
 
