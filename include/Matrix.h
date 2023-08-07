@@ -187,6 +187,21 @@ namespace math
 		{
 			return Columns;
 		}
+
+		static constexpr Options getOption()
+		{
+			return Option;
+		}
+
+		T* data()
+		{
+			return m_data_;
+		}
+
+		const T* data() const
+		{
+			return m_data_;
+		}
 		T determinant() const
 		{
 			static_assert(Rows == Columns, "Determinant is only defined for square matrices");
