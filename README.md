@@ -1,72 +1,87 @@
 # math_library
-static math library for computer graphics. Uses SIMD set instructions
+header-only math library for computer graphics. Uses SIMD set instructions
+
+
+## Requirements
+- A C++ compiler supporting C++20 (or later)
+- CPU with the following SIMD support (at least one of them): AVX 2, AVX, SSE 4.2, SSE 4.1, SSSE3, SSE 3
 
 ---
-## TODO:
+### Features:
+- generates macros during build of the project for choosing the best SIMD instruction set for your CPU
+- uses SIMD instructions for faster calculations
+- header-only library (but you can build it as a static library if you want - just need to add .cpp file)
+- uses C++20 features (concepts)
+- uses CMake for building
+- uses Google Test for unit testing
+- uses Doxygen for documentation
+- uses Google Benchmark for benchmarking
+- uses spdlog for logging (for now not used, but will be used in the future)
+- implements both row-major and column-major matrices
+- implements both left-handed and right-handed coordinate systems
 
-### Current:
-- [ ] instruction set.h - separate them
-- [ ] [[#instruction set - templated]]
-- [ ] add implementation for matrix multiplication (naive and unpolished solution)
+### Third parties:
+- [Google Test](https://github.com/google/googletest)
+- [Google Benchmark](https://github.com/google/benchmark)
+- [spdlog](https://github.com/gabime/spdlog)
 
-### Matrix:
-- [ ] basic operations:
-  - [x] addition (scalar, matrix by matrix)
-   - [x] base and naive
-   - [ ] with bounding cases (column / row)
-   - [ ] optimised (performance)
-  - [ ] substraction (scalar, matrix by matrix)
-  - [ ] multiplication (scalar, matrix by matrix)
-  - [ ] division (scalar, )
-  - [ ] transposition
-  - [ ] finding determinant
-  - [ ] inverse
-  - [ ] rank 
-- [ ] alias for the most common matrix size (2x2, 3x3, 4x4)
-- [ ] support for both row-major and column-major storage
-- [ ] SIMD optimizations (AVX and SSE) for operations where applicable
-- [ ] support for different numerical types (float, double, etc.)
-- [ ] view matrix
-- [ ] projection matrix
-
-### Vector:
-- [ ] Basic operations:
-  - [ ] addition (scalar, vector by vector)
-  - [ ] subtraction (scalar, vector by vector)
-  - [ ] multiplication (scalar, dot product, cross product)
-  - [ ] division (scalar)
-  - [ ] magnitude (length)
-  - [ ] normalization
-- [ ] alias for the most common vector sizes (2D, 3D, 4D)
-
-
-### General:
-- [ ] OpenMP / TBB (Intel Threading Building Blocks) support for parallelization
-- [ ] Comprehensive test suite to verify correctness of operations
-- [ ] Performance benchmarks to measure speed of operations
-- [ ] Documentation for all classes and functions (it's in my dreams =) )
-- [ ] Examples and tutorials for users
-- [ ] Continuous integration setup for automated testing
 ---
-## tree hirerarchy
+### How to build:
+
+1. Clone the repository 
+``` git clone git@github.com:vadymchan/math_library.git ```
+2. Build project:
+``` cmake .```
+P.S. You can use cmake-gui for more comfortable building (and there you can choose options like build with third parties or not)
+
+---
+### Examples:
+
+No examples for now, but you can look at tests and benchmarks for examples of usage
+
+---
+### TODO:
+
+- [ ] add more tests (currently not tested different types (only float was tested), SIMD instruction (only AVX was tested)
+- [ ] add more benchmarks (the same as with tests)
+- [ ] add more documentation (currently no documentation at all =) )
+- [ ] add logging (currently no logging at all =) )
+
+
+---
+### tree hirerarchy
 
 ```
-math_library/
+math_library
 │
-├── src/
-│   ├── lib/
-│   │   ├── vec3.cpp
-│   │   ├── mat4.cpp
-│   │   └── ... 
+├── src
+│   ├── exe (for testing)
+│   │   ├── benchmarks.h
+│   │   ├── main.cpp
+│   │   └── tests.h
 │   │
-│   └── exe/
-│       ├── main.cpp
-│       └── ...
+│   └── lib (internal implementation - hidden from the user)
+│       ├── options
+│       │   └── Options.h
+│       │
+│       └── simd
+│           ├── instruction_set
+│           │   ├── InstructionSet.h
+│           │   ├── InstructionSetDouble.h
+│           │   ├── InstructionSetFloat.h
+│           │   └── InstructionSetInt.h
+│           │
+│           └── precompiled
+│               └── SIMDdefines.h
+│ 
+├── scripts (for generation instruction for current hardware)
+│   └── GenerateSIMDdefines.cpp
 │
-├── include/
-│   ├── vec3.h
-│   ├── mat4.h
-│   └── ... 
+├── include (for user)
+│    ├── All.h
+│    ├── Graphics.h
+│    ├── Matrix.h
+│    └── Vector.h
 │
 └── CMakeLists.txt
 
