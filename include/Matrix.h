@@ -400,6 +400,19 @@ namespace math
 
 			return rank;
 		}
+
+
+		T magnitude() const 
+		{
+			static_assert(Rows == 1 || Columns == 1, "Magnitude is only defined for vectors");
+			T sum = 0;
+			constexpr unsigned int kVectorDimention = 1;
+			constexpr unsigned int kMatrixSize = Rows * Columns;
+			auto mulFunc = InstructionSet<T>::template getMulFunc<Option>();
+			mulFunc(&sum, m_data_, m_data_, kVectorDimention, kVectorDimention, kMatrixSize);
+			return std::sqrt(sum);
+		}
+
 		}
 
 
@@ -505,7 +518,6 @@ namespace math
 			*this = *this * other;
 			return *this;
 		}
-
 
 		Matrix operator*(const T& scalar) const
 		{
