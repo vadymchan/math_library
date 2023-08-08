@@ -13,6 +13,7 @@
 #include <algorithm>
 #include <type_traits>
 #include <ranges>
+#include <cmath>
 
 constexpr unsigned int STACK_ALLOCATION_LIMIT = 16; // 4 by 4 matrix
 
@@ -202,6 +203,18 @@ namespace math
 		{
 			return m_data_;
 		}
+
+		Matrix<T, Columns, Rows, Option> transpose() const
+		{
+			Matrix<T, Columns, Rows, Option> res;
+			for (unsigned int i = 0; i < Rows; ++i) {
+				for (unsigned int j = 0; j < Columns; ++j) {
+					res(j, i) = (*this)(i, j);
+				}
+			}
+			return res;
+		}
+
 		T determinant() const
 		{
 			static_assert(Rows == Columns, "Determinant is only defined for square matrices");
