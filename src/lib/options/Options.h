@@ -17,8 +17,8 @@ namespace math
      */
     enum class Options
     {
-        COLUMN_MAJOR, /**< Enum value for column-major order. In this layout, the elements in the same column of a matrix are stored contiguously in memory. */
-        ROW_MAJOR,    /**< Enum value for row-major order. In this layout, the elements in the same row of a matrix are stored contiguously in memory. */
-        COUNT         /**< Enum value for counting the number of options.  */
+        ColumnMajor, /**< Enum value for column-major order. In this layout, the elements in the same column of a matrix are stored contiguously in memory. */
+        RowMajor,    /**< Enum value for row-major order. In this layout, the elements in the same row of a matrix are stored contiguously in memory. */
+        Count         /**< Enum value for counting the number of options.  */
     };
 }

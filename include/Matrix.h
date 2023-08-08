@@ -332,7 +332,7 @@ namespace math
 
 
 	private:
-		
+
 		using DataType = typename std::conditional<UseHeap, T*, T[Rows * Columns]>::type;
 		DataType m_data_;
 	};

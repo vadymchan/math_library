@@ -431,7 +431,7 @@ namespace math
         template<Options Option>
         static void mul_fallback(double* result, const double* a, const double* b, size_t size, size_t dim)
         {
-            if constexpr (Option == Options::COLUMN_MAJOR) {
+            if constexpr (Option == Options::ColumnMajor) {
                 for (size_t i = 0; i < dim; ++i) {
                     for (size_t j = 0; j < dim; ++j) {
                         double sum = 0;
@@ -442,7 +442,7 @@ namespace math
                     }
                 }
             }
-            else if constexpr (Option == Options::ROW_MAJOR) {
+            else if constexpr (Option == Options::RowMajor) {
                 for (size_t i = 0; i < dim; ++i) {
                     for (size_t j = 0; j < dim; ++j) {
                         double sum = 0;

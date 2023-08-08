@@ -469,10 +469,10 @@ namespace math
 		template<Options Option>
 		static inline size_t indexA(const size_t currentRowA, const size_t innerIndex, const size_t rowsA, const size_t colsA_rowsB)
 		{
-			if constexpr (Option == Options::COLUMN_MAJOR) {
+			if constexpr (Option == Options::ColumnMajor) {
 				return currentRowA + innerIndex * rowsA;
 			}
-			else if constexpr (Option == Options::ROW_MAJOR) {
+			else if constexpr (Option == Options::RowMajor) {
 				return currentRowA * colsA_rowsB + innerIndex;
 			}
 		}
@@ -480,10 +480,10 @@ namespace math
 		template<Options Option>
 		static inline size_t indexB(const size_t innerIndex, const size_t currentColB, const size_t colsB, const size_t colsA_rowsB)
 		{
-			if constexpr (Option == Options::COLUMN_MAJOR) {
+			if constexpr (Option == Options::ColumnMajor) {
 				return innerIndex + currentColB * colsA_rowsB;
 			}
-			else if constexpr (Option == Options::ROW_MAJOR) {
+			else if constexpr (Option == Options::RowMajor) {
 				return innerIndex * colsB + currentColB;
 			}
 		}
@@ -491,10 +491,10 @@ namespace math
 		template<Options Option>
 		static inline size_t indexResult(const size_t currentRowA, const size_t currentColB, const size_t rowsA, const size_t colsB)
 		{
-			if constexpr (Option == Options::COLUMN_MAJOR) {
+			if constexpr (Option == Options::ColumnMajor) {
 				return currentRowA + currentColB * rowsA;
 			}
-			else if constexpr (Option == Options::ROW_MAJOR) {
+			else if constexpr (Option == Options::RowMajor) {
 				return currentRowA * colsB + currentColB;
 			}
 		}
@@ -502,7 +502,7 @@ namespace math
 		template<Options Option>
 		static inline __m256 loadA(const float* a, const size_t currentRowA, const size_t innerIndex, const size_t rowsA, const size_t colsA_rowsB)
 		{
-			if constexpr (Option == Options::ROW_MAJOR) {
+			if constexpr (Option == Options::RowMajor) {
 				return _mm256_loadu_ps(&a[indexA<Option>(currentRowA, innerIndex, rowsA, colsA_rowsB)]);
 			}
 			else {
@@ -521,7 +521,7 @@ namespace math
 		template<Options Option>
 		static inline __m256 loadB(const float* b, const size_t innerIndex, const size_t currentColB, const size_t colsB, const size_t colsA_rowsB)
 		{
-			if constexpr (Option == Options::ROW_MAJOR) {
+			if constexpr (Option == Options::RowMajor) {
 				return _mm256_set_ps(
 					b[indexB<Option>(innerIndex + 7, currentColB, colsB, colsA_rowsB)],
 					b[indexB<Option>(innerIndex + 6, currentColB, colsB, colsA_rowsB)],
