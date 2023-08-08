@@ -593,6 +593,14 @@ namespace math
 	{
 		return std::equal(lhs.data(), lhs.data() + Rows * Columns, rhs.data());
 	}
+
+	template<unsigned int Rows, unsigned int Columns, Options Option>
+	inline constexpr bool operator==(const Matrix<float, Rows, Columns, Option>& lhs, const Matrix<float, Rows, Columns, Option>& rhs)
+	{
+		constexpr float kEpsilon = std::numeric_limits<float>::epsilon();
+		auto almostEqual = [](float a, float b) { return std::fabs(a - b) <= kEpsilon; };
+		return std::equal(lhs.data(), lhs.data() + Rows * Columns, rhs.data(), almostEqual);
+	}
 	template<typename T, unsigned int Rows, unsigned int Columns, Options Option>
 	inline constexpr bool operator!=(const Matrix<T, Rows, Columns, Option>& lhs, const Matrix<T, Rows, Columns, Option>& rhs)
 	{
