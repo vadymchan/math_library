@@ -29,6 +29,14 @@ namespace math
 	template <typename MatrixType>
 	concept OneDimensional = (MatrixType::getRows() == 1 || MatrixType::getColumns() == 1);
 
+	template <typename MatrixType>
+	concept ThreeDimensionalVector = ((MatrixType::getRows() == 3 && MatrixType::getColumns() == 1) ||
+		(MatrixType::getRows() == 1 && MatrixType::getColumns() == 3));
+
+	template <typename MatrixA, typename MatrixB>
+	concept SameSize = (MatrixA::getRows() * MatrixA::getColumns() == MatrixB::getRows() * MatrixB::getColumns());
+
+	template<typename T, unsigned int Rows, unsigned int Columns, Options Option = Options::RowMajor>
 	class Matrix
 	{
 	public:
@@ -427,8 +435,18 @@ namespace math
 			result /= mag;
 			return result;
 		}
-				}
-			}
+
+		template <unsigned int OtherRows, unsigned int OtherColumns> requires
+			OneDimensional<Matrix<T, Rows, Columns>> && 
+			OneDimensional<Matrix<T, OtherRows, OtherColumns>> &&
+			SameSize<Matrix<T, Rows, Columns>, Matrix<T, OtherRows, OtherColumns>>
+		T dot(const Matrix<T, OtherRows, OtherColumns>& other) const
+		{
+			float result;
+			constexpr unsigned int kVectorDimention = 1;
+			constexpr unsigned int kMatrixSize = Rows * Columns;
+			auto mulFunc = InstructionSet<T>::template getMulFunc<Option>();
+			mulFunc(&result, m_data_, other.data(), kVectorDimention, kVectorDimention, kMatrixSize);
 			return result;
 		}
 		}
