@@ -5,6 +5,28 @@
 #include <All.h>
 
 
+static void BM_MatrixCreationStack(benchmark::State& state);
+static void BM_MatrixCreationHeap(benchmark::State& state);
+static void BM_MatrixElementAccess(benchmark::State& state);
+static void BM_MatrixElementAccessRef(benchmark::State& state);
+static void BM_MatrixOperatorAccess(benchmark::State& state);
+static void BM_MatrixOperatorAccessRef(benchmark::State& state);
+static void BM_MatrixAddition(benchmark::State& state);
+static void BM_MatrixAdditionInPlace(benchmark::State& state);
+static void BM_MatrixScalarAddition(benchmark::State& state);
+static void BM_MatrixScalarAdditionInPlace(benchmark::State& state);
+static void BM_MatrixSubtraction(benchmark::State& state);
+static void BM_MatrixSubtractionInPlace(benchmark::State& state);
+static void BM_MatrixScalarSubtraction(benchmark::State& state);
+static void BM_MatrixScalarSubtractionInPlace(benchmark::State& state);
+static void BM_MatrixMultiplication(benchmark::State& state);
+static void BM_MatrixMultiplicationInPlace(benchmark::State& state);
+static void BM_MatrixScalarMultiplication(benchmark::State& state);
+static void BM_MatrixScalarMultiplicationInPlace(benchmark::State& state);
+static void BM_MatrixScalarDivision(benchmark::State& state);
+static void BM_MatrixScalarDivisionInPlace(benchmark::State& state);
+static void BM_MatrixTrace(benchmark::State& state);
+
 //========================================= BENCHMARKING =========================================
 
 
@@ -172,33 +194,6 @@ BENCHMARK(BM_MatrixScalarSubtractionInPlace);
 //END: subtraction benchmark
 //---------------------------------------------------------------------------
 
-//BEGIN: division benchmark
-//---------------------------------------------------------------------------
-
-static void BM_MatrixScalarDivision(benchmark::State& state)
-{
-    math::Matrix<float, 100, 100> matrix;
-    for (auto _ : state)
-    {
-        auto matrix2 = matrix / 1.0f;
-        benchmark::DoNotOptimize(matrix2);
-    }
-}
-BENCHMARK(BM_MatrixScalarDivision);
-
-static void BM_MatrixScalarDivisionInPlace(benchmark::State& state)
-{
-    math::Matrix<float, 100, 100> matrix;
-    for (auto _ : state)
-    {
-        matrix /= 1.0f;
-    }
-}
-BENCHMARK(BM_MatrixScalarDivisionInPlace);
-
-//END: division benchmark
-//---------------------------------------------------------------------------
-
 //BEGIN: multiplication benchmark
 //---------------------------------------------------------------------------
 
@@ -249,200 +244,92 @@ BENCHMARK(BM_MatrixScalarMultiplicationInPlace);
 //END: multiplication benchmark
 //---------------------------------------------------------------------------
 
-
-//========================================= END::BENCHMARKING =========================================
-
-//========================================= BEGIN::INT_BENCHMARKING =========================================
-
-static void BM_MatrixCreationStackInt(benchmark::State& state)
-{
-    for (auto _ : state)
-    {
-        math::Matrix<int, 2, 2> matrix;
-        benchmark::DoNotOptimize(matrix);
-    }
-}
-BENCHMARK(BM_MatrixCreationStackInt);
-
-static void BM_MatrixCreationHeapInt(benchmark::State& state)
-{
-    for (auto _ : state)
-    {
-        math::Matrix<int, 100, 100> matrix;
-        benchmark::DoNotOptimize(matrix);
-    }
-}
-BENCHMARK(BM_MatrixCreationHeapInt);
-
-static void BM_MatrixElementAccessInt(benchmark::State& state)
-{
-    math::Matrix<int, 100, 100> matrix;
-    for (auto _ : state)
-    {
-        auto val = matrix.coeff(50, 50);
-        benchmark::DoNotOptimize(val);
-    }
-}
-BENCHMARK(BM_MatrixElementAccessInt);
-
-static void BM_MatrixElementAccessRefInt(benchmark::State& state)
-{
-    math::Matrix<int, 100, 100> matrix;
-    for (auto _ : state)
-    {
-        matrix.coeffRef(50, 50) = 1;
-    }
-}
-BENCHMARK(BM_MatrixElementAccessRefInt);
-
-static void BM_MatrixOperatorAccessInt(benchmark::State& state)
-{
-    math::Matrix<int, 100, 100> matrix;
-    for (auto _ : state)
-    {
-        auto val = matrix(50, 50);
-        benchmark::DoNotOptimize(val);
-    }
-}
-BENCHMARK(BM_MatrixOperatorAccessInt);
-
-static void BM_MatrixOperatorAccessRefInt(benchmark::State& state)
-{
-    math::Matrix<int, 100, 100> matrix;
-    for (auto _ : state)
-    {
-        matrix(50, 50) = 1;
-    }
-}
-BENCHMARK(BM_MatrixOperatorAccessRefInt);
-
-//BEGIN: addition benchmark
-//---------------------------------------------------------------------------
-
-static void BM_MatrixAdditionInt(benchmark::State& state)
-{
-    math::Matrix<int, 100, 100> matrix1;
-    math::Matrix<int, 100, 100> matrix2;
-    for (auto _ : state)
-    {
-        auto matrix3 = matrix1 + matrix2;
-        benchmark::DoNotOptimize(matrix3);
-    }
-}
-BENCHMARK(BM_MatrixAdditionInt);
-
-static void BM_MatrixAdditionInPlaceInt(benchmark::State& state)
-{
-    math::Matrix<int, 100, 100> matrix1;
-    math::Matrix<int, 100, 100> matrix2;
-    for (auto _ : state)
-    {
-        matrix1 += matrix2;
-    }
-}
-BENCHMARK(BM_MatrixAdditionInPlaceInt);
-
-static void BM_MatrixScalarAdditionInt(benchmark::State& state)
-{
-    math::Matrix<int, 100, 100> matrix;
-    for (auto _ : state)
-    {
-        auto matrix2 = matrix + 1;
-        benchmark::DoNotOptimize(matrix2);
-    }
-}
-BENCHMARK(BM_MatrixScalarAdditionInt);
-
-static void BM_MatrixScalarAdditionInPlaceInt(benchmark::State& state)
-{
-    math::Matrix<int, 100, 100> matrix;
-    for (auto _ : state)
-    {
-        matrix += 1;
-    }
-}
-BENCHMARK(BM_MatrixScalarAdditionInPlaceInt);
-
-//END: addition benchmark
-//---------------------------------------------------------------------------
-
-//BEGIN: subtraction benchmark
-//---------------------------------------------------------------------------
-
-static void BM_MatrixSubtractionInt(benchmark::State& state)
-{
-    math::Matrix<int, 100, 100> matrix1;
-    math::Matrix<int, 100, 100> matrix2;
-    for (auto _ : state)
-    {
-        auto matrix3 = matrix1 - matrix2;
-        benchmark::DoNotOptimize(matrix3);
-    }
-}
-BENCHMARK(BM_MatrixSubtractionInt);
-
-static void BM_MatrixSubtractionInPlaceInt(benchmark::State& state)
-{
-    math::Matrix<int, 100, 100> matrix1;
-    math::Matrix<int, 100, 100> matrix2;
-    for (auto _ : state)
-    {
-        matrix1 -= matrix2;
-    }
-}
-BENCHMARK(BM_MatrixSubtractionInPlaceInt);
-
-static void BM_MatrixScalarSubtractionInt(benchmark::State& state)
-{
-    math::Matrix<int, 100, 100> matrix;
-    for (auto _ : state)
-    {
-        auto matrix2 = matrix - 1;
-        benchmark::DoNotOptimize(matrix2);
-    }
-}
-BENCHMARK(BM_MatrixScalarSubtractionInt);
-
-static void BM_MatrixScalarSubtractionInPlaceInt(benchmark::State& state)
-{
-    math::Matrix<int, 100, 100> matrix;
-    for (auto _ : state)
-    {
-        matrix -= 1;
-    }
-}
-BENCHMARK(BM_MatrixScalarSubtractionInPlaceInt);
-
-//END: subtraction benchmark
-//---------------------------------------------------------------------------
-
 //BEGIN: division benchmark
 //---------------------------------------------------------------------------
 
-static void BM_MatrixScalarDivisionInt(benchmark::State& state)
+static void BM_MatrixScalarDivision(benchmark::State& state)
 {
-    math::Matrix<int, 100, 100> matrix;
+    math::Matrix<float, 100, 100> matrix;
     for (auto _ : state)
     {
-        auto matrix2 = matrix / 1;
+        auto matrix2 = matrix / 1.0f;
         benchmark::DoNotOptimize(matrix2);
     }
 }
-BENCHMARK(BM_MatrixScalarDivisionInt);
+BENCHMARK(BM_MatrixScalarDivision);
 
-static void BM_MatrixScalarDivisionInPlaceInt(benchmark::State& state)
+static void BM_MatrixScalarDivisionInPlace(benchmark::State& state)
 {
-    math::Matrix<int, 100, 100> matrix;
+    math::Matrix<float, 100, 100> matrix;
     for (auto _ : state)
     {
-        matrix /= 1;
+        matrix /= 1.0f;
     }
 }
-BENCHMARK(BM_MatrixScalarDivisionInPlaceInt);
+BENCHMARK(BM_MatrixScalarDivisionInPlace);
 
 //END: division benchmark
 //---------------------------------------------------------------------------
 
+static void BM_MatrixDeterminant(benchmark::State& state) {
+    for (auto _ : state) {
+        math::Matrix<float, 5, 5> m;
+        m.determinant();
+    }
+}
+BENCHMARK(BM_MatrixDeterminant);
 
-//========================================= END::INT_BENCHMARKING =========================================
+static void BM_MatrixInverse(benchmark::State& state) {
+    for (auto _ : state) {
+        math::Matrix<float, 5, 5> m;  
+        m.inverse();            
+    }
+}
+BENCHMARK(BM_MatrixInverse);
+
+static void BM_MatrixRank(benchmark::State& state) {
+    for (auto _ : state) {
+        math::Matrix<float, 5, 5> m;  
+        m.rank();               
+    }
+}
+BENCHMARK(BM_MatrixRank);
+
+static void BM_MatrixMagnitude(benchmark::State& state) {
+    for (auto _ : state) {
+        math::Matrix<float, 5, 1> m; 
+        m.magnitude();         
+    }
+}
+BENCHMARK(BM_MatrixMagnitude);
+
+static void BM_MatrixNormalize(benchmark::State& state) {
+    for (auto _ : state) {
+        math::Matrix<float, 5, 1> m;  
+        m.normalize();          
+    }
+}
+BENCHMARK(BM_MatrixNormalize);
+
+//BEGIN: trace benchmark
+//---------------------------------------------------------------------------
+
+static void BM_MatrixTrace(benchmark::State& state)
+{
+    // Create a 100x100 matrix for the benchmark
+    math::Matrix<float, 100, 100> matrix;
+    for (auto _ : state)
+    {
+        float trace = matrix.trace();
+        benchmark::DoNotOptimize(trace);
+    }
+}
+BENCHMARK(BM_MatrixTrace);
+
+//END: trace benchmark
+//---------------------------------------------------------------------------
+
+
+
+//========================================= END::BENCHMARKING =========================================
 
