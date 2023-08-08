@@ -110,6 +110,7 @@ math_library
 | Typedefs and Type Aliases | PascalCase | `typedef long int BigNum;` or `using BigNum = long int;` |
 | Global Variables | g_ prefix + camelCase | `g_gameState` |
 | Static Variables | s_ prefix + camelCase | `s_instanceCount` |
+| Concepts | PascalCase | `Sortable`, `Drawable` |
 
 P.S if the static variable is an member of the class (struct), then the priority will be given to the `s_` prefix.
 
