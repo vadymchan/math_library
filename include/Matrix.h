@@ -256,8 +256,152 @@ namespace math
 		Matrix inverse() const
 		{
 			static_assert(Rows == Columns, "Inverse is only defined for square matrices");
-			//TODO: implement
-			return;
+
+			Matrix<T, Rows, 2 * Columns, Option> augmentedMatrix;
+			// Fill augmentedMatrix
+			for (unsigned int i = 0; i < Rows; ++i) {
+				for (unsigned int j = 0; j < Columns; ++j) {
+					augmentedMatrix(i, j) = (*this)(i, j);
+				}
+				for (unsigned int j = Columns; j < 2 * Columns; ++j) {
+					if (i == j - Columns) {
+						augmentedMatrix(i, j) = 1;
+					}
+					else {
+						augmentedMatrix(i, j) = 0;
+					}
+				}
+			}
+
+			// Perform Gauss-Jordan elimination
+			for (unsigned int i = 0; i < Rows; ++i) {
+				// Search for maximum in this column
+				T maxEl = std::abs(augmentedMatrix(i, i));
+				unsigned int maxRow = i;
+				for (unsigned int k = i + 1; k < Rows; ++k) {
+					if (std::abs(augmentedMatrix(k, i)) > maxEl) {
+						maxEl = augmentedMatrix(k, i);
+						maxRow = k;
+					}
+				}
+
+				// Swap maximum row with current row
+				for (unsigned int k = i; k < 2 * Columns; ++k) {
+					T tmp = augmentedMatrix(maxRow, k);
+					augmentedMatrix(maxRow, k) = augmentedMatrix(i, k);
+					augmentedMatrix(i, k) = tmp;
+				}
+
+				// Make all rows below this one 0 in current column
+				for (unsigned int k = i + 1; k < Rows; ++k) {
+					T c = -augmentedMatrix(k, i) / augmentedMatrix(i, i);
+					for (unsigned int j = i; j < 2 * Columns; ++j) {
+						if (i == j) {
+							augmentedMatrix(k, j) = 0;
+						}
+						else {
+							augmentedMatrix(k, j) += c * augmentedMatrix(i, j);
+						}
+					}
+				}
+			}
+
+			// Make all rows above this one zero in current column
+			for (int i = Rows - 1; i >= 0; i--) {
+				for (int k = i - 1; k >= 0; k--) {
+					T c = -augmentedMatrix(k, i) / augmentedMatrix(i, i);
+					for (unsigned int j = i; j < 2 * Columns; ++j) {
+						if (i == j) {
+							augmentedMatrix(k, j) = 0;
+						}
+						else {
+							augmentedMatrix(k, j) += c * augmentedMatrix(i, j);
+						}
+					}
+				}
+			}
+
+			// Normalize diagonal
+			for (unsigned int i = 0; i < Rows; ++i) {
+				T c = 1.0 / augmentedMatrix(i, i);
+				for (unsigned int j = i; j < 2 * Columns; ++j) {
+					augmentedMatrix(i, j) *= c;
+				}
+			}
+
+			// Copy the right half of the augmented matrix to the result
+			Matrix<T, Rows, Columns, Option> inverseMatrix;
+			for (unsigned int i = 0; i < Rows; ++i) {
+				for (unsigned int j = 0; j < Columns; ++j) {
+					inverseMatrix(i, j) = augmentedMatrix(i, j + Columns);
+				}
+			}
+
+			return inverseMatrix;
+		}
+
+		int rank() const
+		{
+			// Create a copy of the matrix
+			Matrix<T, Rows, Columns, Option> copy(*this);
+
+			// Apply Gaussian elimination
+			int rank = 0;
+			for (int row = 0; row < Rows; ++row)
+			{
+				// Find the maximum element in this column
+				T maxEl = std::abs(copy(row, rank));
+				int maxRow = row;
+				for (int i = row + 1; i < Rows; ++i)
+				{
+					if (std::abs(copy(i, rank)) > maxEl)
+					{
+						maxEl = std::abs(copy(i, rank));
+						maxRow = i;
+					}
+				}
+
+				// Swap maximum row with current row
+				if (maxEl != 0)
+				{
+					for (int i = 0; i < Columns; ++i)
+					{
+						T tmp = copy(maxRow, i);
+						copy(maxRow, i) = copy(row, i);
+						copy(row, i) = tmp;
+					}
+
+					// Make all rows below this one 0 in current column
+					for (int i = row + 1; i < Rows; ++i)
+					{
+						T c = -copy(i, rank) / copy(row, rank);
+						for (int j = rank; j < Columns; ++j)
+						{
+							if (rank == j)
+							{
+								copy(i, j) = 0;
+							}
+							else
+							{
+								copy(i, j) += c * copy(row, j);
+							}
+						}
+					}
+
+					++rank;
+				}
+
+				// If rank is equal to Columns, no need to continue
+				if (rank == Columns)
+				{
+					break;
+				}
+			}
+
+			return rank;
+		}
+		}
+		}
 		}
 		Matrix operator+(const Matrix& other) const
 		{
