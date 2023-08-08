@@ -149,7 +149,7 @@ namespace math
 
 		T& operator()(unsigned int row, unsigned int col)
 		{
-			if constexpr (Option == Options::ROW_MAJOR) {
+			if constexpr (Option == Options::RowMajor) {
 				return m_data_[row * Columns + col];
 			}
 			else {
@@ -159,7 +159,7 @@ namespace math
 
 		const T& operator()(unsigned int row, unsigned int col) const
 		{
-			if constexpr (Option == Options::ROW_MAJOR) {
+			if constexpr (Option == Options::RowMajor) {
 				return m_data_[row * Columns + col];
 			}
 			else {
