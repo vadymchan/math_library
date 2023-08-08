@@ -413,6 +413,20 @@ namespace math
 			return std::sqrt(sum);
 		}
 
+		Matrix normalize() const
+		{
+			static_assert(Rows == 1 || Columns == 1, "Normalize is only defined for vectors");
+			T mag = magnitude();
+			assert(mag != 0 && "Cannot normalize a zero vector");
+
+			Matrix<T, Rows, Columns, Option> result(*this);
+			for (unsigned int i = 0; i < Rows; ++i) {
+				for (unsigned int j = 0; j < Columns; ++j) {
+					result(i, j) /= mag;
+				}
+			}
+			return result;
+		}
 		}
 
 
