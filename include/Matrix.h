@@ -420,9 +420,9 @@ namespace math
 			assert(mag != 0 && "Cannot normalize a zero vector");
 
 			Matrix<T, Rows, Columns, Option> result(*this);
-			for (unsigned int i = 0; i < Rows; ++i) {
-				for (unsigned int j = 0; j < Columns; ++j) {
-					result(i, j) /= mag;
+			result /= mag;
+			return result;
+		}
 				}
 			}
 			return result;
