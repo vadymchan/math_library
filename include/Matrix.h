@@ -402,7 +402,16 @@ namespace math
 		}
 		}
 		}
+
+		template<unsigned int NewRows, unsigned int NewColumns>
+		Matrix<T, NewRows, NewColumns, Option> reshape() const
+		{
+			static_assert(Rows * Columns == NewRows * NewColumns, "New dimensions must have the same total size as the original matrix");
+			Matrix<T, NewRows, NewColumns, Option> newMatrix;
+			std::copy_n(m_data_, Rows * Columns, newMatrix.data());
+			return newMatrix;
 		}
+
 		Matrix operator+(const Matrix& other) const
 		{
 			Matrix result = *this;
