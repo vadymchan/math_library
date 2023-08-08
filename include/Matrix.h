@@ -449,6 +449,19 @@ namespace math
 			mulFunc(&result, m_data_, other.data(), kVectorDimention, kVectorDimention, kMatrixSize);
 			return result;
 		}
+
+		template<unsigned int OtherRows, unsigned int OtherColumns> requires
+			ThreeDimensionalVector<Matrix<T, OtherRows, OtherColumns>> &&
+			ThreeDimensionalVector<Matrix<T, Rows, Columns>>
+			Matrix cross(const Matrix<T, OtherRows, OtherColumns>& other) const
+		{
+			Matrix<T, 3, 1, Option> result;
+
+			result(0, 0) = this->operator()(1, 0) * other(2, 0) - this->operator()(2, 0) * other(1, 0);
+			result(1, 0) = this->operator()(2, 0) * other(0, 0) - this->operator()(0, 0) * other(2, 0);
+			result(2, 0) = this->operator()(0, 0) * other(1, 0) - this->operator()(1, 0) * other(0, 0);
+
+			return result;
 		}
 
 
