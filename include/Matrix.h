@@ -26,7 +26,9 @@ namespace math
 	template<auto Count, typename... Args>
 	concept ArgsSizeGreaterThanCount = (sizeof...(Args) > Count);
 
-	template<typename T, unsigned int Rows, unsigned int Columns, Options Option = Options::ROW_MAJOR>
+	template <typename MatrixType>
+	concept OneDimensional = (MatrixType::getRows() == 1 || MatrixType::getColumns() == 1);
+
 	class Matrix
 	{
 	public:
@@ -402,7 +404,8 @@ namespace math
 		}
 
 
-		T magnitude() const 
+		T magnitude() const requires 
+			OneDimensional<Matrix<T, Rows, Columns, Option>>
 		{
 			static_assert(Rows == 1 || Columns == 1, "Magnitude is only defined for vectors");
 			T sum = 0;
@@ -413,7 +416,8 @@ namespace math
 			return std::sqrt(sum);
 		}
 
-		Matrix normalize() const
+		Matrix normalize() const requires 
+			OneDimensional<Matrix<T, Rows, Columns, Option>>
 		{
 			static_assert(Rows == 1 || Columns == 1, "Normalize is only defined for vectors");
 			T mag = magnitude();
