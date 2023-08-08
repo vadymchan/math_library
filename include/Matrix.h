@@ -218,8 +218,39 @@ namespace math
 		T determinant() const
 		{
 			static_assert(Rows == Columns, "Determinant is only defined for square matrices");
-			//TODO: implement
-			return;
+			assert(Rows == Columns);
+
+			if constexpr (Rows == 1) {
+				return m_data_[0];
+			}
+			else if constexpr (Rows == 2) {
+				const T& a = operator()(0, 0);
+				const T& b = operator()(0, 1);
+				const T& c = operator()(1, 0);
+				const T& d = operator()(1, 1);
+				return a * d - b * c;
+			}
+			else {
+				T det = 0;
+				int sign = 1;
+				for (unsigned int i = 0; i < Rows; ++i) {
+					// Construct a sub-matrix
+					Matrix<T, Rows - 1, Columns - 1, Option> submatrix;
+					for (unsigned int j = 1; j < Rows; ++j) {
+						unsigned int k = 0;
+						for (unsigned int l = 0; l < Columns; ++l) {
+							if (l != i) {
+								submatrix(j - 1, k) = (*this)(j, l);
+								++k;
+							}
+						}
+					}
+					// Recursive call
+					det += sign * (*this)(0, i) * submatrix.determinant();
+					sign = -sign;
+				}
+				return det;
+			}
 		}
 
 		Matrix inverse() const
