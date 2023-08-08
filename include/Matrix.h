@@ -616,3 +616,29 @@ namespace math
 		return !(lhs == rhs);
 	}
 
+
+	// Matrix of floats
+	template<unsigned int Rows, unsigned int Columns, Options Option = Options::RowMajor>
+	using MatrixNf = Matrix<float, Rows, Columns, Option>;
+
+	// Matrix of doubles
+	template<unsigned int Rows, unsigned int Columns, Options Option = Options::RowMajor>
+	using MatrixNd = Matrix<double, Rows, Columns, Option>;
+
+	// Matrix of ints
+	template<unsigned int Rows, unsigned int Columns, Options Option = Options::RowMajor>
+	using MatrixNi = Matrix<int, Rows, Columns, Option>;
+
+	// Specific size matrices and vectors
+	using Matrix2f = MatrixNf<2, 2>;
+	using Matrix3f = MatrixNf<3, 3>;
+	using Matrix4f = MatrixNf<4, 4>;
+
+	using Matrix2d = MatrixNd<2, 2>;
+	using Matrix3d = MatrixNd<3, 3>;
+	using Matrix4d = MatrixNd<4, 4>;
+
+	using Matrix2i = MatrixNi<2, 2>;
+	using Matrix3i = MatrixNi<3, 3>;
+	using Matrix4i = MatrixNi<4, 4>;
+} // namespace math
