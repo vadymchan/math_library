@@ -601,6 +601,15 @@ namespace math
 		auto almostEqual = [](float a, float b) { return std::fabs(a - b) <= kEpsilon; };
 		return std::equal(lhs.data(), lhs.data() + Rows * Columns, rhs.data(), almostEqual);
 	}
+
+	template<unsigned int Rows, unsigned int Columns, Options Option>
+	inline constexpr bool operator==(const Matrix<double, Rows, Columns, Option>& lhs, const Matrix<double, Rows, Columns, Option>& rhs)
+	{
+		constexpr double kEpsilon = std::numeric_limits<double>::epsilon();
+		auto almostEqual = [](double a, double b) { return std::fabs(a - b) <= kEpsilon; };
+		return std::equal(lhs.data(), lhs.data() + Rows * Columns, rhs.data(), almostEqual);
+	}
+
 	template<typename T, unsigned int Rows, unsigned int Columns, Options Option>
 	inline constexpr bool operator!=(const Matrix<T, Rows, Columns, Option>& lhs, const Matrix<T, Rows, Columns, Option>& rhs)
 	{
