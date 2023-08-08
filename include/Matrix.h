@@ -537,6 +537,50 @@ namespace math
 			return *this;
 		}
 
+		friend std::ostream& operator<<(std::ostream& os, const Matrix& matrix)
+		{
+			for (unsigned int i = 0; i < Rows; ++i) {
+				for (unsigned int j = 0; j < Columns; ++j) {
+					os << matrix(i, j) << ' ';
+				}
+				os << '\n';
+			}
+			return os;
+		}
+
+		class MatrixInitializer
+		{
+			Matrix& m_matrix_;
+			unsigned int m_row_;
+			unsigned int m_column_;
+
+		public:
+			MatrixInitializer(Matrix& matrix, unsigned int row, unsigned int column)
+				: m_matrix_(matrix), m_row_(row), m_column_(column)
+			{}
+
+			MatrixInitializer& operator,(const T& value)
+			{
+				if (m_column_ >= m_matrix_.getColumns()) {
+					++m_row_;
+					m_column_ = 0;
+				}
+
+				if (m_row_ < m_matrix_.getRows()) {
+					m_matrix_(m_row_, m_column_) = value;
+					++m_column_;
+				}
+
+				return *this;
+			}
+		};
+
+		MatrixInitializer operator<<(const T& value)
+		{
+			this->operator()(0, 0) = value;
+			return MatrixInitializer(*this, 0, 1);
+		}
+
 
 	private:
 
