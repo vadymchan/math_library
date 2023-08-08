@@ -587,4 +587,15 @@ namespace math
 		using DataType = typename std::conditional<UseHeap, T*, T[Rows * Columns]>::type;
 		DataType m_data_;
 	};
-}
+
+	template<typename T, unsigned int Rows, unsigned int Columns, Options Option>
+	inline constexpr bool operator==(const Matrix<T, Rows, Columns, Option>& lhs, const Matrix<T, Rows, Columns, Option>& rhs)
+	{
+		return std::equal(lhs.data(), lhs.data() + Rows * Columns, rhs.data());
+	}
+	template<typename T, unsigned int Rows, unsigned int Columns, Options Option>
+	inline constexpr bool operator!=(const Matrix<T, Rows, Columns, Option>& lhs, const Matrix<T, Rows, Columns, Option>& rhs)
+	{
+		return !(lhs == rhs);
+	}
+
