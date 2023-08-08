@@ -401,6 +401,16 @@ namespace math
 			return rank;
 		}
 		}
+
+
+		T trace() const
+		{
+			static_assert(Rows == Columns, "Trace is only defined for square matrices");
+			T sum = 0;
+			for (unsigned int i = 0; i < Rows; ++i) {
+				sum += this->operator()(i, i);
+			}
+			return sum;
 		}
 
 		template<unsigned int NewRows, unsigned int NewColumns>
