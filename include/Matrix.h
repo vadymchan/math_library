@@ -415,7 +415,6 @@ namespace math
 		T magnitude() const requires 
 			OneDimensional<Matrix<T, Rows, Columns, Option>>
 		{
-			static_assert(Rows == 1 || Columns == 1, "Magnitude is only defined for vectors");
 			T sum = 0;
 			constexpr unsigned int kVectorDimention = 1;
 			constexpr unsigned int kMatrixSize = Rows * Columns;
@@ -427,7 +426,6 @@ namespace math
 		Matrix normalize() const requires 
 			OneDimensional<Matrix<T, Rows, Columns, Option>>
 		{
-			static_assert(Rows == 1 || Columns == 1, "Normalize is only defined for vectors");
 			T mag = magnitude();
 			assert(mag != 0 && "Cannot normalize a zero vector");
 
