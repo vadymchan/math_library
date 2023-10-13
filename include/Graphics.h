@@ -112,7 +112,7 @@ namespace math
 	//lookToRH(eyePosition, centerPosition, upDirection)
 	//lookToLH(eyePosition, centerPosition, upDirection)
     
-    template<typename T, Options Opt>
+    template<typename T, Options Option>
     Matrix<T, 4, 4> lookToRH(const Matrix<T, 3, 1>& eye, const Matrix<T, 3, 1>& direction, const Matrix<T, 3, 1>& worldUp)
     {
         Matrix<T, 3, 1> forward = direction.normalize();
@@ -121,7 +121,7 @@ namespace math
 
         Matrix<T, 4, 4> viewMatrix = Matrix<T, 4, 4>::Identity();
 
-        if constexpr (Opt == Options::RowMajor)
+        if constexpr (Option == Options::RowMajor)
         {
             viewMatrix(0, 0) = right(0, 0);
             viewMatrix(0, 1) = right(1, 0);
