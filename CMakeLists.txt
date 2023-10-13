@@ -41,14 +41,15 @@ set(FETCHCONTENT_BASE_DIR ${CMAKE_SOURCE_DIR}/third_party)
 add_executable(generate_SIMD_defines scripts/GenerateSIMDdefines.cpp)
 
 add_custom_command(
-    OUTPUT include/SIMDdefines.h
+    # OUTPUT include/SIMDdefines.h
+    OUTPUT src/lib/simd/precompiled/SIMDdefines.h
     COMMAND generate_SIMD_defines
     DEPENDS generate_SIMD_defines
 )
 
 add_custom_target(
     run_generate_defines ALL
-    DEPENDS include/SIMDdefines.h
+    DEPENDS src/lib/simd/precompiled/SIMDdefines.h
 )
 
 #-------- fetch content ----------------------------------------
