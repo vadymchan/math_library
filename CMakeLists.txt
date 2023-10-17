@@ -88,17 +88,15 @@ endif()
 if(INCLUDE_G_BENCHMARK)
     message(STATUS "Fetching Google Benchmark...")
     FetchContent_Declare(
-        benchmark
+        googlebenchmark
         GIT_REPOSITORY https://github.com/google/benchmark.git
-        GIT_TAG v1.5.0
+        GIT_TAG v1.6.0
     )
-    FetchContent_GetProperties(benchmark)
-    if(NOT benchmark_POPULATED)
-        FetchContent_Populate(benchmark)
-        set(BENCHMARK_ENABLE_TESTING OFF CACHE BOOL "" FORCE)  # Disable benchmark's tests
-        add_subdirectory(${benchmark_SOURCE_DIR} ${benchmark_BINARY_DIR})
-    endif()
-    target_link_libraries(math_library_exe benchmark)
+    set(BENCHMARK_ENABLE_TESTING OFF CACHE BOOL "Suppressing benchmark's tests" FORCE)
+    FetchContent_MakeAvailable(googlebenchmark)
+    get_target_property(BENCHMARK_INCLUDE_DIRS benchmark::benchmark INTERFACE_INCLUDE_DIRECTORIES)
+    target_include_directories(math_library_exe SYSTEM PRIVATE ${BENCHMARK_INCLUDE_DIRS})
+    target_link_libraries(math_library_exe benchmark::benchmark)
 endif()
 
 set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT math_library_exe)
