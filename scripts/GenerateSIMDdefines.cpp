@@ -98,10 +98,11 @@ int main() {
 
 #else
   unsigned int eax, ebx, ecx, edx;
-
   __get_cpuid(0, &eax, &ebx, &ecx, &edx);
 
-  if (eax >= 1) {
+  unsigned int maxLeaf = eax;
+
+  if (maxLeaf >= 1) {
     __get_cpuid(1, &eax, &ebx, &ecx, &edx);
 
     if (ecx & bit_SSE3) {
@@ -119,10 +120,19 @@ int main() {
     if (ecx & bit_AVX) {
       defines << "#define SUPPORTS_AVX\n";
     }
-    if (ecx & bit_AVX2) {
+  }
+
+  if (maxLeaf >= 7) {
+    __get_cpuid(7, &eax, &ebx, &ecx, &edx);
+
+    if (ebx & (1 << 5)) {
       defines << "#define SUPPORTS_AVX2\n";
     }
+    if (ebx & (1 << 16)) {
+      defines << "#define SUPPORTS_AVX512F\n";
+    }
   }
+
 #endif
 
   return 0;
