@@ -29,7 +29,7 @@ option(INCLUDE_G_BENCHMARK "Include the G_BENCHMARK library" ON)
 file(GLOB_RECURSE EXE_SOURCES "src/exe/*.cpp")
 include_directories(${PROJECT_SOURCE_DIR}/include ${CMAKE_BINARY_DIR})
 
-add_executable(math_library_exe ${EXE_SOURCES})
+add_executable(math_library_exe ${EXE_HEADERS} ${EXE_SOURCES})
 
 target_link_libraries(math_library_exe math_library)
 
