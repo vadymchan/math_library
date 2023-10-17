@@ -54,6 +54,9 @@ add_custom_target(
 
 #-------- fetch content ----------------------------------------
 
+include(FetchContent)
+set(FETCHCONTENT_BASE_DIR ${CMAKE_SOURCE_DIR}/third_party)
+
 if(INCLUDE_SPDLOG)
     message(STATUS "Fetching SPDLOG...")
     FetchContent_Declare(
