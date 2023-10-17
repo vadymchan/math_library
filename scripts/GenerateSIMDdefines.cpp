@@ -61,10 +61,11 @@ int main() {
 
 #ifdef _MSC_VER
   int cpuInfo[4];
-
   __cpuid(cpuInfo, 0);
 
-  if (cpuInfo[0] >= 1) {
+  int maxLeaf = cpuInfo[0];
+
+  if (maxLeaf >= 1) {
     __cpuid(cpuInfo, 1);
 
     if (cpuInfo[2] & (1 << 0)) {
@@ -82,10 +83,19 @@ int main() {
     if (cpuInfo[2] & (1 << 28)) {
       defines << "#define SUPPORTS_AVX\n";
     }
-    if (cpuInfo[3] & (1 << 5)) {
+  }
+
+  if (maxLeaf >= 7) {
+    __cpuidex(cpuInfo, 7, 0);
+
+    if (cpuInfo[1] & (1 << 5)) {
       defines << "#define SUPPORTS_AVX2\n";
     }
+    if (cpuInfo[1] & (1 << 16)) {
+      defines << "#define SUPPORTS_AVX512F\n";
+    }
   }
+
 #else
   unsigned int eax, ebx, ecx, edx;
 
