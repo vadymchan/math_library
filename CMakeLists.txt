@@ -27,6 +27,7 @@ option(INCLUDE_SPDLOG "Include the SPDLOG library" OFF)
 option(INCLUDE_G_BENCHMARK "Include the G_BENCHMARK library" ON)
 
 file(GLOB_RECURSE EXE_SOURCES "src/exe/*.cpp")
+file(GLOB_RECURSE EXE_HEADERS "src/exe/*.h")
 include_directories(${PROJECT_SOURCE_DIR}/include ${CMAKE_BINARY_DIR})
 
 add_executable(math_library_exe ${EXE_HEADERS} ${EXE_SOURCES})
