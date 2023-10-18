@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.10)
-project(math_library)
 set(CMAKE_CXX_STANDARD 20)
+project(math_library)
 
 #-------- lib ----------------------------------------
 
@@ -32,9 +32,6 @@ include_directories(${PROJECT_SOURCE_DIR}/include ${CMAKE_BINARY_DIR})
 add_executable(math_library_exe ${EXE_HEADERS} ${EXE_SOURCES})
 
 target_link_libraries(math_library_exe math_library)
-
-include(FetchContent)
-set(FETCHCONTENT_BASE_DIR ${CMAKE_SOURCE_DIR}/third_party)
 
 #-------- generate_defines ----------------------------------------
 
