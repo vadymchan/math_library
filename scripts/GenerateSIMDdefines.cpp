@@ -1,3 +1,4 @@
+#include <array>
 #include <chrono>
 #include <fstream>
 #include <iomanip>
@@ -40,9 +41,6 @@ auto main() -> int {
   if (!defines) {
     std::cerr << "Failed to open " << defines_file_path << " for writing\n";
     return 1;
-  } else {
-    std::cout << "Successfully opened " << defines_file_path
-              << " for writing\n";
   }
   std::cout << "Successfully opened " << defines_file_path << " for writing\n";
 
@@ -64,6 +62,11 @@ auto main() -> int {
              "SSE4.1, SSE4.2, AVX,\n"
           << " * AVX2 and AVX512F.\n"
           << " */\n\n";
+
+  // Check if Intel compiler is being used or Visual C++ 2019 or later
+#if defined(__INTEL_COMPILER) || (defined(_MSC_VER) && _MSC_VER >= 1920)
+  defines << "#define SUPPORTS_SVML\n";
+#endif
 
 #ifdef _MSC_VER
 
@@ -113,7 +116,6 @@ auto main() -> int {
       defines << "#define SUPPORTS_AVX512F\n";
     }
   }
-
 #else
   unsigned int eax, ebx, ecx, edx;
   __get_cpuid(0, &eax, &ebx, &ecx, &edx);
