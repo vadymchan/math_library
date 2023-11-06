@@ -16,20 +16,24 @@
   #define USE_GMT
 #endif
 
-std::string getCurrentDateTime() {
+auto g_getCurrentDateTime() -> std::string {
   std::ostringstream ss;
   auto               now = std::chrono::system_clock::now();
   auto               itt = std::chrono::system_clock::to_time_t(now);
+
+  std::tm bt{};
+
 #ifdef USE_GMT
-  ss << std::put_time(gmtime(&itt), "%Y-%m-%d %H:%M:%S");
+  gmtime_s(&bt, &itt);
 #else
-  ss << std::put_time(localtime(&itt), "%Y-%m-%d %H:%M:%S");
+  localtime_s(&bt, &itt);
 #endif
 
+  ss << std::put_time(&bt, "%Y-%m-%d %H:%M:%S");
   return ss.str();
 }
 
-int main() {
+auto main() -> int {
   std::string   defines_file_path = "src/lib/simd/precompiled/SIMDdefines.h";
   std::ofstream defines(defines_file_path);
 
@@ -40,8 +44,9 @@ int main() {
     std::cout << "Successfully opened " << defines_file_path
               << " for writing\n";
   }
+  std::cout << "Successfully opened " << defines_file_path << " for writing\n";
 
-  std::string currentDateTime = getCurrentDateTime();
+  std::string currentDateTime = g_getCurrentDateTime();
 
   // Doxygen comment
   defines << "/**\n"
@@ -61,38 +66,50 @@ int main() {
           << " */\n\n";
 
 #ifdef _MSC_VER
-  int cpuInfo[4];
-  __cpuid(cpuInfo, 0);
+
+  constexpr int kCpuidLeaf1 = 1;
+  constexpr int kCpuidLeaf7 = 7;
+
+  constexpr int kBitSse3    = 0;
+  constexpr int kBitSsse3   = 9;
+  constexpr int kBitSse41   = 19;
+  constexpr int kBitSse42   = 20;
+  constexpr int kBitAvx     = 28;
+  constexpr int kBitAvx2    = 5;
+  constexpr int kBitAvx512F = 16;
+
+  std::array<int, 4> cpuInfo{};
+  __cpuid(cpuInfo.data(), 0);
 
   int maxLeaf = cpuInfo[0];
 
-  if (maxLeaf >= 1) {
-    __cpuid(cpuInfo, 1);
+  if (maxLeaf >= kCpuidLeaf1) {
+    __cpuid(cpuInfo.data(), kCpuidLeaf1);
 
-    if (cpuInfo[2] & (1 << 0)) {
+    if (cpuInfo[2] & (1 << kBitSse3)) {
       defines << "#define SUPPORTS_SSE3\n";
     }
-    if (cpuInfo[2] & (1 << 9)) {
+    if (cpuInfo[2] & (1 << kBitSsse3)) {
       defines << "#define SUPPORTS_SSSE3\n";
     }
-    if (cpuInfo[2] & (1 << 19)) {
+    if (cpuInfo[2] & (1 << kBitSse41)) {
       defines << "#define SUPPORTS_SSE4_1\n";
     }
-    if (cpuInfo[2] & (1 << 20)) {
+    if (cpuInfo[2] & (1 << kBitSse42)) {
       defines << "#define SUPPORTS_SSE4_2\n";
     }
-    if (cpuInfo[2] & (1 << 28)) {
+    if (cpuInfo[2] & (1 << kBitAvx)) {
       defines << "#define SUPPORTS_AVX\n";
     }
   }
 
-  if (maxLeaf >= 7) {
-    __cpuidex(cpuInfo, 7, 0);
+  if (maxLeaf >= kCpuidLeaf7) {
+    __cpuidex(cpuInfo.data(), kCpuidLeaf7, 0);
 
-    if (cpuInfo[1] & (1 << 5)) {
+    if (cpuInfo[1] & (1 << kBitAvx2)) {
       defines << "#define SUPPORTS_AVX2\n";
     }
-    if (cpuInfo[1] & (1 << 16)) {
+    if (cpuInfo[1] & (1 << kBitAvx512F)) {
       defines << "#define SUPPORTS_AVX512F\n";
     }
   }
