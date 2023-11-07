@@ -511,6 +511,7 @@ class InstructionSet<double> {
                          const size_t  rowsA,
                          const size_t  colsB,
                          const size_t  colsA_rowsB) {
+    mul_sse3<Option>(result, a, b, rowsA, colsB, colsA_rowsB);
   }
 
   template <Options Option>
@@ -520,6 +521,7 @@ class InstructionSet<double> {
                          const size_t  rowsA,
                          const size_t  colsB,
                          const size_t  colsA_rowsB) {
+    mul_sse3<Option>(result, a, b, rowsA, colsB, colsA_rowsB);
   }
 
   template <Options Option>
@@ -529,6 +531,7 @@ class InstructionSet<double> {
                         const size_t  rowsA,
                         const size_t  colsB,
                         const size_t  colsA_rowsB) {
+    mul_sse3<Option>(result, a, b, rowsA, colsB, colsA_rowsB);
   }
 
   template <Options Option>
@@ -538,6 +541,33 @@ class InstructionSet<double> {
                        const size_t  rowsA,
                        const size_t  colsB,
                        const size_t  colsA_rowsB) {
+    for (size_t currentRowA = 0; currentRowA < rowsA; ++currentRowA) {
+      for (size_t currentColB = 0; currentColB < colsB; ++currentColB) {
+        __m128d sum        = _mm_setzero_pd();
+        size_t  innerIndex = 0;
+        for (; innerIndex + SSE_SIMD_WIDTH - 1 < colsA_rowsB;
+             innerIndex += SSE_SIMD_WIDTH) {
+          __m128d a_vec = loadA_sse<Option>(
+              a, currentRowA, innerIndex, rowsA, colsA_rowsB);
+          __m128d b_vec = loadB_sse<Option>(
+              b, innerIndex, currentColB, colsB, colsA_rowsB);
+          sum = _mm_add_pd(sum, _mm_mul_pd(a_vec, b_vec));
+        }
+        double tmp[SSE_SIMD_WIDTH];
+        _mm_storeu_pd(tmp, sum);
+        double finalSum = 0.0;
+        for (int i = 0; i < SSE_SIMD_WIDTH; ++i) {
+          finalSum += tmp[i];
+        }
+        for (; innerIndex < colsA_rowsB; ++innerIndex) {
+          finalSum
+              += a[indexA<Option>(currentRowA, innerIndex, rowsA, colsA_rowsB)]
+               * b[indexB<Option>(innerIndex, currentColB, colsB, colsA_rowsB)];
+        }
+        result[indexResult<Option>(currentRowA, currentColB, rowsA, colsB)]
+            = finalSum;
+      }
+    }
   }
 
   template <Options Option>
