@@ -97,7 +97,12 @@ class InstructionSet<double> {
   }
 
   template <Options Option>
-  using MulFunc = void (*)(double*, const double*, const double*, size_t);
+  using MulFunc = void (*)(double*,
+                           const double*,
+                           const double*,
+                           const size_t,
+                           const size_t,
+                           const size_t);
 
   template <Options Option>
   static MulFunc<Option> getMulFunc() {
@@ -370,57 +375,63 @@ class InstructionSet<double> {
   static void mul_avx2(double*       result,
                        const double* a,
                        const double* b,
-                       size_t        size) {
-    mul_fallback<Option>(result, a, b, size);
+                       size_t        rowsA,
+                       size_t        colsB,
+                       size_t        colsA_rowsB) {
   }
 
   template <Options Option>
   static void mul_avx(double*       result,
                       const double* a,
                       const double* b,
-                      size_t        size) {
-    mul_fallback<Option>(result, a, b, size);
+                      size_t        rowsA,
+                      size_t        colsB,
+                      size_t        colsA_rowsB) {
   }
 
   template <Options Option>
   static void mul_sse4_2(double*       result,
                          const double* a,
                          const double* b,
-                         size_t        size) {
-    mul_fallback<Option>(result, a, b, size);
+                         const size_t  rowsA,
+                         const size_t  colsB,
+                         const size_t  colsA_rowsB) {
   }
 
   template <Options Option>
   static void mul_sse4_1(double*       result,
                          const double* a,
                          const double* b,
-                         size_t        size) {
-    mul_fallback<Option>(result, a, b, size);
+                         const size_t  rowsA,
+                         const size_t  colsB,
+                         const size_t  colsA_rowsB) {
   }
 
   template <Options Option>
   static void mul_ssse3(double*       result,
                         const double* a,
                         const double* b,
-                        size_t        size) {
-    mul_fallback<Option>(result, a, b, size);
+                        const size_t  rowsA,
+                        const size_t  colsB,
+                        const size_t  colsA_rowsB) {
   }
 
   template <Options Option>
   static void mul_sse3(double*       result,
                        const double* a,
                        const double* b,
-                       size_t        size) {
-    mul_fallback<Option>(result, a, b, size);
+                       const size_t  rowsA,
+                       const size_t  colsB,
+                       const size_t  colsA_rowsB) {
   }
 
   template <Options Option>
   static void mul_fallback(double*       result,
                            const double* a,
                            const double* b,
-                           size_t        size,
-                           size_t        dim) {
-    if constexpr (Option == Options::ColumnMajor) {
+                           const size_t  rowsA,
+                           const size_t  colsB,
+                           const size_t  colsA_rowsB) {
       for (size_t i = 0; i < dim; ++i) {
         for (size_t j = 0; j < dim; ++j) {
           double sum = 0;
