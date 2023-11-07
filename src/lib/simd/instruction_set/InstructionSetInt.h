@@ -96,7 +96,8 @@ class InstructionSet<int> {
   }
 
   template <Options Option>
-  using MulFunc = void (*)(int*, const int*, const int*, size_t);
+  using MulFunc = void (*)(
+      int*, const int*, const int*, const size_t, const size_t, const size_t);
 
   template <Options Option>
   static MulFunc<Option> getMulFunc() {
@@ -755,9 +756,6 @@ class InstructionSet<int> {
 
   // BEGIN: division scalar
   //----------------------------------------------------------------------------
-
-  // Note: SIMD instructions do not support integer division. So we use a loop
-  // for this operation.
 
   static void div_scalar_avx2(int* a, int scalar, size_t size) {
 #ifdef SUPPORTS_SVML
