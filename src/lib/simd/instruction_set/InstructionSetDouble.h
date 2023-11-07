@@ -493,6 +493,7 @@ class InstructionSet<double> {
                        size_t        rowsA,
                        size_t        colsB,
                        size_t        colsA_rowsB) {
+    mul_avx<Option>(result, a, b, rowsA, colsB, colsA_rowsB);
   }
 
   template <Options Option>
@@ -502,6 +503,34 @@ class InstructionSet<double> {
                       size_t        rowsA,
                       size_t        colsB,
                       size_t        colsA_rowsB) {
+    for (size_t currentRowA = 0; currentRowA < rowsA; ++currentRowA) {
+      for (size_t currentColB = 0; currentColB < colsB; ++currentColB) {
+        __m256d sum        = _mm256_setzero_pd();
+        size_t  innerIndex = 0;
+        for (; innerIndex + AVX_SIMD_WIDTH - 1 < colsA_rowsB;
+             innerIndex += AVX_SIMD_WIDTH) {
+          __m256d a_vec
+              = loadA<Option>(a, currentRowA, innerIndex, rowsA, colsA_rowsB);
+          __m256d b_vec
+              = loadB<Option>(b, innerIndex, currentColB, colsB, colsA_rowsB);
+
+          sum = _mm256_fmadd_pd(a_vec, b_vec, sum);
+        }
+        double tmp[AVX_SIMD_WIDTH];
+        _mm256_storeu_pd(tmp, sum);
+        double finalSum = 0.0;
+        for (int i = 0; i < AVX_SIMD_WIDTH; ++i) {
+          finalSum += tmp[i];
+        }
+        for (; innerIndex < colsA_rowsB; ++innerIndex) {
+          finalSum
+              += a[indexA<Option>(currentRowA, innerIndex, rowsA, colsA_rowsB)]
+               * b[indexB<Option>(innerIndex, currentColB, colsB, colsA_rowsB)];
+        }
+        result[indexResult<Option>(currentRowA, currentColB, rowsA, colsB)]
+            = finalSum;
+      }
+    }
   }
 
   template <Options Option>
