@@ -520,6 +520,18 @@ class InstructionSet<double> {
     }
   }
 
+  static void div_scalar_sse4_2(double* a, double scalar, size_t size) {
+    div_scalar_sse3(a, scalar, size);
+  }
+
+  static void div_scalar_sse4_1(double* a, double scalar, size_t size) {
+    div_scalar_sse3(a, scalar, size);
+  }
+
+  static void div_scalar_ssse3(double* a, double scalar, size_t size) {
+    div_scalar_sse3(a, scalar, size);
+  }
+
   static void div_scalar_sse3(double* a, double scalar, size_t size) {
     const size_t sse_limit = size - (size % SSE_SIMD_WIDTH);
     __m128d      xmm0      = _mm_set1_pd(scalar);
