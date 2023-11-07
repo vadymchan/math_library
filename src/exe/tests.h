@@ -50,6 +50,8 @@
 // TEST(MatrixTest, TraceFloat)
 // TEST(MatrixTest, TraceFailureFloat)
 
+// ============================== FLOAT ==================================
+
 TEST(MatrixTest, ConstructorDestructorFloat) {
   math::Matrix<float, 2, 2> matrix;
   // If the constructor and destructor work correctly, this test will pass
@@ -591,6 +593,26 @@ TEST(MatrixTest, MultiplicationColumnMajorFloatInPlace) {
 
 // Method: scalar multiplication
 
+TEST(MatrixTest, ScalarMultiplicationFloat) {
+  math::Matrix<float, 4, 4, math::Options::RowMajor> matrix1;
+  // Populate matrix1 with some values
+  for (int i = 0; i < 4; ++i) {
+    for (int j = 0; j < 4; ++j) {
+      matrix1.coeffRef(i, j) = i * 4 + j + 1;
+    }
+  }
+  math::Matrix<float, 4, 4, math::Options::RowMajor> matrix2 = matrix1 * 10;
+  // Check that each element of the result is the corresponding element of
+  // matrix1 multiplied by 10
+  for (int i = 0; i < 4; ++i) {
+    for (int j = 0; j < 4; ++j) {
+      EXPECT_EQ(matrix2.coeff(i, j), matrix1.coeff(i, j) * 10);
+    }
+  }
+}
+
+// Method: scalar division
+
 TEST(MatrixTest, ScalarDivisionFloat) {
   math::Matrix<float, 4, 4, math::Options::RowMajor> matrix1;
 
@@ -612,7 +634,7 @@ TEST(MatrixTest, ScalarDivisionFloat) {
   }
 }
 
-// Method: scalar division
+// Method: scalar division - failure
 
 TEST(MatrixTest, ScalarDivisionFailureFloat) {
   math::Matrix<float, 4, 4> matrix1;
@@ -631,6 +653,50 @@ TEST(MatrixTest, ScalarDivisionFailureFloat) {
   for (int i = 0; i < 4; ++i) {
     for (int j = 0; j < 4; ++j) {
       EXPECT_NE(matrix2.coeff(i, j), matrix1.coeff(i, j) / 11);
+    }
+  }
+}
+
+// Method: scalar division in place
+
+TEST(MatrixTest, ScalarDivisionInPlaceFloat) {
+  math::Matrix<float, 4, 4, math::Options::RowMajor> matrix;
+
+  // Populate matrix with some values
+  for (int i = 0; i < 4; ++i) {
+    for (int j = 0; j < 4; ++j) {
+      matrix.coeffRef(i, j) = (i * 4 + j + 1);
+    }
+  }
+
+  matrix /= 10.0f; 
+
+  // Check that each element of the matrix is the original value divided by 10
+  for (int i = 0; i < 4; ++i) {
+    for (int j = 0; j < 4; ++j) {
+      EXPECT_FLOAT_EQ(matrix.coeff(i, j), (i * 4 + j + 1) / 10.0f);
+    }
+  }
+}
+
+// Method: scalar division in place - failure
+
+TEST(MatrixTest, ScalarDivisionInPlaceFailureFloat) {
+  math::Matrix<float, 4, 4, math::Options::RowMajor> matrix;
+
+  // Populate matrix with some values
+  for (int i = 0; i < 4; ++i) {
+    for (int j = 0; j < 4; ++j) {
+      matrix.coeffRef(i, j) = (i * 4 + j + 1);
+    }
+  }
+
+  matrix /= 10.0f;  
+
+  // Check that each element of the matrix is the original value divided by 10
+  for (int i = 0; i < 4; ++i) {
+    for (int j = 0; j < 4; ++j) {
+      EXPECT_NE(matrix.coeff(i, j), (i * 4 + j + 1) / 11.0f);
     }
   }
 }
@@ -1325,8 +1391,7 @@ TEST(MatrixTest, CrossProductFloatRandom) {
   }
 }
 
-// ========================================== DOUBLE
-// ==========================================
+// ============================== DOUBLE ==================================
 
 // Matrix equality with very small numbers
 TEST(MatrixTest, MatrixEqualityTrueDoubleSmallNumbers) {
@@ -1368,4 +1433,220 @@ TEST(MatrixTest, MatrixEqualityTrueDoubleCloseNumbers) {
   // Check that each element of matrix1 is equal to the corresponding element of
   // matrix2
   EXPECT_TRUE(matrix1 == matrix2);
+}
+
+// Method: row major multiplication (matrix * matrix)
+
+TEST(MatrixTest, MultiplicationRowMajorDouble) {
+  constexpr int kRows    = 2;
+  constexpr int kColumns = 2;
+
+  math::Matrix<double, kRows, kColumns, math::Options::RowMajor> matrix1;
+  math::Matrix<double, kRows, kColumns, math::Options::RowMajor> matrix2;
+
+  // Populate matrix1 and matrix2 with some values
+  for (int i = 0; i < kRows; ++i) {
+    for (int j = 0; j < kColumns; ++j) {
+      matrix1.coeffRef(i, j) = i * 4 + j + 1;
+      matrix2.coeffRef(i, j) = (i * 4 + j + 1) * 2;
+    }
+  }
+
+  auto matrix3 = matrix1 * matrix2;
+
+  // Check that each element of the result is the correct multiplication of the
+  // corresponding rows and columns of matrix1 and matrix2
+  for (int i = 0; i < kRows; ++i) {
+    for (int j = 0; j < kColumns; ++j) {
+      double expected_value = 0;
+      for (int k = 0; k < kColumns; ++k) {
+        expected_value += matrix1.coeff(i, k) * matrix2.coeff(k, j);
+      }
+      EXPECT_EQ(matrix3.coeff(i, j), expected_value);
+    }
+  }
+}
+
+// Method: row major multiplication (matrix * matrix) - non square matrices
+
+TEST(MatrixTest, MultiplicationRowMajorDoubleNonSquare) {
+  constexpr int kRowsA       = 3;
+  constexpr int kColsA_RowsB = 4;
+  constexpr int kColsB       = 2;
+
+  math::Matrix<double, kRowsA, kColsA_RowsB, math::Options::RowMajor> matrix1;
+  math::Matrix<double, kColsA_RowsB, kColsB, math::Options::RowMajor> matrix2;
+
+  // Populate matrix1 and matrix2 with some values
+  for (int i = 0; i < kRowsA; ++i) {
+    for (int j = 0; j < kColsA_RowsB; ++j) {
+      matrix1.coeffRef(i, j) = static_cast<double>(rand())
+                             / RAND_MAX;  // random values between 0 and 1
+    }
+  }
+
+  for (int i = 0; i < kColsA_RowsB; ++i) {
+    for (int j = 0; j < kColsB; ++j) {
+      matrix2.coeffRef(i, j) = static_cast<double>(rand())
+                             / RAND_MAX;  // random values between 0 and 1
+    }
+  }
+
+  auto matrix3 = matrix1 * matrix2;
+
+  for (int i = 0; i < kRowsA; ++i) {
+    for (int j = 0; j < kColsB; ++j) {
+      double expected_value = 0.0;
+      for (int k = 0; k < kColsA_RowsB; ++k) {
+        expected_value += matrix1.coeff(i, k) * matrix2.coeff(k, j);
+      }
+      EXPECT_NEAR(
+          matrix3.coeff(i, j),
+          expected_value,
+          1e-9);  // Using EXPECT_NEAR with adjusted precision for double
+    }
+  }
+}
+
+// Method: row major multiplication (matrix * matrix) - non square matrices with
+// precise values
+
+TEST(MatrixTest, MultiplicationRowMajorDoubleNonSquare_2) {
+  constexpr int kRowsA       = 3;
+  constexpr int kColsA_RowsB = 4;
+  constexpr int kColsB       = 2;
+
+  math::Matrix<double, kRowsA, kColsA_RowsB, math::Options::RowMajor> matrix1;
+  math::Matrix<double, kColsA_RowsB, kColsB, math::Options::RowMajor> matrix2;
+
+  // Populate matrix1
+  matrix1.coeffRef(0, 0) = 1.0;
+  matrix1.coeffRef(0, 1) = 2.0;
+  matrix1.coeffRef(0, 2) = 3.0;
+  matrix1.coeffRef(0, 3) = 4.0;
+  matrix1.coeffRef(1, 0) = 5.0;
+  matrix1.coeffRef(1, 1) = 6.0;
+  matrix1.coeffRef(1, 2) = 7.0;
+  matrix1.coeffRef(1, 3) = 8.0;
+  matrix1.coeffRef(2, 0) = 9.0;
+  matrix1.coeffRef(2, 1) = 10.0;
+  matrix1.coeffRef(2, 2) = 11.0;
+  matrix1.coeffRef(2, 3) = 12.0;
+
+  // Populate matrix2
+  matrix2.coeffRef(0, 0) = 2.0;
+  matrix2.coeffRef(0, 1) = 3.0;
+  matrix2.coeffRef(1, 0) = 4.0;
+  matrix2.coeffRef(1, 1) = 5.0;
+  matrix2.coeffRef(2, 0) = 6.0;
+  matrix2.coeffRef(2, 1) = 7.0;
+  matrix2.coeffRef(3, 0) = 8.0;
+  matrix2.coeffRef(3, 1) = 9.0;
+
+  auto matrix3 = matrix1 * matrix2;
+
+  // Expected values based on manual matrix multiplication
+  EXPECT_EQ(matrix3.coeff(0, 0), 60.0);
+  EXPECT_EQ(matrix3.coeff(0, 1), 70.0);
+  EXPECT_EQ(matrix3.coeff(1, 0), 140.0);
+  EXPECT_EQ(matrix3.coeff(1, 1), 166.0);
+  EXPECT_EQ(matrix3.coeff(2, 0), 220.0);
+  EXPECT_EQ(matrix3.coeff(2, 1), 262.0);
+}
+
+// Method: column major multiplication (matrix * matrix)
+
+TEST(MatrixTest, MultiplicationColumnMajorDouble) {
+  constexpr int kRows    = 2;
+  constexpr int kColumns = 2;
+
+  math::Matrix<double, kRows, kColumns, math::Options::ColumnMajor> matrix1;
+  math::Matrix<double, kRows, kColumns, math::Options::ColumnMajor> matrix2;
+
+  // Populate matrix1 and matrix2 with some values
+  for (int i = 0; i < kRows; ++i) {
+    for (int j = 0; j < kColumns; ++j) {
+      matrix1.coeffRef(i, j) = i * 4 + j + 1;
+      matrix2.coeffRef(i, j) = (i * 4 + j + 1) * 2;
+    }
+  }
+
+  auto matrix3 = matrix1 * matrix2;
+
+  // Check that each element of the result is the correct multiplication of the
+  // corresponding rows and columns of matrix1 and matrix2
+  for (int i = 0; i < kRows; ++i) {
+    for (int j = 0; j < kColumns; ++j) {
+      double expected_value = 0;
+      for (int k = 0; k < kColumns; ++k) {
+        expected_value += matrix1.coeff(i, k) * matrix2.coeff(k, j);
+      }
+      EXPECT_EQ(matrix3.coeff(i, j), expected_value);
+    }
+  }
+}
+
+// Method: row major multiplication (matrix *= matrix)
+
+TEST(MatrixTest, MultiplicationRowMajorDoubleInPlace) {
+  constexpr int kRows    = 2;
+  constexpr int kColumns = 2;
+
+  math::Matrix<double, kRows, kColumns, math::Options::RowMajor> matrix1;
+  math::Matrix<double, kRows, kColumns, math::Options::RowMajor> matrix2;
+
+  for (int i = 0; i < kRows; ++i) {
+    for (int j = 0; j < kColumns; ++j) {
+      matrix1.coeffRef(i, j) = i * 4 + j + 1;
+      matrix2.coeffRef(i, j) = (i * 4 + j + 1) * 2;
+    }
+  }
+
+  auto matrix3  = matrix1;
+  matrix3      *= matrix2;
+
+  // Check that each element of the result is the correct multiplication of the
+  // corresponding rows and columns of matrix1 and matrix2
+  for (int i = 0; i < kRows; ++i) {
+    for (int j = 0; j < kColumns; ++j) {
+      double expected_value = 0;
+      for (int k = 0; k < kColumns; ++k) {
+        expected_value += matrix1.coeff(i, k) * matrix2.coeff(k, j);
+      }
+      EXPECT_DOUBLE_EQ(matrix3.coeff(i, j), expected_value);
+    }
+  }
+}
+
+// Method: column major multiplication (matrix *= matrix)
+
+TEST(MatrixTest, MultiplicationColumnMajorDoubleInPlace) {
+  constexpr int kRows    = 2;
+  constexpr int kColumns = 2;
+
+  math::Matrix<double, kRows, kColumns, math::Options::ColumnMajor> matrix1;
+  math::Matrix<double, kRows, kColumns, math::Options::ColumnMajor> matrix2;
+
+  // Populate matrix1 and matrix2 with some values
+  for (int i = 0; i < kRows; ++i) {
+    for (int j = 0; j < kColumns; ++j) {
+      matrix1.coeffRef(i, j) = i * 4 + j + 1;
+      matrix2.coeffRef(i, j) = (i * 4 + j + 1) * 2;
+    }
+  }
+
+  auto matrix3  = matrix1;
+  matrix3      *= matrix2;
+
+  // Check that each element of the result is the correct multiplication of the
+  // corresponding rows and columns of matrix1 and matrix2
+  for (int i = 0; i < kRows; ++i) {
+    for (int j = 0; j < kColumns; ++j) {
+      double expected_value = 0;
+      for (int k = 0; k < kColumns; ++k) {
+        expected_value += matrix1.coeff(i, k) * matrix2.coeff(k, j);
+      }
+      EXPECT_DOUBLE_EQ(matrix3.coeff(i, j), expected_value);
+    }
+  }
 }
