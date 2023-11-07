@@ -565,7 +565,8 @@ class InstructionSet<float> {
       for (size_t currentColB = 0; currentColB < colsB; ++currentColB) {
         __m256 sum        = _mm256_setzero_ps();
         size_t innerIndex = 0;
-        for (; innerIndex + 7 < colsA_rowsB; innerIndex += 8) {
+        for (; innerIndex + AVX_SIMD_WIDTH - 1 < colsA_rowsB;
+             innerIndex += AVX_SIMD_WIDTH) {
           __m256 a_vec
               = loadA<Option>(a, currentRowA, innerIndex, rowsA, colsA_rowsB);
           __m256 b_vec
@@ -573,10 +574,10 @@ class InstructionSet<float> {
 
           sum = _mm256_fmadd_ps(a_vec, b_vec, sum);
         }
-        float tmp[8];
+        float tmp[AVX_SIMD_WIDTH];
         _mm256_storeu_ps(tmp, sum);
         float finalSum = 0.0f;
-        for (int i = 0; i < 8; ++i) {
+        for (int i = 0; i < AVX_SIMD_WIDTH; ++i) {
           finalSum += tmp[i];
         }
         for (; innerIndex < colsA_rowsB; ++innerIndex) {
