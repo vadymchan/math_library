@@ -491,16 +491,33 @@ class InstructionSet<int> {
   //----------------------------------------------------------------------------
 
   static void mul_scalar_avx2(int* a, int scalar, size_t size) {
-    // AVX2 does not support direct multiplication of 32-bit integers. You may
-    // need to use a workaround or fallback to SSE4.1
+    __m256i      ymm0       = _mm256_set1_epi32(scalar);
+    const size_t avx2_limit = size - (size % AVX_SIMD_WIDTH);
+    size_t       i          = 0;
+
+    for (; i < avx2_limit; i += AVX_SIMD_WIDTH) {
+      __m256i ymm1 = _mm256_loadu_si256((__m256i*)(a + i));
+      ymm1         = _mm256_mullo_epi32(ymm1, ymm0);
+      _mm256_storeu_si256((__m256i*)(a + i), ymm1);
+    }
+
+    // Handle any remaining values that didn't fit into the last AVX2 vector
+    for (; i < size; ++i) {
+      a[i] *= scalar;
+    }
   }
 
   static void mul_scalar_avx(int* a, int scalar, size_t size) {
-    // AVX does not support direct multiplication of 32-bit integers. You may
-    // need to use a workaround or fallback to SSE4.1
+    mul_scalar_sse4_2(a, scalar, size);  // downgrade to SSE 4.2 since AVX does
+                                         // not support direct multiplication of
+                                         // 32-bit integers
   }
 
   static void mul_scalar_sse4_2(int* a, int scalar, size_t size) {
+    mul_scalar_sse4_1(a, scalar, size);
+  }
+
+  static void mul_scalar_sse4_1(int* a, int scalar, size_t size) {
     __m128i      xmm0      = _mm_set1_epi32(scalar);
     const size_t sse_limit = size - (size % SSE_SIMD_WIDTH);
     size_t       i         = 0;
@@ -517,18 +534,16 @@ class InstructionSet<int> {
     }
   }
 
-  static void mul_scalar_sse4_1(int* a, int scalar, size_t size) {
-    mul_scalar_sse4_2(a, scalar, size);
-  }
-
   static void mul_scalar_ssse3(int* a, int scalar, size_t size) {
-    // SSSE3 does not support direct multiplication of 32-bit integers. You may
-    // need to use a workaround or fallback to SSE4.1
+    // SSSE3 does not include instructions for multiplying a vector of 32-bit
+    // integers by a scalar.
+    mul_scalar_fallback(a, scalar, size);
   }
 
   static void mul_scalar_sse3(int* a, int scalar, size_t size) {
-    // SSE3 does not support direct multiplication of 32-bit integers. You may
-    // need to use a workaround or fallback to SSE4.1
+    // SSE3 does not include instructions for multiplying a vector of 32-bit
+    // integers by a scalar.
+    mul_scalar_fallback(a, scalar, size);
   }
 
   static void mul_scalar_fallback(int* a, int scalar, size_t size) {
