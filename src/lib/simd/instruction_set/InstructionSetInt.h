@@ -410,30 +410,129 @@ class InstructionSet<int> {
   // BEGIN: multiplication array
   //----------------------------------------------------------------------------
 
-  template <Options Option>
-  static void mul_avx2(int* result, const int* a, const int* b, size_t size) {
-    float breakpoint = 0;
-    // AVX2 does not support direct multiplication of 32-bit integers. You may
-    // need to use a workaround or fallback to SSE4.1
-  }
+  // BEGIN: multiplication array utility functions
 
   template <Options Option>
-  static void mul_avx(int* result, const int* a, const int* b, size_t size) {
-    // AVX does not support direct multiplication of 32-bit integers. You may
-    // need to use a workaround or fallback to SSE4.1
-  }
-
-  template <Options Option>
-  static void mul_sse4_2(int* result, const int* a, const int* b, size_t size) {
-    size_t aligned_size = (size / SSE_SIMD_WIDTH) * SSE_SIMD_WIDTH;
-    size_t i            = 0;
-
-    for (i = 0; i < aligned_size; i += SSE_SIMD_WIDTH) {
-      __m128i xmm1 = _mm_loadu_si128((const __m128i*)(a + i));
-      __m128i xmm2 = _mm_loadu_si128((const __m128i*)(b + i));
-      xmm1         = _mm_mullo_epi32(xmm1, xmm2);
-      _mm_storeu_si128((__m128i*)(result + i), xmm1);
+  static inline size_t indexA(const size_t currentRowA,
+                              const size_t innerIndex,
+                              const size_t rowsA,
+                              const size_t colsA_rowsB) {
+    if constexpr (Option == Options::ColumnMajor) {
+      return currentRowA + innerIndex * rowsA;
+    } else if constexpr (Option == Options::RowMajor) {
+      return currentRowA * colsA_rowsB + innerIndex;
     }
+  }
+
+  template <Options Option>
+  static inline size_t indexB(const size_t innerIndex,
+                              const size_t currentColB,
+                              const size_t colsB,
+                              const size_t colsA_rowsB) {
+    if constexpr (Option == Options::ColumnMajor) {
+      return innerIndex + currentColB * colsA_rowsB;
+    } else if constexpr (Option == Options::RowMajor) {
+      return innerIndex * colsB + currentColB;
+    }
+  }
+
+  template <Options Option>
+  static inline size_t indexResult(const size_t currentRowA,
+                                   const size_t currentColB,
+                                   const size_t rowsA,
+                                   const size_t colsB) {
+    if constexpr (Option == Options::ColumnMajor) {
+      return currentRowA + currentColB * rowsA;
+    } else if constexpr (Option == Options::RowMajor) {
+      return currentRowA * colsB + currentColB;
+    }
+  }
+
+  // BEGIN: AVX multiplication array utility functions
+
+  template <Options Option>
+  static inline __m256i loadA_avx(const int*   a,
+                                  const size_t currentRowA,
+                                  const size_t innerIndex,
+                                  const size_t rowsA,
+                                  const size_t colsA_rowsB) {
+    if constexpr (Option == Options::RowMajor) {
+      return _mm256_loadu_si256(reinterpret_cast<const __m256i*>(
+          &a[indexA<Option>(currentRowA, innerIndex, rowsA, colsA_rowsB)]));
+    } else {
+      return _mm256_set_epi32(
+          a[indexA<Option>(currentRowA, innerIndex + 7, rowsA, colsA_rowsB)],
+          a[indexA<Option>(currentRowA, innerIndex + 6, rowsA, colsA_rowsB)],
+          a[indexA<Option>(currentRowA, innerIndex + 5, rowsA, colsA_rowsB)],
+          a[indexA<Option>(currentRowA, innerIndex + 4, rowsA, colsA_rowsB)],
+          a[indexA<Option>(currentRowA, innerIndex + 3, rowsA, colsA_rowsB)],
+          a[indexA<Option>(currentRowA, innerIndex + 2, rowsA, colsA_rowsB)],
+          a[indexA<Option>(currentRowA, innerIndex + 1, rowsA, colsA_rowsB)],
+          a[indexA<Option>(currentRowA, innerIndex, rowsA, colsA_rowsB)]);
+    }
+  }
+
+  template <Options Option>
+  static inline __m256 loadB(const int*   b,
+                             const size_t innerIndex,
+                             const size_t currentColB,
+                             const size_t colsB,
+                             const size_t colsA_rowsB) {
+    if constexpr (Option == Options::RowMajor) {
+      return _mm256_set_epi32(
+          b[indexB<Option>(innerIndex + 7, currentColB, colsB, colsA_rowsB)],
+          b[indexB<Option>(innerIndex + 6, currentColB, colsB, colsA_rowsB)],
+          b[indexB<Option>(innerIndex + 5, currentColB, colsB, colsA_rowsB)],
+          b[indexB<Option>(innerIndex + 4, currentColB, colsB, colsA_rowsB)],
+          b[indexB<Option>(innerIndex + 3, currentColB, colsB, colsA_rowsB)],
+          b[indexB<Option>(innerIndex + 2, currentColB, colsB, colsA_rowsB)],
+          b[indexB<Option>(innerIndex + 1, currentColB, colsB, colsA_rowsB)],
+          b[indexB<Option>(innerIndex, currentColB, colsB, colsA_rowsB)]);
+    } else {
+      return _mm256_loadu_si256(reinterpret_cast<const __m256i*>(
+          &b[indexB<Option>(innerIndex, currentColB, colsB, colsA_rowsB)]));
+    }
+  }
+
+  // END: AVX multiplication array utility functions
+
+  // BEGIN: SSE multiplication array utility functions
+
+  template <Options Option>
+  static inline __m128i loadA_sse(const int*   a,
+                                  const size_t currentRowA,
+                                  const size_t innerIndex,
+                                  const size_t rowsA,
+                                  const size_t colsA_rowsB) {
+    if constexpr (Option == Options::RowMajor) {
+      return _mm_loadu_si128(reinterpret_cast<const __m128i*>(
+          &a[indexA<Option>(currentRowA, innerIndex, rowsA, colsA_rowsB)]));
+    } else {
+      return _mm_set_epi32(
+          a[indexA<Option>(currentRowA, innerIndex + 3, rowsA, colsA_rowsB)],
+          a[indexA<Option>(currentRowA, innerIndex + 2, rowsA, colsA_rowsB)],
+          a[indexA<Option>(currentRowA, innerIndex + 1, rowsA, colsA_rowsB)],
+          a[indexA<Option>(currentRowA, innerIndex, rowsA, colsA_rowsB)]);
+    }
+  }
+
+  template <Options Option>
+  static inline __m128 loadB_sse(const int*   b,
+                                 const size_t innerIndex,
+                                 const size_t currentColB,
+                                 const size_t colsB,
+                                 const size_t colsA_rowsB) {
+    if constexpr (Option == Options::ColumnMajor) {
+      return _mm_loadu_si128(reinterpret_cast<const __m128i*>(
+          &b[indexB<Option>(innerIndex, currentColB, colsB, colsA_rowsB)]));
+    } else {
+      return _mm_set_epi32(
+          b[indexB<Option>(innerIndex + 3, currentColB, colsB, colsA_rowsB)],
+          b[indexB<Option>(innerIndex + 2, currentColB, colsB, colsA_rowsB)],
+          b[indexB<Option>(innerIndex + 1, currentColB, colsB, colsA_rowsB)],
+          b[indexB<Option>(innerIndex, currentColB, colsB, colsA_rowsB)]);
+    }
+  }
 
     // Handling remaining elements
     for (; i < size; ++i) {
