@@ -606,24 +606,14 @@ class InstructionSet<double> {
                            const size_t  rowsA,
                            const size_t  colsB,
                            const size_t  colsA_rowsB) {
-      for (size_t i = 0; i < dim; ++i) {
-        for (size_t j = 0; j < dim; ++j) {
-          double sum = 0;
-          for (size_t k = 0; k < dim; ++k) {
-            sum += a[i + k * dim] * b[k + j * dim];
-          }
-          result[i + j * dim] = sum;
+    for (size_t i = 0; i < rowsA; ++i) {
+      for (size_t j = 0; j < colsB; ++j) {
+        double sum = 0;
+        for (size_t k = 0; k < colsA_rowsB; ++k) {
+          sum += a[indexA<Option>(i, k, rowsA, colsA_rowsB)]
+               * b[indexB<Option>(k, j, colsB, colsA_rowsB)];
         }
-      }
-    } else if constexpr (Option == Options::RowMajor) {
-      for (size_t i = 0; i < dim; ++i) {
-        for (size_t j = 0; j < dim; ++j) {
-          double sum = 0;
-          for (size_t k = 0; k < dim; ++k) {
-            sum += a[i * dim + k] * b[k * dim + j];
-          }
-          result[i * dim + j] = sum;
-        }
+        result[indexResult<Option>(i, j, rowsA, colsB)] = sum;
       }
     }
   }
