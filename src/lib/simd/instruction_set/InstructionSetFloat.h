@@ -454,6 +454,8 @@ class InstructionSet<float> {
     }
   }
 
+  // BEGIN: AVX multiplication array utility functions
+
   template <Options Option>
   static inline __m256 loadA(const float* a,
                              const size_t currentRowA,
@@ -497,6 +499,48 @@ class InstructionSet<float> {
           &b[indexB<Option>(innerIndex, currentColB, colsB, colsA_rowsB)]);
     }
   }
+
+  // END: AVX multiplication array utility functions
+
+  // BEGIN: SSE multiplication array utility functions
+
+  template <Options Option>
+  static inline __m128 loadA_sse(const float* a,
+                                 const size_t currentRowA,
+                                 const size_t innerIndex,
+                                 const size_t rowsA,
+                                 const size_t colsA_rowsB) {
+    if constexpr (Option == Options::RowMajor) {
+      return _mm_loadu_ps(
+          &a[indexA<Option>(currentRowA, innerIndex, rowsA, colsA_rowsB)]);
+    } else {
+      return _mm_set_ps(
+          a[indexA<Option>(currentRowA, innerIndex + 3, rowsA, colsA_rowsB)],
+          a[indexA<Option>(currentRowA, innerIndex + 2, rowsA, colsA_rowsB)],
+          a[indexA<Option>(currentRowA, innerIndex + 1, rowsA, colsA_rowsB)],
+          a[indexA<Option>(currentRowA, innerIndex, rowsA, colsA_rowsB)]);
+    }
+  }
+
+  template <Options Option>
+  static inline __m128 loadB_sse(const float* b,
+                                 const size_t innerIndex,
+                                 const size_t currentColB,
+                                 const size_t colsB,
+                                 const size_t colsA_rowsB) {
+    if constexpr (Option == Options::ColumnMajor) {
+      return _mm_loadu_ps(
+          &b[indexB<Option>(innerIndex, currentColB, colsB, colsA_rowsB)]);
+    } else {
+      return _mm_set_ps(
+          b[indexB<Option>(innerIndex + 3, currentColB, colsB, colsA_rowsB)],
+          b[indexB<Option>(innerIndex + 2, currentColB, colsB, colsA_rowsB)],
+          b[indexB<Option>(innerIndex + 1, currentColB, colsB, colsA_rowsB)],
+          b[indexB<Option>(innerIndex, currentColB, colsB, colsA_rowsB)]);
+    }
+  }
+
+  // END: SSE multiplication array utility functions
 
   // END: multiplication array utility functions
 
@@ -553,7 +597,7 @@ class InstructionSet<float> {
                          const size_t rowsA,
                          const size_t colsB,
                          const size_t colsA_rowsB) {
-    mul_fallback<Option>(result, a, b, rowsA, colsB, colsA_rowsB);
+    mul_sse3<Option>(result, a, b, rowsA, colsB, colsA_rowsB);
   }
 
   template <Options Option>
@@ -563,7 +607,7 @@ class InstructionSet<float> {
                          const size_t rowsA,
                          const size_t colsB,
                          const size_t colsA_rowsB) {
-    mul_fallback<Option>(result, a, b, rowsA, colsB, colsA_rowsB);
+    mul_sse3<Option>(result, a, b, rowsA, colsB, colsA_rowsB);
   }
 
   template <Options Option>
@@ -573,7 +617,7 @@ class InstructionSet<float> {
                         const size_t rowsA,
                         const size_t colsB,
                         const size_t colsA_rowsB) {
-    mul_fallback<Option>(result, a, b, rowsA, colsB, colsA_rowsB);
+    mul_sse3<Option>(result, a, b, rowsA, colsB, colsA_rowsB);
   }
 
   template <Options Option>
@@ -583,7 +627,33 @@ class InstructionSet<float> {
                        const size_t rowsA,
                        const size_t colsB,
                        const size_t colsA_rowsB) {
-    mul_fallback<Option>(result, a, b, rowsA, colsB, colsA_rowsB);
+    for (size_t currentRowA = 0; currentRowA < rowsA; ++currentRowA) {
+      for (size_t currentColB = 0; currentColB < colsB; ++currentColB) {
+        __m128 sum        = _mm_setzero_ps();
+        size_t innerIndex = 0;
+        for (; innerIndex + SSE_SIMD_WIDTH - 1 < colsA_rowsB;
+             innerIndex += SSE_SIMD_WIDTH) {
+          __m128 a_vec = loadA_sse<Option>(
+              a, currentRowA, innerIndex, rowsA, colsA_rowsB);
+          __m128 b_vec = loadB_sse<Option>(
+              b, innerIndex, currentColB, colsB, colsA_rowsB);
+          sum = _mm_add_ps(sum, _mm_mul_ps(a_vec, b_vec));
+        }
+        float tmp[SSE_SIMD_WIDTH];
+        _mm_storeu_ps(tmp, sum);
+        float finalSum = 0.0f;
+        for (int i = 0; i < SSE_SIMD_WIDTH; ++i) {
+          finalSum += tmp[i];
+        }
+        for (; innerIndex < colsA_rowsB; ++innerIndex) {
+          finalSum
+              += a[indexA<Option>(currentRowA, innerIndex, rowsA, colsA_rowsB)]
+               * b[indexB<Option>(innerIndex, currentColB, colsB, colsA_rowsB)];
+        }
+        result[indexResult<Option>(currentRowA, currentColB, rowsA, colsB)]
+            = finalSum;
+      }
+    }
   }
 
   template <Options Option>
