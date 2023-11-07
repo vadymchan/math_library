@@ -547,27 +547,77 @@ class InstructionSet<int> {
   // for this operation.
 
   static void div_scalar_avx2(int* a, int scalar, size_t size) {
+#ifdef SUPPORTS_SVML
+    div_scalar_avx(a, scalar, size);
+#else
     div_scalar_fallback(a, scalar, size);
+#endif
   }
 
   static void div_scalar_avx(int* a, int scalar, size_t size) {
+#ifdef SUPPORTS_SVML
+    const size_t avx_limit = size - (size % AVX_SIMD_WIDTH);
+    __m256i      ymm0      = _mm256_set1_epi32(scalar);
+    size_t       i         = 0;
+
+    for (; i < avx_limit; i += AVX_SIMD_WIDTH) {
+      __m256i ymm1 = _mm256_loadu_epi32(a + i);
+      ymm1         = _mm256_div_epi32(ymm1, ymm0);
+      _mm256_storeu_epi32(a + i, ymm1);
+    }
+
+    // Handle any remainder
+    for (; i < size; ++i) {
+      a[i] /= scalar;
+    }
+#else
     div_scalar_fallback(a, scalar, size);
+#endif
   }
 
   static void div_scalar_sse4_2(int* a, int scalar, size_t size) {
+#ifdef SUPPORTS_SVML
+    div_scalar_sse3(a, scalar, size);
+#else
     div_scalar_fallback(a, scalar, size);
+#endif
   }
 
   static void div_scalar_sse4_1(int* a, int scalar, size_t size) {
+#ifdef SUPPORTS_SVML
+    div_scalar_sse3(a, scalar, size);
+#else
     div_scalar_fallback(a, scalar, size);
+#endif
   }
 
   static void div_scalar_ssse3(int* a, int scalar, size_t size) {
+#ifdef SUPPORTS_SVML
+    div_scalar_sse3(a, scalar, size);
+#else
     div_scalar_fallback(a, scalar, size);
+#endif
   }
 
   static void div_scalar_sse3(int* a, int scalar, size_t size) {
+#ifdef SUPPORTS_SVML
+    const size_t sse_limit = size - (size % SSE_SIMD_WIDTH);
+    __m128i      xmm0      = _mm_set1_epi32(scalar);
+    size_t       i         = 0;
+
+    for (; i < sse_limit; i += SSE_SIMD_WIDTH) {
+      __m128i xmm1 = _mm_loadu_epi32(a + i);
+      xmm1         = _mm_div_epi32(xmm1, xmm0);
+      _mm_storeu_epi32(a + i, xmm1);
+    }
+
+    // Handle any remainder
+    for (; i < size; ++i) {
+      a[i] /= scalar;
+    }
+#else
     div_scalar_fallback(a, scalar, size);
+#endif
   }
 
   static void div_scalar_fallback(int* a, int scalar, size_t size) {
