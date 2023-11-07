@@ -534,27 +534,126 @@ class InstructionSet<int> {
     }
   }
 
-    // Handling remaining elements
-    for (; i < size; ++i) {
-      result[i] = a[i] * b[i];
+  // END: SSE multiplication array utility functions
+
+  template <Options Option>
+  static void mul_avx2(int*         result,
+                       const int*   a,
+                       const int*   b,
+                       const size_t rowsA,
+                       const size_t colsB,
+                       const size_t colsA_rowsB) {
+    for (size_t currentRowA = 0; currentRowA < rowsA; ++currentRowA) {
+      for (size_t currentColB = 0; currentColB < colsB; ++currentColB) {
+        __m256i sum        = _mm256_setzero_si256();
+        size_t  innerIndex = 0;
+        for (; innerIndex + AVX_SIMD_WIDTH - 1 < colsA_rowsB;
+             innerIndex += AVX_SIMD_WIDTH) {
+          __m256i a_vec = _mm256_loadu_si256(reinterpret_cast<const __m256i*>(
+              &a[indexA<Option>(currentRowA, innerIndex, rowsA, colsA_rowsB)]));
+          __m256i b_vec = _mm256_loadu_si256(reinterpret_cast<const __m256i*>(
+              &b[indexB<Option>(innerIndex, currentColB, colsB, colsA_rowsB)]));
+
+          sum = _mm256_add_epi32(sum, _mm256_mullo_epi32(a_vec, b_vec));
+        }
+        int tmp[AVX_SIMD_WIDTH];
+        _mm256_storeu_si256(reinterpret_cast<__m256i*>(tmp), sum);
+        int finalSum = 0;
+        for (int i = 0; i < AVX_SIMD_WIDTH; ++i) {
+          finalSum += tmp[i];
+        }
+        for (; innerIndex < colsA_rowsB; ++innerIndex) {
+          finalSum
+              += a[indexA<Option>(currentRowA, innerIndex, rowsA, colsA_rowsB)]
+               * b[indexB<Option>(innerIndex, currentColB, colsB, colsA_rowsB)];
+        }
+        result[indexResult<Option>(currentRowA, currentColB, rowsA, colsB)]
+            = finalSum;
+      }
     }
   }
 
   template <Options Option>
-  static void mul_sse4_1(int* result, const int* a, const int* b, size_t size) {
-    mul_sse4_2(result, a, b, size);
+  static void mul_avx(int*         result,
+                      const int*   a,
+                      const int*   b,
+                      const size_t rowsA,
+                      const size_t colsB,
+                      const size_t colsA_rowsB) {
+    // downgrade to SSE 4.2 since AVX does not support direct multiplication of
+    // 32-bit integers
+    mul_sse4_2<Option>(result, a, b, rowsA, colsB, colsA_rowsB);
   }
 
   template <Options Option>
-  static void mul_ssse3(int* result, const int* a, const int* b, size_t size) {
-    // SSSE3 does not support direct multiplication of 32-bit integers. You may
-    // need to use a workaround or fallback to SSE4.1
+  static void mul_sse4_2(int*         result,
+                         const int*   a,
+                         const int*   b,
+                         const size_t rowsA,
+                         const size_t colsB,
+                         const size_t colsA_rowsB) {
+    mul_sse4_1<Option>(result, a, b, rowsA, colsB, colsA_rowsB);
   }
 
   template <Options Option>
-  static void mul_sse3(int* result, const int* a, const int* b, size_t size) {
-    // SSE3 does not support direct multiplication of 32-bit integers. You may
-    // need to use a workaround or fallback to SSE4.1
+  static void mul_sse4_1(int*         result,
+                         const int*   a,
+                         const int*   b,
+                         const size_t rowsA,
+                         const size_t colsB,
+                         const size_t colsA_rowsB) {
+    for (size_t currentRowA = 0; currentRowA < rowsA; ++currentRowA) {
+      for (size_t currentColB = 0; currentColB < colsB; ++currentColB) {
+        __m128i sum        = _mm_setzero_si128();
+        size_t  innerIndex = 0;
+        for (; innerIndex + SSE_SIMD_WIDTH - 1 < colsA_rowsB;
+             innerIndex += SSE_SIMD_WIDTH) {
+          __m128i a_vec = _mm_loadu_si128(reinterpret_cast<const __m128i*>(
+              &a[indexA<Option>(currentRowA, innerIndex, rowsA, colsA_rowsB)]));
+          __m128i b_vec = _mm_loadu_si128(reinterpret_cast<const __m128i*>(
+              &b[indexB<Option>(innerIndex, currentColB, colsB, colsA_rowsB)]));
+
+          sum = _mm_add_epi32(sum, _mm_mullo_epi32(a_vec, b_vec));
+        }
+        int tmp[SSE_SIMD_WIDTH];
+        _mm_storeu_si128(reinterpret_cast<__m128i*>(tmp), sum);
+        int finalSum = 0;
+        for (int i = 0; i < SSE_SIMD_WIDTH; ++i) {
+          finalSum += tmp[i];
+        }
+        for (; innerIndex < colsA_rowsB; ++innerIndex) {
+          finalSum
+              += a[indexA<Option>(currentRowA, innerIndex, rowsA, colsA_rowsB)]
+               * b[indexB<Option>(innerIndex, currentColB, colsB, colsA_rowsB)];
+        }
+        result[indexResult<Option>(currentRowA, currentColB, rowsA, colsB)]
+            = finalSum;
+      }
+    }
+  }
+
+  template <Options Option>
+  static void mul_ssse3(int*         result,
+                        const int*   a,
+                        const int*   b,
+                        const size_t rowsA,
+                        const size_t colsB,
+                        const size_t colsA_rowsB) {
+    // SSSE3 does not include instructions for multiplying a vector of 32-bit
+    // integers by a scalar.
+    mul_fallback<Option>(result, a, b, rowsA, colsB, colsA_rowsB);
+  }
+
+  template <Options Option>
+  static void mul_sse3(int*         result,
+                       const int*   a,
+                       const int*   b,
+                       const size_t rowsA,
+                       const size_t colsB,
+                       const size_t colsA_rowsB) {
+    // SSE3 does not include instructions for multiplying a vector of 32-bit
+    // integers by a scalar.
+    mul_fallback<Option>(result, a, b, rowsA, colsB, colsA_rowsB);
   }
 
   template <Options Option>
