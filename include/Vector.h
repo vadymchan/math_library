@@ -2,7 +2,9 @@
  * @file Vector.h
  */
 
-#pragma once
+#ifndef MATH_LIBRARY_VECTOR_H
+#define MATH_LIBRARY_VECTOR_H
+
 
 #include "Matrix.h"
 
@@ -55,3 +57,5 @@ using RowVector3i = RowVectorXi<3>;
 using RowVector4i = RowVectorXi<4>;
 
 }  // namespace math
+
+#endif  

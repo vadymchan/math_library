@@ -1,3 +1,7 @@
+#ifndef MATH_LIBRARY_OPTIONS_H
+#define MATH_LIBRARY_OPTIONS_H
+
+
 /**
  * @file Options.h
  * @brief This file contains the Options enum used for specifying various
@@ -26,3 +30,5 @@ enum class Options {
   Count     /**< Enum value for counting the number of options.  */
 };
 }  // namespace math
+
+#endif

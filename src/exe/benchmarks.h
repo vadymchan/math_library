@@ -1,8 +1,8 @@
-#pragma once
+#ifndef MATH_LIBRARY_BENCHMARK_H
+#define MATH_LIBRARY_BENCHMARK_H
 
 #include <All.h>
 #include <benchmark/benchmark.h>
-
 
 static void bmMatrixCreationStack(benchmark::State& state);
 static void bmMatrixCreationHeap(benchmark::State& state);
@@ -314,3 +314,5 @@ BENCHMARK(bmMatrixTrace);
 //=========================================
 //            END::BENCHMARKING
 //=========================================
+
+#endif

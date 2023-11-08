@@ -2,7 +2,8 @@
  * @file InstructionSetDouble.h
  */
 
-#pragma once
+#ifndef MATH_LIBRARY_INSTRUCTION_SET_DOUBLE_H
+#define MATH_LIBRARY_INSTRUCTION_SET_DOUBLE_H
 
 #include "../../Options/Options.h"
 
@@ -747,3 +748,5 @@ class InstructionSet<double> {
   //----------------------------------------------------------------------------
 };
 }  // namespace math
+
+#endif

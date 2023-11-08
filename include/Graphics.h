@@ -2,7 +2,8 @@
  * @file Graphics.h
  */
 
-#pragma once
+#ifndef MATH_LIBRARY_GRAPHICS_H
+#define MATH_LIBRARY_GRAPHICS_H
 
 #include "Matrix.h"
 
@@ -13,8 +14,8 @@ namespace math {
 
 template <typename T, Options Option = Options::RowMajor>
 auto g_lookAtRH(const Matrix<T, 3, 1>& eye,
-                         const Matrix<T, 3, 1>& target,
-                         const Matrix<T, 3, 1>& worldUp) -> Matrix<T, 4, 4> {
+                const Matrix<T, 3, 1>& target,
+                const Matrix<T, 3, 1>& worldUp) -> Matrix<T, 4, 4> {
   Matrix<T, 3, 1> forward = (eye - target).normalize();
   Matrix<T, 3, 1> right   = worldUp.cross(forward).normalize();
   Matrix<T, 3, 1> up      = forward.cross(right);
@@ -58,8 +59,8 @@ auto g_lookAtRH(const Matrix<T, 3, 1>& eye,
 
 template <typename T, Options Option = Options::RowMajor>
 auto g_lookAtLh(const Matrix<T, 3, 1>& eye,
-                         const Matrix<T, 3, 1>& target,
-                         const Matrix<T, 3, 1>& worldUp) -> Matrix<T, 4, 4> {
+                const Matrix<T, 3, 1>& target,
+                const Matrix<T, 3, 1>& worldUp) -> Matrix<T, 4, 4> {
   Matrix<T, 3, 1> forward = (target - eye).normalize();
   Matrix<T, 3, 1> right   = worldUp.cross(forward).normalize();
   Matrix<T, 3, 1> up      = forward.cross(right);
@@ -107,8 +108,8 @@ auto g_lookAtLh(const Matrix<T, 3, 1>& eye,
 
 template <typename T, Options Option>
 auto g_lookToRh(const Matrix<T, 3, 1>& eye,
-                         const Matrix<T, 3, 1>& direction,
-                         const Matrix<T, 3, 1>& worldUp) -> Matrix<T, 4, 4> {
+                const Matrix<T, 3, 1>& direction,
+                const Matrix<T, 3, 1>& worldUp) -> Matrix<T, 4, 4> {
   Matrix<T, 3, 1> forward = direction.normalize();
   Matrix<T, 3, 1> right   = worldUp.cross(forward).normalize();
   Matrix<T, 3, 1> up      = forward.cross(right);
@@ -152,8 +153,8 @@ auto g_lookToRh(const Matrix<T, 3, 1>& eye,
 
 template <typename T, Options Option = Options::RowMajor>
 auto g_lookToLh(const Matrix<T, 3, 1>& eye,
-                         const Matrix<T, 3, 1>& direction,
-                         const Matrix<T, 3, 1>& worldUp) -> Matrix<T, 4, 4> {
+                const Matrix<T, 3, 1>& direction,
+                const Matrix<T, 3, 1>& worldUp) -> Matrix<T, 4, 4> {
   Matrix<T, 3, 1> forward = direction.normalize();
   Matrix<T, 3, 1> right   = worldUp.cross(forward).normalize();
   Matrix<T, 3, 1> up      = forward.cross(right);
@@ -198,10 +199,8 @@ auto g_lookToLh(const Matrix<T, 3, 1>& eye,
 // perspectiveFovRH(fov, aspectRatio, nearPlane, farPlane)
 // perspectiveFovLH(fov, aspectRatio, nearPlane, farPlane)
 template <typename T, Options Option = Options::RowMajor>
-auto g_perspectiveFovRh(T fov,
-                                 T aspectRatio,
-                                 T nearPlane,
-                                 T farPlane) -> Matrix<T, 4, 4> {
+auto g_perspectiveFovRh(T fov, T aspectRatio, T nearPlane, T farPlane)
+    -> Matrix<T, 4, 4> {
   assert(abs(aspectRatio - std::numeric_limits<T>::epsilon())
          > static_cast<T>(0));
 
@@ -224,10 +223,8 @@ auto g_perspectiveFovRh(T fov,
 }
 
 template <typename T, Options Option = Options::RowMajor>
-auto g_perspectiveFovLh(T fov,
-                                 T aspectRatio,
-                                 T nearPlane,
-                                 T farPlane) -> Matrix<T, 4, 4> {
+auto g_perspectiveFovLh(T fov, T aspectRatio, T nearPlane, T farPlane)
+    -> Matrix<T, 4, 4> {
   assert(abs(aspectRatio - std::numeric_limits<T>::epsilon())
          > static_cast<T>(0));
 
@@ -253,7 +250,8 @@ auto g_perspectiveFovLh(T fov,
 
 template <typename T, Options Option = Options::RowMajor>
 auto g_perspectiveOffCenter(
-    T left, T right, T bottom, T top, T nearPlane, T farPlane) -> Matrix<T, 4, 4> {
+    T left, T right, T bottom, T top, T nearPlane, T farPlane)
+    -> Matrix<T, 4, 4> {
   assert(abs(right - left) > std::numeric_limits<T>::epsilon()
          && "Right and left values cannot be equal");
   assert(abs(top - bottom) > std::numeric_limits<T>::epsilon()
@@ -287,8 +285,8 @@ auto g_perspectiveOffCenter(
 // orthoLH(left, right, bottom, top, nearPlane, farPlane)
 
 template <typename T, Options Option = Options::RowMajor>
-auto g_orthoRh(
-    T left, T right, T bottom, T top, T nearPlane, T farPlane) -> Matrix<T, 4, 4> {
+auto g_orthoRh(T left, T right, T bottom, T top, T nearPlane, T farPlane)
+    -> Matrix<T, 4, 4> {
   assert(abs(right - left) > std::numeric_limits<T>::epsilon()
          && "Right and left values cannot be equal");
   assert(abs(top - bottom) > std::numeric_limits<T>::epsilon()
@@ -315,8 +313,8 @@ auto g_orthoRh(
 }
 
 template <typename T, Options Option = Options::RowMajor>
-auto g_orthoLh(
-    T left, T right, T bottom, T top, T nearPlane, T farPlane) -> Matrix<T, 4, 4> {
+auto g_orthoLh(T left, T right, T bottom, T top, T nearPlane, T farPlane)
+    -> Matrix<T, 4, 4> {
   assert(abs(right - left) > std::numeric_limits<T>::epsilon()
          && "Right and left values cannot be equal");
   assert(abs(top - bottom) > std::numeric_limits<T>::epsilon()
@@ -343,3 +341,5 @@ auto g_orthoLh(
 }
 
 }  // namespace math
+
+#endif

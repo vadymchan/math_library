@@ -2,7 +2,8 @@
  * @file Matrix.h
  */
 
-#pragma once
+#ifndef MATH_LIBRARY_MATRIX_H
+#define MATH_LIBRARY_MATRIX_H
 
 #include "../src/lib/Options/Options.h"
 #include "../src/lib/simd/instruction_set/InstructionSet.h"
@@ -672,3 +673,5 @@ using Matrix2i = MatrixNi<2, 2>;
 using Matrix3i = MatrixNi<3, 3>;
 using Matrix4i = MatrixNi<4, 4>;
 }  // namespace math
+
+#endif

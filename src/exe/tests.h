@@ -1,4 +1,5 @@
-#pragma once
+#ifndef MATH_LIBRARY_TESTS_H
+#define MATH_LIBRARY_TESTS_H
 
 #include <All.h>
 #include <gtest/gtest.h>
@@ -411,9 +412,9 @@ TEST(MatrixTest, MultiplicationRowMajorFloat) {
 // Method: row major multiplication (matrix * matrix) - non square matrices
 
 TEST(MatrixTest, MultiplicationRowMajorFloatNonSquare) {
-  constexpr int kRowsA       = 3;
+  constexpr int kRowsA      = 3;
   constexpr int kColsARowsB = 4;
-  constexpr int kColsB       = 2;
+  constexpr int kColsB      = 2;
 
   math::Matrix<float, kRowsA, kColsARowsB, math::Options::RowMajor> matrix1;
   math::Matrix<float, kColsARowsB, kColsB, math::Options::RowMajor> matrix2;
@@ -452,9 +453,9 @@ TEST(MatrixTest, MultiplicationRowMajorFloatNonSquare) {
 // precise values
 
 TEST(MatrixTest, MultiplicationRowMajorFloatNonSquare_2) {
-  constexpr int kRowsA       = 3;
+  constexpr int kRowsA      = 3;
   constexpr int kColsARowsB = 4;
-  constexpr int kColsB       = 2;
+  constexpr int kColsB      = 2;
 
   math::Matrix<float, kRowsA, kColsARowsB, math::Options::RowMajor> matrix1;
   math::Matrix<float, kColsARowsB, kColsB, math::Options::RowMajor> matrix2;
@@ -669,7 +670,7 @@ TEST(MatrixTest, ScalarDivisionInPlaceFloat) {
     }
   }
 
-  matrix /= 10.0f; 
+  matrix /= 10.0f;
 
   // Check that each element of the matrix is the original value divided by 10
   for (int i = 0; i < 4; ++i) {
@@ -691,7 +692,7 @@ TEST(MatrixTest, ScalarDivisionInPlaceFailureFloat) {
     }
   }
 
-  matrix /= 10.0f;  
+  matrix /= 10.0f;
 
   // Check that each element of the matrix is the original value divided by 10
   for (int i = 0; i < 4; ++i) {
@@ -1089,7 +1090,7 @@ TEST(MatrixTest, RankFailureFloat_2) {
 TEST(MatrixTest, MagnitudeFloat) {
   math::Matrix<float, 3, 1> vector(2.0f, 2.0f, 1.0f);  // 3D vector
 
-  auto magnitude = vector.magnitude(); 
+  auto magnitude = vector.magnitude();
   // Expected magnitude is sqrt(2^2 + 2^2 + 1^2) = sqrt(9) = 3
   EXPECT_FLOAT_EQ(vector.magnitude(), 3);
 }
@@ -1471,9 +1472,9 @@ TEST(MatrixTest, MultiplicationRowMajorDouble) {
 // Method: row major multiplication (matrix * matrix) - non square matrices
 
 TEST(MatrixTest, MultiplicationRowMajorDoubleNonSquare) {
-  constexpr int kRowsA       = 3;
+  constexpr int kRowsA      = 3;
   constexpr int kColsARowsB = 4;
-  constexpr int kColsB       = 2;
+  constexpr int kColsB      = 2;
 
   math::Matrix<double, kRowsA, kColsARowsB, math::Options::RowMajor> matrix1;
   math::Matrix<double, kColsARowsB, kColsB, math::Options::RowMajor> matrix2;
@@ -1513,9 +1514,9 @@ TEST(MatrixTest, MultiplicationRowMajorDoubleNonSquare) {
 // precise values
 
 TEST(MatrixTest, MultiplicationRowMajorDoubleNonSquare_2) {
-  constexpr int kRowsA       = 3;
+  constexpr int kRowsA      = 3;
   constexpr int kColsARowsB = 4;
-  constexpr int kColsB       = 2;
+  constexpr int kColsB      = 2;
 
   math::Matrix<double, kRowsA, kColsARowsB, math::Options::RowMajor> matrix1;
   math::Matrix<double, kColsARowsB, kColsB, math::Options::RowMajor> matrix2;
@@ -1652,9 +1653,7 @@ TEST(MatrixTest, MultiplicationColumnMajorDoubleInPlace) {
   }
 }
 
-
 // ============================== INT ==================================
-
 
 // Matrix equality with very small numbers
 TEST(MatrixTest, MatrixEqualityTrueIntSmallNumbers) {
@@ -1711,3 +1710,5 @@ TEST(MatrixTest, MultiplicationRowMajorIntNonSquare_2) {
   EXPECT_EQ(matrix3.coeff(2, 0), 220.0);
   EXPECT_EQ(matrix3.coeff(2, 1), 262.0);
 }
+
+#endif

@@ -2,7 +2,8 @@
  * @file InstructionSet.h
  */
 
-#pragma once
+#ifndef MATH_LIBRARY_INSTRUCTION_SET_H
+  #define MATH_LIBRARY_INSTRUCTION_SET_H
 
 #include "../../options/Options.h"
 #include "../precompiled/SIMDdefines.h"
@@ -445,3 +446,5 @@ class InstructionSet {
 #include "InstructionSetDouble.h"
 #include "InstructionSetFloat.h"
 #include "InstructionSetInt.h"
+
+#endif

@@ -2,7 +2,8 @@
  * @file InstructionSetInt.h
  */
 
-#pragma once
+#ifndef MATH_LIBRARY_INSTRUCTION_SET_INT_H
+#define MATH_LIBRARY_INSTRUCTION_SET_INT_H
 
 #include "../../options/Options.h"
 
@@ -660,7 +661,7 @@ class InstructionSet<int> {
   }
 
   template <Options Option>
-  static void mulFallback(int*         result,
+  static void MulFallback(int*         result,
                           const int*   a,
                           const int*   b,
                           const size_t kRowsA,
@@ -837,3 +838,5 @@ class InstructionSet<int> {
 };
 
 }  // namespace math
+
+#endif

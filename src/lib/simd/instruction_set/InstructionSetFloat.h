@@ -2,7 +2,8 @@
  * @file InstructionSetFloat.h
  */
 
-#pragma once
+#ifndef MATH_LIBRARY_INSTRUCTION_SET_FLOAT_H
+#define MATH_LIBRARY_INSTRUCTION_SET_FLOAT_H
 
 #include "../../options/Options.h"
 
@@ -807,3 +808,5 @@ class InstructionSet<float> {
 };
 
 }  // namespace math
+
+#endif
