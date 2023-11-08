@@ -10,7 +10,7 @@ file(GLOB_RECURSE PRIVATE_HEADERS "src/lib/**/*.h")
 
 if(LIB_SOURCES) 
     message(STATUS "Build math library as static library")
-    add_library(math_library STATIC ${PUBLIC_HEADERS} ${LIB_SOURCES})
+    add_library(math_library STATIC ${PUBLIC_HEADERS} ${PRIVATE_HEADERS} ${LIB_SOURCES})
     target_include_directories(math_library PUBLIC include)
     target_include_directories(math_library PRIVATE src/lib)
 else()
