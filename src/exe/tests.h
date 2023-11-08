@@ -66,12 +66,12 @@ TEST(MatrixTest, ConstructorDestructorFailureFloat) {
 // Method: Matrix(const T& element)
 
 TEST(MatrixTest, ElementConstructorFloat) {
-  const float                     elementValue = 5.0f;
-  const math::Matrix<float, 3, 3> matrix(elementValue);
+  const float                     kElementValue = 5.0f;
+  const math::Matrix<float, 3, 3> kMatrix(kElementValue);
 
   for (int i = 0; i < 3; ++i) {
     for (int j = 0; j < 3; ++j) {
-      EXPECT_EQ(matrix(i, j), elementValue);
+      EXPECT_EQ(kMatrix(i, j), kElementValue);
     }
   }
 }
@@ -103,13 +103,13 @@ TEST(MatrixTest, MoveConstructorFloat) {
 // Method: Matrix& operator=(const Matrix& other)
 
 TEST(MatrixTest, AssignmentOperatorFloat) {
-  const math::Matrix<float, 3, 3> original(5.0f);
+  const math::Matrix<float, 3, 3> kOriginal(5.0f);
   math::Matrix<float, 3, 3>       copy;
-  copy = original;
+  copy = kOriginal;
 
   for (int i = 0; i < 3; ++i) {
     for (int j = 0; j < 3; ++j) {
-      EXPECT_EQ(copy(i, j), original(i, j));
+      EXPECT_EQ(copy(i, j), kOriginal(i, j));
     }
   }
 }
@@ -214,7 +214,7 @@ TEST(MatrixTest, CoeffAccessConstFloat) {
 TEST(MatrixTest, StackAllocationFloat) {
   // This matrix should be small enough to be allocated on the stack
   math::Matrix<float, 2, 2> matrix;
-  EXPECT_FALSE(matrix.UseHeap);
+  EXPECT_FALSE(matrix.s_kUseHeap);
 }
 
 // Method: heap allocation
@@ -222,7 +222,7 @@ TEST(MatrixTest, StackAllocationFloat) {
 TEST(MatrixTest, HeapAllocationFloat) {
   // This matrix should be large enough to be allocated on the heap
   math::Matrix<float, 100, 100> matrix;
-  EXPECT_TRUE(matrix.UseHeap);
+  EXPECT_TRUE(matrix.s_kUseHeap);
 }
 
 // Method: addition (matrix + matrix)
@@ -412,21 +412,21 @@ TEST(MatrixTest, MultiplicationRowMajorFloat) {
 
 TEST(MatrixTest, MultiplicationRowMajorFloatNonSquare) {
   constexpr int kRowsA       = 3;
-  constexpr int kColsA_RowsB = 4;
+  constexpr int kColsARowsB = 4;
   constexpr int kColsB       = 2;
 
-  math::Matrix<float, kRowsA, kColsA_RowsB, math::Options::RowMajor> matrix1;
-  math::Matrix<float, kColsA_RowsB, kColsB, math::Options::RowMajor> matrix2;
+  math::Matrix<float, kRowsA, kColsARowsB, math::Options::RowMajor> matrix1;
+  math::Matrix<float, kColsARowsB, kColsB, math::Options::RowMajor> matrix2;
 
   // Populate matrix1 and matrix2 with some values
   for (int i = 0; i < kRowsA; ++i) {
-    for (int j = 0; j < kColsA_RowsB; ++j) {
+    for (int j = 0; j < kColsARowsB; ++j) {
       matrix1.coeffRef(i, j) = static_cast<float>(rand())
                              / RAND_MAX;  // random values between 0 and 1
     }
   }
 
-  for (int i = 0; i < kColsA_RowsB; ++i) {
+  for (int i = 0; i < kColsARowsB; ++i) {
     for (int j = 0; j < kColsB; ++j) {
       matrix2.coeffRef(i, j) = static_cast<float>(rand())
                              / RAND_MAX;  // random values between 0 and 1
@@ -438,7 +438,7 @@ TEST(MatrixTest, MultiplicationRowMajorFloatNonSquare) {
   for (int i = 0; i < kRowsA; ++i) {
     for (int j = 0; j < kColsB; ++j) {
       float expected_value = 0;
-      for (int k = 0; k < kColsA_RowsB; ++k) {
+      for (int k = 0; k < kColsARowsB; ++k) {
         expected_value += matrix1.coeff(i, k) * matrix2.coeff(k, j);
       }
       EXPECT_NEAR(matrix3.coeff(i, j),
@@ -453,11 +453,11 @@ TEST(MatrixTest, MultiplicationRowMajorFloatNonSquare) {
 
 TEST(MatrixTest, MultiplicationRowMajorFloatNonSquare_2) {
   constexpr int kRowsA       = 3;
-  constexpr int kColsA_RowsB = 4;
+  constexpr int kColsARowsB = 4;
   constexpr int kColsB       = 2;
 
-  math::Matrix<float, kRowsA, kColsA_RowsB, math::Options::RowMajor> matrix1;
-  math::Matrix<float, kColsA_RowsB, kColsB, math::Options::RowMajor> matrix2;
+  math::Matrix<float, kRowsA, kColsARowsB, math::Options::RowMajor> matrix1;
+  math::Matrix<float, kColsARowsB, kColsB, math::Options::RowMajor> matrix2;
 
   // Populate matrix1
   matrix1.coeffRef(0, 0) = 1;
@@ -1089,6 +1089,7 @@ TEST(MatrixTest, RankFailureFloat_2) {
 TEST(MatrixTest, MagnitudeFloat) {
   math::Matrix<float, 3, 1> vector(2.0f, 2.0f, 1.0f);  // 3D vector
 
+  auto magnitude = vector.magnitude(); 
   // Expected magnitude is sqrt(2^2 + 2^2 + 1^2) = sqrt(9) = 3
   EXPECT_FLOAT_EQ(vector.magnitude(), 3);
 }
@@ -1471,21 +1472,21 @@ TEST(MatrixTest, MultiplicationRowMajorDouble) {
 
 TEST(MatrixTest, MultiplicationRowMajorDoubleNonSquare) {
   constexpr int kRowsA       = 3;
-  constexpr int kColsA_RowsB = 4;
+  constexpr int kColsARowsB = 4;
   constexpr int kColsB       = 2;
 
-  math::Matrix<double, kRowsA, kColsA_RowsB, math::Options::RowMajor> matrix1;
-  math::Matrix<double, kColsA_RowsB, kColsB, math::Options::RowMajor> matrix2;
+  math::Matrix<double, kRowsA, kColsARowsB, math::Options::RowMajor> matrix1;
+  math::Matrix<double, kColsARowsB, kColsB, math::Options::RowMajor> matrix2;
 
   // Populate matrix1 and matrix2 with some values
   for (int i = 0; i < kRowsA; ++i) {
-    for (int j = 0; j < kColsA_RowsB; ++j) {
+    for (int j = 0; j < kColsARowsB; ++j) {
       matrix1.coeffRef(i, j) = static_cast<double>(rand())
                              / RAND_MAX;  // random values between 0 and 1
     }
   }
 
-  for (int i = 0; i < kColsA_RowsB; ++i) {
+  for (int i = 0; i < kColsARowsB; ++i) {
     for (int j = 0; j < kColsB; ++j) {
       matrix2.coeffRef(i, j) = static_cast<double>(rand())
                              / RAND_MAX;  // random values between 0 and 1
@@ -1497,7 +1498,7 @@ TEST(MatrixTest, MultiplicationRowMajorDoubleNonSquare) {
   for (int i = 0; i < kRowsA; ++i) {
     for (int j = 0; j < kColsB; ++j) {
       double expected_value = 0.0;
-      for (int k = 0; k < kColsA_RowsB; ++k) {
+      for (int k = 0; k < kColsARowsB; ++k) {
         expected_value += matrix1.coeff(i, k) * matrix2.coeff(k, j);
       }
       EXPECT_NEAR(
@@ -1513,11 +1514,11 @@ TEST(MatrixTest, MultiplicationRowMajorDoubleNonSquare) {
 
 TEST(MatrixTest, MultiplicationRowMajorDoubleNonSquare_2) {
   constexpr int kRowsA       = 3;
-  constexpr int kColsA_RowsB = 4;
+  constexpr int kColsARowsB = 4;
   constexpr int kColsB       = 2;
 
-  math::Matrix<double, kRowsA, kColsA_RowsB, math::Options::RowMajor> matrix1;
-  math::Matrix<double, kColsA_RowsB, kColsB, math::Options::RowMajor> matrix2;
+  math::Matrix<double, kRowsA, kColsARowsB, math::Options::RowMajor> matrix1;
+  math::Matrix<double, kColsARowsB, kColsB, math::Options::RowMajor> matrix2;
 
   // Populate matrix1
   matrix1.coeffRef(0, 0) = 1.0;
@@ -1649,4 +1650,64 @@ TEST(MatrixTest, MultiplicationColumnMajorDoubleInPlace) {
       EXPECT_DOUBLE_EQ(matrix3.coeff(i, j), expected_value);
     }
   }
+}
+
+
+// ============================== INT ==================================
+
+
+// Matrix equality with very small numbers
+TEST(MatrixTest, MatrixEqualityTrueIntSmallNumbers) {
+  math::Matrix<int, 1, 2, math::Options::RowMajor> matrix1;
+  matrix1.coeffRef(0, 0) = std::numeric_limits<int>::min();
+  matrix1.coeffRef(0, 1) = std::numeric_limits<int>::min();
+
+  math::Matrix<int, 1, 2, math::Options::RowMajor> matrix2 = matrix1;
+
+  // Check that each element of matrix1 is equal to the corresponding element of
+  // matrix2
+  EXPECT_TRUE(matrix1 == matrix2);
+}
+
+TEST(MatrixTest, MultiplicationRowMajorIntNonSquare_2) {
+  constexpr int kRowsA      = 3;
+  constexpr int kColsARowsB = 4;
+  constexpr int kColsB      = 2;
+
+  math::Matrix<int, kRowsA, kColsARowsB, math::Options::RowMajor> matrix1;
+  math::Matrix<int, kColsARowsB, kColsB, math::Options::RowMajor> matrix2;
+
+  // Populate matrix1
+  matrix1.coeffRef(0, 0) = 1.0;
+  matrix1.coeffRef(0, 1) = 2.0;
+  matrix1.coeffRef(0, 2) = 3.0;
+  matrix1.coeffRef(0, 3) = 4.0;
+  matrix1.coeffRef(1, 0) = 5.0;
+  matrix1.coeffRef(1, 1) = 6.0;
+  matrix1.coeffRef(1, 2) = 7.0;
+  matrix1.coeffRef(1, 3) = 8.0;
+  matrix1.coeffRef(2, 0) = 9.0;
+  matrix1.coeffRef(2, 1) = 10.0;
+  matrix1.coeffRef(2, 2) = 11.0;
+  matrix1.coeffRef(2, 3) = 12.0;
+
+  // Populate matrix2
+  matrix2.coeffRef(0, 0) = 2.0;
+  matrix2.coeffRef(0, 1) = 3.0;
+  matrix2.coeffRef(1, 0) = 4.0;
+  matrix2.coeffRef(1, 1) = 5.0;
+  matrix2.coeffRef(2, 0) = 6.0;
+  matrix2.coeffRef(2, 1) = 7.0;
+  matrix2.coeffRef(3, 0) = 8.0;
+  matrix2.coeffRef(3, 1) = 9.0;
+
+  auto matrix3 = matrix1 * matrix2;
+
+  // Expected values based on manual matrix multiplication
+  EXPECT_EQ(matrix3.coeff(0, 0), 60.0);
+  EXPECT_EQ(matrix3.coeff(0, 1), 70.0);
+  EXPECT_EQ(matrix3.coeff(1, 0), 140.0);
+  EXPECT_EQ(matrix3.coeff(1, 1), 166.0);
+  EXPECT_EQ(matrix3.coeff(2, 0), 220.0);
+  EXPECT_EQ(matrix3.coeff(2, 1), 262.0);
 }

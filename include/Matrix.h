@@ -4,12 +4,15 @@
 
 #pragma once
 
-#include "../src/lib/options/Options.h"
+#include "../src/lib/Options/Options.h"
 #include "../src/lib/simd/instruction_set/InstructionSet.h"
+
+#include <math.h>
 
 #include <algorithm>
 #include <cassert>
 #include <cmath>
+#include <cstddef>
 #include <iostream>
 #include <iterator>
 #include <ranges>
@@ -27,16 +30,16 @@ concept ArgsSizeGreaterThanCount = (sizeof...(Args) > Count);
 
 template <typename MatrixType>
 concept OneDimensional
-    = (MatrixType::getRows() == 1 || MatrixType::getColumns() == 1);
+    = (MatrixType::GetRows() == 1 || MatrixType::GetColumns() == 1);
 
 template <typename MatrixType>
 concept ThreeDimensionalVector
-    = ((MatrixType::getRows() == 3 && MatrixType::getColumns() == 1)
-       || (MatrixType::getRows() == 1 && MatrixType::getColumns() == 3));
+    = ((MatrixType::GetRows() == 3 && MatrixType::GetColumns() == 1)
+       || (MatrixType::GetRows() == 1 && MatrixType::GetColumns() == 3));
 
 template <typename MatrixA, typename MatrixB>
-concept SameSize = (MatrixA::getRows() * MatrixA::getColumns()
-                    == MatrixB::getRows() * MatrixB::getColumns());
+concept SameSize = (MatrixA::GetRows() * MatrixA::GetColumns()
+                    == MatrixB::GetRows() * MatrixB::GetColumns());
 
 template <typename T,
           unsigned int Rows,
@@ -44,34 +47,39 @@ template <typename T,
           Options      Option = Options::RowMajor>
 class Matrix {
   public:
-  static const bool UseHeap = Rows * Columns > g_kStackAllocationLimit;
+  static const bool s_kUseHeap = Rows * Columns > g_kStackAllocationLimit;
 
+  private:
+  using DataType = std::conditional_t<s_kUseHeap, T*, T[Rows * Columns]>;
+  DataType m_data_;
+
+  public:
   Matrix() {
-    if constexpr (UseHeap) {
-      m_data_ = new T[Rows * Columns];
+    if constexpr (s_kUseHeap) {
+      m_data_ = new T[static_cast<unsigned long long>(Rows) * Columns];
     }
   }
 
   Matrix(const T& element) {
-    if constexpr (UseHeap) {
-      m_data_ = new T[Rows * Columns];
+    if constexpr (s_kUseHeap) {
+      m_data_ = new T[static_cast<unsigned long long>(Rows) * Columns];
     }
     std::fill_n(m_data_, Rows * Columns, element);
   }
 
   Matrix(const Matrix& other) {
-    if constexpr (UseHeap) {
-      m_data_ = new T[Rows * Columns];
+    if constexpr (s_kUseHeap) {
+      m_data_ = new T[static_cast<unsigned long long>(Rows) * Columns];
     }
 
     std::copy_n(other.m_data_, Rows * Columns, m_data_);
   }
 
-  Matrix& operator=(const Matrix& other) {
+  auto operator=(const Matrix& other) -> Matrix& {
     if (this != &other) {
-      if constexpr (UseHeap) {
+      if constexpr (s_kUseHeap) {
         delete[] m_data_;
-        m_data_ = new T[Rows * Columns];
+        m_data_ = new T[static_cast<unsigned long long>(Rows) * Columns];
       }
       std::copy_n(other.m_data_, Rows * Columns, m_data_);
     }
@@ -79,7 +87,7 @@ class Matrix {
   }
 
   Matrix(Matrix&& other) noexcept {
-    if constexpr (UseHeap) {
+    if constexpr (s_kUseHeap) {
       m_data_       = other.m_data_;
       other.m_data_ = nullptr;
     } else {
@@ -89,9 +97,9 @@ class Matrix {
     }
   }
 
-  Matrix& operator=(Matrix&& other) noexcept {
+  auto operator=(Matrix&& other) noexcept -> Matrix& {
     if (this != &other) {
-      if constexpr (UseHeap) {
+      if constexpr (s_kUseHeap) {
         delete[] m_data_;
         m_data_       = other.m_data_;
         other.m_data_ = nullptr;
@@ -107,10 +115,11 @@ class Matrix {
   template <typename... Args>
     requires AllSameAs<T, Args...> && ArgsSizeGreaterThanCount<1, Args...>
   Matrix(Args... args) {
-    static_assert(sizeof...(Args) == Rows * Columns,
-                  "Incorrect number of arguments for Matrix initialization");
-    if constexpr (UseHeap) {
-      m_data_ = new T[Rows * Columns];
+    static_assert(
+        sizeof...(Args) == static_cast<unsigned long long>(Rows) * Columns,
+        "Incorrect number of arguments for Matrix initialization");
+    if constexpr (s_kUseHeap) {
+      m_data_ = new T[static_cast<unsigned long long>(Rows) * Columns];
     }
     T arr[] = {args...};
     std::copy(std::begin(arr), std::end(arr), m_data_);
@@ -119,8 +128,8 @@ class Matrix {
   template <std::input_iterator InputIt>
   Matrix(InputIt first, InputIt last) {
     assert(std::distance(first, last) == Rows * Columns);
-    if constexpr (UseHeap) {
-      m_data_ = new T[Rows * Columns];
+    if constexpr (s_kUseHeap) {
+      m_data_ = new T[static_cast<unsigned long long>(Rows) * Columns];
     }
     std::copy(first, last, m_data_);
   }
@@ -128,13 +137,13 @@ class Matrix {
   template <std::ranges::range Range>
   Matrix(const Range& range) {
     assert(std::ranges::size(range) <= Rows * Columns);
-    if constexpr (UseHeap) {
+    if constexpr (s_kUseHeap) {
       m_data_ = new T[Rows * Columns];
     }
     std::copy_n(range.begin(), Rows * Columns, m_data_);
   }
 
-  static constexpr Matrix Identity() {
+  static constexpr auto Identity() -> Matrix {
     Matrix                 m(0);
     constexpr unsigned int kMin = std::min(Rows, Columns);
     for (unsigned int i = 0; i < kMin; ++i) {
@@ -144,12 +153,12 @@ class Matrix {
   }
 
   ~Matrix() {
-    if constexpr (UseHeap) {
+    if constexpr (s_kUseHeap) {
       delete[] m_data_;
     }
   }
 
-  T& operator()(unsigned int row, unsigned int col) {
+  auto operator()(unsigned int row, unsigned int col) -> T& {
     if constexpr (Option == Options::RowMajor) {
       return m_data_[row * Columns + col];
     } else {
@@ -157,7 +166,7 @@ class Matrix {
     }
   }
 
-  const T& operator()(unsigned int row, unsigned int col) const {
+  auto operator()(unsigned int row, unsigned int col) const -> const T& {
     if constexpr (Option == Options::RowMajor) {
       return m_data_[row * Columns + col];
     } else {
@@ -165,27 +174,28 @@ class Matrix {
     }
   }
 
-  const T& coeff(unsigned int row, unsigned int col) const {
+  [[nodiscard]] auto coeff(unsigned int row, unsigned int col) const
+      -> const T& {
     assert(row < Rows && col < Columns && "Index out of bounds");
     return operator()(row, col);
   }
 
-  T& coeffRef(unsigned int row, unsigned int col) {
+  auto coeffRef(unsigned int row, unsigned int col) -> T& {
     assert(row < Rows && col < Columns && "Index out of bounds");
     return operator()(row, col);
   }
 
-  static constexpr unsigned int getRows() { return Rows; }
+  static constexpr auto GetRows() -> unsigned int { return Rows; }
 
-  static constexpr unsigned int getColumns() { return Columns; }
+  static constexpr auto GetColumns() -> unsigned int { return Columns; }
 
-  static constexpr Options getOption() { return Option; }
+  static constexpr auto GetOption() -> Options { return Option; }
 
-  T* data() { return m_data_; }
+  auto data() -> T* { return m_data_; }
 
-  const T* data() const { return m_data_; }
+  [[nodiscard]] auto data() const -> const T* { return m_data_; }
 
-  Matrix<T, Columns, Rows, Option> transpose() const {
+  [[nodiscard]] auto transpose() const -> Matrix<T, Columns, Rows, Option> {
     Matrix<T, Columns, Rows, Option> res;
     for (unsigned int i = 0; i < Rows; ++i) {
       for (unsigned int j = 0; j < Columns; ++j) {
@@ -195,7 +205,7 @@ class Matrix {
     return res;
   }
 
-  T determinant() const {
+  [[nodiscard]] auto determinant() const -> T {
     static_assert(Rows == Columns,
                   "Determinant is only defined for square matrices");
     assert(Rows == Columns);
@@ -231,7 +241,7 @@ class Matrix {
     }
   }
 
-  Matrix inverse() const {
+  [[nodiscard]] auto inverse() const -> Matrix {
     static_assert(Rows == Columns,
                   "Inverse is only defined for square matrices");
 
@@ -269,7 +279,7 @@ class Matrix {
         augmentedMatrix(i, k)      = tmp;
       }
 
-      // Make all rows below this one 0 in current column
+      // Make all Rows below this one 0 in current column
       for (unsigned int k = i + 1; k < Rows; ++k) {
         T c = -augmentedMatrix(k, i) / augmentedMatrix(i, i);
         for (unsigned int j = i; j < 2 * Columns; ++j) {
@@ -282,7 +292,7 @@ class Matrix {
       }
     }
 
-    // Make all rows above this one zero in current column
+    // Make all Rows above this one zero in current column
     for (int i = Rows - 1; i >= 0; i--) {
       for (int k = i - 1; k >= 0; k--) {
         T c = -augmentedMatrix(k, i) / augmentedMatrix(i, i);
@@ -315,7 +325,7 @@ class Matrix {
     return inverseMatrix;
   }
 
-  int rank() const {
+  [[nodiscard]] auto rank() const -> int {
     // Create a copy of the matrix
     Matrix<T, Rows, Columns, Option> copy(*this);
 
@@ -340,7 +350,7 @@ class Matrix {
           copy(row, i)    = tmp;
         }
 
-        // Make all rows below this one 0 in current column
+        // Make all Rows below this one 0 in current column
         for (int i = row + 1; i < Rows; ++i) {
           T c = -copy(i, rank) / copy(row, rank);
           for (int j = rank; j < Columns; ++j) {
@@ -364,13 +374,13 @@ class Matrix {
     return rank;
   }
 
-  T magnitude() const
+  [[nodiscard]] auto magnitude() const -> T
     requires OneDimensional<Matrix<T, Rows, Columns, Option>>
   {
     T                      sum              = 0;
     constexpr unsigned int kVectorDimention = 1;
     constexpr unsigned int kMatrixSize      = Rows * Columns;
-    auto mulFunc = InstructionSet<T>::template getMulFunc<Option>();
+    auto mulFunc = InstructionSet<T>::template GetMulFunc<Option>();
     mulFunc(&sum,
             m_data_,
             m_data_,
@@ -380,7 +390,7 @@ class Matrix {
     return std::sqrt(sum);
   }
 
-  Matrix normalize() const
+  [[nodiscard]] auto normalize() const -> Matrix
     requires OneDimensional<Matrix<T, Rows, Columns, Option>>
   {
     T mag = magnitude();
@@ -396,11 +406,12 @@ class Matrix {
           && OneDimensional<Matrix<T, OtherRows, OtherColumns>>
           && SameSize<Matrix<T, Rows, Columns>,
                       Matrix<T, OtherRows, OtherColumns>>
-  T dot(const Matrix<T, OtherRows, OtherColumns>& other) const {
-    float                  result;
+  [[nodiscard]] auto dot(const Matrix<T, OtherRows, OtherColumns>& other) const
+      -> T {
+    float                  result           = NAN;
     constexpr unsigned int kVectorDimention = 1;
     constexpr unsigned int kMatrixSize      = Rows * Columns;
-    auto mulFunc = InstructionSet<T>::template getMulFunc<Option>();
+    auto mulFunc = InstructionSet<T>::template GetMulFunc<Option>();
     mulFunc(&result,
             m_data_,
             other.data(),
@@ -413,7 +424,8 @@ class Matrix {
   template <unsigned int OtherRows, unsigned int OtherColumns>
     requires ThreeDimensionalVector<Matrix<T, OtherRows, OtherColumns>>
           && ThreeDimensionalVector<Matrix<T, Rows, Columns>>
-  Matrix cross(const Matrix<T, OtherRows, OtherColumns>& other) const {
+  [[nodiscard]] auto cross(
+      const Matrix<T, OtherRows, OtherColumns>& other) const -> Matrix {
     Matrix<T, 3, 1, Option> result;
 
     result(0, 0) = this->operator()(1, 0) * other(2, 0)
@@ -426,7 +438,7 @@ class Matrix {
     return result;
   }
 
-  T trace() const {
+  [[nodiscard]] auto trace() const -> T {
     static_assert(Rows == Columns, "Trace is only defined for square matrices");
     T sum = 0;
     for (unsigned int i = 0; i < Rows; ++i) {
@@ -436,7 +448,7 @@ class Matrix {
   }
 
   template <unsigned int NewRows, unsigned int NewColumns>
-  Matrix<T, NewRows, NewColumns, Option> reshape() const {
+  [[nodiscard]] auto reshape() const -> Matrix<T, NewRows, NewColumns, Option> {
     static_assert(
         Rows * Columns == NewRows * NewColumns,
         "New dimensions must have the same total size as the original matrix");
@@ -445,63 +457,63 @@ class Matrix {
     return newMatrix;
   }
 
-  Matrix operator+(const Matrix& other) const {
+  auto operator+(const Matrix& other) const -> Matrix {
     Matrix result  = *this;
-    auto   addFunc = InstructionSet<T>::getAddFunc();
+    auto   addFunc = InstructionSet<T>::GetAddFunc();
     addFunc(result.m_data_, other.m_data_, Rows * Columns);
     return result;
   }
 
-  Matrix& operator+=(const Matrix& other) {
-    auto addFunc = InstructionSet<T>::getAddFunc();
+  auto operator+=(const Matrix& other) -> Matrix& {
+    auto addFunc = InstructionSet<T>::GetAddFunc();
     addFunc(m_data_, other.m_data_, Rows * Columns);
     return *this;
   }
 
-  Matrix operator+(const T& scalar) const {
+  auto operator+(const T& scalar) const -> Matrix {
     Matrix result        = *this;
-    auto   addScalarFunc = InstructionSet<T>::getAddScalarFunc();
+    auto   addScalarFunc = InstructionSet<T>::GetAddScalarFunc();
     addScalarFunc(result.m_data_, scalar, Rows * Columns);
     return result;
   }
 
-  Matrix& operator+=(const T& scalar) {
-    auto addScalarFunc = InstructionSet<T>::getAddScalarFunc();
+  auto operator+=(const T& scalar) -> Matrix& {
+    auto addScalarFunc = InstructionSet<T>::GetAddScalarFunc();
     addScalarFunc(m_data_, scalar, Rows * Columns);
     return *this;
   }
 
-  Matrix operator-(const Matrix& other) const {
+  auto operator-(const Matrix& other) const -> Matrix {
     Matrix result  = *this;
-    auto   subFunc = InstructionSet<T>::getSubFunc();
+    auto   subFunc = InstructionSet<T>::GetSubFunc();
     subFunc(result.m_data_, other.m_data_, Rows * Columns);
     return result;
   }
 
-  Matrix& operator-=(const Matrix& other) {
-    auto subFunc = InstructionSet<T>::getSubFunc();
+  auto operator-=(const Matrix& other) -> Matrix& {
+    auto subFunc = InstructionSet<T>::GetSubFunc();
     subFunc(m_data_, other.m_data_, Rows * Columns);
     return *this;
   }
 
-  Matrix operator-(const T& scalar) const {
+  auto operator-(const T& scalar) const -> Matrix {
     Matrix result        = *this;
-    auto   subScalarFunc = InstructionSet<T>::getSubScalarFunc();
+    auto   subScalarFunc = InstructionSet<T>::GetSubScalarFunc();
     subScalarFunc(result.m_data_, scalar, Rows * Columns);
     return result;
   }
 
-  Matrix& operator-=(const T& scalar) {
-    auto subScalarFunc = InstructionSet<T>::getSubScalarFunc();
+  auto operator-=(const T& scalar) -> Matrix& {
+    auto subScalarFunc = InstructionSet<T>::GetSubScalarFunc();
     subScalarFunc(m_data_, scalar, Rows * Columns);
     return *this;
   }
 
   template <unsigned int ResultColumns>
-  Matrix<T, Rows, ResultColumns, Option> operator*(
-      const Matrix<T, Columns, ResultColumns, Option>& other) const {
+  auto operator*(const Matrix<T, Columns, ResultColumns, Option>& other) const
+      -> Matrix<T, Rows, ResultColumns, Option> {
     Matrix<T, Rows, ResultColumns, Option> result;
-    auto mulFunc = InstructionSet<T>::template getMulFunc<Option>();
+    auto mulFunc = InstructionSet<T>::template GetMulFunc<Option>();
     mulFunc(result.data(), m_data_, other.data(), Rows, ResultColumns, Columns);
     return result;
   }
@@ -514,7 +526,7 @@ class Matrix {
    * and squared.
    *
    */
-  Matrix& operator*=(const Matrix& other) {
+  auto operator*=(const Matrix& other) -> Matrix& {
     static_assert(
         Columns == Rows,
         "For Matrix multiplication (*=), matrix dimensions must be squared");
@@ -524,33 +536,34 @@ class Matrix {
     return *this;
   }
 
-  Matrix operator*(const T& scalar) const {
+  auto operator*(const T& scalar) const -> Matrix {
     Matrix result        = *this;
-    auto   mulScalarFunc = InstructionSet<T>::getMulScalarFunc();
+    auto   mulScalarFunc = InstructionSet<T>::GetMulScalarFunc();
     mulScalarFunc(result.m_data_, scalar, Rows * Columns);
     return result;
   }
 
-  Matrix& operator*=(const T& scalar) {
-    auto mulScalarFunc = InstructionSet<T>::getMulScalarFunc();
+  auto operator*=(const T& scalar) -> Matrix& {
+    auto mulScalarFunc = InstructionSet<T>::GetMulScalarFunc();
     mulScalarFunc(m_data_, scalar, Rows * Columns);
     return *this;
   }
 
-  Matrix operator/(const T& scalar) const {
+  auto operator/(const T& scalar) const -> Matrix {
     Matrix result        = *this;
-    auto   divScalarFunc = InstructionSet<T>::getDivScalarFunc();
+    auto   divScalarFunc = InstructionSet<T>::GetDivScalarFunc();
     divScalarFunc(result.m_data_, scalar, Rows * Columns);
     return result;
   }
 
-  Matrix& operator/=(const T& scalar) {
-    auto divScalarFunc = InstructionSet<T>::getDivScalarFunc();
+  auto operator/=(const T& scalar) -> Matrix& {
+    auto divScalarFunc = InstructionSet<T>::GetDivScalarFunc();
     divScalarFunc(m_data_, scalar, Rows * Columns);
     return *this;
   }
 
-  friend std::ostream& operator<<(std::ostream& os, const Matrix& matrix) {
+  friend auto operator<<(std::ostream& os, const Matrix& matrix)
+      -> std::ostream& {
     for (unsigned int i = 0; i < Rows; ++i) {
       for (unsigned int j = 0; j < Columns; ++j) {
         os << matrix(i, j) << ' ';
@@ -571,13 +584,13 @@ class Matrix {
         , m_row_(row)
         , m_column_(column) {}
 
-    MatrixInitializer& operator,(const T& value) {
-      if (m_column_ >= m_matrix_.getColumns()) {
+    auto operator,(const T& value) -> MatrixInitializer& {
+      if (m_column_ >= m_matrix_.GetColumns()) {
         ++m_row_;
         m_column_ = 0;
       }
 
-      if (m_row_ < m_matrix_.getRows()) {
+      if (m_row_ < m_matrix_.GetRows()) {
         m_matrix_(m_row_, m_column_) = value;
         ++m_column_;
       }
@@ -586,27 +599,23 @@ class Matrix {
     }
   };
 
-  MatrixInitializer operator<<(const T& value) {
+  auto operator<<(const T& value) -> MatrixInitializer {
     this->operator()(0, 0) = value;
     return MatrixInitializer(*this, 0, 1);
   }
-
-  private:
-  using DataType =
-      typename std::conditional<UseHeap, T*, T[Rows * Columns]>::type;
-  DataType m_data_;
 };
 
 template <typename T, unsigned int Rows, unsigned int Columns, Options Option>
-inline constexpr bool operator==(const Matrix<T, Rows, Columns, Option>& lhs,
-                                 const Matrix<T, Rows, Columns, Option>& rhs) {
+inline constexpr auto operator==(const Matrix<T, Rows, Columns, Option>& lhs,
+                                 const Matrix<T, Rows, Columns, Option>& rhs)
+    -> bool {
   return std::equal(lhs.data(), lhs.data() + Rows * Columns, rhs.data());
 }
 
 template <unsigned int Rows, unsigned int Columns, Options Option>
-inline constexpr bool operator==(
+inline constexpr auto operator==(
     const Matrix<float, Rows, Columns, Option>& lhs,
-    const Matrix<float, Rows, Columns, Option>& rhs) {
+    const Matrix<float, Rows, Columns, Option>& rhs) -> bool {
   constexpr float kEpsilon = std::numeric_limits<float>::epsilon();
   auto            almostEqual
       = [](float a, float b) { return std::fabs(a - b) <= kEpsilon; };
@@ -615,9 +624,9 @@ inline constexpr bool operator==(
 }
 
 template <unsigned int Rows, unsigned int Columns, Options Option>
-inline constexpr bool operator==(
+inline constexpr auto operator==(
     const Matrix<double, Rows, Columns, Option>& lhs,
-    const Matrix<double, Rows, Columns, Option>& rhs) {
+    const Matrix<double, Rows, Columns, Option>& rhs) -> bool {
   constexpr double kEpsilon = std::numeric_limits<double>::epsilon();
   auto             almostEqual
       = [](double a, double b) { return std::fabs(a - b) <= kEpsilon; };
@@ -626,8 +635,9 @@ inline constexpr bool operator==(
 }
 
 template <typename T, unsigned int Rows, unsigned int Columns, Options Option>
-inline constexpr bool operator!=(const Matrix<T, Rows, Columns, Option>& lhs,
-                                 const Matrix<T, Rows, Columns, Option>& rhs) {
+inline constexpr auto operator!=(const Matrix<T, Rows, Columns, Option>& lhs,
+                                 const Matrix<T, Rows, Columns, Option>& rhs)
+    -> bool {
   return !(lhs == rhs);
 }
 

@@ -4,7 +4,7 @@
 
 #include <All.h>
 
-int main(int argc, char** argv) {
+auto main(int argc, char** argv) -> int {
   ::testing::InitGoogleTest(&argc, argv);
   int test_result = RUN_ALL_TESTS();
   if (test_result != 0) {
