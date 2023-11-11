@@ -2,10 +2,11 @@
  * @file All.h
  */
 
+#ifndef MATH_LIBRARY_ALL_H
+#define MATH_LIBRARY_ALL_H
 
-#pragma once
-
-#include "Vector.h"
-#include "Matrix.h"
 #include "Graphics.h"
+#include "Matrix.h"
+#include "Vector.h"
 
+#endif

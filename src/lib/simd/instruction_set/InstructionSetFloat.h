@@ -2,766 +2,811 @@
  * @file InstructionSetFloat.h
  */
 
-
-
-#pragma once
+#ifndef MATH_LIBRARY_INSTRUCTION_SET_FLOAT_H
+#define MATH_LIBRARY_INSTRUCTION_SET_FLOAT_H
 
 #include "../../options/Options.h"
+
 #include <immintrin.h>
 
+namespace math {
 
-namespace math
-{
+template <typename T>
+class InstructionSet;
 
-	template<typename T>
-	class InstructionSet;
+template <>
+class InstructionSet<float> {
+  public:
+  using AddFunc = void (*)(float*, const float*, size_t);
 
-	template<>
-	class InstructionSet<float>
-	{
-	public:
-
-
-		using AddFunc = void(*)(float*, const float*, size_t);
-
-		static AddFunc getAddFunc()
-		{
+  static auto GetAddFunc() -> AddFunc {
 #ifdef SUPPORTS_AVX2
-			return add_avx2;
+    return AddAvx2;
 #elif defined(SUPPORTS_AVX)
-			return add_avx;
+    return AddAvx;
 #elif defined(SUPPORTS_SSE4_2)
-			return add_sse4_2;
+    return AddSse42;
 #elif defined(SUPPORTS_SSE4_1)
-			return add_sse4_1;
+    return AddSse41;
 #elif defined(SUPPORTS_SSSE3)
-			return add_ssse3;
+    return AddSsse3;
 #elif defined(SUPPORTS_SSE3)
-			return add_sse3;
+    return AddSse3;
 #else
-			return add_fallback;
+    return AddFallback;
 #endif
-		}
+  }
 
-		using AddScalarFunc = void(*)(float*, float, size_t);
+  using AddScalarFunc = void (*)(float*, float, size_t);
 
-		static AddScalarFunc getAddScalarFunc()
-		{
+  static auto GetAddScalarFunc() -> AddScalarFunc {
 #ifdef SUPPORTS_AVX2
-			return add_scalar_avx2;
+    return AddScalarAvx2;
 #elif defined(SUPPORTS_AVX)
-			return add_scalar_avx;
+    return AddScalarAvx;
 #elif defined(SUPPORTS_SSE4_2)
-			return add_scalar_sse4_2;
+    return AddScalarSse42;
 #elif defined(SUPPORTS_SSE4_1)
-			return add_scalar_sse4_1;
+    return AddScalarSse41;
 #elif defined(SUPPORTS_SSSE3)
-			return add_scalar_ssse3;
+    return AddScalarSsse3;
 #elif defined(SUPPORTS_SSE3)
-			return add_scalar_sse3;
+    return AddScalarSse3;
 #else
-			return add_scalar_fallback;
+    return AddScalarFallback;
 #endif
-		}
+  }
 
-		using SubFunc = void(*)(float*, const float*, size_t);
+  using SubFunc = void (*)(float*, const float*, size_t);
 
-		static SubFunc getSubFunc()
-		{
+  static auto GetSubFunc() -> SubFunc {
 #ifdef SUPPORTS_AVX2
-			return sub_avx2;
+    return SubAvx2;
 #elif defined(SUPPORTS_AVX)
-			return sub_avx;
+    return SubAvx;
 #elif defined(SUPPORTS_SSE4_2)
-			return sub_sse4_2;
+    return SubSse42;
 #elif defined(SUPPORTS_SSE4_1)
-			return sub_sse4_1;
+    return SubSse41;
 #elif defined(SUPPORTS_SSSE3)
-			return sub_ssse3;
+    return SubSsse3;
 #elif defined(SUPPORTS_SSE3)
-			return sub_sse3;
+    return SubSse3;
 #else
-			return sub_fallback;
+    return SubFallback;
 #endif
-		}
+  }
 
-		using SubScalarFunc = void(*)(float*, float, size_t);
+  using SubScalarFunc = void (*)(float*, float, size_t);
 
-		static SubScalarFunc getSubScalarFunc()
-		{
+  static auto GetSubScalarFunc() -> SubScalarFunc {
 #ifdef SUPPORTS_AVX2
-			return sub_scalar_avx2;
+    return SubScalarAvx2;
 #elif defined(SUPPORTS_AVX)
-			return sub_scalar_avx;
+    return SubScalarAvx;
 #elif defined(SUPPORTS_SSE4_2)
-			return sub_scalar_sse4_2;
+    return SubScalarSse42;
 #elif defined(SUPPORTS_SSE4_1)
-			return sub_scalar_sse4_1;
+    return SubScalarSse41;
 #elif defined(SUPPORTS_SSSE3)
-			return sub_scalar_ssse3;
+    return SubScalarSsse3;
 #elif defined(SUPPORTS_SSE3)
-			return sub_scalar_sse3;
+    return SubScalarSse3;
 #else
-			return sub_scalar_fallback;
+    return SubScalarFallback;
 #endif
-		}
+  }
 
-		template<Options Option>
-		using MulFunc = void(*)(float*, const float*, const float*, const size_t, const size_t, const size_t);
+  template <Options Option>
+  using MulFunc = void (*)(float*,
+                           const float*,
+                           const float*,
+                           const size_t,
+                           const size_t,
+                           const size_t);
 
-		template<Options Option>
-		static MulFunc<Option> getMulFunc()
-		{
-
+  template <Options Option>
+  static auto GetMulFunc() -> MulFunc<Option> {
 #ifdef SUPPORTS_AVX2
-			return mul_avx2<Option>;
+    return MulAvx2<Option>;
 #elif defined(SUPPORTS_AVX)
-			return mul_avx<Option>;
+    return MulAvx<Option>;
 #elif defined(SUPPORTS_SSE4_2)
-			return mul_sse4_2<Option>;
+    return MulSse42<Option>;
 #elif defined(SUPPORTS_SSE4_1)
-			return mul_sse4_1<Option>;
+    return MulSse41<Option>;
 #elif defined(SUPPORTS_SSSE3)
-			return mul_ssse3<Option>;
+    return MulSsse3<Option>;
 #elif defined(SUPPORTS_SSE3)
-			return mul_sse3<Option>;
+    return MulSse3<Option>;
 #else
-			return mul_fallback<Option>;
+    return MulFallback<Option>;
 #endif
-		}
+  }
 
-		using MulScalarFunc = void(*)(float*, float, size_t);
+  using MulScalarFunc = void (*)(float*, float, size_t);
 
-		static MulScalarFunc getMulScalarFunc()
-		{
+  static auto GetMulScalarFunc() -> MulScalarFunc {
 #ifdef SUPPORTS_AVX2
-			return mul_scalar_avx2;
+    return MulScalarAvx2;
 #elif defined(SUPPORTS_AVX)
-			return mul_scalar_avx;
+    return MulScalarAvx;
 #elif defined(SUPPORTS_SSE4_2)
-			return mul_scalar_sse4_2;
+    return MulScalarSse42;
 #elif defined(SUPPORTS_SSE4_1)
-			return mul_scalar_sse4_1;
+    return MulScalarSse41;
 #elif defined(SUPPORTS_SSSE3)
-			return mul_scalar_ssse3;
+    return MulScalarSsse3;
 #elif defined(SUPPORTS_SSE3)
-			return mul_scalar_sse3;
+    return MulScalarSse3;
 #else
-			return mul_scalar_fallback;
+    return MulScalarFallback;
 #endif
-		}
+  }
 
-		using DivScalarFunc = void(*)(float*, float, size_t);
+  using DivScalarFunc = void (*)(float*, float, size_t);
 
-		static DivScalarFunc getDivScalarFunc()
-		{
+  static auto GetDivScalarFunc() -> DivScalarFunc {
 #ifdef SUPPORTS_AVX2
-			return div_scalar_avx2;
+    return DivScalarAvx2;
 #elif defined(SUPPORTS_AVX)
-			return div_scalar_avx;
+    return DivScalarAvx;
 #elif defined(SUPPORTS_SSE4_2)
-			return div_scalar_sse4_2;
+    return DivScalarSse42;
 #elif defined(SUPPORTS_SSE4_1)
-			return div_scalar_sse4_1;
+    return DivScalarSse41;
 #elif defined(SUPPORTS_SSSE3)
-			return div_scalar_ssse3;
+    return DivScalarSsse3;
 #elif defined(SUPPORTS_SSE3)
-			return div_scalar_sse3;
+    return DivScalarSse3;
 #else
-			return div_scalar_fallback;
+    return DivScalarFallback;
 #endif
-		}
-
-
-	private:
-
-		static constexpr size_t AVX_SIMD_WIDTH = 8;
-		static constexpr size_t SSE_SIMD_WIDTH = 4;
-
-		//BEGIN: add two arrays
-		//----------------------------------------------------------------------------
-
-		static void add_avx2(float* a, const float* b, size_t size)
-		{
-			add_avx(a, b, size);
-		}
-
-
-		static void add_avx(float* a, const float* b, size_t size)
-		{
-			const size_t avx_limit = size - (size % AVX_SIMD_WIDTH);
-			size_t i = 0;
-
-			for (; i < avx_limit; i += AVX_SIMD_WIDTH) {
-				__m256 ymm1 = _mm256_loadu_ps(a + i);
-				__m256 ymm2 = _mm256_loadu_ps(b + i);
-				ymm1 = _mm256_add_ps(ymm1, ymm2);
-				_mm256_storeu_ps(a + i, ymm1);
-			}
-
-			// Handle any remainder
-			for (; i < size; ++i) {
-				a[i] += b[i];
-			}
-		}
-
-
-		static void add_sse4_2(float* a, const float* b, size_t size)
-		{
-			add_sse3(a, b, size);
-		}
-
-		static void add_sse4_1(float* a, const float* b, size_t size)
-		{
-			add_sse3(a, b, size);
-		}
-
-		static void add_ssse3(float* a, const float* b, size_t size)
-		{
-			add_sse3(a, b, size);
-		}
-
-		static void add_sse3(float* a, const float* b, size_t size)
-		{
-			const size_t sse_limit = size - (size % SSE_SIMD_WIDTH);
-			size_t i = 0;
-
-			for (; i < sse_limit; i += SSE_SIMD_WIDTH) {
-				__m128 xmm1 = _mm_loadu_ps(a + i);
-				__m128 xmm2 = _mm_loadu_ps(b + i);
-				xmm1 = _mm_add_ps(xmm1, xmm2);
-				_mm_storeu_ps(a + i, xmm1);
-			}
-
-			// Handling remaining elements
-			for (; i < size; ++i) {
-				a[i] += b[i];
-			}
-		}
-
-
-		static void add_fallback(float* a, const float* b, size_t size)
-		{
-			for (size_t i = 0; i < size; ++i) {
-				a[i] += b[i];
-			}
-		}
-
-
-		//END: add two arrays
-		//----------------------------------------------------------------------------
-
-		//BEGIN: add scalar
-		//----------------------------------------------------------------------------
-
-		static void add_scalar_avx2(float* a, float scalar, size_t size)
-		{
-			add_scalar_avx(a, scalar, size);
-		}
-
-		static void add_scalar_avx(float* a, float scalar, size_t size)
-		{
-			__m256 ymm0 = _mm256_set1_ps(scalar);
-			const size_t avx_limit = size - (size % AVX_SIMD_WIDTH);
-			size_t i = 0;
-
-			for (; i < avx_limit; i += AVX_SIMD_WIDTH) {
-				__m256 ymm1 = _mm256_loadu_ps(a + i);
-				ymm1 = _mm256_add_ps(ymm1, ymm0);
-				_mm256_storeu_ps(a + i, ymm1);
-			}
-
-			// Handle any remainder
-			for (; i < size; ++i) {
-				a[i] += scalar;
-			}
-		}
-
-
-		static void add_scalar_sse4_2(float* a, float scalar, size_t size)
-		{
-			add_scalar_sse3(a, scalar, size);
-		}
-
-		static void add_scalar_sse4_1(float* a, float scalar, size_t size)
-		{
-			add_scalar_sse3(a, scalar, size);
-		}
-
-		static void add_scalar_ssse3(float* a, float scalar, size_t size)
-		{
-			add_scalar_sse3(a, scalar, size);
-		}
-
-		static void add_scalar_sse3(float* a, float scalar, size_t size)
-		{
-			__m128 xmm0 = _mm_set1_ps(scalar);
-			const size_t sse_limit = size - (size % SSE_SIMD_WIDTH);
-			size_t i = 0;
-
-			for (; i < sse_limit; i += SSE_SIMD_WIDTH) {
-				__m128 xmm1 = _mm_loadu_ps(a + i);
-				xmm1 = _mm_add_ps(xmm1, xmm0);
-				_mm_storeu_ps(a + i, xmm1);
-			}
-
-			// Handle any remainder
-			for (; i < size; ++i) {
-				a[i] += scalar;
-			}
-		}
-
-
-		static void add_scalar_fallback(float* a, float scalar, size_t size)
-		{
-			//no SIMD
-			for (size_t i = 0; i < size; ++i)
-				a[i] += scalar;
-		}
-
-		//END: add scalar
-		//----------------------------------------------------------------------------
-
-		//BEGIN: subtract two arrays
-		//----------------------------------------------------------------------------
-
-		static void sub_avx2(float* a, const float* b, size_t size)
-		{
-			sub_avx(a, b, size);
-		}
-
-		static void sub_avx(float* a, const float* b, size_t size)
-		{
-			const size_t avx_limit = size - (size % AVX_SIMD_WIDTH);
-			size_t i = 0;
-
-			for (; i < avx_limit; i += AVX_SIMD_WIDTH) {
-				__m256 ymm1 = _mm256_loadu_ps(a + i);
-				__m256 ymm2 = _mm256_loadu_ps(b + i);
-				ymm1 = _mm256_sub_ps(ymm1, ymm2);
-				_mm256_storeu_ps(a + i, ymm1);
-			}
-
-			// Handle any remainder
-			for (; i < size; ++i) {
-				a[i] -= b[i];
-			}
-		}
-
-
-		static void sub_sse4_2(float* a, const float* b, size_t size)
-		{
-			sub_sse3(a, b, size);
-		}
-
-		static void sub_sse4_1(float* a, const float* b, size_t size)
-		{
-			sub_sse3(a, b, size);
-		}
-
-		static void sub_ssse3(float* a, const float* b, size_t size)
-		{
-			sub_sse3(a, b, size);
-		}
-
-		static void sub_sse3(float* a, const float* b, size_t size)
-		{
-			const size_t sse_limit = size - (size % SSE_SIMD_WIDTH);
-			size_t i = 0;
-
-			for (; i < sse_limit; i += SSE_SIMD_WIDTH) {
-				__m128 xmm1 = _mm_loadu_ps(a + i);
-				__m128 xmm2 = _mm_loadu_ps(b + i);
-				xmm1 = _mm_sub_ps(xmm1, xmm2);
-				_mm_storeu_ps(a + i, xmm1);
-			}
-
-			// Handle any remaining elements
-			for (; i < size; ++i) {
-				a[i] -= b[i];
-			}
-		}
-
-
-		static void sub_fallback(float* a, const float* b, size_t size)
-		{
-			for (size_t i = 0; i < size; ++i) {
-				a[i] -= b[i];
-			}
-		}
-
-		//END: subtract two arrays
-		//----------------------------------------------------------------------------
-
-		static void sub_scalar_avx2(float* a, float scalar, size_t size)
-		{
-			sub_scalar_avx(a, scalar, size);
-		}
-
-		static void sub_scalar_avx(float* a, float scalar, size_t size)
-		{
-			__m256 ymm0 = _mm256_set1_ps(scalar);
-			const size_t avx_limit = size - (size % AVX_SIMD_WIDTH);
-			size_t i = 0;
-
-			for (; i < avx_limit; i += AVX_SIMD_WIDTH) {
-				__m256 ymm1 = _mm256_loadu_ps(a + i);
-				ymm1 = _mm256_sub_ps(ymm1, ymm0);
-				_mm256_storeu_ps(a + i, ymm1);
-			}
-
-			// Handle any remainder
-			for (; i < size; ++i) {
-				a[i] -= scalar;
-			}
-		}
-
-
-		static void sub_scalar_sse4_2(float* a, float scalar, size_t size)
-		{
-			sub_scalar_sse3(a, scalar, size);
-		}
-
-		static void sub_scalar_sse4_1(float* a, float scalar, size_t size)
-		{
-			sub_scalar_sse3(a, scalar, size);
-		}
-
-		static void sub_scalar_ssse3(float* a, float scalar, size_t size)
-		{
-			sub_scalar_sse3(a, scalar, size);
-		}
-
-		static void sub_scalar_sse3(float* a, float scalar, size_t size)
-		{
-			__m128 xmm0 = _mm_set1_ps(scalar);
-			const size_t sse_limit = size - (size % SSE_SIMD_WIDTH);
-			size_t i = 0;
-
-			for (; i < sse_limit; i += SSE_SIMD_WIDTH) {
-				__m128 xmm1 = _mm_loadu_ps(a + i);
-				xmm1 = _mm_sub_ps(xmm1, xmm0);
-				_mm_storeu_ps(a + i, xmm1);
-			}
-
-			// Handle any remainder
-			for (; i < size; ++i) {
-				a[i] -= scalar;
-			}
-		}
-
-
-		static void sub_scalar_fallback(float* a, float scalar, size_t size)
-		{
-			for (size_t i = 0; i < size; ++i) {
-				a[i] -= scalar;
-			}
-		}
-
-		//END: subtract scalar
-		//----------------------------------------------------------------------------
-
-		//BEGIN: multiplication array
-		//----------------------------------------------------------------------------
-
-		//BEGIN: multiplication array utility functions
-
-		template<Options Option>
-		static inline size_t indexA(const size_t currentRowA, const size_t innerIndex, const size_t rowsA, const size_t colsA_rowsB)
-		{
-			if constexpr (Option == Options::ColumnMajor) {
-				return currentRowA + innerIndex * rowsA;
-			}
-			else if constexpr (Option == Options::RowMajor) {
-				return currentRowA * colsA_rowsB + innerIndex;
-			}
-		}
-
-		template<Options Option>
-		static inline size_t indexB(const size_t innerIndex, const size_t currentColB, const size_t colsB, const size_t colsA_rowsB)
-		{
-			if constexpr (Option == Options::ColumnMajor) {
-				return innerIndex + currentColB * colsA_rowsB;
-			}
-			else if constexpr (Option == Options::RowMajor) {
-				return innerIndex * colsB + currentColB;
-			}
-		}
-
-		template<Options Option>
-		static inline size_t indexResult(const size_t currentRowA, const size_t currentColB, const size_t rowsA, const size_t colsB)
-		{
-			if constexpr (Option == Options::ColumnMajor) {
-				return currentRowA + currentColB * rowsA;
-			}
-			else if constexpr (Option == Options::RowMajor) {
-				return currentRowA * colsB + currentColB;
-			}
-		}
-
-		template<Options Option>
-		static inline __m256 loadA(const float* a, const size_t currentRowA, const size_t innerIndex, const size_t rowsA, const size_t colsA_rowsB)
-		{
-			if constexpr (Option == Options::RowMajor) {
-				return _mm256_loadu_ps(&a[indexA<Option>(currentRowA, innerIndex, rowsA, colsA_rowsB)]);
-			}
-			else {
-				return _mm256_set_ps(
-					a[indexA<Option>(currentRowA, innerIndex + 7, rowsA, colsA_rowsB)],
-					a[indexA<Option>(currentRowA, innerIndex + 6, rowsA, colsA_rowsB)],
-					a[indexA<Option>(currentRowA, innerIndex + 5, rowsA, colsA_rowsB)],
-					a[indexA<Option>(currentRowA, innerIndex + 4, rowsA, colsA_rowsB)],
-					a[indexA<Option>(currentRowA, innerIndex + 3, rowsA, colsA_rowsB)],
-					a[indexA<Option>(currentRowA, innerIndex + 2, rowsA, colsA_rowsB)],
-					a[indexA<Option>(currentRowA, innerIndex + 1, rowsA, colsA_rowsB)],
-					a[indexA<Option>(currentRowA, innerIndex, rowsA, colsA_rowsB)]);
-			}
-		}
-
-		template<Options Option>
-		static inline __m256 loadB(const float* b, const size_t innerIndex, const size_t currentColB, const size_t colsB, const size_t colsA_rowsB)
-		{
-			if constexpr (Option == Options::RowMajor) {
-				return _mm256_set_ps(
-					b[indexB<Option>(innerIndex + 7, currentColB, colsB, colsA_rowsB)],
-					b[indexB<Option>(innerIndex + 6, currentColB, colsB, colsA_rowsB)],
-					b[indexB<Option>(innerIndex + 5, currentColB, colsB, colsA_rowsB)],
-					b[indexB<Option>(innerIndex + 4, currentColB, colsB, colsA_rowsB)],
-					b[indexB<Option>(innerIndex + 3, currentColB, colsB, colsA_rowsB)],
-					b[indexB<Option>(innerIndex + 2, currentColB, colsB, colsA_rowsB)],
-					b[indexB<Option>(innerIndex + 1, currentColB, colsB, colsA_rowsB)],
-					b[indexB<Option>(innerIndex, currentColB, colsB, colsA_rowsB)]);
-			}
-			else {
-				return _mm256_loadu_ps(&b[indexB<Option>(innerIndex, currentColB, colsB, colsA_rowsB)]);
-			}
-		}
-
-		//END: multiplication array utility functions
-
-		template<Options Option>
-		static void mul_avx2(float* result, const float* a, const float* b, size_t rowsA, size_t colsB, size_t colsA_rowsB)
-		{
-			mul_avx<Option>(result, a, b, rowsA, colsB, colsA_rowsB);
-		}
-
-		template<Options Option>
-		static void mul_avx(float* result, const float* a, const float* b, size_t rowsA, size_t colsB, size_t colsA_rowsB)
-		{
-			for (size_t currentRowA = 0; currentRowA < rowsA; ++currentRowA)
-			{
-				for (size_t currentColB = 0; currentColB < colsB; ++currentColB)
-				{
-					__m256 sum = _mm256_setzero_ps();
-					size_t innerIndex = 0;
-					for (; innerIndex + 7 < colsA_rowsB; innerIndex += 8)
-					{
-						__m256 a_vec = loadA<Option>(a, currentRowA, innerIndex, rowsA, colsA_rowsB);
-						__m256 b_vec = loadB<Option>(b, innerIndex, currentColB, colsB, colsA_rowsB);
-
-						sum = _mm256_fmadd_ps(a_vec, b_vec, sum);
-					}
-					float tmp[8];
-					_mm256_storeu_ps(tmp, sum);
-					float finalSum = 0.0f;
-					for (int i = 0; i < 8; ++i) {
-						finalSum += tmp[i];
-					}
-					for (; innerIndex < colsA_rowsB; ++innerIndex)
-					{
-						finalSum += a[indexA<Option>(currentRowA, innerIndex, rowsA, colsA_rowsB)] * b[indexB<Option>(innerIndex, currentColB, colsB, colsA_rowsB)];
-					}
-					result[indexResult<Option>(currentRowA, currentColB, rowsA, colsB)] = finalSum;
-				}
-			}
-		}
-
-		template<Options Option>
-		static void mul_sse4_2(float* result, const float* a, const float* b, const size_t rowsA, const size_t colsB, const size_t colsA_rowsB)
-		{
-			mul_fallback<Option>(result, a, b, rowsA, colsB, colsA_rowsB);
-		}
-
-		template<Options Option>
-		static void mul_sse4_1(float* result, const float* a, const float* b, const size_t rowsA, const size_t colsB, const size_t colsA_rowsB)
-		{
-			mul_fallback<Option>(result, a, b, rowsA, colsB, colsA_rowsB);
-		}
-
-		template<Options Option>
-		static void mul_ssse3(float* result, const float* a, const float* b, const size_t rowsA, const size_t colsB, const size_t colsA_rowsB)
-		{
-			mul_fallback<Option>(result, a, b, rowsA, colsB, colsA_rowsB);
-		}
-
-		template<Options Option>
-		static void mul_sse3(float* result, const float* a, const float* b, const size_t rowsA, const size_t colsB, const size_t colsA_rowsB)
-		{
-			mul_fallback<Option>(result, a, b, rowsA, colsB, colsA_rowsB);
-		}
-
-
-		template<Options Option>
-		static void mul_fallback(float* result, const float* a, const float* b, const size_t rowsA, const size_t colsB, const size_t colsA_rowsB){
-			for (size_t i = 0; i < rowsA; ++i) {
-				for (size_t j = 0; j < colsB; ++j) {
-					float sum = 0;
-					for (size_t k = 0; k < colsA_rowsB; ++k) {
-						sum += a[indexA<Option>(i, k, rowsA, colsA_rowsB)] * b[indexB<Option>(k, j, colsB, colsA_rowsB)];
-					}
-					result[indexResult<Option>(i, j, rowsA, colsB)] = sum;
-				}
-			}
-		}
-
-		//END: multiplication array
-		//----------------------------------------------------------------------------
-
-
-		//BEGIN: multiplication scalar
-		//----------------------------------------------------------------------------
-
-		static void mul_scalar_avx2(float* a, float scalar, size_t size)
-		{
-
-			mul_scalar_avx(a, scalar, size);
-		}
-
-		static void mul_scalar_avx(float* a, float scalar, size_t size)
-		{
-			__m256 ymm0 = _mm256_set1_ps(scalar);
-			const size_t avx_limit = size - (size % AVX_SIMD_WIDTH);
-			size_t i = 0;
-
-			for (; i < avx_limit; i += AVX_SIMD_WIDTH) {
-				__m256 ymm1 = _mm256_loadu_ps(a + i);
-				ymm1 = _mm256_mul_ps(ymm1, ymm0);
-				_mm256_storeu_ps(a + i, ymm1);
-			}
-
-			// Handle any remainder
-			for (; i < size; ++i) {
-				a[i] *= scalar;
-			}
-		}
-
-
-		static void mul_scalar_sse4_2(float* a, float scalar, size_t size)
-		{
-			mul_scalar_sse3(a, scalar, size);
-		}
-
-		static void mul_scalar_sse4_1(float* a, float scalar, size_t size)
-		{
-			mul_scalar_sse3(a, scalar, size);
-		}
-
-		static void mul_scalar_ssse3(float* a, float scalar, size_t size)
-		{
-			mul_scalar_sse3(a, scalar, size);
-		}
-
-		static void mul_scalar_sse3(float* a, float scalar, size_t size)
-		{
-			__m128 xmm0 = _mm_set1_ps(scalar);
-			const size_t sse_limit = size - (size % SSE_SIMD_WIDTH);
-			size_t i = 0;
-
-			for (; i < sse_limit; i += SSE_SIMD_WIDTH) {
-				__m128 xmm1 = _mm_loadu_ps(a + i);
-				xmm1 = _mm_mul_ps(xmm1, xmm0);
-				_mm_storeu_ps(a + i, xmm1);
-			}
-
-			// Handle any remainder
-			for (; i < size; ++i) {
-				a[i] *= scalar;
-			}
-		}
-
-
-		static void mul_scalar_fallback(float* a, float scalar, size_t size)
-		{
-			for (size_t i = 0; i < size; ++i) {
-				a[i] *= scalar;
-			}
-		}
-
-		//END: multiplication scalar
-		//----------------------------------------------------------------------------
-
-		//BEGIN: division scalar
-		//----------------------------------------------------------------------------
-
-		static void div_scalar_avx2(float* a, float scalar, size_t size)
-		{
-			div_scalar_avx(a, scalar, size);
-		}
-
-		static void div_scalar_avx(float* a, float scalar, size_t size)
-		{
-			__m256 ymm0 = _mm256_set1_ps(scalar);
-			const size_t avx_limit = size - (size % AVX_SIMD_WIDTH);
-			size_t i = 0;
-
-			for (; i < avx_limit; i += AVX_SIMD_WIDTH) {
-				__m256 ymm1 = _mm256_loadu_ps(a + i);
-				ymm1 = _mm256_div_ps(ymm1, ymm0);
-				_mm256_storeu_ps(a + i, ymm1);
-			}
-
-			// Handle any remainder
-			for (; i < size; ++i) {
-				a[i] /= scalar;
-			}
-		}
-
-
-		static void div_scalar_sse4_2(float* a, float scalar, size_t size)
-		{
-			div_scalar_sse3(a, scalar, size);
-		}
-
-		static void div_scalar_sse4_1(float* a, float scalar, size_t size)
-		{
-			div_scalar_sse3(a, scalar, size);
-		}
-
-		static void div_scalar_ssse3(float* a, float scalar, size_t size)
-		{
-			div_scalar_sse3(a, scalar, size);
-		}
-
-		static void div_scalar_sse3(float* a, float scalar, size_t size)
-		{
-			__m128 xmm0 = _mm_set1_ps(scalar);
-			const size_t sse_limit = size - (size % SSE_SIMD_WIDTH);
-			size_t i = 0;
-
-			for (; i < sse_limit; i += SSE_SIMD_WIDTH) {
-				__m128 xmm1 = _mm_loadu_ps(a + i);
-				xmm1 = _mm_div_ps(xmm1, xmm0);
-				_mm_storeu_ps(a + i, xmm1);
-			}
-
-			// Handle any remainder
-			for (; i < size; ++i) {
-				a[i] /= scalar;
-			}
-		}
-
-
-		static void div_scalar_fallback(float* a, float scalar, size_t size)
-		{
-			for (size_t i = 0; i < size; ++i) {
-				a[i] /= scalar;
-			}
-		}
-
-		//END: division scalar
-		//----------------------------------------------------------------------------
-
-
-	};
-
-}
+  }
+
+  private:
+  static constexpr size_t s_kAvxSimdWidth = 8;
+  static constexpr size_t s_kSseSimdWidth = 4;
+
+  // BEGIN: add two arrays
+  //----------------------------------------------------------------------------
+
+  static void AddAvx2(float* a, const float* b, size_t size) {
+    AddAvx(a, b, size);
+  }
+
+  static void AddAvx(float* a, const float* b, size_t size) {
+    const size_t kAvxLimit = size - (size % s_kAvxSimdWidth);
+    size_t       i         = 0;
+
+    for (; i < kAvxLimit; i += s_kAvxSimdWidth) {
+      __m256 ymm1 = _mm256_loadu_ps(a + i);
+      __m256 ymm2 = _mm256_loadu_ps(b + i);
+      ymm1        = _mm256_add_ps(ymm1, ymm2);
+      _mm256_storeu_ps(a + i, ymm1);
+    }
+
+    // Handle any remainder
+    for (; i < size; ++i) {
+      a[i] += b[i];
+    }
+  }
+
+  static void AddSse42(float* a, const float* b, size_t size) {
+    AddSse3(a, b, size);
+  }
+
+  static void AddSse41(float* a, const float* b, size_t size) {
+    AddSse3(a, b, size);
+  }
+
+  static void AddSsse3(float* a, const float* b, size_t size) {
+    AddSse3(a, b, size);
+  }
+
+  static void AddSse3(float* a, const float* b, size_t size) {
+    const size_t kSseLimit = size - (size % s_kSseSimdWidth);
+    size_t       i         = 0;
+
+    for (; i < kSseLimit; i += s_kSseSimdWidth) {
+      __m128 xmm1 = _mm_loadu_ps(a + i);
+      __m128 xmm2 = _mm_loadu_ps(b + i);
+      xmm1        = _mm_add_ps(xmm1, xmm2);
+      _mm_storeu_ps(a + i, xmm1);
+    }
+
+    // Handling remaining elements
+    for (; i < size; ++i) {
+      a[i] += b[i];
+    }
+  }
+
+  static void AddFallback(float* a, const float* b, size_t size) {
+    for (size_t i = 0; i < size; ++i) {
+      a[i] += b[i];
+    }
+  }
+
+  // END: add two arrays
+  //----------------------------------------------------------------------------
+
+  // BEGIN: add scalar
+  //----------------------------------------------------------------------------
+
+  static void AddScalarAvx2(float* a, float scalar, size_t size) {
+    AddScalarAvx(a, scalar, size);
+  }
+
+  static void AddScalarAvx(float* a, float scalar, size_t size) {
+    __m256       ymm0      = _mm256_set1_ps(scalar);
+    const size_t kAvxLimit = size - (size % s_kAvxSimdWidth);
+    size_t       i         = 0;
+
+    for (; i < kAvxLimit; i += s_kAvxSimdWidth) {
+      __m256 ymm1 = _mm256_loadu_ps(a + i);
+      ymm1        = _mm256_add_ps(ymm1, ymm0);
+      _mm256_storeu_ps(a + i, ymm1);
+    }
+
+    // Handle any remainder
+    for (; i < size; ++i) {
+      a[i] += scalar;
+    }
+  }
+
+  static void AddScalarSse42(float* a, float scalar, size_t size) {
+    AddScalarSse3(a, scalar, size);
+  }
+
+  static void AddScalarSse41(float* a, float scalar, size_t size) {
+    AddScalarSse3(a, scalar, size);
+  }
+
+  static void AddScalarSsse3(float* a, float scalar, size_t size) {
+    AddScalarSse3(a, scalar, size);
+  }
+
+  static void AddScalarSse3(float* a, float scalar, size_t size) {
+    __m128       xmm0      = _mm_set1_ps(scalar);
+    const size_t kSseLimit = size - (size % s_kSseSimdWidth);
+    size_t       i         = 0;
+
+    for (; i < kSseLimit; i += s_kSseSimdWidth) {
+      __m128 xmm1 = _mm_loadu_ps(a + i);
+      xmm1        = _mm_add_ps(xmm1, xmm0);
+      _mm_storeu_ps(a + i, xmm1);
+    }
+
+    // Handle any remainder
+    for (; i < size; ++i) {
+      a[i] += scalar;
+    }
+  }
+
+  static void AddScalarFallback(float* a, float scalar, size_t size) {
+    // no SIMD
+    for (size_t i = 0; i < size; ++i) {
+      a[i] += scalar;
+    }
+  }
+
+  // END: add scalar
+  //----------------------------------------------------------------------------
+
+  // BEGIN: subtract two arrays
+  //----------------------------------------------------------------------------
+
+  static void SubAvx2(float* a, const float* b, size_t size) {
+    SubAvx(a, b, size);
+  }
+
+  static void SubAvx(float* a, const float* b, size_t size) {
+    const size_t kAvxLimit = size - (size % s_kAvxSimdWidth);
+    size_t       i         = 0;
+
+    for (; i < kAvxLimit; i += s_kAvxSimdWidth) {
+      __m256 ymm1 = _mm256_loadu_ps(a + i);
+      __m256 ymm2 = _mm256_loadu_ps(b + i);
+      ymm1        = _mm256_sub_ps(ymm1, ymm2);
+      _mm256_storeu_ps(a + i, ymm1);
+    }
+
+    // Handle any remainder
+    for (; i < size; ++i) {
+      a[i] -= b[i];
+    }
+  }
+
+  static void SubSse42(float* a, const float* b, size_t size) {
+    SubSse3(a, b, size);
+  }
+
+  static void SubSse41(float* a, const float* b, size_t size) {
+    SubSse3(a, b, size);
+  }
+
+  static void SubSsse3(float* a, const float* b, size_t size) {
+    SubSse3(a, b, size);
+  }
+
+  static void SubSse3(float* a, const float* b, size_t size) {
+    const size_t kSseLimit = size - (size % s_kSseSimdWidth);
+    size_t       i         = 0;
+
+    for (; i < kSseLimit; i += s_kSseSimdWidth) {
+      __m128 xmm1 = _mm_loadu_ps(a + i);
+      __m128 xmm2 = _mm_loadu_ps(b + i);
+      xmm1        = _mm_sub_ps(xmm1, xmm2);
+      _mm_storeu_ps(a + i, xmm1);
+    }
+
+    // Handle any remaining elements
+    for (; i < size; ++i) {
+      a[i] -= b[i];
+    }
+  }
+
+  static void SubFallback(float* a, const float* b, size_t size) {
+    for (size_t i = 0; i < size; ++i) {
+      a[i] -= b[i];
+    }
+  }
+
+  // END: subtract two arrays
+  //----------------------------------------------------------------------------
+
+  static void SubScalarAvx2(float* a, float scalar, size_t size) {
+    SubScalarAvx(a, scalar, size);
+  }
+
+  static void SubScalarAvx(float* a, float scalar, size_t size) {
+    __m256       ymm0      = _mm256_set1_ps(scalar);
+    const size_t kAvxLimit = size - (size % s_kAvxSimdWidth);
+    size_t       i         = 0;
+
+    for (; i < kAvxLimit; i += s_kAvxSimdWidth) {
+      __m256 ymm1 = _mm256_loadu_ps(a + i);
+      ymm1        = _mm256_sub_ps(ymm1, ymm0);
+      _mm256_storeu_ps(a + i, ymm1);
+    }
+
+    // Handle any remainder
+    for (; i < size; ++i) {
+      a[i] -= scalar;
+    }
+  }
+
+  static void SubScalarSse42(float* a, float scalar, size_t size) {
+    SubScalarSse3(a, scalar, size);
+  }
+
+  static void SubScalarSse41(float* a, float scalar, size_t size) {
+    SubScalarSse3(a, scalar, size);
+  }
+
+  static void SubScalarSsse3(float* a, float scalar, size_t size) {
+    SubScalarSse3(a, scalar, size);
+  }
+
+  static void SubScalarSse3(float* a, float scalar, size_t size) {
+    __m128       xmm0      = _mm_set1_ps(scalar);
+    const size_t kSseLimit = size - (size % s_kSseSimdWidth);
+    size_t       i         = 0;
+
+    for (; i < kSseLimit; i += s_kSseSimdWidth) {
+      __m128 xmm1 = _mm_loadu_ps(a + i);
+      xmm1        = _mm_sub_ps(xmm1, xmm0);
+      _mm_storeu_ps(a + i, xmm1);
+    }
+
+    // Handle any remainder
+    for (; i < size; ++i) {
+      a[i] -= scalar;
+    }
+  }
+
+  static void SubScalarFallback(float* a, float scalar, size_t size) {
+    for (size_t i = 0; i < size; ++i) {
+      a[i] -= scalar;
+    }
+  }
+
+  // END: subtract scalar
+  //----------------------------------------------------------------------------
+
+  // BEGIN: multiplication array
+  //----------------------------------------------------------------------------
+
+  // BEGIN: multiplication array utility functions
+
+  template <Options Option>
+  static inline auto IndexA(const size_t kCurrentRowA,
+                            const size_t kInnerIndex,
+                            const size_t kRowsA,
+                            const size_t kColsARowsB) -> size_t {
+    if constexpr (Option == Options::ColumnMajor) {
+      return kCurrentRowA + kInnerIndex * kRowsA;
+    } else if constexpr (Option == Options::RowMajor) {
+      return kCurrentRowA * kColsARowsB + kInnerIndex;
+    }
+  }
+
+  template <Options Option>
+  static inline auto IndexB(const size_t kInnerIndex,
+                            const size_t kCurrentColB,
+                            const size_t kColsB,
+                            const size_t kColsARowsB) -> size_t {
+    if constexpr (Option == Options::ColumnMajor) {
+      return kInnerIndex + kCurrentColB * kColsARowsB;
+    } else if constexpr (Option == Options::RowMajor) {
+      return kInnerIndex * kColsB + kCurrentColB;
+    }
+  }
+
+  template <Options Option>
+  static inline auto IndexResult(const size_t kCurrentRowA,
+                                 const size_t kCurrentColB,
+                                 const size_t kRowsA,
+                                 const size_t kColsB) -> size_t {
+    if constexpr (Option == Options::ColumnMajor) {
+      return kCurrentRowA + kCurrentColB * kRowsA;
+    } else if constexpr (Option == Options::RowMajor) {
+      return kCurrentRowA * kColsB + kCurrentColB;
+    }
+  }
+
+  // BEGIN: AVX multiplication array utility functions
+
+  template <Options Option>
+  static inline auto LoadA(const float* a,
+                           const size_t kCurrentRowA,
+                           const size_t kInnerIndex,
+                           const size_t kRowsA,
+                           const size_t kColsARowsB) -> __m256 {
+    if constexpr (Option == Options::RowMajor) {
+      return _mm256_loadu_ps(
+          &a[IndexA<Option>(kCurrentRowA, kInnerIndex, kRowsA, kColsARowsB)]);
+    } else {
+      return _mm256_set_ps(
+          a[IndexA<Option>(kCurrentRowA, kInnerIndex + 7, kRowsA, kColsARowsB)],
+          a[IndexA<Option>(kCurrentRowA, kInnerIndex + 6, kRowsA, kColsARowsB)],
+          a[IndexA<Option>(kCurrentRowA, kInnerIndex + 5, kRowsA, kColsARowsB)],
+          a[IndexA<Option>(kCurrentRowA, kInnerIndex + 4, kRowsA, kColsARowsB)],
+          a[IndexA<Option>(kCurrentRowA, kInnerIndex + 3, kRowsA, kColsARowsB)],
+          a[IndexA<Option>(kCurrentRowA, kInnerIndex + 2, kRowsA, kColsARowsB)],
+          a[IndexA<Option>(kCurrentRowA, kInnerIndex + 1, kRowsA, kColsARowsB)],
+          a[IndexA<Option>(kCurrentRowA, kInnerIndex, kRowsA, kColsARowsB)]);
+    }
+  }
+
+  template <Options Option>
+  static inline auto LoadB(const float* b,
+                           const size_t kInnerIndex,
+                           const size_t kCurrentColB,
+                           const size_t kColsB,
+                           const size_t kColsARowsB) -> __m256 {
+    if constexpr (Option == Options::RowMajor) {
+      return _mm256_set_ps(
+          b[IndexB<Option>(kInnerIndex + 7, kCurrentColB, kColsB, kColsARowsB)],
+          b[IndexB<Option>(kInnerIndex + 6, kCurrentColB, kColsB, kColsARowsB)],
+          b[IndexB<Option>(kInnerIndex + 5, kCurrentColB, kColsB, kColsARowsB)],
+          b[IndexB<Option>(kInnerIndex + 4, kCurrentColB, kColsB, kColsARowsB)],
+          b[IndexB<Option>(kInnerIndex + 3, kCurrentColB, kColsB, kColsARowsB)],
+          b[IndexB<Option>(kInnerIndex + 2, kCurrentColB, kColsB, kColsARowsB)],
+          b[IndexB<Option>(kInnerIndex + 1, kCurrentColB, kColsB, kColsARowsB)],
+          b[IndexB<Option>(kInnerIndex, kCurrentColB, kColsB, kColsARowsB)]);
+    } else {
+      return _mm256_loadu_ps(
+          &b[IndexB<Option>(kInnerIndex, kCurrentColB, kColsB, kColsARowsB)]);
+    }
+  }
+
+  // END: AVX multiplication array utility functions
+
+  // BEGIN: SSE multiplication array utility functions
+
+  template <Options Option>
+  static inline auto LoadASse(const float* a,
+                              const size_t kCurrentRowA,
+                              const size_t kInnerIndex,
+                              const size_t kRowsA,
+                              const size_t kColsARowsB) -> __m128 {
+    if constexpr (Option == Options::RowMajor) {
+      return _mm_loadu_ps(
+          &a[IndexA<Option>(kCurrentRowA, kInnerIndex, kRowsA, kColsARowsB)]);
+    } else {
+      return _mm_set_ps(
+          a[IndexA<Option>(kCurrentRowA, kInnerIndex + 3, kRowsA, kColsARowsB)],
+          a[IndexA<Option>(kCurrentRowA, kInnerIndex + 2, kRowsA, kColsARowsB)],
+          a[IndexA<Option>(kCurrentRowA, kInnerIndex + 1, kRowsA, kColsARowsB)],
+          a[IndexA<Option>(kCurrentRowA, kInnerIndex, kRowsA, kColsARowsB)]);
+    }
+  }
+
+  template <Options Option>
+  static inline auto LoadBSse(const float* b,
+                              const size_t kInnerIndex,
+                              const size_t kCurrentColB,
+                              const size_t kColsB,
+                              const size_t kColsARowsB) -> __m128 {
+    if constexpr (Option == Options::ColumnMajor) {
+      return _mm_loadu_ps(
+          &b[IndexB<Option>(kInnerIndex, kCurrentColB, kColsB, kColsARowsB)]);
+    } else {
+      return _mm_set_ps(
+          b[IndexB<Option>(kInnerIndex + 3, kCurrentColB, kColsB, kColsARowsB)],
+          b[IndexB<Option>(kInnerIndex + 2, kCurrentColB, kColsB, kColsARowsB)],
+          b[IndexB<Option>(kInnerIndex + 1, kCurrentColB, kColsB, kColsARowsB)],
+          b[IndexB<Option>(kInnerIndex, kCurrentColB, kColsB, kColsARowsB)]);
+    }
+  }
+
+  // END: SSE multiplication array utility functions
+
+  // END: multiplication array utility functions
+
+  template <Options Option>
+  static void MulAvx2(float*       result,
+                      const float* a,
+                      const float* b,
+                      const size_t kRowsA,
+                      const size_t kColsB,
+                      const size_t kColsARowsB) {
+    MulAvx<Option>(result, a, b, kRowsA, kColsB, kColsARowsB);
+  }
+
+  template <Options Option>
+  static void MulAvx(float*       result,
+                     const float* a,
+                     const float* b,
+                     const size_t kRowsA,
+                     const size_t kColsB,
+                     const size_t kColsARowsB) {
+    for (size_t currentRowA = 0; currentRowA < kRowsA; ++currentRowA) {
+      for (size_t currentColB = 0; currentColB < kColsB; ++currentColB) {
+        __m256 sum        = _mm256_setzero_ps();
+        size_t innerIndex = 0;
+        for (; innerIndex + s_kAvxSimdWidth - 1 < kColsARowsB;
+             innerIndex += s_kAvxSimdWidth) {
+          __m256 a_vec
+              = LoadA<Option>(a, currentRowA, innerIndex, kRowsA, kColsARowsB);
+          __m256 b_vec
+              = LoadB<Option>(b, innerIndex, currentColB, kColsB, kColsARowsB);
+
+          sum = _mm256_fmadd_ps(a_vec, b_vec, sum);
+        }
+        float tmp[s_kAvxSimdWidth];
+        _mm256_storeu_ps(tmp, sum);
+        float finalSum = 0.0f;
+        for (float i : tmp) {
+          finalSum += i;
+        }
+        for (; innerIndex < kColsARowsB; ++innerIndex) {
+          finalSum
+              += a[IndexA<Option>(currentRowA, innerIndex, kRowsA, kColsARowsB)]
+               * b[IndexB<Option>(
+                   innerIndex, currentColB, kColsB, kColsARowsB)];
+        }
+        result[IndexResult<Option>(currentRowA, currentColB, kRowsA, kColsB)]
+            = finalSum;
+      }
+    }
+  }
+
+  template <Options Option>
+  static void MulSse42(float*       result,
+                       const float* a,
+                       const float* b,
+                       const size_t kRowsA,
+                       const size_t kColsB,
+                       const size_t kColsARowsB) {
+    MulSse3<Option>(result, a, b, kRowsA, kColsB, kColsARowsB);
+  }
+
+  template <Options Option>
+  static void MulSse41(float*       result,
+                       const float* a,
+                       const float* b,
+                       const size_t kRowsA,
+                       const size_t kColsB,
+                       const size_t kColsARowsB) {
+    MulSse3<Option>(result, a, b, kRowsA, kColsB, kColsARowsB);
+  }
+
+  template <Options Option>
+  static void MulSsse3(float*       result,
+                       const float* a,
+                       const float* b,
+                       const size_t kRowsA,
+                       const size_t kColsB,
+                       const size_t kColsARowsB) {
+    MulSse3<Option>(result, a, b, kRowsA, kColsB, kColsARowsB);
+  }
+
+  template <Options Option>
+  static void MulSse3(float*       result,
+                      const float* a,
+                      const float* b,
+                      const size_t kRowsA,
+                      const size_t kColsB,
+                      const size_t kColsARowsB) {
+    for (size_t currentRowA = 0; currentRowA < kRowsA; ++currentRowA) {
+      for (size_t currentColB = 0; currentColB < kColsB; ++currentColB) {
+        __m128 sum        = _mm_setzero_ps();
+        size_t innerIndex = 0;
+        for (; innerIndex + s_kSseSimdWidth - 1 < kColsARowsB;
+             innerIndex += s_kSseSimdWidth) {
+          __m128 a_vec = LoadA_sse<Option>(
+              a, currentRowA, innerIndex, kRowsA, kColsARowsB);
+          __m128 b_vec = LoadB_sse<Option>(
+              b, innerIndex, currentColB, kColsB, kColsARowsB);
+          sum = _mm_add_ps(sum, _mm_mul_ps(a_vec, b_vec));
+        }
+        float tmp[s_kSseSimdWidth];
+        _mm_storeu_ps(tmp, sum);
+        float finalSum = 0.0f;
+        for (float i : tmp) {
+          finalSum += i;
+        }
+        for (; innerIndex < kColsARowsB; ++innerIndex) {
+          finalSum
+              += a[IndexA<Option>(currentRowA, innerIndex, kRowsA, kColsARowsB)]
+               * b[IndexB<Option>(
+                   innerIndex, currentColB, kColsB, kColsARowsB)];
+        }
+        result[IndexResult<Option>(currentRowA, currentColB, kRowsA, kColsB)]
+            = finalSum;
+      }
+    }
+  }
+
+  template <Options Option>
+  static void MulFallback(float*       result,
+                          const float* a,
+                          const float* b,
+                          const size_t kRowsA,
+                          const size_t kColsB,
+                          const size_t kColsARowsB) {
+    for (size_t i = 0; i < kRowsA; ++i) {
+      for (size_t j = 0; j < kColsB; ++j) {
+        float sum = 0;
+        for (size_t k = 0; k < kColsARowsB; ++k) {
+          sum += a[IndexA<Option>(i, k, kRowsA, kColsARowsB)]
+               * b[IndexB<Option>(k, j, kColsB, kColsARowsB)];
+        }
+        result[IndexResult<Option>(i, j, kRowsA, kColsB)] = sum;
+      }
+    }
+  }
+
+  // END: multiplication array
+  //----------------------------------------------------------------------------
+
+  // BEGIN: multiplication scalar
+  //----------------------------------------------------------------------------
+
+  static void MulScalarAvx2(float* a, float scalar, size_t size) {
+    MulScalarAvx(a, scalar, size);
+  }
+
+  static void MulScalarAvx(float* a, float scalar, size_t size) {
+    __m256       ymm0      = _mm256_set1_ps(scalar);
+    const size_t kAvxLimit = size - (size % s_kAvxSimdWidth);
+    size_t       i         = 0;
+
+    for (; i < kAvxLimit; i += s_kAvxSimdWidth) {
+      __m256 ymm1 = _mm256_loadu_ps(a + i);
+      ymm1        = _mm256_mul_ps(ymm1, ymm0);
+      _mm256_storeu_ps(a + i, ymm1);
+    }
+
+    // Handle any remainder
+    for (; i < size; ++i) {
+      a[i] *= scalar;
+    }
+  }
+
+  static void MulScalarSse42(float* a, float scalar, size_t size) {
+    MulScalarSse3(a, scalar, size);
+  }
+
+  static void MulScalarSse41(float* a, float scalar, size_t size) {
+    MulScalarSse3(a, scalar, size);
+  }
+
+  static void MulScalarSsse3(float* a, float scalar, size_t size) {
+    MulScalarSse3(a, scalar, size);
+  }
+
+  static void MulScalarSse3(float* a, float scalar, size_t size) {
+    __m128       xmm0      = _mm_set1_ps(scalar);
+    const size_t kSseLimit = size - (size % s_kSseSimdWidth);
+    size_t       i         = 0;
+
+    for (; i < kSseLimit; i += s_kSseSimdWidth) {
+      __m128 xmm1 = _mm_loadu_ps(a + i);
+      xmm1        = _mm_mul_ps(xmm1, xmm0);
+      _mm_storeu_ps(a + i, xmm1);
+    }
+
+    // Handle any remainder
+    for (; i < size; ++i) {
+      a[i] *= scalar;
+    }
+  }
+
+  static void MulScalarFallback(float* a, float scalar, size_t size) {
+    for (size_t i = 0; i < size; ++i) {
+      a[i] *= scalar;
+    }
+  }
+
+  // END: multiplication scalar
+  //----------------------------------------------------------------------------
+
+  // BEGIN: division scalar
+  //----------------------------------------------------------------------------
+
+  static void DivScalarAvx2(float* a, float scalar, size_t size) {
+    DivScalarAvx(a, scalar, size);
+  }
+
+  static void DivScalarAvx(float* a, float scalar, size_t size) {
+    __m256       ymm0      = _mm256_set1_ps(scalar);
+    const size_t kAvxLimit = size - (size % s_kAvxSimdWidth);
+    size_t       i         = 0;
+
+    for (; i < kAvxLimit; i += s_kAvxSimdWidth) {
+      __m256 ymm1 = _mm256_loadu_ps(a + i);
+      ymm1        = _mm256_div_ps(ymm1, ymm0);
+      _mm256_storeu_ps(a + i, ymm1);
+    }
+
+    // Handle any remainder
+    for (; i < size; ++i) {
+      a[i] /= scalar;
+    }
+  }
+
+  static void DivScalarSse42(float* a, float scalar, size_t size) {
+    DivScalarSse3(a, scalar, size);
+  }
+
+  static void DivScalarSse41(float* a, float scalar, size_t size) {
+    DivScalarSse3(a, scalar, size);
+  }
+
+  static void DivScalarSsse3(float* a, float scalar, size_t size) {
+    DivScalarSse3(a, scalar, size);
+  }
+
+  static void DivScalarSse3(float* a, float scalar, size_t size) {
+    __m128       xmm0      = _mm_set1_ps(scalar);
+    const size_t kSseLimit = size - (size % s_kSseSimdWidth);
+    size_t       i         = 0;
+
+    for (; i < kSseLimit; i += s_kSseSimdWidth) {
+      __m128 xmm1 = _mm_loadu_ps(a + i);
+      xmm1        = _mm_div_ps(xmm1, xmm0);
+      _mm_storeu_ps(a + i, xmm1);
+    }
+
+    // Handle any remainder
+    for (; i < size; ++i) {
+      a[i] /= scalar;
+    }
+  }
+
+  static void DivScalarFallback(float* a, float scalar, size_t size) {
+    for (size_t i = 0; i < size; ++i) {
+      a[i] /= scalar;
+    }
+  }
+
+  // END: division scalar
+  //----------------------------------------------------------------------------
+};
+
+}  // namespace math
+
+#endif
