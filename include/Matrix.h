@@ -7,6 +7,7 @@
 
 #include "../src/lib/Options/Options.h"
 #include "../src/lib/simd/instruction_set/InstructionSet.h"
+#include "../src/lib/utils/Concepts.h"
 
 #include <math.h>
 
@@ -22,25 +23,6 @@
 constexpr unsigned int g_kStackAllocationLimit = 16;  // 4 by 4 matrix
 
 namespace math {
-
-template <typename U, typename... Args>
-concept AllSameAs = (std::same_as<Args, U> && ...);
-
-template <auto Count, typename... Args>
-concept ArgsSizeGreaterThanCount = (sizeof...(Args) > Count);
-
-template <typename MatrixType>
-concept OneDimensional
-    = (MatrixType::GetRows() == 1 || MatrixType::GetColumns() == 1);
-
-template <typename MatrixType>
-concept ThreeDimensionalVector
-    = ((MatrixType::GetRows() == 3 && MatrixType::GetColumns() == 1)
-       || (MatrixType::GetRows() == 1 && MatrixType::GetColumns() == 3));
-
-template <typename MatrixA, typename MatrixB>
-concept SameSize = (MatrixA::GetRows() * MatrixA::GetColumns()
-                    == MatrixB::GetRows() * MatrixB::GetColumns());
 
 template <typename T,
           unsigned int Rows,
