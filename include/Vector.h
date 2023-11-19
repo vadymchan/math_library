@@ -13,34 +13,44 @@ namespace math {
 template <typename T, unsigned int Size, Options Option = Options::RowMajor>
 class Vector {
   public:
+  Vector()
+      : m_dataStorage_() {}
 
-// Vector of doubles
-template <unsigned int Size, Options Option = Options::RowMajor>
-using VectorXd = Matrix<double, Size, 1, Option>;
+  Vector(const T& element)
+      : m_dataStorage_(element) {}
 
-// Vector of ints
-template <unsigned int Size, Options Option = Options::RowMajor>
-using VectorXi = Matrix<int, Size, 1, Option>;
+  Vector(const Vector& other)
+      : m_dataStorage_(other.m_dataStorage_) {}
 
-// Row vector of floats
-template <unsigned int Size, Options Option = Options::RowMajor>
-using RowVectorXf = Matrix<float, 1, Size, Option>;
+  auto operator=(const Vector& other) -> Vector& {
+    if (this != &other) {
+      m_dataStorage_ = other.m_dataStorage_;
+    }
+    return *this;
+  }
 
-// Row vector of doubles
-template <unsigned int Size, Options Option = Options::RowMajor>
-using RowVectorXd = Matrix<double, 1, Size, Option>;
+  Vector(Vector&& other) noexcept
+      : m_dataStorage_(std::move(other.m_dataStorage_)) {}
 
-// Row vector of ints
-template <unsigned int Size, Options Option = Options::RowMajor>
-using RowVectorXi = Matrix<int, 1, Size, Option>;
+  auto operator=(Vector&& other) noexcept -> Vector& {
+    if (this != &other) {
+      m_dataStorage_ = std::move(other.m_dataStorage_);
+    }
+    return *this;
+  }
 
-// Specific size vectors
-using Vector2f    = VectorXf<2>;
-using Vector3f    = VectorXf<3>;
-using Vector4f    = VectorXf<4>;
-using RowVector2f = RowVectorXf<2>;
-using RowVector3f = RowVectorXf<3>;
-using RowVector4f = RowVectorXf<4>;
+  template <typename... Args>
+    requires AllSameAs<T, Args...> && ArgsSizeGreaterThanCount<1, Args...>
+  Vector(Args... args)
+      : m_dataStorage_(args...) {}
+
+  template <std::input_iterator InputIt>
+  Vector(InputIt first, InputIt last)
+      : m_dataStorage_(first, last) {}
+
+  template <std::ranges::range Range>
+  Vector(const Range& range)
+      : m_dataStorage_(range) {}
 
   private:
   using UnderlyingType = std::conditional_t<Option == Options::RowMajor,
