@@ -357,9 +357,10 @@ class Matrix {
     return rank;
   }
 
-  [[nodiscard]] auto magnitude() const -> T
-    requires OneDimensional<Matrix<T, Rows, Columns, Option>>
-  {
+  /**
+   * \brief Calculates the Frobenius norm (magnitude) of a matrix.
+   */
+  [[nodiscard]] auto magnitude() const -> T {
     T                      sum              = 0;
     constexpr unsigned int kVectorDimention = 1;
     constexpr unsigned int kMatrixSize      = Rows * Columns;
@@ -373,9 +374,10 @@ class Matrix {
     return std::sqrt(sum);
   }
 
-  [[nodiscard]] auto normalize() const -> Matrix
-    requires OneDimensional<Matrix<T, Rows, Columns, Option>>
-  {
+  /**
+   * \brief Normalizes the matrix based on its Frobenius norm.
+   */
+  [[nodiscard]] auto normalize() const -> Matrix {
     T mag = magnitude();
     assert(mag != 0 && "Cannot normalize a zero vector");
 
