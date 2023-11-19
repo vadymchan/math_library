@@ -168,7 +168,7 @@ class Matrix {
     return operator()(row, col);
   }
 
-  static constexpr auto GetRows() -> unsigned int { return Rows; }
+  static constexpr auto GetRows() -> unsigned int { return Rows; } 
 
   static constexpr auto GetColumns() -> unsigned int { return Columns; }
 
@@ -374,17 +374,30 @@ class Matrix {
     return std::sqrt(sum);
   }
 
+#ifdef USE_NORMALIZE_IN_PLACE
+  /**
+   * \brief Normalizes the matrix based on its Frobenius norm.
+   */
+  void normalize() {
+    T mag = magnitude();
+    assert(mag != 0 && "Normalization error: magnitude is zero, implying a zero matrix/vector");
+    *this /= mag;
+  }
+
+#else
   /**
    * \brief Normalizes the matrix based on its Frobenius norm.
    */
   [[nodiscard]] auto normalize() const -> Matrix {
     T mag = magnitude();
-    assert(mag != 0 && "Cannot normalize a zero vector");
+    assert(mag != 0 && "Normalization error: magnitude is zero, implying a zero matrix/vector");
 
     Matrix<T, Rows, Columns, Option> result(*this);
     result /= mag;
     return result;
   }
+
+#endif  // USE_NORMALIZE_IN_PLACE
 
   template <unsigned int OtherRows, unsigned int OtherColumns>
     requires OneDimensional<Matrix<T, Rows, Columns>>
