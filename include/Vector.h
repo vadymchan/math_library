@@ -58,4 +58,4 @@ using RowVector4i = RowVectorXi<4>;
 
 }  // namespace math
 
-#endif  
+#endif
