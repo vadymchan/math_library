@@ -545,6 +545,23 @@ class Matrix {
     return *this;
   }
 
+  auto operator==(const Matrix& other) const -> bool {
+    if constexpr (std::is_same_v<T, float> || std::is_same_v<T, double>) {
+      // floating point types
+      constexpr T kEpsilon = std::numeric_limits<T>::epsilon();
+      auto almostEqual = [](T a, T b) { return std::fabs(a - b) <= kEpsilon; };
+      return std::equal(
+          m_data_, m_data_ + Rows * Columns, other.m_data_, almostEqual);
+    } else {
+      // general types
+      return std::equal(m_data_, m_data_ + Rows * Columns, other.m_data_);
+    }
+  }
+
+  auto operator!=(const Matrix& other) const -> bool {
+    return !(*this == other);
+  }
+
   friend auto operator<<(std::ostream& os, const Matrix& matrix)
       -> std::ostream& {
     for (unsigned int i = 0; i < Rows; ++i) {
@@ -587,42 +604,6 @@ class Matrix {
     return MatrixInitializer(*this, 0, 1);
   }
 };
-
-template <typename T, unsigned int Rows, unsigned int Columns, Options Option>
-inline constexpr auto operator==(const Matrix<T, Rows, Columns, Option>& lhs,
-                                 const Matrix<T, Rows, Columns, Option>& rhs)
-    -> bool {
-  return std::equal(lhs.data(), lhs.data() + Rows * Columns, rhs.data());
-}
-
-template <unsigned int Rows, unsigned int Columns, Options Option>
-inline constexpr auto operator==(
-    const Matrix<float, Rows, Columns, Option>& lhs,
-    const Matrix<float, Rows, Columns, Option>& rhs) -> bool {
-  constexpr float kEpsilon = std::numeric_limits<float>::epsilon();
-  auto            almostEqual
-      = [](float a, float b) { return std::fabs(a - b) <= kEpsilon; };
-  return std::equal(
-      lhs.data(), lhs.data() + Rows * Columns, rhs.data(), almostEqual);
-}
-
-template <unsigned int Rows, unsigned int Columns, Options Option>
-inline constexpr auto operator==(
-    const Matrix<double, Rows, Columns, Option>& lhs,
-    const Matrix<double, Rows, Columns, Option>& rhs) -> bool {
-  constexpr double kEpsilon = std::numeric_limits<double>::epsilon();
-  auto             almostEqual
-      = [](double a, double b) { return std::fabs(a - b) <= kEpsilon; };
-  return std::equal(
-      lhs.data(), lhs.data() + Rows * Columns, rhs.data(), almostEqual);
-}
-
-template <typename T, unsigned int Rows, unsigned int Columns, Options Option>
-inline constexpr auto operator!=(const Matrix<T, Rows, Columns, Option>& lhs,
-                                 const Matrix<T, Rows, Columns, Option>& rhs)
-    -> bool {
-  return !(lhs == rhs);
-}
 
 // Matrix of floats
 template <unsigned int Rows,
