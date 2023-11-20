@@ -516,20 +516,11 @@ class Matrix {
     return result;
   }
 
-  // clang-format off
-
-  /**
-   * @brief Multiplies this matrix with another matrix and updates this matrix
-   * with the result.
-   *
-   * @note 'Columns' is used for both dimensions to reflect the nature of square
-   * matrices and to make sure that the result matrix will be the same dimention
-   * as original one.
-   */
-  auto operator*=(const Matrix& other) -> Matrix& 
-    requires SquaredMatrix<other>
-          && ((ValueEqualTo<Rows, Size> && Option == Options::RowMajor)
-               || (ValueEqualTo<Columns, Size> && Option == Options::ColumnMajor)) {
+  template <unsigned int OtherRows, unsigned int OtherColumns>
+  auto operator*=(const Matrix<T, OtherRows, OtherColumns, Option>& other)
+      -> Matrix&
+    requires SquaredMatrix<Matrix<T, OtherRows, OtherColumns, Option>>
+  {
     if constexpr (Option == Options::RowMajor) {
       *this = *this * other;
     } else {
@@ -537,8 +528,6 @@ class Matrix {
     }
     return *this;
   }
-
-  // clang-format on
 
   auto operator*(const T& scalar) const -> Matrix {
     Matrix result        = *this;
