@@ -3,7 +3,7 @@
  */
 
 #ifndef MATH_LIBRARY_INSTRUCTION_SET_H
-  #define MATH_LIBRARY_INSTRUCTION_SET_H
+#define MATH_LIBRARY_INSTRUCTION_SET_H
 
 #include "../../options/Options.h"
 #include "../precompiled/SIMDdefines.h"
@@ -313,58 +313,121 @@ class InstructionSet {
   // BEGIN: multiplication array
   //----------------------------------------------------------------------------
 
-  template <Options Option>
-  static void MulAvx2(T* result, const T* a, const T* b, size_t size) {
-    MulFallback<Option>(result, a, b, size);
-  }
+  // BEGIN: multiplication array utility functions
 
   template <Options Option>
-  static void MulAvx(T* result, const T* a, const T* b, size_t size) {
-    MulFallback<Option>(result, a, b, size);
-  }
-
-  template <Options Option>
-  static void MulSse42(T* result, const T* a, const T* b, size_t size) {
-    MulFallback<Option>(result, a, b, size);
-  }
-
-  template <Options Option>
-  static void MulSse41(T* result, const T* a, const T* b, size_t size) {
-    MulFallback<Option>(result, a, b, size);
-  }
-
-  template <Options Option>
-  static void MulSsse3(T* result, const T* a, const T* b, size_t size) {
-    MulFallback<Option>(result, a, b, size);
-  }
-
-  template <Options Option>
-  static void MulSse3(T* result, const T* a, const T* b, size_t size) {
-    MulFallback<Option>(result, a, b, size);
-  }
-
-  template <Options Option>
-  static void MulFallback(
-      T* result, const T* a, const T* b, size_t size, size_t dim) {
+  static inline auto IndexA(const size_t kCurrentRowA,
+                            const size_t kInnerIndex,
+                            const size_t kRowsA,
+                            const size_t kColsARowsB) -> size_t {
     if constexpr (Option == Options::ColumnMajor) {
-      for (size_t i = 0; i < dim; ++i) {
-        for (size_t j = 0; j < dim; ++j) {
-          T sum = 0;
-          for (size_t k = 0; k < dim; ++k) {
-            sum += a[i + k * dim] * b[k + j * dim];
-          }
-          result[i + j * dim] = sum;
-        }
-      }
+      return kCurrentRowA + kInnerIndex * kRowsA;
     } else if constexpr (Option == Options::RowMajor) {
-      for (size_t i = 0; i < dim; ++i) {
-        for (size_t j = 0; j < dim; ++j) {
-          T sum = 0;
-          for (size_t k = 0; k < dim; ++k) {
-            sum += a[i * dim + k] * b[k * dim + j];
-          }
-          result[i * dim + j] = sum;
+      return kCurrentRowA * kColsARowsB + kInnerIndex;
+    }
+  }
+
+  template <Options Option>
+  static inline auto IndexB(const size_t kInnerIndex,
+                            const size_t kCurrentColB,
+                            const size_t kColsB,
+                            const size_t kColsARowsB) -> size_t {
+    if constexpr (Option == Options::ColumnMajor) {
+      return kInnerIndex + kCurrentColB * kColsARowsB;
+    } else if constexpr (Option == Options::RowMajor) {
+      return kInnerIndex * kColsB + kCurrentColB;
+    }
+  }
+
+  template <Options Option>
+  static inline auto IndexResult(const size_t kCurrentRowA,
+                                 const size_t kCurrentColB,
+                                 const size_t kRowsA,
+                                 const size_t kColsB) -> size_t {
+    if constexpr (Option == Options::ColumnMajor) {
+      return kCurrentRowA + kCurrentColB * kRowsA;
+    } else if constexpr (Option == Options::RowMajor) {
+      return kCurrentRowA * kColsB + kCurrentColB;
+    }
+  }
+
+  // END: multiplication array utility functions
+
+  template <Options Option>
+  static void MulAvx2(T*           result,
+                      const T*     a,
+                      const T*     b,
+                      const size_t kRowsA,
+                      const size_t kColsB,
+                      const size_t kColsARowsB) {
+    MulFallback<Option>(result, a, b, kRowsA, kColsB, kColsARowsB);
+  }
+
+  template <Options Option>
+  static void MulAvx(T*           result,
+                     const T*     a,
+                     const T*     b,
+                     const size_t kRowsA,
+                     const size_t kColsB,
+                     const size_t kColsARowsB) {
+    MulFallback<Option>(result, a, b, kRowsA, kColsB, kColsARowsB);
+  }
+
+  template <Options Option>
+  static void MulSse42(T*           result,
+                       const T*     a,
+                       const T*     b,
+                       const size_t kRowsA,
+                       const size_t kColsB,
+                       const size_t kColsARowsB) {
+    MulFallback<Option>(result, a, b, kRowsA, kColsB, kColsARowsB);
+  }
+
+  template <Options Option>
+  static void MulSse41(T*           result,
+                       const T*     a,
+                       const T*     b,
+                       const size_t kRowsA,
+                       const size_t kColsB,
+                       const size_t kColsARowsB) {
+    MulFallback<Option>(result, a, b, kRowsA, kColsB, kColsARowsB);
+  }
+
+  template <Options Option>
+  static void MulSsse3(T*           result,
+                       const T*     a,
+                       const T*     b,
+                       const size_t kRowsA,
+                       const size_t kColsB,
+                       const size_t kColsARowsB) {
+    MulFallback<Option>(result, a, b, kRowsA, kColsB, kColsARowsB);
+  }
+
+  template <Options Option>
+  static void MulSse3(T*           result,
+                      const T*     a,
+                      const T*     b,
+                      const size_t kRowsA,
+                      const size_t kColsB,
+                      const size_t kColsARowsB) {
+    MulFallback<Option>(result, a, b, kRowsA, kColsB, kColsARowsB);
+  }
+
+  template <Options Option>
+  static void MulFallback(T*           result,
+                          const T*     a,
+                          const T*     b,
+                          const size_t kRowsA,
+                          const size_t kColsB,
+                          const size_t kColsARowsB) {
+    for (size_t i = 0; i < kRowsA; ++i) {
+      for (size_t j = 0; j < kColsB; ++j) {
+        float sum = 0;
+        for (size_t k = 0; k < kColsARowsB; ++k) {
+          sum += a[IndexA<Option>(i, k, kRowsA, kColsARowsB)]
+               * b[IndexB<Option>(k, j, kColsB, kColsARowsB)];
         }
+        result[IndexResult<Option>(i, j, kRowsA, kColsB)] = sum;
       }
     }
   }
