@@ -517,19 +517,14 @@ class Matrix {
   }
 
   /**
-   * @brief Matrix multiplication-assignment operator
+   * @brief Multiplies this matrix with another matrix and updates this matrix
+   * with the result.
    *
-   * This operator multiplies the current matrix with the given one.
-   * Note: This function only works when the matrices have the same dimensions
-   * and squared.
-   *
+   * @note 'Columns' is used for both dimensions to reflect the nature of square
+   * matrices and to make sure that the result matrix will be the same dimention
+   * as original one. 
    */
-  auto operator*=(const Matrix& other) -> Matrix& {
-    static_assert(
-        Columns == Rows,
-        "For Matrix multiplication (*=), matrix dimensions must be squared");
-    assert(this != &other
-           && "Cannot perform operation on the same matrix instance");
+  auto operator*=(const Matrix<T, Columns, Columns, Option>& other) -> Matrix& {
     *this = *this * other;
     return *this;
   }
