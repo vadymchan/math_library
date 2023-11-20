@@ -597,25 +597,16 @@ class Matrix {
    */
   class MatrixInitializer {
     Matrix&      m_matrix_;
-    unsigned int m_row_;
-    unsigned int m_column_;
+    unsigned int m_index_;
 
     public:
-    MatrixInitializer(Matrix& matrix, unsigned int row, unsigned int column)
+    MatrixInitializer(Matrix& matrix, unsigned int index)
         : m_matrix_(matrix)
-        , m_row_(row)
-        , m_column_(column) {}
+        , m_index_(index) {}
 
     auto operator,(const T& value) -> MatrixInitializer& {
-      if (m_column_ >= m_matrix_.GetColumns()) {
-        ++m_row_;
-        m_column_ = 0;
-      }
-
-      if (m_row_ < m_matrix_.GetRows()) {
-        m_matrix_(m_row_, m_column_) = value;
-        ++m_column_;
-      }
+      auto data        = m_matrix_.data();
+      data[m_index_++] = value;
 
       return *this;
     }
@@ -623,7 +614,7 @@ class Matrix {
 
   auto operator<<(const T& value) -> MatrixInitializer {
     this->operator()(0, 0) = value;
-    return MatrixInitializer(*this, 0, 1);
+    return MatrixInitializer(*this, 1);
   }
 };
 
