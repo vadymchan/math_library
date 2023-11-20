@@ -5,6 +5,9 @@
 
 namespace math {
 
+template <auto Value, auto ExactValue>
+concept ValueEqualTo = Value == ExactValue;
+
 template <typename U, typename... Args>
 concept AllSameAs = (std::same_as<Args, U> && ...);
 
@@ -23,6 +26,9 @@ concept ThreeDimensionalVector
 template <typename MatrixA, typename MatrixB>
 concept SameSize = (MatrixA::GetRows() * MatrixA::GetColumns()
                     == MatrixB::GetRows() * MatrixB::GetColumns());
+
+template <typename Matrix>
+concept SquaredMatrix = (Matrix::GetRows() == Matrix::GetColumns());
 
 }  // namespace math
 
