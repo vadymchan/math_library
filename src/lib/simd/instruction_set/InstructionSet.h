@@ -21,8 +21,10 @@ concept SimdSupportedType = std::is_same_v<T, int> || std::is_same_v<T, float>
 template <typename T>
 class InstructionSet {
   public:
+#ifdef MATH_LIBRARY_ENABLE_SIMD_TYPE_CHECK
   static_assert(SimdSupportedType<T>,
                 "InstructionSet supports only int, float, and double types");
+#endif
 
   using AddFunc = void (*)(T*, const T*, size_t);
 
