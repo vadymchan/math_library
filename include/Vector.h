@@ -226,6 +226,16 @@ class Vector {
     return *this;
   }
 
+
+  auto operator/(const T& scalar) const -> Vector {
+    return Vector(m_dataStorage_ / scalar);
+  }
+
+  auto operator/=(const T& scalar) -> Vector& {
+    m_dataStorage_ /= scalar;
+    return *this;
+  }
+
   auto operator==(const Vector& other) const -> bool {
     return m_dataStorage_ == other.m_dataStorage_;
   }
