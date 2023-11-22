@@ -226,6 +226,13 @@ class Vector {
     return *this;
   }
 
+  auto operator==(const Vector& other) const -> bool {
+    return m_dataStorage_ == other.m_dataStorage_;
+  }
+
+  auto operator!=(const Vector& other) const -> bool {
+    return m_dataStorage_ != other.m_dataStorage_;
+  }
   private:
   using UnderlyingType = std::conditional_t<Option == Options::RowMajor,
                                             Matrix<T, Size, 1, Option>,
