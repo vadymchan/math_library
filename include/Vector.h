@@ -226,6 +226,24 @@ class Vector {
     return *this;
   }
 
+  /**
+   * @brief Multiplies the vector by a matrix in a row-major context (vector *
+   * matrix).
+   *
+   * Usage example:
+   *    Vector<float, 2> vec(1.0f, 2.0f);
+   *    Matrix<float, 2, 3> mat = { '1, 2, 3,' '4, 5, 6' };
+   *    auto result = vec * mat; // result is a Vector<float, 3> { 9, 12, 15 }
+   *
+   * @note This function is only for row-major vectors where the
+   *       size of the vector equals the number of rows in the matrix.
+   */
+  template <unsigned int Rows, unsigned int Columns>
+    requires ValueEqualTo<Rows, Size> && (Option == Options::RowMajor)
+  auto operator*(const Matrix<T, Rows, Columns, Option>& matrix) const
+      -> Vector<T, Columns, Option> {
+    return Vector<T, Columns, Option>(m_dataStorage_ * matrix);
+  }
 
   auto operator*(const T& scalar) const -> Vector {
     return Vector(m_dataStorage_ * scalar);
