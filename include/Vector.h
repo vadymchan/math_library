@@ -245,6 +245,27 @@ class Vector {
     return Vector<T, Columns, Option>(m_dataStorage_ * matrix);
   }
 
+  // clang-format off
+
+  /**
+   * @brief Matrix multiplication-assignment operator
+   *
+   * This operator multiplies the current matrix with the given one.
+   * Note: This function only works when the matrices have the same dimensions
+   * and squared.
+   *
+   */
+  template <unsigned int Rows, unsigned int Columns>
+    requires SquaredMatrix<Matrix<T, Rows, Columns, Option>>
+          && ((ValueEqualTo<Rows, Size> && Option == Options::RowMajor)
+              || (ValueEqualTo<Columns, Size> && Option == Options::ColumnMajor))
+  auto operator*=(const Matrix<T, Rows, Columns, Option>& matrix) -> Vector& {
+    m_dataStorage_ *= matrix;
+    return *this;
+  }
+
+  // clang-format on
+
   auto operator*(const T& scalar) const -> Vector {
     return Vector(m_dataStorage_ * scalar);
   }
@@ -309,6 +330,16 @@ class Vector {
     this->operator()(0) = value;
     return VectorInitializer(*this, 1);
   }
+
+  template <typename T1,
+            unsigned int Rows,
+            unsigned int Columns,
+            Options      Option1,
+            unsigned int Size1>
+  friend auto operator*(const Matrix<T1, Rows, Columns, Option1>& matrix,
+                        const Vector<T1, Size1, Option1>&         vector)
+      -> Vector<T1, Rows, Option1>;
+
   private:
   using UnderlyingType = std::conditional_t<Option == Options::RowMajor,
                                             Matrix<T, 1, Size, Option>,
