@@ -371,6 +371,44 @@ inline auto operator*(const Matrix<T, Rows, Columns, Option>& matrix,
     -> Vector<T, Rows, Option> {
   return Vector<T, Rows, Option>(matrix * vector.m_dataStorage_);
 }
+
+// Vector of floats
+template <unsigned int Size, Options Option = Options::RowMajor>
+using VectorNf = Vector<float, Size, Option>;
+
+// Vector of doubles
+template <unsigned int Size, Options Option = Options::RowMajor>
+using VectorNd = Vector<double, Size, Option>;
+
+// Vector of ints
+template <unsigned int Size, Options Option = Options::RowMajor>
+using VectorNi = Vector<int, Size, Option>;
+
+// Templated Vector 2D
+template <typename T, Options Option = Options::RowMajor>
+using Vector2D = Vector<T, 2, Option>;
+
+// Templated Vector 3D
+template <typename T, Options Option = Options::RowMajor>
+using Vector3D = Vector<T, 3, Option>;
+
+// Templated Vector 4D
+template <typename T, Options Option = Options::RowMajor>
+using Vector4D = Vector<T, 4, Option>;
+
+// Specific data type vectors
+using Vector2Df = Vector2D<float>;
+using Vector3Df = Vector3D<float>;
+using Vector4Df = Vector4D<float>;
+
+using Vector2Dd = Vector2D<double>;
+using Vector3Dd = Vector3D<double>;
+using Vector4Dd = Vector4D<double>;
+
+using Vector2Di = Vector2D<int>;
+using Vector3Di = Vector3D<int>;
+using Vector4Di = Vector4D<int>;
+
 }  // namespace math
 
 #endif
