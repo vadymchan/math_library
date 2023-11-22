@@ -150,6 +150,10 @@ class Vector {
     }
   }
 
+  static constexpr auto GetSize() -> unsigned int { return Size; }
+
+  static constexpr auto GetOption() -> Options { return Option; }
+
   auto data() -> T* { return m_dataStorage_.data(); }
 
   [[nodiscard]] auto data() const -> const T* { return m_dataStorage_.data(); }
