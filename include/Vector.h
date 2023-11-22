@@ -150,6 +150,9 @@ class Vector {
     }
   }
 
+  auto data() -> T* { return m_dataStorage_.data(); }
+
+  [[nodiscard]] auto data() const -> const T* { return m_dataStorage_.data(); }
   private:
   using UnderlyingType = std::conditional_t<Option == Options::RowMajor,
                                             Matrix<T, Size, 1, Option>,
