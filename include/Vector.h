@@ -157,6 +157,38 @@ class Vector {
   auto data() -> T* { return m_dataStorage_.data(); }
 
   [[nodiscard]] auto data() const -> const T* { return m_dataStorage_.data(); }
+
+  auto magnitude() -> T { return m_dataStorage_.magnitude(); }
+
+  // TODO: add condition conmilation to normalize
+  [[nodiscard]] auto normalize() const -> Vector {
+    return Vector(m_dataStorage_.normalize());
+  }
+
+  [[nodiscard]] auto dot(const Vector& other) const -> T {
+    float                  result           = NAN;
+    constexpr unsigned int kVectorDimention = 1;
+    auto mulFunc = InstructionSet<T>::template GetMulFunc<Option>();
+    mulFunc(&result,
+            this->data(),
+            other.data(),
+            kVectorDimention,
+            kVectorDimention,
+            Size);
+    return result;
+  }
+
+  [[nodiscard]] auto cross(const Vector& other) const -> Vector
+    requires ValueEqualTo<Size, 3>
+  {
+    Vector result;
+
+    result.x() = this->y() * other.z() - this->z() * other.y();
+    result.y() = this->z() * other.x() - this->x() * other.z();
+    result.z() = this->x() * other.y() - this->y() * other.x();
+
+    return result;
+  }
   private:
   using UnderlyingType = std::conditional_t<Option == Options::RowMajor,
                                             Matrix<T, Size, 1, Option>,
