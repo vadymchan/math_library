@@ -5,6 +5,11 @@
 
 namespace math {
 
+template <auto Value, auto MinValue>
+concept ValueAtLeast = Value >= MinValue;
+
+template <auto Value, auto ExactValue>
+concept ValueEqualTo = Value == ExactValue;
 template <typename U, typename... Args>
 concept AllSameAs = (std::same_as<Args, U> && ...);
 
