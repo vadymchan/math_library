@@ -5,7 +5,6 @@
 #ifndef MATH_LIBRARY_VECTOR_H
 #define MATH_LIBRARY_VECTOR_H
 
-
 #include "Matrix.h"
 
 namespace math {
@@ -35,6 +34,25 @@ class Vector {
   auto operator=(Vector&& other) noexcept -> Vector& {
     if (this != &other) {
       m_dataStorage_ = std::move(other.m_dataStorage_);
+    }
+    return *this;
+  }
+
+  template <unsigned int Rows, unsigned int Columns>
+    requires OneDimensional<Rows, Columns>
+  explicit Vector(const Matrix<T, Rows, Columns, Option>& matrix)
+      : m_dataStorage_(matrix) {}
+
+  template <unsigned int Rows, unsigned int Columns>
+    requires OneDimensional<Rows, Columns>
+  explicit Vector(Matrix<T, Rows, Columns, Option>&& matrix) noexcept
+      : m_dataStorage_(std::move(matrix)) {}
+
+  template <unsigned int Rows, unsigned int Columns>
+    requires OneDimensional<Rows, Columns>
+  auto operator=(const Matrix<T, Rows, Columns, Option>& matrix) -> Vector& {
+    if (m_dataStorage_ != matrix) {
+      m_dataStorage_ = matrix;
     }
     return *this;
   }
