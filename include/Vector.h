@@ -117,6 +117,39 @@ class Vector {
   {
     return operator()(3);
   }
+
+  auto operator()(unsigned int index) const -> const T& {
+    if constexpr (Option == Options::RowMajor) {
+      return m_dataStorage_(0, index);
+    } else {
+      return m_dataStorage_(index, 0);
+    }
+  }
+
+  auto operator()(unsigned int index) -> T& {
+    if constexpr (Option == Options::RowMajor) {
+      return m_dataStorage_(0, index);
+    } else {
+      return m_dataStorage_(index, 0);
+    }
+  }
+
+  [[nodiscard]] auto coeff(unsigned int index) const -> const T& {
+    if constexpr (Option == Options::RowMajor) {
+      return m_dataStorage_.coeff(0, index);
+    } else {
+      return m_dataStorage_.coeff(index, 0);
+    }
+  }
+
+  auto coeffRef(unsigned int index) -> T& {
+    if constexpr (Option == Options::RowMajor) {
+      return m_dataStorage_.coeffRef(0, index);
+    } else {
+      return m_dataStorage_.coeffRef(index, 0);
+    }
+  }
+
   private:
   using UnderlyingType = std::conditional_t<Option == Options::RowMajor,
                                             Matrix<T, Size, 1, Option>,
