@@ -10,6 +10,10 @@ concept ValueAtLeast = Value >= MinValue;
 
 template <auto Value, auto ExactValue>
 concept ValueEqualTo = Value == ExactValue;
+
+template <unsigned int Rows, unsigned int Columns>
+concept OneDimensional = (Rows == 1 || Columns == 1);
+
 template <typename U, typename... Args>
 concept AllSameAs = (std::same_as<Args, U> && ...);
 

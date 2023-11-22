@@ -358,7 +358,7 @@ class Matrix {
   }
 
   [[nodiscard]] auto magnitude() const -> T
-    requires OneDimensional<Matrix<T, Rows, Columns, Option>>
+    requires OneDimensional<Rows, Columns>
   {
     T                      sum              = 0;
     constexpr unsigned int kVectorDimention = 1;
@@ -374,7 +374,7 @@ class Matrix {
   }
 
   [[nodiscard]] auto normalize() const -> Matrix
-    requires OneDimensional<Matrix<T, Rows, Columns, Option>>
+    requires OneDimensional<Rows, Columns>
   {
     T mag = magnitude();
     assert(mag != 0 && "Cannot normalize a zero vector");
@@ -385,8 +385,7 @@ class Matrix {
   }
 
   template <unsigned int OtherRows, unsigned int OtherColumns>
-    requires OneDimensional<Matrix<T, Rows, Columns>>
-          && OneDimensional<Matrix<T, OtherRows, OtherColumns>>
+    requires OneDimensional<Rows, Columns> && OneDimensional<Rows, Columns>
           && SameSize<Matrix<T, Rows, Columns>,
                       Matrix<T, OtherRows, OtherColumns>>
   [[nodiscard]] auto dot(const Matrix<T, OtherRows, OtherColumns>& other) const
