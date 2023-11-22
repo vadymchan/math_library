@@ -317,6 +317,29 @@ class Vector {
   UnderlyingType m_dataStorage_;
 };
 
+/**
+ * @brief Multiplies a matrix by a vector in a column-major context (matrix *
+ * vector).
+ *
+ * Usage example:
+ *    Matrix<float, 3, 2> mat = { '1, 2', '3, 4', '5, 6' };
+ *    Vector<float, 2> vec(1.0f, 2.0f);
+ *    auto result = mat * vec; // result is a Vector<float, 3> { 5, 11, 17 }
+ *
+ * @note This function is only for column-major matrices where the number of
+ * columns in the matrix equals the size of the vector.
+ */
+template <typename T,
+          unsigned int Rows,
+          unsigned int Columns,
+          Options      Option,
+          unsigned int Size>
+  requires ValueEqualTo<Columns, Size> && (Option == Options::ColumnMajor)
+inline auto operator*(const Matrix<T, Rows, Columns, Option>& matrix,
+                      const Vector<T, Size, Option>&          vector)
+    -> Vector<T, Rows, Option> {
+  return Vector<T, Rows, Option>(matrix * vector.m_dataStorage_);
+}
 }  // namespace math
 
 #endif
