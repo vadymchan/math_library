@@ -274,8 +274,8 @@ class Vector {
   }
   private:
   using UnderlyingType = std::conditional_t<Option == Options::RowMajor,
-                                            Matrix<T, Size, 1, Option>,
-                                            Matrix<T, 1, Size, Option>>;
+                                            Matrix<T, 1, Size, Option>,
+                                            Matrix<T, Size, 1, Option>>;
 
   UnderlyingType m_dataStorage_;
 };
