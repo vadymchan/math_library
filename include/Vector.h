@@ -233,6 +233,16 @@ class Vector {
   auto operator!=(const Vector& other) const -> bool {
     return m_dataStorage_ != other.m_dataStorage_;
   }
+
+  friend auto operator<<(std::ostream& os, const Vector& vector)
+      -> std::ostream& {
+    for (int i = 0; i < Size; ++i) {
+      os << vector(i) << ' ';
+    }
+    os << '\n';
+    return os;
+  }
+
   private:
   using UnderlyingType = std::conditional_t<Option == Options::RowMajor,
                                             Matrix<T, Size, 1, Option>,
