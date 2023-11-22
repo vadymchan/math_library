@@ -1108,7 +1108,13 @@ TEST(MatrixTest, MagnitudeFailureFloat) {
 
 TEST(MatrixTest, NormalizeFloat) {
   math::Matrix<float, 3, 1> vector(2.0f, 2.0f, 1.0f);  // 3D vector
-  auto                      normalizedVector = vector.normalize();
+
+#ifdef USE_NORMALIZE_IN_PLACE
+  vector.normalize();
+  auto& normalizedVector = vector;
+#else
+  auto normalizedVector = vector.normalize();
+#endif
 
   // The expected normalized vector is (2/3, 2/3, 1/3)
   EXPECT_NEAR(normalizedVector(0, 0), 2.0f / 3, 1e-5);
@@ -1120,7 +1126,13 @@ TEST(MatrixTest, NormalizeFloat) {
 
 TEST(MatrixTest, NormalizeFailureFloat) {
   math::Matrix<float, 3, 1> vector(2.0f, 2.0f, 1.0f);  // 3D vector
-  auto                      normalizedVector = vector.normalize();
+
+#ifdef USE_NORMALIZE_IN_PLACE
+  vector.normalize();
+  auto& normalizedVector = vector;
+#else
+  auto normalizedVector = vector.normalize();
+#endif
 
   vector *= 2;
 
@@ -1139,7 +1151,9 @@ TEST(MatrixTest, NormalizeZeroVector) {
   math::Matrix<float, 3, 1> vector(0.0f, 0.0f, 0.0f);  // Zero vector
 
   // Trying to normalize a zero vector should throw an assertion
-  EXPECT_DEATH(vector.normalize(), "Cannot normalize a zero vector");
+  EXPECT_DEATH(
+      vector.normalize(),
+      "Normalization error: magnitude is zero, implying a zero matrix/vector");
 }
 
 #endif  // _DEBUG

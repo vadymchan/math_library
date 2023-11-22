@@ -20,9 +20,10 @@
 #include <ranges>
 #include <type_traits>
 
-constexpr unsigned int g_kStackAllocationLimit = 16;  // 4 by 4 matrix
 
 namespace math {
+
+constexpr unsigned int g_kStackAllocationLimit = 16;  // 4 by 4 matrix
 
 template <typename T,
           unsigned int Rows,
@@ -357,6 +358,9 @@ class Matrix {
     return rank;
   }
 
+  /**
+   * \brief Calculates the Frobenius norm (magnitude) of a matrix.
+   */
   [[nodiscard]] auto magnitude() const -> T
     requires OneDimensional<Rows, Columns>
   {
@@ -373,16 +377,34 @@ class Matrix {
     return std::sqrt(sum);
   }
 
-  [[nodiscard]] auto normalize() const -> Matrix
+#ifdef USE_NORMALIZE_IN_PLACE
+  /**
+   * \brief Normalizes the matrix based on its Frobenius norm.
+   */
+  void normalize() 
     requires OneDimensional<Rows, Columns>
   {
     T mag = magnitude();
-    assert(mag != 0 && "Cannot normalize a zero vector");
+    assert(mag != 0 && "Normalization error: magnitude is zero, implying a zero matrix/vector");
+    *this /= mag;
+  }
+
+#else
+  /**
+   * \brief Normalizes the matrix based on its Frobenius norm.
+   */
+  [[nodiscard]] auto normalize() const -> Matrix 
+    requires OneDimensional<Rows, Columns>
+  {
+    T mag = magnitude();
+    assert(mag != 0 && "Normalization error: magnitude is zero, implying a zero matrix/vector");
 
     Matrix<T, Rows, Columns, Option> result(*this);
     result /= mag;
     return result;
   }
+
+#endif  // USE_NORMALIZE_IN_PLACE
 
   template <unsigned int OtherRows, unsigned int OtherColumns>
     requires OneDimensional<Rows, Columns> && OneDimensional<Rows, Columns>

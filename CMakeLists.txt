@@ -4,20 +4,30 @@ project(math_library)
 
 #-------- lib ----------------------------------------
 
+option(USE_NORMALIZE_IN_PLACE "Use in-place normalization" ON)
+
 file(GLOB_RECURSE LIB_SOURCES "src/lib/*.cpp")
 file(GLOB_RECURSE PUBLIC_HEADERS "include/*.h")
 file(GLOB_RECURSE PRIVATE_HEADERS "src/lib/**/*.h")
 
 if(LIB_SOURCES) 
+    #Static Lib
     message(STATUS "Build math library as static library")
     add_library(math_library STATIC ${PUBLIC_HEADERS} ${PRIVATE_HEADERS} ${LIB_SOURCES})
     target_include_directories(math_library PUBLIC include)
     target_include_directories(math_library PRIVATE src/lib)
+    if(USE_NORMALIZE_IN_PLACE)
+        target_compile_definitions(math_library PUBLIC USE_NORMALIZE_IN_PLACE)
+    endif()
 else()
     #Header Only
     message(STATUS "Build math library as header only library")
     add_library(math_library INTERFACE ${PUBLIC_HEADERS} ${PRIVATE_HEADERS})
-    target_include_directories(math_library INTERFACE include src/lib)
+    target_include_directories(math_library INTERFACE include)
+    target_include_directories(math_library INTERFACE src/lib)
+    if(USE_NORMALIZE_IN_PLACE)
+        target_compile_definitions(math_library INTERFACE USE_NORMALIZE_IN_PLACE)
+    endif()
 endif()
 
 #-------- exe ----------------------------------------
