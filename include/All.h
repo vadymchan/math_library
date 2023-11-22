@@ -8,5 +8,7 @@
 #include "Graphics.h"
 #include "Matrix.h"
 #include "Vector.h"
+#include "Point.h"
+#include "Dimension.h"
 
 #endif
