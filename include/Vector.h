@@ -70,6 +70,53 @@ class Vector {
   Vector(const Range& range)
       : m_dataStorage_(range) {}
 
+  auto x() -> T&
+    requires ValueAtLeast<Size, 1>
+  {
+    return operator()(0);
+  }
+
+  auto x() const -> const T&
+    requires ValueAtLeast<Size, 1>
+  {
+    return operator()(0);
+  }
+
+  auto y() -> T&
+    requires ValueAtLeast<Size, 2>
+  {
+    return operator()(1);
+  }
+
+  auto y() const -> const T&
+    requires ValueAtLeast<Size, 2>
+  {
+    return operator()(1);
+  }
+
+  auto z() -> T&
+    requires ValueAtLeast<Size, 3>
+  {
+    return operator()(2);
+  }
+
+  auto z() const -> const T&
+    requires ValueAtLeast<Size, 3>
+  {
+    return operator()(2);
+  }
+
+  auto w() -> T&
+    requires ValueAtLeast<Size, 4>
+  {
+    return operator()(3);
+  }
+
+  auto w() const -> const T&
+    requires ValueAtLeast<Size, 4>
+  {
+    return operator()(3);
+  }
   private:
   using UnderlyingType = std::conditional_t<Option == Options::RowMajor,
                                             Matrix<T, Size, 1, Option>,
