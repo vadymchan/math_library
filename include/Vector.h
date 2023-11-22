@@ -189,6 +189,24 @@ class Vector {
 
     return result;
   }
+
+  auto operator+(const Vector& other) const -> Vector {
+    return Vector(m_dataStorage_ + other.m_dataStorage_);
+  }
+
+  auto operator+=(const Vector& other) -> Vector& {
+    m_dataStorage_ += other;
+    return *this;
+  }
+
+  auto operator+(const T& scalar) const -> Vector {
+    return Vector(m_dataStorage_ + scalar);
+  }
+
+  auto operator+=(const T& scalar) -> Vector& {
+    m_dataStorage_ += scalar;
+    return *this;
+  }
   private:
   using UnderlyingType = std::conditional_t<Option == Options::RowMajor,
                                             Matrix<T, Size, 1, Option>,
