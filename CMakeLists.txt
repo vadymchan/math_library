@@ -52,15 +52,22 @@ target_link_libraries(math_library_exe math_library)
 add_executable(generate_SIMD_defines scripts/generate_simd_defines.cpp)
 
 add_custom_command(
-    OUTPUT src/lib/simd/precompiled/simd_defines.h
+    OUTPUT ${CMAKE_CURRENT_SOURCE_DIR}/src/lib/simd/precompiled/simd_defines.h
     COMMAND generate_SIMD_defines
     DEPENDS generate_SIMD_defines
+    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
 )
 
 add_custom_target(
     run_generate_defines ALL
-    DEPENDS src/lib/simd/precompiled/simd_defines.h
+    DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/src/lib/simd/precompiled/simd_defines.h
 )
+
+if(LIB_SOURCES) 
+    target_include_directories(math_library PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src/lib/simd/precompiled)
+else()
+    target_include_directories(math_library INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/src/lib/simd/precompiled)
+endif()
 
 #-------- fetch content ----------------------------------------
 
