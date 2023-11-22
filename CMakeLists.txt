@@ -7,7 +7,7 @@ project(math_library)
 option(USE_NORMALIZE_IN_PLACE "Use in-place normalization" ON)
 
 file(GLOB_RECURSE LIB_SOURCES "src/lib/*.cpp")
-file(GLOB_RECURSE PUBLIC_HEADERS "include/*.h")
+file(GLOB_RECURSE PUBLIC_HEADERS "include/math_library/*.h")
 file(GLOB_RECURSE PRIVATE_HEADERS "src/lib/**/*.h")
 
 if(LIB_SOURCES) 
@@ -29,6 +29,9 @@ else()
         target_compile_definitions(math_library INTERFACE USE_NORMALIZE_IN_PLACE)
     endif()
 endif()
+    
+add_dependencies(math_library run_generate_defines)
+
 
 #-------- exe ----------------------------------------
 
@@ -46,18 +49,17 @@ target_link_libraries(math_library_exe math_library)
 
 #-------- generate_defines ----------------------------------------
 
-add_executable(generate_SIMD_defines scripts/GenerateSIMDdefines.cpp)
+add_executable(generate_SIMD_defines scripts/generate_simd_defines.cpp)
 
 add_custom_command(
-    # OUTPUT include/SIMDdefines.h
-    OUTPUT src/lib/simd/precompiled/SIMDdefines.h
+    OUTPUT src/lib/simd/precompiled/simd_defines.h
     COMMAND generate_SIMD_defines
     DEPENDS generate_SIMD_defines
 )
 
 add_custom_target(
     run_generate_defines ALL
-    DEPENDS src/lib/simd/precompiled/SIMDdefines.h
+    DEPENDS src/lib/simd/precompiled/simd_defines.h
 )
 
 #-------- fetch content ----------------------------------------

@@ -1,7 +1,7 @@
 #ifndef MATH_LIBRARY_POINT
 #define MATH_LIBRARY_POINT
 
-#include "Vector.h"
+#include "vector.h"
 
 namespace math {
 

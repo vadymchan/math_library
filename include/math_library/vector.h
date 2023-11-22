@@ -5,7 +5,7 @@
 #ifndef MATH_LIBRARY_VECTOR_H
 #define MATH_LIBRARY_VECTOR_H
 
-#include "Matrix.h"
+#include "matrix.h"
 
 namespace math {
 

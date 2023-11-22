@@ -1,7 +1,7 @@
 #ifndef MATH_LIBRARY_DIMENSION
 #define MATH_LIBRARY_DIMENSION
 
-#include "Vector.h"
+#include "vector.h"
 
 namespace math {
 

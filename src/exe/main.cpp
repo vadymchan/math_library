@@ -2,7 +2,7 @@
 #include "benchmarks.h"
 #include "tests.h"
 
-#include <All.h>
+#include <math_library/all.h>
 
 auto main(int argc, char** argv) -> int {
   ::testing::InitGoogleTest(&argc, argv);

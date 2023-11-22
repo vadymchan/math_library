@@ -1,7 +1,7 @@
 #ifndef MATH_LIBRARY_TESTS_H
 #define MATH_LIBRARY_TESTS_H
 
-#include <All.h>
+#include <math_library/all.h>
 #include <gtest/gtest.h>
 
 // TEST(MatrixTest, ConstructorDestructorFloat)

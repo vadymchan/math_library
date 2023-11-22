@@ -5,8 +5,8 @@
 #ifndef MATH_LIBRARY_INSTRUCTION_SET_H
 #define MATH_LIBRARY_INSTRUCTION_SET_H
 
-#include "../../options/Options.h"
-#include "../precompiled/SIMDdefines.h"
+#include "../../options/options.h"
+#include "../precompiled/simd_defines.h"
 
 #include <immintrin.h>
 
@@ -508,8 +508,8 @@ class InstructionSet {
 
 }  // namespace math
 
-#include "InstructionSetDouble.h"
-#include "InstructionSetFloat.h"
-#include "InstructionSetInt.h"
+#include "instruction_set_double.h"
+#include "instruction_set_float.h"
+#include "instruction_set_int.h"
 
 #endif

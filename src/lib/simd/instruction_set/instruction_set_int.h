@@ -5,7 +5,7 @@
 #ifndef MATH_LIBRARY_INSTRUCTION_SET_INT_H
 #define MATH_LIBRARY_INSTRUCTION_SET_INT_H
 
-#include "../../options/Options.h"
+#include "../../options/options.h"
 
 #include <immintrin.h>
 

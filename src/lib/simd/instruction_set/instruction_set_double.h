@@ -5,7 +5,7 @@
 #ifndef MATH_LIBRARY_INSTRUCTION_SET_DOUBLE_H
 #define MATH_LIBRARY_INSTRUCTION_SET_DOUBLE_H
 
-#include "../../Options/Options.h"
+#include "../../options/options.h"
 
 #include <immintrin.h>
 

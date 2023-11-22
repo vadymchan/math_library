@@ -1,7 +1,7 @@
 #ifndef MATH_LIBRARY_BENCHMARK_H
 #define MATH_LIBRARY_BENCHMARK_H
 
-#include <All.h>
+#include <math_library/all.h>
 #include <benchmark/benchmark.h>
 
 static void bmMatrixCreationStack(benchmark::State& state);
