@@ -243,6 +243,35 @@ class Vector {
     return os;
   }
 
+  /**
+   * @brief Helper class for initializing Vector elements using the comma
+   * operator (operator,).
+   *
+   * Usage example:
+   *    Vector<float, 3> vec;
+   *    vec << 1.0f, 2.0f, 3.0f; // Initializes vec to [1.0, 2.0, 3.0]
+   */
+  class VectorInitializer {
+    Vector&      m_vector_;
+    unsigned int m_index_;
+
+    public:
+    VectorInitializer(Vector& vector, unsigned int index)
+        : m_vector_(vector)
+        , m_index_(index) {}
+
+    auto operator,(const T& value) -> VectorInitializer& {
+      if (m_index_ < Size) {
+        m_vector_(m_index_++) = value;
+      }
+      return *this;
+    }
+  };
+
+  auto operator<<(const T& value) -> VectorInitializer {
+    this->operator()(0) = value;
+    return VectorInitializer(*this, 1);
+  }
   private:
   using UnderlyingType = std::conditional_t<Option == Options::RowMajor,
                                             Matrix<T, Size, 1, Option>,
