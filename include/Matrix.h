@@ -20,9 +20,10 @@
 #include <ranges>
 #include <type_traits>
 
-constexpr unsigned int g_kStackAllocationLimit = 16;  // 4 by 4 matrix
 
 namespace math {
+
+constexpr unsigned int g_kStackAllocationLimit = 16;  // 4 by 4 matrix
 
 template <typename T,
           unsigned int Rows,
