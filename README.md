@@ -81,9 +81,9 @@ math_library
 │       │   │
 │       │   └── precompiled
 │       │       └── SIMDdefines.h
-|		|
+│       │
 │       └── utils
-|			└── Concepts.h
+│           └── Concepts.h
 │ 
 ├── scripts (for generation instruction for current hardware)
 │   └── GenerateSIMDdefines.cpp
