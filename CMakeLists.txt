@@ -30,7 +30,7 @@ else()
     endif()
 endif()
     
-add_dependencies(math_library run_generate_defines)
+
 
 
 #-------- exe ----------------------------------------
@@ -62,6 +62,8 @@ add_custom_target(
     run_generate_defines ALL
     DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/src/lib/simd/precompiled/simd_defines.h
 )
+
+add_dependencies(math_library run_generate_defines)
 
 if(LIB_SOURCES) 
     target_include_directories(math_library PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src/lib/simd/precompiled)
