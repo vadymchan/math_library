@@ -140,3 +140,18 @@ math_library
 P.S. for some elements i'm still not sure: 
 - for class methods do i really need to add `s_` prefix 🤔
 - do i need to add `s_k`, `g_k` prefixes 🤔
+
+### Issues
+
+#### include in other project using CMake FetchContent and math_library build as header only library
+
+this problem occurs since math_library is header only library (INTERFACE), so it doesn't have to build before the main project. But math_library dependent on run_generate_defines which generates 
+simd_defines.h file for internal use. So if math_library is not built before the main project, then simd_defines.h is not generated and math_library can't be used.
+
+Solution:
+add to CMakeLists.txt of the main project where you want to use math_library:
+``` cmake
+add_dependency (<project_name> math_library)
+```
+
+this will forcefully build math_library (specifically run_generate_defines) before the main project.
