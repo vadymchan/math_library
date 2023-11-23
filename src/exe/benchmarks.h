@@ -1,3 +1,7 @@
+/**
+ * @file benchmarks.h
+ */
+
 #ifndef MATH_LIBRARY_BENCHMARK_H
 #define MATH_LIBRARY_BENCHMARK_H
 

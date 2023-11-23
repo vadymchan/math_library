@@ -1,3 +1,7 @@
+/**
+ * @file tests.h
+ */
+
 #ifndef MATH_LIBRARY_TESTS_H
 #define MATH_LIBRARY_TESTS_H
 

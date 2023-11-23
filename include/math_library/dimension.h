@@ -1,3 +1,7 @@
+/**
+ * @file dimension.h
+ */
+
 #ifndef MATH_LIBRARY_DIMENSION
 #define MATH_LIBRARY_DIMENSION
 

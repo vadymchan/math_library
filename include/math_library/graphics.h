@@ -1,5 +1,5 @@
 /**
- * @file Graphics.h
+ * @file graphics.h
  */
 
 #ifndef MATH_LIBRARY_GRAPHICS_H

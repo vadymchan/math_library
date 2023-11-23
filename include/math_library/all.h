@@ -1,5 +1,5 @@
 /**
- * @file All.h
+ * @file all.h
  */
 
 #ifndef MATH_LIBRARY_ALL_H

@@ -1,5 +1,5 @@
 /**
- * @file InstructionSetInt.h
+ * @file instruction_set_int.h
  */
 
 #ifndef MATH_LIBRARY_INSTRUCTION_SET_INT_H

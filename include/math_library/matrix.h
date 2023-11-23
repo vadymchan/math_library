@@ -1,5 +1,5 @@
 /**
- * @file Matrix.h
+ * @file matrix.h
  */
 
 #ifndef MATH_LIBRARY_MATRIX_H

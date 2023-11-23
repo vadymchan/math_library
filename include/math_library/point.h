@@ -1,3 +1,7 @@
+/**
+ * @file point.h
+ */
+
 #ifndef MATH_LIBRARY_POINT
 #define MATH_LIBRARY_POINT
 

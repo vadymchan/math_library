@@ -1,14 +1,12 @@
-#ifndef MATH_LIBRARY_OPTIONS_H
-#define MATH_LIBRARY_OPTIONS_H
-
-
 /**
- * @file Options.h
+ * @file options.h
  * @brief This file contains the Options enum used for specifying various
  * configuration options for mathematical objects.
  */
 
-#pragma once
+#ifndef MATH_LIBRARY_OPTIONS_H
+#define MATH_LIBRARY_OPTIONS_H
+
 
 namespace math {
 /**

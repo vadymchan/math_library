@@ -1,5 +1,5 @@
 /**
- * @file Vector.h
+ * @file vector.h
  */
 
 #ifndef MATH_LIBRARY_VECTOR_H

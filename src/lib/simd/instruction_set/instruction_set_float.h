@@ -1,5 +1,5 @@
 /**
- * @file InstructionSetFloat.h
+ * @file instruction_set_float.h
  */
 
 #ifndef MATH_LIBRARY_INSTRUCTION_SET_FLOAT_H

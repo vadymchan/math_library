@@ -1,5 +1,5 @@
 /**
- * @file InstructionSetDouble.h
+ * @file instruction_set_double.h
  */
 
 #ifndef MATH_LIBRARY_INSTRUCTION_SET_DOUBLE_H
