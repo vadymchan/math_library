@@ -60,10 +60,6 @@ option(MATH_LIBRARY_BUILD_TESTS "Build the tests and benchmarks for math_library
 
 if(MATH_LIBRARY_BUILD_TESTS)
 
-option(MATH_LIBRARY_INCLUDE_G_TEST "Include the G_TEST library" ON)
-option(MATH_LIBRARY_INCLUDE_SPDLOG "Include the SPDLOG library" OFF)
-option(MATH_LIBRARY_INCLUDE_G_BENCHMARK "Include the G_BENCHMARK library" ON)
-
 file(GLOB_RECURSE EXE_SOURCES "src/exe/*.cpp")
 file(GLOB_RECURSE EXE_HEADERS "src/exe/*.h")
 include_directories(${PROJECT_SOURCE_DIR}/include ${CMAKE_BINARY_DIR})
@@ -76,53 +72,60 @@ endif()
 
 #-------- fetch content ----------------------------------------
 
+include(CMakeDependentOption)
+
+cmake_dependent_option(MATH_LIBRARY_INCLUDE_G_TEST "Include the G_TEST library" ON "MATH_LIBRARY_BUILD_TESTS" ON)
+cmake_dependent_option(MATH_LIBRARY_INCLUDE_SPDLOG "Include the SPDLOG library" OFF "MATH_LIBRARY_BUILD_TESTS" ON)
+cmake_dependent_option(MATH_LIBRARY_INCLUDE_G_BENCHMARK "Include the G_BENCHMARK library" ON "MATH_LIBRARY_BUILD_TESTS" ON)
+
 if(MATH_LIBRARY_BUILD_TESTS)
+    
+        
+    include(FetchContent)
+    set(FETCHCONTENT_BASE_DIR ${CMAKE_SOURCE_DIR}/third_party)
 
-include(FetchContent)
-set(FETCHCONTENT_BASE_DIR ${CMAKE_SOURCE_DIR}/third_party)
+    if(MATH_LIBRARY_INCLUDE_SPDLOG)
+        message(STATUS "Fetching SPDLOG...")
+        FetchContent_Declare(
+            spdlog
+            GIT_REPOSITORY https://github.com/gabime/spdlog.git
+            GIT_TAG v1.9.2
+        )
+        FetchContent_MakeAvailable(spdlog)
+        target_link_libraries(math_library_exe spdlog)
+    endif()
 
-if(INCLUDE_SPDLOG)
-    message(STATUS "Fetching SPDLOG...")
-    FetchContent_Declare(
-        spdlog
-        GIT_REPOSITORY https://github.com/gabime/spdlog.git
-        GIT_TAG v1.9.2
-    )
-    FetchContent_MakeAvailable(spdlog)
-    target_link_libraries(math_library_exe spdlog)
-endif()
+    if(MATH_LIBRARY_INCLUDE_G_TEST)
+        message(STATUS "Fetching Google Test...")
+        FetchContent_Declare(
+            googletest
+            GIT_REPOSITORY https://github.com/google/googletest.git
+            GIT_TAG v1.13.0
+        )
+        FetchContent_MakeAvailable(googletest)
+        target_link_libraries(math_library_exe gtest gtest_main)
+    endif()
 
-if(INCLUDE_G_TEST)
-    message(STATUS "Fetching Google Test...")
-    FetchContent_Declare(
-        googletest
-        GIT_REPOSITORY https://github.com/google/googletest.git
-        GIT_TAG v1.13.0
-    )
-    FetchContent_MakeAvailable(googletest)
-    target_link_libraries(math_library_exe gtest gtest_main)
-endif()
+    #set to compile the gtest using Multi-threaded Debug /MTd runtime library
+    if(MSVC) 
+        set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /MTd")
+        set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /MT")
+    endif()
 
-#set to compile the gtest using Multi-threaded Debug /MTd runtime library
-if(MSVC) 
-    set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /MTd")
-    set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /MT")
-endif()
+    if(MATH_LIBRARY_INCLUDE_G_BENCHMARK)
+        message(STATUS "Fetching Google Benchmark...")
+        FetchContent_Declare(
+            googlebenchmark
+            GIT_REPOSITORY https://github.com/google/benchmark.git
+            GIT_TAG v1.6.0
+        )
+        set(BENCHMARK_ENABLE_TESTING OFF CACHE BOOL "Suppressing benchmark's tests" FORCE)
+        FetchContent_MakeAvailable(googlebenchmark)
+        get_target_property(BENCHMARK_INCLUDE_DIRS benchmark::benchmark INTERFACE_INCLUDE_DIRECTORIES)
+        target_include_directories(math_library_exe SYSTEM PRIVATE ${BENCHMARK_INCLUDE_DIRS})
+        target_link_libraries(math_library_exe benchmark::benchmark)
+    endif()
 
-if(INCLUDE_G_BENCHMARK)
-    message(STATUS "Fetching Google Benchmark...")
-    FetchContent_Declare(
-        googlebenchmark
-        GIT_REPOSITORY https://github.com/google/benchmark.git
-        GIT_TAG v1.6.0
-    )
-    set(BENCHMARK_ENABLE_TESTING OFF CACHE BOOL "Suppressing benchmark's tests" FORCE)
-    FetchContent_MakeAvailable(googlebenchmark)
-    get_target_property(BENCHMARK_INCLUDE_DIRS benchmark::benchmark INTERFACE_INCLUDE_DIRECTORIES)
-    target_include_directories(math_library_exe SYSTEM PRIVATE ${BENCHMARK_INCLUDE_DIRS})
-    target_link_libraries(math_library_exe benchmark::benchmark)
-endif()
-
-set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT math_library_exe)
+    set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT math_library_exe)
 
 endif()
