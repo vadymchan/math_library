@@ -1113,7 +1113,7 @@ TEST(MatrixTest, MagnitudeFailureFloat) {
 TEST(MatrixTest, NormalizeFloat) {
   math::Matrix<float, 3, 1> vector(2.0f, 2.0f, 1.0f);  // 3D vector
 
-#ifdef USE_NORMALIZE_IN_PLACE
+#ifdef MATH_LIBRARY_USE_NORMALIZE_IN_PLACE
   vector.normalize();
   auto& normalizedVector = vector;
 #else
@@ -1131,7 +1131,7 @@ TEST(MatrixTest, NormalizeFloat) {
 TEST(MatrixTest, NormalizeFailureFloat) {
   math::Matrix<float, 3, 1> vector(2.0f, 2.0f, 1.0f);  // 3D vector
 
-#ifdef USE_NORMALIZE_IN_PLACE
+#ifdef MATH_LIBRARY_USE_NORMALIZE_IN_PLACE
   vector.normalize();
   auto& normalizedVector = vector;
 #else

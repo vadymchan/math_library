@@ -160,10 +160,17 @@ class Vector {
 
   auto magnitude() -> T { return m_dataStorage_.magnitude(); }
 
-  // TODO: add condition conmilation to normalize
+#ifdef MATH_LIBRARY_USE_NORMALIZE_IN_PLACE
+
+  void normalize() { m_dataStorage_.normalize(); }
+
+#else
+
   [[nodiscard]] auto normalize() const -> Vector {
     return Vector(m_dataStorage_.normalize());
   }
+
+#endif
 
   [[nodiscard]] auto dot(const Vector& other) const -> T {
     float                  result           = NAN;

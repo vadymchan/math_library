@@ -377,7 +377,7 @@ class Matrix {
     return std::sqrt(sum);
   }
 
-#ifdef USE_NORMALIZE_IN_PLACE
+#ifdef MATH_LIBRARY_USE_NORMALIZE_IN_PLACE
   /**
    * \brief Normalizes the matrix based on its Frobenius norm.
    */
