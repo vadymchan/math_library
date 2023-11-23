@@ -5,9 +5,9 @@
 #ifndef MATH_LIBRARY_MATRIX_H
 #define MATH_LIBRARY_MATRIX_H
 
-#include "../src/lib/options/options.h"
-#include "../src/lib/simd/instruction_set/instruction_set.h"
-#include "../src/lib/utils/concepts.h"
+#include "../../src/lib/options/options.h"
+#include "../../src/lib/simd/instruction_set/instruction_set.h"
+#include "../../src/lib/utils/concepts.h"
 
 #include <math.h>
 
