@@ -4,7 +4,7 @@ project(math_library)
 
 #-------- lib ----------------------------------------
 
-option(USE_NORMALIZE_IN_PLACE "Use in-place normalization" ON)
+option(MATH_LIBRARY_USE_NORMALIZE_IN_PLACE "Use in-place normalization" ON)
 
 file(GLOB_RECURSE LIB_SOURCES "src/lib/*.cpp")
 file(GLOB_RECURSE PUBLIC_HEADERS "include/math_library/*.h")
@@ -29,23 +29,6 @@ else()
         target_compile_definitions(math_library INTERFACE USE_NORMALIZE_IN_PLACE)
     endif()
 endif()
-    
-
-
-
-#-------- exe ----------------------------------------
-
-option(INCLUDE_G_TEST "Include the G_TEST library" ON)
-option(INCLUDE_SPDLOG "Include the SPDLOG library" OFF)
-option(INCLUDE_G_BENCHMARK "Include the G_BENCHMARK library" ON)
-
-file(GLOB_RECURSE EXE_SOURCES "src/exe/*.cpp")
-file(GLOB_RECURSE EXE_HEADERS "src/exe/*.h")
-include_directories(${PROJECT_SOURCE_DIR}/include ${CMAKE_BINARY_DIR})
-
-add_executable(math_library_exe ${EXE_HEADERS} ${EXE_SOURCES})
-
-target_link_libraries(math_library_exe math_library)
 
 #-------- generate_defines ----------------------------------------
 
@@ -70,6 +53,21 @@ if(LIB_SOURCES)
 else()
     target_include_directories(math_library INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/src/lib/simd/precompiled)
 endif()
+
+#-------- exe ----------------------------------------
+
+option(MATH_LIBRARY_INCLUDE_G_TEST "Include the G_TEST library" ON)
+option(MATH_LIBRARY_INCLUDE_SPDLOG "Include the SPDLOG library" OFF)
+option(MATH_LIBRARY_INCLUDE_G_BENCHMARK "Include the G_BENCHMARK library" ON)
+
+file(GLOB_RECURSE EXE_SOURCES "src/exe/*.cpp")
+file(GLOB_RECURSE EXE_HEADERS "src/exe/*.h")
+include_directories(${PROJECT_SOURCE_DIR}/include ${CMAKE_BINARY_DIR})
+
+add_executable(math_library_exe ${EXE_HEADERS} ${EXE_SOURCES})
+
+target_link_libraries(math_library_exe math_library)
+
 
 #-------- fetch content ----------------------------------------
 
