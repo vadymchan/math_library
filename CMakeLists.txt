@@ -56,6 +56,10 @@ endif()
 
 #-------- exe ----------------------------------------
 
+option(MATH_LIBRARY_BUILD_TESTS "Build the tests and benchmarks for math_library" OFF)
+
+if(MATH_LIBRARY_BUILD_TESTS)
+
 option(MATH_LIBRARY_INCLUDE_G_TEST "Include the G_TEST library" ON)
 option(MATH_LIBRARY_INCLUDE_SPDLOG "Include the SPDLOG library" OFF)
 option(MATH_LIBRARY_INCLUDE_G_BENCHMARK "Include the G_BENCHMARK library" ON)
@@ -68,8 +72,11 @@ add_executable(math_library_exe ${EXE_HEADERS} ${EXE_SOURCES})
 
 target_link_libraries(math_library_exe math_library)
 
+endif()
 
 #-------- fetch content ----------------------------------------
+
+if(MATH_LIBRARY_BUILD_TESTS)
 
 include(FetchContent)
 set(FETCHCONTENT_BASE_DIR ${CMAKE_SOURCE_DIR}/third_party)
@@ -117,3 +124,5 @@ if(INCLUDE_G_BENCHMARK)
 endif()
 
 set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT math_library_exe)
+
+endif()
