@@ -24,7 +24,6 @@ else()
     message(STATUS "Build math library as header only library")
     add_library(math_library INTERFACE ${PUBLIC_HEADERS} ${PRIVATE_HEADERS})
     target_include_directories(math_library INTERFACE include)
-    target_include_directories(math_library INTERFACE src/lib)
     if(MATH_LIBRARY_USE_NORMALIZE_IN_PLACE)
         target_compile_definitions(math_library INTERFACE MATH_LIBRARY_USE_NORMALIZE_IN_PLACE)
     endif()
@@ -47,12 +46,6 @@ add_custom_target(
 )
 
 add_dependencies(math_library run_generate_defines)
-
-if(LIB_SOURCES) 
-    target_include_directories(math_library PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src/lib/simd/precompiled)
-else()
-    target_include_directories(math_library INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/src/lib/simd/precompiled)
-endif()
 
 #-------- exe ----------------------------------------
 
