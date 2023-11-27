@@ -70,7 +70,7 @@ math_library
 │   └── lib (internal implementation - hidden from the user)
 │       ├── options
 │       │   └── Options.h
-|		|
+|		    |
 │       │
 │       ├── simd
 │       │   ├── instruction_set
