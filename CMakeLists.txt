@@ -119,6 +119,9 @@ if(MATH_LIBRARY_BUILD_TESTS)
         target_link_libraries(math_library_exe benchmark::benchmark)
     endif()
 
-    set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT math_library_exe)
+    # Startup project for VS 
+    if(CMAKE_GENERATOR MATCHES "Visual Studio")
+        set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT math_library_exe)
+    endif()
 
 endif()
