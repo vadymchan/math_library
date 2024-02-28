@@ -20,7 +20,6 @@
 #include <ranges>
 #include <type_traits>
 
-
 namespace math {
 
 constexpr unsigned int g_kStackAllocationLimit = 16;  // 4 by 4 matrix
@@ -381,7 +380,7 @@ class Matrix {
   /**
    * \brief Normalizes the matrix based on its Frobenius norm.
    */
-  void normalize() 
+  void normalize()
     requires OneDimensional<Rows, Columns>
   {
     T mag = magnitude();
@@ -393,7 +392,7 @@ class Matrix {
   /**
    * \brief Normalizes the matrix based on its Frobenius norm.
    */
-  [[nodiscard]] auto normalize() const -> Matrix 
+  [[nodiscard]] auto normalize() const -> Matrix
     requires OneDimensional<Rows, Columns>
   {
     T mag = magnitude();
@@ -511,6 +510,13 @@ class Matrix {
     auto subScalarFunc = InstructionSet<T>::GetSubScalarFunc();
     subScalarFunc(m_data_, scalar, Rows * Columns);
     return *this;
+  }
+
+  auto operator-() const -> Matrix {
+    Matrix result  = *this;
+    auto   negFunc = InstructionSet<T>::GetNegFunc();
+    negFunc(result.data(), Rows * Columns);
+    return result;
   }
 
   template <unsigned int ResultColumns>
