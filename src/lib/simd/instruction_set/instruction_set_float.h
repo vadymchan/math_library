@@ -185,8 +185,10 @@ class InstructionSet<float> {
   }
 
   private:
-  static constexpr size_t s_kAvxSimdWidth = 8;
-  static constexpr size_t s_kSseSimdWidth = 4;
+  static constexpr size_t s_kAvxSimdWidth
+      = sizeof(__m256) / sizeof(float);  // 8
+  static constexpr size_t s_kSseSimdWidth
+      = sizeof(__m128) / sizeof(float);  // 4
 
   // BEGIN: add two arrays
   //----------------------------------------------------------------------------
