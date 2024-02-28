@@ -5,8 +5,8 @@
 #ifndef MATH_LIBRARY_TESTS_H
 #define MATH_LIBRARY_TESTS_H
 
-#include <math_library/all.h>
 #include <gtest/gtest.h>
+#include <math_library/all.h>
 
 // TEST(MatrixTest, ConstructorDestructorFloat)
 //  TEST(MatrixTest, CopyConstructorFloat)
@@ -336,14 +336,15 @@ TEST(MatrixTest, SubtractionFloat) {
   constexpr int kRows    = 2;
   constexpr int kColumns = 2;
 
-  math::Matrix<int, kRows, kColumns> matrix1;
-  math::Matrix<int, kRows, kColumns> matrix2;
+  math::Matrix<float, kRows, kColumns> matrix1;
+  math::Matrix<float, kRows, kColumns> matrix2;
 
   // Populate matrix1 and matrix2 with some values
   for (int i = 0; i < kRows; ++i) {
     for (int j = 0; j < kColumns; ++j) {
-      matrix1.coeffRef(i, j) = i * 4 + j + 1;
-      matrix2.coeffRef(i, j) = (i * 4 + j + 1) * 2;
+      matrix1.coeffRef(i, j) = i * 4.0f + j + 1.0f;  // Use float literals
+      matrix2.coeffRef(i, j)
+          = (i * 4.0f + j + 1.0f) * 2.0f;            // Use float literals
     }
   }
 
@@ -353,7 +354,11 @@ TEST(MatrixTest, SubtractionFloat) {
   // corresponding elements of matrix1 and matrix2
   for (int i = 0; i < kRows; ++i) {
     for (int j = 0; j < kColumns; ++j) {
-      EXPECT_EQ(matrix3.coeff(i, j), matrix1.coeff(i, j) - matrix2.coeff(i, j));
+      EXPECT_NEAR(
+          matrix3.coeff(i, j), matrix1.coeff(i, j) - matrix2.coeff(i, j), 1e-5);
+      // Alternatively, for exact floating-point comparisons (which might be
+      // risky due to precision issues): EXPECT_FLOAT_EQ(matrix3.coeff(i, j),
+      // matrix1.coeff(i, j) - matrix2.coeff(i, j));
     }
   }
 }
@@ -377,6 +382,32 @@ TEST(MatrixTest, ScalarSubtractionFloat) {
   for (int i = 0; i < 4; ++i) {
     for (int j = 0; j < 4; ++j) {
       EXPECT_EQ(matrix2.coeff(i, j), matrix1.coeff(i, j) - 10);
+    }
+  }
+}
+
+// Test: Negation (-Matrix)
+
+TEST(MatrixTest, NegationFloat) {
+  constexpr int kRows    = 2;
+  constexpr int kColumns = 2;
+
+  math::Matrix<float, kRows, kColumns> matrix;
+
+  // Populate matrix with some values
+  for (int i = 0; i < kRows; ++i) {
+    for (int j = 0; j < kColumns; ++j) {
+      matrix.coeffRef(i, j) = i * 4 + j + 1;  // Example values: 1, 2, 5, 6
+    }
+  }
+
+  auto negatedMatrix = -matrix;
+
+  // Check that each element of the negated matrix is the negation
+  // of the corresponding element in the original matrix
+  for (int i = 0; i < kRows; ++i) {
+    for (int j = 0; j < kColumns; ++j) {
+      EXPECT_EQ(negatedMatrix.coeff(i, j), -matrix.coeff(i, j));
     }
   }
 }
@@ -1727,6 +1758,33 @@ TEST(MatrixTest, MultiplicationRowMajorIntNonSquare_2) {
   EXPECT_EQ(matrix3.coeff(1, 1), 166.0);
   EXPECT_EQ(matrix3.coeff(2, 0), 220.0);
   EXPECT_EQ(matrix3.coeff(2, 1), 262.0);
+}
+
+// Test: Negation (-Matrix)
+
+TEST(MatrixTest, NegationInt) {
+  constexpr int kRows    = 3;
+  constexpr int kColumns = 3;
+
+  math::Matrix<int, kRows, kColumns> matrix;
+
+  // Populate matrix with some values
+  for (int i = 0; i < kRows; ++i) {
+    for (int j = 0; j < kColumns; ++j) {
+      matrix.coeffRef(i, j)
+          = (i + 1) * (j + 1);  // Example values: 1, 2, 3, ..., 9
+    }
+  }
+
+  auto negatedMatrix = -matrix;
+
+  // Check that each element of the negated matrix is the negation
+  // of the corresponding element in the original matrix
+  for (int i = 0; i < kRows; ++i) {
+    for (int j = 0; j < kColumns; ++j) {
+      EXPECT_EQ(negatedMatrix.coeff(i, j), -matrix.coeff(i, j));
+    }
+  }
 }
 
 #endif
