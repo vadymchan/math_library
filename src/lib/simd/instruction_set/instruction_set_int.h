@@ -96,6 +96,26 @@ class InstructionSet<int> {
 #endif
   }
 
+  using NegFunc = void (*)(int*, size_t);
+
+  static auto GetNegFunc() -> NegFunc {
+#ifdef SUPPORTS_AVX2
+    return NegAvx2;
+#elif defined(SUPPORTS_AVX)
+    return NegAvx;
+#elif defined(SUPPORTS_SSE4_2)
+    return NegSse42;
+#elif defined(SUPPORTS_SSE4_1)
+    return NegSse41;
+#elif defined(SUPPORTS_SSSE3)
+    return NegSsse3;
+#elif defined(SUPPORTS_SSE3)
+    return NegSse3;
+#else
+    return NegFallback;
+#endif
+  }
+
   template <Options Option>
   using MulFunc = void (*)(
       int*, const int*, const int*, const size_t, const size_t, const size_t);
@@ -403,6 +423,59 @@ class InstructionSet<int> {
   }
 
   // END: subtract scalar
+  //----------------------------------------------------------------------------
+
+  // BEGIN: negation array
+  //----------------------------------------------------------------------------
+
+  static void NegAvx2(int* a, size_t size) { NegAvx(a, size); }
+
+  static void NegAvx(int* a, size_t size) {
+    const size_t kAvxLimit = size - (size % s_kAvxSimdWidth);
+    size_t       i         = 0;
+
+    for (; i < kAvxLimit; i += s_kAvxSimdWidth) {
+      __m256i ymm1
+          = _mm256_loadu_si256(reinterpret_cast<const __m256i*>(a + i));
+      ymm1 = _mm256_sub_epi32(_mm256_setzero_si256(), ymm1);  // Negate
+      _mm256_storeu_si256(reinterpret_cast<__m256i*>(a + i), ymm1);
+    }
+
+    // Handle any remaining elements without SIMD
+    for (; i < size; ++i) {
+      a[i] = -a[i];
+    }
+  }
+
+  static void NegSse42(int* a, size_t size) { NegSse3(a, size); }
+
+  static void NegSse41(int* a, size_t size) { NegSse3(a, size); }
+
+  static void NegSsse3(int* a, size_t size) { NegSse3(a, size); }
+
+  static void NegSse3(int* a, size_t size) {
+    const size_t kSseLimit = size - (size % s_kSseSimdWidth);
+    size_t       i         = 0;
+
+    for (; i < kSseLimit; i += s_kSseSimdWidth) {
+      __m128i xmm1 = _mm_loadu_si128(reinterpret_cast<const __m128i*>(a + i));
+      xmm1         = _mm_sub_epi32(_mm_setzero_si128(), xmm1);  // Negate
+      _mm_storeu_si128(reinterpret_cast<__m128i*>(a + i), xmm1);
+    }
+
+    // Handle any remaining elements without SIMD
+    for (; i < size; ++i) {
+      a[i] = -a[i];
+    }
+  }
+
+  static void NegFallback(int* a, size_t size) {
+    for (size_t i = 0; i < size; ++i) {
+      a[i] = -a[i];
+    }
+  }
+
+  // END: negation array
   //----------------------------------------------------------------------------
 
   // BEGIN: multiplication array
