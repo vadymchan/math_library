@@ -180,8 +180,8 @@ class InstructionSet<int> {
   }
 
   private:
-  static constexpr size_t s_kAvxSimdWidth = 8;
-  static constexpr size_t s_kSseSimdWidth = 4;
+  static constexpr size_t s_kAvxSimdWidth = sizeof(__m256i) / sizeof(int);  // 8
+  static constexpr size_t s_kSseSimdWidth = sizeof(__m128i) / sizeof(int);  // 4
 
   // BEGIN: add two arrays
   //----------------------------------------------------------------------------
