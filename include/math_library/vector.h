@@ -228,6 +228,8 @@ class Vector {
     return Vector(m_dataStorage_ - scalar);
   }
 
+  auto operator-() const -> Vector { return Vector(-m_dataStorage_); }
+
   auto operator-=(const T& scalar) -> Vector& {
     m_dataStorage_ -= scalar;
     return *this;
