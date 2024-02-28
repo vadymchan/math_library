@@ -5,8 +5,8 @@
 #ifndef MATH_LIBRARY_BENCHMARK_H
 #define MATH_LIBRARY_BENCHMARK_H
 
-#include <math_library/all.h>
 #include <benchmark/benchmark.h>
+#include <math_library/all.h>
 
 static void bmMatrixCreationStack(benchmark::State& state);
 static void bmMatrixCreationHeap(benchmark::State& state);
@@ -180,6 +180,30 @@ static void bmMatrixScalarSubtractionInPlace(benchmark::State& state) {
 BENCHMARK(bmMatrixScalarSubtractionInPlace);
 
 // END: subtraction benchmark
+//---------------------------------------------------------------------------
+
+// BEGIN: negation benchmark
+//---------------------------------------------------------------------------
+
+static void bmMatrixNegation(benchmark::State& state) {
+  math::Matrix<float, 100, 100> matrix;
+
+  // Optionally, initialize matrix with some values
+  for (int i = 0; i < 100; ++i) {
+    for (int j = 0; j < 100; ++j) {
+      matrix(i, j) = static_cast<float>(i * 100 + j);
+    }
+  }
+
+  for (auto _ : state) {
+    auto negatedMatrix = -matrix;
+    benchmark::DoNotOptimize(negatedMatrix);
+  }
+}
+
+BENCHMARK(bmMatrixNegation);
+
+// END: negation benchmark
 //---------------------------------------------------------------------------
 
 // BEGIN: multiplication benchmark
