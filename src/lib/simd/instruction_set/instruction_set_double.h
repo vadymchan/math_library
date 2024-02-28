@@ -97,6 +97,26 @@ class InstructionSet<double> {
 #endif
   }
 
+  using NegFunc = void (*)(double*, size_t);
+
+  static auto GetNegFunc() -> NegFunc {
+#ifdef SUPPORTS_AVX2
+    return NegAvx2;
+#elif defined(SUPPORTS_AVX)
+    return NegAvx;
+#elif defined(SUPPORTS_SSE4_2)
+    return NegSse42;
+#elif defined(SUPPORTS_SSE4_1)
+    return NegSse41;
+#elif defined(SUPPORTS_SSSE3)
+    return NegSsse3;
+#elif defined(SUPPORTS_SSE3)
+    return NegSse3;
+#else
+    return NegFallback;
+#endif
+  }
+
   template <Options Option>
   using MulFunc = void (*)(double*,
                            const double*,
@@ -367,6 +387,61 @@ class InstructionSet<double> {
   }
 
   // END: subtract scalar
+  //----------------------------------------------------------------------------
+
+  // BEGIN: negation array
+  //----------------------------------------------------------------------------
+
+  static void NegAvx2(double* a, size_t size) { NegAvx(a, size); }
+
+  static void NegAvx(double* a, size_t size) {
+    __m256d      negZero   = _mm256_set1_pd(-0.0);
+    const size_t kAvxLimit = size - (size % s_kAvxSimdWidth);
+    size_t       i         = 0;
+
+    for (; i < kAvxLimit; i += s_kAvxSimdWidth) {
+      __m256d ymm1 = _mm256_loadu_pd(a + i);
+      ymm1         = _mm256_xor_pd(ymm1, negZero);
+      _mm256_storeu_pd(a + i, ymm1);
+    }
+
+    // Handle any remaining elements without SIMD
+    for (; i < size; ++i) {
+      a[i] = -a[i];
+    }
+  }
+
+  static void NegSse42(double* a, size_t size) { NegSse3(a, size); }
+
+  static void NegSse41(double* a, size_t size) { NegSse3(a, size); }
+
+  static void NegSsse3(double* a, size_t size) { NegSse3(a, size); }
+
+  static void NegSse3(double* a, size_t size) {
+    __m128d      negZero   = _mm_set1_pd(-0.0);
+    const size_t kSseLimit = size - (size % s_kSseSimdWidth);
+    size_t       i         = 0;
+
+    for (; i < kSseLimit; i += s_kSseSimdWidth) {
+      __m128d xmm1 = _mm_loadu_pd(a + i);
+      xmm1         = _mm_xor_pd(xmm1, negZero);
+      _mm_storeu_pd(a + i, xmm1);
+    }
+
+    // Handle any remaining elements without SIMD
+    for (; i < size; ++i) {
+      a[i] = -a[i];
+    }
+  }
+
+  // Fallback adapted for double type
+  static void NegFallback(double* a, size_t size) {
+    for (size_t i = 0; i < size; ++i) {
+      a[i] = -a[i];
+    }
+  }
+
+  // END: negation array
   //----------------------------------------------------------------------------
 
   // BEGIN: multiplication array
