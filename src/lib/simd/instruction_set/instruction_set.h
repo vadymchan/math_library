@@ -106,6 +106,26 @@ class InstructionSet {
 #endif
   }
 
+  using NegFunc = void (*)(T*, size_t);
+
+  static auto GetNegFunc() -> NegFunc {
+#ifdef SUPPORTS_AVX2
+    return NegAvx2;
+#elif defined(SUPPORTS_AVX)
+    return NegAvx;
+#elif defined(SUPPORTS_SSE4_2)
+    return NegSse42;
+#elif defined(SUPPORTS_SSE4_1)
+    return NegSse41;
+#elif defined(SUPPORTS_SSSE3)
+    return NegSsse3;
+#elif defined(SUPPORTS_SSE3)
+    return NegSse3;
+#else
+    return NegFallback;
+#endif
+  }
+
   template <Options Option>
   using MulFunc = void (*)(
       T*, const T*, const T*, const size_t, const size_t, const size_t);
@@ -308,6 +328,30 @@ class InstructionSet {
   }
 
   // END: subtraction scalar
+  //----------------------------------------------------------------------------
+
+  // BEGIN: negation array
+  //----------------------------------------------------------------------------
+
+  static void NegAvx2(T* a, size_t size) { NegFallback(a, size); }
+
+  static void NegAvx(T* a, size_t size) { NegFallback(a, size); }
+
+  static void NegSse42(T* a, size_t size) { NegFallback(a, size); }
+
+  static void NegSse41(T* a, size_t size) { NegFallback(a, size); }
+
+  static void NegSsse3(T* a, size_t size) { NegFallback(a, size); }
+
+  static void NegSse3(T* a, size_t size) { NegFallback(a, size); }
+
+  static void NegFallback(T* a, size_t size) {
+    for (size_t i = 0; i < size; ++i) {
+      a[i] = -a[i];
+    }
+  }
+
+  // END: negation array
   //----------------------------------------------------------------------------
 
   // BEGIN: multiplication array
