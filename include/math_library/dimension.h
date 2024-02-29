@@ -137,7 +137,7 @@ using Dimension3D = Dimension<T, 3, Option>;
 template <typename T, Options Option = Options::RowMajor>
 using Dimension4D = Dimension<T, 4, Option>;
 
-// Specific data type vectors
+// Specific data type dimension
 using Dimension2Df = Dimension2D<float>;
 using Dimension3Df = Dimension3D<float>;
 using Dimension4Df = Dimension4D<float>;
