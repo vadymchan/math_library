@@ -15,8 +15,10 @@
 namespace math {
 
 template <typename T>
-concept SimdSupportedType = std::is_same_v<T, int> || std::is_same_v<T, float>
-                         || std::is_same_v<T, double>;
+concept SimdSupportedType
+    = std::is_same_v<T, int> || std::is_same_v<T, float>
+   || std::is_same_v<T, double> || std::is_same_v<T, unsigned int>
+   || std::is_same_v<T, std::uint32_t>;
 
 template <typename T>
 class InstructionSet {
@@ -555,5 +557,6 @@ class InstructionSet {
 #include "instruction_set_double.h"
 #include "instruction_set_float.h"
 #include "instruction_set_int.h"
+#include "instruction_set_unsigned_int.h"
 
 #endif
