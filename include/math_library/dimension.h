@@ -57,7 +57,7 @@ class Dimension {
     return operator()(0);
   }
 
-  auto width() const -> const T&
+  [[nodiscard]] auto width() const -> const T&
     requires ValueAtLeast<Size, 1>
   {
     return operator()(0);
@@ -69,7 +69,7 @@ class Dimension {
     return operator()(1);
   }
 
-  auto height() const -> const T&
+  [[nodiscard]] auto height() const -> const T&
     requires ValueAtLeast<Size, 2>
   {
     return operator()(1);
@@ -81,7 +81,7 @@ class Dimension {
     return operator()(2);
   }
 
-  auto depth() const -> const T&
+  [[nodiscard]] auto depth() const -> const T&
     requires ValueAtLeast<Size, 3>
   {
     return operator()(2);
