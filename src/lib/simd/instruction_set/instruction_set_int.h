@@ -194,10 +194,12 @@ class InstructionSet<int> {
     size_t       i         = 0;
 
     for (; i < kAvxLimit; i += s_kAvxSimdWidth) {
-      __m256i ymm1 = _mm256_loadu_si256((const __m256i*)(a + i));
-      __m256i ymm2 = _mm256_loadu_si256((const __m256i*)(b + i));
-      ymm1         = _mm256_add_epi32(ymm1, ymm2);
-      _mm256_storeu_si256((__m256i*)(a + i), ymm1);
+      __m256i ymm1
+          = _mm256_loadu_si256(reinterpret_cast<const __m256i*>(a + i));
+      __m256i ymm2
+          = _mm256_loadu_si256(reinterpret_cast<const __m256i*>(b + i));
+      ymm1 = _mm256_add_epi32(ymm1, ymm2);
+      _mm256_storeu_si256(reinterpret_cast<__m256i*>(a + i), ymm1);
     }
 
     // Handle any remainder
@@ -223,10 +225,10 @@ class InstructionSet<int> {
     size_t       i         = 0;
 
     for (; i < kSseLimit; i += s_kSseSimdWidth) {
-      __m128i xmm1 = _mm_loadu_si128((const __m128i*)(a + i));
-      __m128i xmm2 = _mm_loadu_si128((const __m128i*)(b + i));
+      __m128i xmm1 = _mm_loadu_si128(reinterpret_cast<const __m128i*>(a + i));
+      __m128i xmm2 = _mm_loadu_si128(reinterpret_cast<const __m128i*>(b + i));
       xmm1         = _mm_add_epi32(xmm1, xmm2);
-      _mm_storeu_si128((__m128i*)(a + i), xmm1);
+      _mm_storeu_si128(reinterpret_cast<__m128i*>(a + i), xmm1);
     }
 
     // Handle any remainder
@@ -257,9 +259,10 @@ class InstructionSet<int> {
     size_t       i         = 0;
 
     for (; i < kAvxLimit; i += s_kAvxSimdWidth) {
-      __m256i ymm1 = _mm256_loadu_si256((const __m256i*)(a + i));
-      ymm1         = _mm256_add_epi32(ymm1, ymm0);
-      _mm256_storeu_si256((__m256i*)(a + i), ymm1);
+      __m256i ymm1
+          = _mm256_loadu_si256(reinterpret_cast<const __m256i*>(a + i));
+      ymm1 = _mm256_add_epi32(ymm1, ymm0);
+      _mm256_storeu_si256(reinterpret_cast<__m256i*>(a + i), ymm1);
     }
 
     // Handle any remainder
@@ -286,9 +289,9 @@ class InstructionSet<int> {
     size_t       i         = 0;
 
     for (; i < kSseLimit; i += s_kSseSimdWidth) {
-      __m128i xmm1 = _mm_loadu_si128((const __m128i*)(a + i));
+      __m128i xmm1 = _mm_loadu_si128(reinterpret_cast<const __m128i*>(a + i));
       xmm1         = _mm_add_epi32(xmm1, xmm0);
-      _mm_storeu_si128((__m128i*)(a + i), xmm1);
+      _mm_storeu_si128(reinterpret_cast<__m128i*>(a + i), xmm1);
     }
 
     // Handle any remainder
@@ -317,10 +320,12 @@ class InstructionSet<int> {
     size_t       i         = 0;
 
     for (; i < kAvxLimit; i += s_kAvxSimdWidth) {
-      __m256i ymm1 = _mm256_loadu_si256((const __m256i*)(a + i));
-      __m256i ymm2 = _mm256_loadu_si256((const __m256i*)(b + i));
-      ymm1         = _mm256_sub_epi32(ymm1, ymm2);
-      _mm256_storeu_si256((__m256i*)(a + i), ymm1);
+      __m256i ymm1
+          = _mm256_loadu_si256(reinterpret_cast<const __m256i*>(a + i));
+      __m256i ymm2
+          = _mm256_loadu_si256(reinterpret_cast<const __m256i*>(b + i));
+      ymm1 = _mm256_sub_epi32(ymm1, ymm2);
+      _mm256_storeu_si256(reinterpret_cast<__m256i*>(a + i), ymm1);
     }
 
     // Handling remaining elements
@@ -346,10 +351,10 @@ class InstructionSet<int> {
     size_t       i         = 0;
 
     for (; i < kSseLimit; i += s_kSseSimdWidth) {
-      __m128i xmm1 = _mm_loadu_si128((const __m128i*)(a + i));
-      __m128i xmm2 = _mm_loadu_si128((const __m128i*)(b + i));
+      __m128i xmm1 = _mm_loadu_si128(reinterpret_cast<const __m128i*>(a + i));
+      __m128i xmm2 = _mm_loadu_si128(reinterpret_cast<const __m128i*>(b + i));
       xmm1         = _mm_sub_epi32(xmm1, xmm2);
-      _mm_storeu_si128((__m128i*)(a + i), xmm1);
+      _mm_storeu_si128(reinterpret_cast<__m128i*>(a + i), xmm1);
     }
 
     // Handle any remainder
@@ -367,6 +372,9 @@ class InstructionSet<int> {
   // END: subtract two arrays
   //----------------------------------------------------------------------------
 
+  // BEGIN: subtract scalar
+  //----------------------------------------------------------------------------
+
   static void SubScalarAvx2(int* a, int scalar, size_t size) {
     SubScalarAvx(a, scalar, size);
   }
@@ -377,9 +385,10 @@ class InstructionSet<int> {
     size_t       i         = 0;
 
     for (; i < kAvxLimit; i += s_kAvxSimdWidth) {
-      __m256i ymm1 = _mm256_loadu_si256((const __m256i*)(a + i));
-      ymm1         = _mm256_sub_epi32(ymm1, ymm0);
-      _mm256_storeu_si256((__m256i*)(a + i), ymm1);
+      __m256i ymm1
+          = _mm256_loadu_si256(reinterpret_cast<const __m256i*>(a + i));
+      ymm1 = _mm256_sub_epi32(ymm1, ymm0);
+      _mm256_storeu_si256(reinterpret_cast<__m256i*>(a + i), ymm1);
     }
 
     // Handle any remainder
@@ -406,9 +415,9 @@ class InstructionSet<int> {
     size_t       i         = 0;
 
     for (; i < kSseLimit; i += s_kSseSimdWidth) {
-      __m128i xmm1 = _mm_loadu_si128((const __m128i*)(a + i));
+      __m128i xmm1 = _mm_loadu_si128(reinterpret_cast<const __m128i*>(a + i));
       xmm1         = _mm_sub_epi32(xmm1, xmm0);
-      _mm_storeu_si128((__m128i*)(a + i), xmm1);
+      _mm_storeu_si128(reinterpret_cast<__m128i*>(a + i), xmm1);
     }
 
     // Handle any remainder
@@ -765,9 +774,9 @@ class InstructionSet<int> {
     size_t       i          = 0;
 
     for (; i < kAvx2Limit; i += s_kAvxSimdWidth) {
-      __m256i ymm1 = _mm256_loadu_si256((__m256i*)(a + i));
+      __m256i ymm1 = _mm256_loadu_si256(reinterpret_cast<__m256i*>(a + i));
       ymm1         = _mm256_mullo_epi32(ymm1, ymm0);
-      _mm256_storeu_si256((__m256i*)(a + i), ymm1);
+      _mm256_storeu_si256(reinterpret_cast<__m256i*>(a + i), ymm1);
     }
 
     // Handle any remaining values that didn't fit into the last AVX2 vector
@@ -792,9 +801,9 @@ class InstructionSet<int> {
     size_t       i         = 0;
 
     for (; i < kSseLimit; i += s_kSseSimdWidth) {
-      __m128i xmm1 = _mm_loadu_si128((const __m128i*)(a + i));
+      __m128i xmm1 = _mm_loadu_si128(reinterpret_cast<const __m128i*>(a + i));
       xmm1         = _mm_mullo_epi32(xmm1, xmm0);
-      _mm_storeu_si128((__m128i*)(a + i), xmm1);
+      _mm_storeu_si128(reinterpret_cast<__m128i*>(a + i), xmm1);
     }
 
     // Handle any remainder
