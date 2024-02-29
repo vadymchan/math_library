@@ -21,6 +21,9 @@ concept OneDimensional = (Rows == 1 || Columns == 1);
 template <typename U, typename... Args>
 concept AllSameAs = (std::same_as<Args, U> && ...);
 
+template <typename U, typename... Args>
+concept AllConvertibleTo = (std::convertible_to<Args, U> && ...);
+
 template <auto Count, typename... Args>
 concept ArgsSizeGreaterThanCount = (sizeof...(Args) > Count);
 
