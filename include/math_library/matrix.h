@@ -651,6 +651,21 @@ class Matrix {
   }
 };
 
+/**
+ * @brief Performs scalar multiplication on a Matrix, where the scalar value is
+ * the left-hand operand. (scalar * Matrix)
+ */
+template <typename ScalarType,
+          typename T,
+          unsigned int Rows,
+          unsigned int Columns,
+          Options      Option>
+auto operator*(const ScalarType&                       scalar,
+               const Matrix<T, Rows, Columns, Option>& matrix)
+    -> Matrix<T, Rows, Columns, Option> {
+  return matrix * static_cast<T>(scalar);
+}
+
 // Matrix of floats
 template <unsigned int Rows,
           unsigned int Columns,
