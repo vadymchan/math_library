@@ -122,6 +122,11 @@ class Dimension {
   auto data() -> T* { return m_dataStorage_.data(); }
 
   [[nodiscard]] auto data() const -> const T* { return m_dataStorage_.data(); }
+  friend auto operator<<(std::ostream& os, const Dimension& dimension)
+      -> std::ostream& {
+    return os << dimension.m_dataStorage_;
+  }
+
   auto operator<<(const T& value) ->
       typename Matrix<T,
                       Option == Options::RowMajor ? 1 : Size,
