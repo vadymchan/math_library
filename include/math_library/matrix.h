@@ -188,25 +188,28 @@ class Matrix {
     return res;
   }
 
-  [[nodiscard]] auto determinant() const -> T {
+  // TODO: consider for determinant method return type similar to T but with
+  // trait for mapping unsigned types to signed types + std::conditional_t
+
+  template <typename ReturnType = float>
+  [[nodiscard]] auto determinant() const -> ReturnType {
     static_assert(Rows == Columns,
                   "Determinant is only defined for square matrices");
     assert(Rows == Columns);
 
     if constexpr (Rows == 1) {
-      return m_data_[0];
+      return static_cast<ReturnType>(m_data_[0]);
     } else if constexpr (Rows == 2) {
-      const T& a = operator()(0, 0);
-      const T& b = operator()(0, 1);
-      const T& c = operator()(1, 0);
-      const T& d = operator()(1, 1);
+      const auto& a = static_cast<ReturnType>(operator()(0, 0));
+      const auto& b = static_cast<ReturnType>(operator()(0, 1));
+      const auto& c = static_cast<ReturnType>(operator()(1, 0));
+      const auto& d = static_cast<ReturnType>(operator()(1, 1));
       return a * d - b * c;
     } else {
-      T   det  = 0;
-      int sign = 1;
+      ReturnType det  = 0;
+      int        sign = 1;
       for (unsigned int i = 0; i < Rows; ++i) {
-        // Construct a sub-matrix
-        Matrix<T, Rows - 1, Columns - 1, Option> submatrix;
+        Matrix<std::remove_cv_t<T>, Rows - 1, Columns - 1, Option> submatrix;
         for (unsigned int j = 1; j < Rows; ++j) {
           unsigned int k = 0;
           for (unsigned int l = 0; l < Columns; ++l) {
@@ -217,8 +220,9 @@ class Matrix {
           }
         }
         // Recursive call
-        det  += sign * (*this)(0, i) * submatrix.determinant();
-        sign  = -sign;
+        det += sign * static_cast<ReturnType>((*this)(0, i))
+             * submatrix.template determinant<ReturnType>();
+        sign = -sign;
       }
       return det;
     }
