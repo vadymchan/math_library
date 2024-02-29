@@ -76,7 +76,7 @@ class Vector {
     return operator()(0);
   }
 
-  auto x() const -> const T&
+  [[nodiscard]] auto x() const -> const T&
     requires ValueAtLeast<Size, 1>
   {
     return operator()(0);
@@ -88,7 +88,7 @@ class Vector {
     return operator()(1);
   }
 
-  auto y() const -> const T&
+  [[nodiscard]] auto y() const -> const T&
     requires ValueAtLeast<Size, 2>
   {
     return operator()(1);
@@ -100,7 +100,7 @@ class Vector {
     return operator()(2);
   }
 
-  auto z() const -> const T&
+  [[nodiscard]] auto z() const -> const T&
     requires ValueAtLeast<Size, 3>
   {
     return operator()(2);
@@ -112,7 +112,7 @@ class Vector {
     return operator()(3);
   }
 
-  auto w() const -> const T&
+  [[nodiscard]] auto w() const -> const T&
     requires ValueAtLeast<Size, 4>
   {
     return operator()(3);
