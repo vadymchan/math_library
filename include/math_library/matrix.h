@@ -315,17 +315,25 @@ class Matrix {
 
   [[nodiscard]] auto rank() const -> int {
     // Create a copy of the matrix
-    Matrix<T, Rows, Columns, Option> copy(*this);
+    // TODO: using float matrix - temp solution
+    Matrix<float, Rows, Columns, Option> copy;
+    // TODO: consider moving convert type logic to separate method
+    std::transform(this->data(),
+                   this->data() + Rows * Columns,
+                   copy.data(),
+                   [](const T& element) -> float {
+                     return static_cast<float>(element);
+                   });
 
     // Apply Gaussian elimination
     int rank = 0;
     for (int row = 0; row < Rows; ++row) {
       // Find the maximum element in this column
-      T   maxEl  = std::abs(copy(row, rank));
-      int maxRow = row;
+      auto maxEl  = math::abs(copy(row, rank));
+      int  maxRow = row;
       for (int i = row + 1; i < Rows; ++i) {
-        if (std::abs(copy(i, rank)) > maxEl) {
-          maxEl  = std::abs(copy(i, rank));
+        if (math::abs(copy(i, rank)) > maxEl) {
+          maxEl  = math::abs(copy(i, rank));
           maxRow = i;
         }
       }
@@ -333,14 +341,14 @@ class Matrix {
       // Swap maximum row with current row
       if (maxEl != 0) {
         for (int i = 0; i < Columns; ++i) {
-          T tmp           = copy(maxRow, i);
+          auto tmp        = copy(maxRow, i);
           copy(maxRow, i) = copy(row, i);
           copy(row, i)    = tmp;
         }
 
         // Make all Rows below this one 0 in current column
         for (int i = row + 1; i < Rows; ++i) {
-          T c = -copy(i, rank) / copy(row, rank);
+          auto c = -copy(i, rank) / copy(row, rank);
           for (int j = rank; j < Columns; ++j) {
             if (rank == j) {
               copy(i, j) = 0;
