@@ -122,6 +122,13 @@ class Dimension {
   auto data() -> T* { return m_dataStorage_.data(); }
 
   [[nodiscard]] auto data() const -> const T* { return m_dataStorage_.data(); }
+  auto operator<<(const T& value) ->
+      typename Matrix<T,
+                      Option == Options::RowMajor ? 1 : Size,
+                      Option == Options::RowMajor ? Size : 1,
+                      Option>::MatrixInitializer {
+    return m_dataStorage_ << value;
+  }
 
   private:
   Vector<T, Size, Option> m_dataStorage_;
