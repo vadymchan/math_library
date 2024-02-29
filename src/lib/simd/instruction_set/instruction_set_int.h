@@ -529,6 +529,8 @@ class InstructionSet<int> {
     }
   }
 
+  #ifdef FEATURE_LOAD_SIMD_INT
+
   // BEGIN: AVX multiplication array utility functions
 
   template <Options Option>
@@ -554,11 +556,11 @@ class InstructionSet<int> {
   }
 
   template <Options Option>
-  static inline auto LoadB(const int*   b,
+  static inline auto LoadBAvx(const int*   b,
                            const size_t kInnerIndex,
                            const size_t kCurrentColB,
                            const size_t kColsB,
-                           const size_t kColsARowsB) -> __m256 {
+                           const size_t kColsARowsB) -> __m256i {
     if constexpr (Option == Options::RowMajor) {
       return _mm256_set_epi32(
           b[IndexB<Option>(kInnerIndex + 7, kCurrentColB, kColsB, kColsARowsB)],
@@ -616,6 +618,8 @@ class InstructionSet<int> {
   }
 
   // END: SSE multiplication array utility functions
+
+  #endif
 
   template <Options Option>
   static void MulAvx2(int*         result,

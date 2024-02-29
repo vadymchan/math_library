@@ -489,7 +489,7 @@ class InstructionSet<double> {
   // BEGIN: AVX multiplication array utility functions
 
   template <Options Option>
-  static inline auto LoadA(const double* a,
+  static inline auto LoadAAvx(const double* a,
                            const size_t  kCurrentRowA,
                            const size_t  kInnerIndex,
                            const size_t  kRowsA,
@@ -507,7 +507,7 @@ class InstructionSet<double> {
   }
 
   template <Options Option>
-  static inline auto LoadB(const double* b,
+  static inline auto LoadBAvx(const double* b,
                            const size_t  kInnerIndex,
                            const size_t  kCurrentColB,
                            const size_t  kColsB,
@@ -585,12 +585,12 @@ class InstructionSet<double> {
         size_t  innerIndex = 0;
         for (; innerIndex + s_kAvxSimdWidth - 1 < kColsARowsB;
              innerIndex += s_kAvxSimdWidth) {
-          __m256d a_vec
-              = LoadA<Option>(a, currentRowA, innerIndex, kRowsA, kColsARowsB);
-          __m256d b_vec
-              = LoadB<Option>(b, innerIndex, currentColB, kColsB, kColsARowsB);
+          __m256d aVec = LoadAAvx<Option>(
+              a, currentRowA, innerIndex, kRowsA, kColsARowsB);
+          __m256d bVec = LoadBAvx<Option>(
+              b, innerIndex, currentColB, kColsB, kColsARowsB);
 
-          sum = _mm256_fmadd_pd(a_vec, b_vec, sum);
+          sum = _mm256_fmadd_pd(aVec, bVec, sum);
         }
         double tmp[s_kAvxSimdWidth];
         _mm256_storeu_pd(tmp, sum);
@@ -653,11 +653,11 @@ class InstructionSet<double> {
         size_t  innerIndex = 0;
         for (; innerIndex + s_kSseSimdWidth - 1 < kColsARowsB;
              innerIndex += s_kSseSimdWidth) {
-          __m128d a_vec = LoadASse<Option>(
+          __m128d aVec = LoadASse<Option>(
               a, currentRowA, innerIndex, kRowsA, kColsARowsB);
-          __m128d b_vec = LoadBSse<Option>(
+          __m128d bVec = LoadBSse<Option>(
               b, innerIndex, currentColB, kColsB, kColsARowsB);
-          sum = _mm_add_pd(sum, _mm_mul_pd(a_vec, b_vec));
+          sum = _mm_add_pd(sum, _mm_mul_pd(aVec, bVec));
         }
         double tmp[s_kSseSimdWidth];
         _mm_storeu_pd(tmp, sum);

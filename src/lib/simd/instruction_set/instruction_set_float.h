@@ -535,7 +535,7 @@ class InstructionSet<float> {
   // BEGIN: AVX multiplication array utility functions
 
   template <Options Option>
-  static inline auto LoadA(const float* a,
+  static inline auto LoadAAvx(const float* a,
                            const size_t kCurrentRowA,
                            const size_t kInnerIndex,
                            const size_t kRowsA,
@@ -557,7 +557,7 @@ class InstructionSet<float> {
   }
 
   template <Options Option>
-  static inline auto LoadB(const float* b,
+  static inline auto LoadBAvx(const float* b,
                            const size_t kInnerIndex,
                            const size_t kCurrentColB,
                            const size_t kColsB,
@@ -713,11 +713,11 @@ class InstructionSet<float> {
         size_t innerIndex = 0;
         for (; innerIndex + s_kSseSimdWidth - 1 < kColsARowsB;
              innerIndex += s_kSseSimdWidth) {
-          __m128 a_vec = LoadA_sse<Option>(
+          __m128 aVec = LoadASse<Option>(
               a, currentRowA, innerIndex, kRowsA, kColsARowsB);
-          __m128 b_vec = LoadB_sse<Option>(
+          __m128 bVec = LoadBSse<Option>(
               b, innerIndex, currentColB, kColsB, kColsARowsB);
-          sum = _mm_add_ps(sum, _mm_mul_ps(a_vec, b_vec));
+          sum = _mm_add_ps(sum, _mm_mul_ps(aVec, bVec));
         }
         float tmp[s_kSseSimdWidth];
         _mm_storeu_ps(tmp, sum);
