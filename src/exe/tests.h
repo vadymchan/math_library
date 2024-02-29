@@ -3105,5 +3105,1319 @@ TEST(MatrixTest, CrossProductUnsignedIntRandom) {
   }
 }
 
+// ========================== UINT32_T ==============================
+
+TEST(MatrixTest, ConstructorDestructorUint32T) {
+  math::Matrix<std::uint32_t, 2, 2> matrix;
+  // If the constructor and destructor work correctly, this test will pass
+}
+
+TEST(MatrixTest, ConstructorDestructorFailureUint32T) {
+  math::Matrix<std::uint32_t, 2, 2> matrix;
+  // This test will pass because the matrix is not null after construction
+  EXPECT_NE(&matrix, nullptr);
+}
+
+// Method: Matrix(const T& element)
+
+TEST(MatrixTest, ElementConstructorUint32T) {
+  const std::uint32_t                     kElementValue = 5;
+  const math::Matrix<std::uint32_t, 3, 3> kMatrix(kElementValue);
+
+  for (int i = 0; i < 3; ++i) {
+    for (int j = 0; j < 3; ++j) {
+      EXPECT_EQ(kMatrix(i, j), kElementValue);
+    }
+  }
+}
+
+// Method: Matrix(const Matrix& other)
+
+TEST(MatrixTest, CopyConstructorUint32T) {
+  math::Matrix<std::uint32_t, 2, 2> matrix1(1, 2, 3, 4);
+  math::Matrix<std::uint32_t, 2, 2> matrix2(matrix1);
+
+  ASSERT_EQ(matrix2(0, 0), 1);
+  ASSERT_EQ(matrix2(0, 1), 2);
+  ASSERT_EQ(matrix2(1, 0), 3);
+  ASSERT_EQ(matrix2(1, 1), 4);
+}
+
+// Method: Matrix(Matrix&& other)
+
+TEST(MatrixTest, MoveConstructorUint32T) {
+  math::Matrix<std::uint32_t, 2, 2> matrix1(1, 2, 3, 4);
+  math::Matrix<std::uint32_t, 2, 2> matrix2(std::move(matrix1));
+
+  ASSERT_EQ(matrix2(0, 0), 1);
+  ASSERT_EQ(matrix2(0, 1), 2);
+  ASSERT_EQ(matrix2(1, 0), 3);
+  ASSERT_EQ(matrix2(1, 1), 4);
+}
+
+// Method: Matrix& operator=(const Matrix& other)
+
+TEST(MatrixTest, AssignmentOperatorUint32T) {
+  const math::Matrix<std::uint32_t, 3, 3> kOriginal(5);
+  math::Matrix<std::uint32_t, 3, 3>       copy;
+  copy = kOriginal;
+
+  for (int i = 0; i < 3; ++i) {
+    for (int j = 0; j < 3; ++j) {
+      EXPECT_EQ(copy(i, j), kOriginal(i, j));
+    }
+  }
+}
+
+// Method: coeff(row, col)
+
+TEST(MatrixTest, ElementAccessUint32T) {
+  math::Matrix<std::uint32_t, 2, 2> matrix;
+  matrix.coeffRef(0, 0) = 1;
+  matrix.coeffRef(0, 1) = 2;
+  matrix.coeffRef(1, 0) = 3;
+  matrix.coeffRef(1, 1) = 4;
+  EXPECT_EQ(matrix.coeff(0, 0), 1);
+  EXPECT_EQ(matrix.coeff(0, 1), 2);
+  EXPECT_EQ(matrix.coeff(1, 0), 3);
+  EXPECT_EQ(matrix.coeff(1, 1), 4);
+}
+
+// Method: coeff(row, col) - failure
+
+TEST(MatrixTest, ElementAccessFailureUint32T) {
+  math::Matrix<std::uint32_t, 2, 2> matrix;
+  matrix.coeffRef(0, 0) = 1;
+  matrix.coeffRef(0, 1) = 2;
+  matrix.coeffRef(1, 0) = 3;
+  matrix.coeffRef(1, 1) = 4;
+  // These tests will pass because the expected values match the actual values
+  EXPECT_NE(matrix.coeff(0, 0), 2);
+  EXPECT_NE(matrix.coeff(0, 1), 1);
+  EXPECT_NE(matrix.coeff(1, 0), 4);
+  EXPECT_NE(matrix.coeff(1, 1), 3);
+}
+
+// Method: modification operator(row, col)
+
+TEST(MatrixTest, ElementModificationUint32T) {
+  math::Matrix<std::uint32_t, 2, 2> matrix;
+  matrix.coeffRef(0, 0) = 1;
+  EXPECT_EQ(matrix.coeff(0, 0), 1);
+  matrix.coeffRef(0, 0) = 2;
+  EXPECT_EQ(matrix.coeff(0, 0), 2);
+}
+
+// Method: modification operator(row, col) - failure
+
+TEST(MatrixTest, ElementModificationFailureUint32T) {
+  math::Matrix<std::uint32_t, 2, 2> matrix;
+  matrix.coeffRef(0, 0) = 1;
+  EXPECT_NE(matrix.coeff(0, 0), 2);
+  matrix.coeffRef(0, 0) = 2;
+  EXPECT_NE(matrix.coeff(0, 0), 1);
+}
+
+#ifdef _DEBUG
+
+// Method: coeff(row, col) - out of bounds
+
+TEST(MatrixTest, OutOfBoundsAccessUint32T) {
+  math::Matrix<std::uint32_t, 2, 2> matrix;
+  EXPECT_DEATH(matrix.coeff(2, 2), "Index out of bounds");
+  EXPECT_DEATH(matrix.coeffRef(2, 2), "Index out of bounds");
+}
+
+#endif  // DEBUG
+
+// Method: access operator(row, col)
+
+TEST(MatrixTest, OperatorAccessUint32T) {
+  math::Matrix<std::uint32_t, 2, 2> matrix;
+  matrix(0, 0) = 1;
+  EXPECT_EQ(matrix(0, 0), 1);
+  matrix(0, 0) = 2;
+  EXPECT_EQ(matrix(0, 0), 2);
+}
+
+// Method: access operator(row, col) - failure
+
+TEST(MatrixTest, OperatorAccessConstUint32T) {
+  math::Matrix<std::uint32_t, 2, 2> matrix;
+  matrix(0, 0)             = 1;
+  const auto& const_matrix = matrix;
+  EXPECT_EQ(const_matrix(0, 0), 1);
+  // Check that the type of the returned reference is const
+  EXPECT_TRUE(
+      std::is_const_v<std::remove_reference_t<decltype(const_matrix(0, 0))>>);
+}
+
+// Method: const operator(row, col)
+
+TEST(MatrixTest, CoeffAccessConstUint32T) {
+  math::Matrix<std::uint32_t, 2, 2> matrix;
+  matrix.coeffRef(0, 0)    = 1;
+  const auto& const_matrix = matrix;
+  EXPECT_EQ(const_matrix.coeff(0, 0), 1);
+  // Check that the type of the returned reference is const
+  EXPECT_TRUE(std::is_const_v<
+              std::remove_reference_t<decltype(const_matrix.coeff(0, 0))>>);
+}
+
+// Method: stack allocation
+
+TEST(MatrixTest, StackAllocationUint32T) {
+  // This matrix should be small enough to be allocated on the stack
+  math::Matrix<std::uint32_t, 2, 2> matrix;
+  EXPECT_FALSE(matrix.s_kUseHeap);
+}
+
+// Method: heap allocation
+
+TEST(MatrixTest, HeapAllocationUint32T) {
+  // This matrix should be large enough to be allocated on the heap
+  math::Matrix<std::uint32_t, 100, 100> matrix;
+  EXPECT_TRUE(matrix.s_kUseHeap);
+}
+
+// Method: addition (matrix + matrix)
+
+TEST(MatrixTest, AdditionUint32T) {
+  constexpr int kRows    = 2;
+  constexpr int kColumns = 2;
+
+  math::Matrix<std::uint32_t, kRows, kColumns> matrix1;
+  math::Matrix<std::uint32_t, kRows, kColumns> matrix2;
+
+  // Populate matrix1 and matrix2 with some values
+  for (int i = 0; i < kRows; ++i) {
+    for (int j = 0; j < kColumns; ++j) {
+      matrix1.coeffRef(i, j) = i * 4 + j + 1;
+      matrix2.coeffRef(i, j) = (i * 4 + j + 1) * 2;
+    }
+  }
+
+  auto matrix3 = matrix1 + matrix2;
+
+  // Check that each element of the result is the sum of the corresponding
+  // elements of matrix1 and matrix2
+  for (int i = 0; i < kRows; ++i) {
+    for (int j = 0; j < kColumns; ++j) {
+      EXPECT_EQ(matrix3.coeff(i, j), matrix1.coeff(i, j) + matrix2.coeff(i, j));
+    }
+  }
+}
+
+// Method: addition (matrix + matrix) - failure
+
+TEST(MatrixTest, AdditionFailureUint32T) {
+  math::Matrix<std::uint32_t, 4, 4, math::Options::ColumnMajor> matrix1;
+  math::Matrix<std::uint32_t, 4, 4, math::Options::ColumnMajor> matrix2;
+
+  // Populate matrix1 and matrix2 with some values
+  for (int i = 0; i < 4; ++i) {
+    for (int j = 0; j < 4; ++j) {
+      matrix1.coeffRef(i, j) = i * 4 + j + 1;
+      matrix2.coeffRef(i, j) = (i * 4 + j + 1) * 2;
+    }
+  }
+
+  auto matrix3 = matrix1 + matrix2;
+
+  // Check that each element of the result is not the sum of the corresponding
+  // elements of matrix1 and matrix2 plus 1
+  for (int i = 0; i < 4; ++i) {
+    for (int j = 0; j < 4; ++j) {
+      EXPECT_NE(matrix3.coeff(i, j),
+                matrix1.coeff(i, j) + matrix2.coeff(i, j) + 1);
+    }
+  }
+}
+
+// Method: addition (matrix + scalar)
+
+TEST(MatrixTest, ScalarAdditionUint32T) {
+  math::Matrix<std::uint32_t, 4, 4, math::Options::RowMajor> matrix1;
+
+  // Populate matrix1 with some values
+  for (int i = 0; i < 4; ++i) {
+    for (int j = 0; j < 4; ++j) {
+      matrix1.coeffRef(i, j) = i * 4 + j + 1;
+    }
+  }
+
+  math::Matrix<std::uint32_t, 4, 4, math::Options::RowMajor> matrix2
+      = matrix1 + 10;
+
+  // Check that each element of the result is the corresponding element of
+  // matrix1 plus 10
+  for (int i = 0; i < 4; ++i) {
+    for (int j = 0; j < 4; ++j) {
+      EXPECT_EQ(matrix2.coeff(i, j), matrix1.coeff(i, j) + 10);
+    }
+  }
+}
+
+// Method: addition (matrix + scalar) - failure
+
+TEST(MatrixTest, ScalarAdditionFailureUint32T) {
+  math::Matrix<std::uint32_t, 4, 4> matrix1;
+
+  // Populate matrix1 with some values
+  for (int i = 0; i < 4; ++i) {
+    for (int j = 0; j < 4; ++j) {
+      matrix1.coeffRef(i, j) = i * 4 + j + 1;
+    }
+  }
+
+  math::Matrix<std::uint32_t, 4, 4> matrix2 = matrix1 + 10;
+
+  // Check that each element of the result is not the corresponding element of
+  // matrix1 plus 11
+  for (int i = 0; i < 4; ++i) {
+    for (int j = 0; j < 4; ++j) {
+      EXPECT_NE(matrix2.coeff(i, j), matrix1.coeff(i, j) + 11);
+    }
+  }
+}
+
+// Method: subtraction (matrix - matrix)
+
+TEST(MatrixTest, SubtractionUint32T) {
+  constexpr int kRows    = 2;
+  constexpr int kColumns = 2;
+
+  math::Matrix<std::uint32_t, kRows, kColumns> matrix1;
+  math::Matrix<std::uint32_t, kRows, kColumns> matrix2;
+
+  // Populate matrix1 and matrix2 with some values
+  for (int i = 0; i < kRows; ++i) {
+    for (int j = 0; j < kColumns; ++j) {
+      matrix1.coeffRef(i, j) = i * 4 + j + 1;  // Use std::uint32_t literals
+      matrix2.coeffRef(i, j)
+          = (i * 4 + j + 1) * 2;               // Use std::uint32_t literals
+    }
+  }
+
+  auto matrix3 = matrix1 - matrix2;
+
+  // Check that each element of the result is the difference of the
+  // corresponding elements of matrix1 and matrix2
+  for (int i = 0; i < kRows; ++i) {
+    for (int j = 0; j < kColumns; ++j) {
+      EXPECT_NEAR(
+          matrix3.coeff(i, j), matrix1.coeff(i, j) - matrix2.coeff(i, j), 1e-5);
+      // Alternatively, for exact std::uint32_ting-point comparisons (which might
+      // be risky due to precision issues): EXPECT_FLOAT_EQ(matrix3.coeff(i, j),
+      // matrix1.coeff(i, j) - matrix2.coeff(i, j));
+    }
+  }
+}
+
+// Method: subtraction (matrix - scalar)
+
+TEST(MatrixTest, ScalarSubtractionUint32T) {
+  math::Matrix<std::uint32_t, 4, 4, math::Options::RowMajor> matrix1;
+
+  // Populate matrix1 with some values
+  for (int i = 0; i < 4; ++i) {
+    for (int j = 0; j < 4; ++j) {
+      matrix1.coeffRef(i, j) = i * 4 + j + 1;
+    }
+  }
+
+  math::Matrix<std::uint32_t, 4, 4, math::Options::RowMajor> matrix2
+      = matrix1 - 10;
+
+  // Check that each element of the result is the corresponding element of
+  // matrix1 minus 10
+  for (int i = 0; i < 4; ++i) {
+    for (int j = 0; j < 4; ++j) {
+      EXPECT_EQ(matrix2.coeff(i, j), matrix1.coeff(i, j) - 10);
+    }
+  }
+}
+
+// Test: Negation (-Matrix)
+
+TEST(MatrixTest, NegationUint32T) {
+  constexpr int kRows    = 2;
+  constexpr int kColumns = 2;
+
+  math::Matrix<std::uint32_t, kRows, kColumns> matrix;
+
+  // Populate matrix with some values
+  for (int i = 0; i < kRows; ++i) {
+    for (int j = 0; j < kColumns; ++j) {
+      matrix.coeffRef(i, j) = i * 4 + j + 1;  // Example values: 1, 2, 5, 6
+    }
+  }
+
+  // Since negating an std::uint32_t matrix is expected to trigger an assertion,
+  // we use EXPECT_DEATH to verify that the assertion indeed occurs.
+  EXPECT_DEATH({ auto negatedMatrix = -matrix; }, "");
+
+  // auto negatedMatrix = -matrix;
+
+  // Check that each element of the negated matrix is the negation
+  // of the corresponding element in the original matrix
+  // for (int i = 0; i < kRows; ++i) {
+  //  for (int j = 0; j < kColumns; ++j) {
+  //    EXPECT_EQ(negatedMatrix.coeff(i, j), -matrix.coeff(i, j));
+  //  }
+  //}
+}
+
+// Method: row major multiplication (matrix * matrix)
+
+TEST(MatrixTest, MultiplicationRowMajorUint32T) {
+  constexpr int kRows    = 2;
+  constexpr int kColumns = 2;
+
+  math::Matrix<std::uint32_t, kRows, kColumns, math::Options::RowMajor> matrix1;
+  math::Matrix<std::uint32_t, kRows, kColumns, math::Options::RowMajor> matrix2;
+
+  // Populate matrix1 and matrix2 with some values
+  for (int i = 0; i < kRows; ++i) {
+    for (int j = 0; j < kColumns; ++j) {
+      matrix1.coeffRef(i, j) = i * 4 + j + 1;
+      matrix2.coeffRef(i, j) = (i * 4 + j + 1) * 2;
+    }
+  }
+
+  auto matrix3 = matrix1 * matrix2;
+
+  // Check that each element of the result is the correct multiplication of the
+  // corresponding rows and columns of matrix1 and matrix2
+  for (int i = 0; i < kRows; ++i) {
+    for (int j = 0; j < kColumns; ++j) {
+      std::uint32_t expected_value = 0;
+      for (int k = 0; k < kColumns; ++k) {
+        expected_value += matrix1.coeff(i, k) * matrix2.coeff(k, j);
+      }
+      EXPECT_EQ(matrix3.coeff(i, j), expected_value);
+    }
+  }
+}
+
+// Method: row major multiplication (matrix * matrix) - non square matrices
+
+TEST(MatrixTest, MultiplicationRowMajorUint32TNonSquare) {
+  constexpr int kRowsA      = 3;
+  constexpr int kColsARowsB = 4;
+  constexpr int kColsB      = 2;
+
+  math::Matrix<std::uint32_t, kRowsA, kColsARowsB, math::Options::RowMajor>
+      matrix1;
+  math::Matrix<std::uint32_t, kColsARowsB, kColsB, math::Options::RowMajor>
+      matrix2;
+
+  // Populate matrix1 and matrix2 with some values
+  for (int i = 0; i < kRowsA; ++i) {
+    for (int j = 0; j < kColsARowsB; ++j) {
+      matrix1.coeffRef(i, j) = static_cast<std::uint32_t>(rand())
+                             / RAND_MAX;  // random values between 0 and 1
+    }
+  }
+
+  for (int i = 0; i < kColsARowsB; ++i) {
+    for (int j = 0; j < kColsB; ++j) {
+      matrix2.coeffRef(i, j) = static_cast<std::uint32_t>(rand())
+                             / RAND_MAX;  // random values between 0 and 1
+    }
+  }
+
+  auto matrix3 = matrix1 * matrix2;
+
+  for (int i = 0; i < kRowsA; ++i) {
+    for (int j = 0; j < kColsB; ++j) {
+      std::uint32_t expected_value = 0;
+      for (int k = 0; k < kColsARowsB; ++k) {
+        expected_value += matrix1.coeff(i, k) * matrix2.coeff(k, j);
+      }
+      EXPECT_NEAR(matrix3.coeff(i, j),
+                  expected_value,
+                  1e-5);  // Using EXPECT_NEAR due to potential precision issues
+    }
+  }
+}
+
+// Method: row major multiplication (matrix * matrix) - non square matrices with
+// precise values
+
+TEST(MatrixTest, MultiplicationRowMajorUint32TNonSquare_2) {
+  constexpr int kRowsA      = 3;
+  constexpr int kColsARowsB = 4;
+  constexpr int kColsB      = 2;
+
+  math::Matrix<std::uint32_t, kRowsA, kColsARowsB, math::Options::RowMajor>
+      matrix1;
+  math::Matrix<std::uint32_t, kColsARowsB, kColsB, math::Options::RowMajor>
+      matrix2;
+
+  // Populate matrix1
+  matrix1.coeffRef(0, 0) = 1;
+  matrix1.coeffRef(0, 1) = 2;
+  matrix1.coeffRef(0, 2) = 3;
+  matrix1.coeffRef(0, 3) = 4;
+  matrix1.coeffRef(1, 0) = 5;
+  matrix1.coeffRef(1, 1) = 6;
+  matrix1.coeffRef(1, 2) = 7;
+  matrix1.coeffRef(1, 3) = 8;
+  matrix1.coeffRef(2, 0) = 9;
+  matrix1.coeffRef(2, 1) = 10;
+  matrix1.coeffRef(2, 2) = 11;
+  matrix1.coeffRef(2, 3) = 12;
+
+  // Populate matrix2
+  matrix2.coeffRef(0, 0) = 2;
+  matrix2.coeffRef(0, 1) = 3;
+  matrix2.coeffRef(1, 0) = 4;
+  matrix2.coeffRef(1, 1) = 5;
+  matrix2.coeffRef(2, 0) = 6;
+  matrix2.coeffRef(2, 1) = 7;
+  matrix2.coeffRef(3, 0) = 8;
+  matrix2.coeffRef(3, 1) = 9;
+
+  auto matrix3 = matrix1 * matrix2;
+
+  // Expected values based on manual matrix multiplication
+  EXPECT_EQ(matrix3.coeff(0, 0), 60);
+  EXPECT_EQ(matrix3.coeff(0, 1), 70);
+  EXPECT_EQ(matrix3.coeff(1, 0), 140);
+  EXPECT_EQ(matrix3.coeff(1, 1), 166);
+  EXPECT_EQ(matrix3.coeff(2, 0), 220);
+  EXPECT_EQ(matrix3.coeff(2, 1), 262);
+}
+
+// Method: column major multiplication (matrix * matrix)
+
+TEST(MatrixTest, MultiplicationColumnMajorUint32T) {
+  constexpr int kRows    = 2;
+  constexpr int kColumns = 2;
+
+  math::Matrix<std::uint32_t, kRows, kColumns, math::Options::ColumnMajor>
+      matrix1;
+  math::Matrix<std::uint32_t, kRows, kColumns, math::Options::ColumnMajor>
+      matrix2;
+
+  // Populate matrix1 and matrix2 with some values
+  for (int i = 0; i < kRows; ++i) {
+    for (int j = 0; j < kColumns; ++j) {
+      matrix1.coeffRef(i, j) = i * 4 + j + 1;
+      matrix2.coeffRef(i, j) = (i * 4 + j + 1) * 2;
+    }
+  }
+
+  auto matrix3 = matrix1 * matrix2;
+
+  // Check that each element of the result is the correct multiplication of the
+  // corresponding rows and columns of matrix1 and matrix2
+  for (int i = 0; i < kRows; ++i) {
+    for (int j = 0; j < kColumns; ++j) {
+      std::uint32_t expected_value = 0;
+      for (int k = 0; k < kColumns; ++k) {
+        expected_value += matrix1.coeff(i, k) * matrix2.coeff(k, j);
+      }
+      EXPECT_EQ(matrix3.coeff(i, j), expected_value);
+    }
+  }
+}
+
+// Method: row major multiplication (matrix *= matrix)
+
+TEST(MatrixTest, MultiplicationRowMajorUint32TInPlace) {
+  constexpr int kRows    = 2;
+  constexpr int kColumns = 2;
+
+  math::Matrix<std::uint32_t, kRows, kColumns, math::Options::RowMajor> matrix1;
+  math::Matrix<std::uint32_t, kRows, kColumns, math::Options::RowMajor> matrix2;
+
+  for (int i = 0; i < kRows; ++i) {
+    for (int j = 0; j < kColumns; ++j) {
+      matrix1.coeffRef(i, j) = i * 4 + j + 1;
+      matrix2.coeffRef(i, j) = (i * 4 + j + 1) * 2;
+    }
+  }
+
+  auto matrix3  = matrix1;
+  matrix3      *= matrix2;
+
+  // Check that each element of the result is the correct multiplication of the
+  // corresponding rows and columns of matrix1 and matrix2
+  for (int i = 0; i < kRows; ++i) {
+    for (int j = 0; j < kColumns; ++j) {
+      std::uint32_t expected_value = 0;
+      for (int k = 0; k < kColumns; ++k) {
+        expected_value += matrix1.coeff(i, k) * matrix2.coeff(k, j);
+      }
+      EXPECT_EQ(matrix3.coeff(i, j), expected_value);
+    }
+  }
+}
+
+// Method: column major multiplication (matrix *= matrix)
+
+TEST(MatrixTest, MultiplicationColumnMajorUint32TInPlace) {
+  constexpr int kRows    = 2;
+  constexpr int kColumns = 2;
+
+  math::Matrix<std::uint32_t, kRows, kColumns, math::Options::ColumnMajor>
+      matrix1;
+  math::Matrix<std::uint32_t, kRows, kColumns, math::Options::ColumnMajor>
+      matrix2;
+
+  // Populate matrix1 and matrix2 with some values
+  for (int i = 0; i < kRows; ++i) {
+    for (int j = 0; j < kColumns; ++j) {
+      matrix1.coeffRef(i, j) = i * 4 + j + 1;
+      matrix2.coeffRef(i, j) = (i * 4 + j + 1) * 2;
+    }
+  }
+
+  auto matrix3  = matrix1;  // copy of matrix1
+  matrix3      *= matrix2;
+
+  // Check that each element of the result is the correct multiplication of the
+  // corresponding rows and columns of matrix1 and matrix2
+  for (int i = 0; i < kRows; ++i) {
+    for (int j = 0; j < kColumns; ++j) {
+      std::uint32_t expected_value = 0;
+      for (int k = 0; k < kColumns; ++k) {
+        expected_value += matrix1.coeff(i, k) * matrix2.coeff(k, j);
+      }
+      EXPECT_EQ(matrix3.coeff(i, j), expected_value);
+    }
+  }
+}
+
+// Method: scalar multiplication
+
+TEST(MatrixTest, ScalarMultiplicationUint32T) {
+  math::Matrix<std::uint32_t, 4, 4, math::Options::RowMajor> matrix1;
+  // Populate matrix1 with some values
+  for (int i = 0; i < 4; ++i) {
+    for (int j = 0; j < 4; ++j) {
+      matrix1.coeffRef(i, j) = i * 4 + j + 1;
+    }
+  }
+  math::Matrix<std::uint32_t, 4, 4, math::Options::RowMajor> matrix2
+      = matrix1 * 10;
+  // Check that each element of the result is the corresponding element of
+  // matrix1 multiplied by 10
+  for (int i = 0; i < 4; ++i) {
+    for (int j = 0; j < 4; ++j) {
+      EXPECT_EQ(matrix2.coeff(i, j), matrix1.coeff(i, j) * 10);
+    }
+  }
+}
+
+// Method: scalar division
+
+TEST(MatrixTest, ScalarDivisionUint32T) {
+  math::Matrix<std::uint32_t, 4, 4, math::Options::RowMajor> matrix1;
+
+  // Populate matrix1 with some values
+  for (int i = 0; i < 4; ++i) {
+    for (int j = 0; j < 4; ++j) {
+      matrix1.coeffRef(i, j) = i * 4 + j + 1;
+    }
+  }
+
+  math::Matrix<std::uint32_t, 4, 4, math::Options::RowMajor> matrix2
+      = matrix1 / 10;
+
+  // Check that each element of the result is the corresponding element of
+  // matrix1 divided by 10
+  for (int i = 0; i < 4; ++i) {
+    for (int j = 0; j < 4; ++j) {
+      EXPECT_EQ(matrix2.coeff(i, j), matrix1.coeff(i, j) / 10);
+    }
+  }
+}
+
+// Method: scalar division - failure
+
+TEST(MatrixTest, ScalarDivisionFailureUint32T) {
+  math::Matrix<std::uint32_t, 4, 4> matrix1;
+
+  for (std::uint32_t i = 0; i < 4; ++i) {
+    for (std::uint32_t j = 0; j < 4; ++j) {
+      matrix1.coeffRef(i, j) = (i * 4 + j + 1) * 110;
+    }
+  }
+
+  math::Matrix<std::uint32_t, 4, 4> matrix2 = matrix1 / 10;
+
+  for (std::uint32_t i = 0; i < 4; ++i) {
+    for (std::uint32_t j = 0; j < 4; ++j) {
+      EXPECT_NE(matrix2.coeff(i, j), matrix1.coeff(i, j) / 11);
+    }
+  }
+}
+
+// Method: scalar division in place
+
+TEST(MatrixTest, ScalarDivisionInPlaceUint32T) {
+  math::Matrix<std::uint32_t, 4, 4, math::Options::RowMajor> matrix;
+
+  // Populate matrix with some values
+  for (int i = 0; i < 4; ++i) {
+    for (int j = 0; j < 4; ++j) {
+      matrix.coeffRef(i, j) = (i * 4 + j + 1);
+    }
+  }
+
+  matrix /= 10;
+
+  // Check that each element of the matrix is the original value divided by 10
+  for (int i = 0; i < 4; ++i) {
+    for (int j = 0; j < 4; ++j) {
+      EXPECT_FLOAT_EQ(matrix.coeff(i, j), (i * 4 + j + 1) / 10);
+    }
+  }
+}
+
+// Method: scalar division in place - failure
+
+TEST(MatrixTest, ScalarDivisionInPlaceFailureUint32T) {
+  math::Matrix<std::uint32_t, 4, 4, math::Options::RowMajor> matrix;
+
+  // Populate matrix with some values
+  for (int i = 0; i < 4; ++i) {
+    for (int j = 0; j < 4; ++j) {
+      matrix.coeffRef(i, j) = (i * 4 + j + 1) * 110;
+    }
+  }
+
+  matrix /= 10;
+
+  // Check that each element of the matrix is the original value divided by 10
+  for (int i = 0; i < 4; ++i) {
+    for (int j = 0; j < 4; ++j) {
+      EXPECT_NE(matrix.coeff(i, j), (i * 4 + j + 1) / 11);
+    }
+  }
+}
+
+// Method: matrix equality comparison
+
+TEST(MatrixTest, MatrixEqualityTrueUint32T) {
+  math::Matrix<std::uint32_t, 4, 4, math::Options::RowMajor> matrix1;
+
+  for (int i = 0; i < 4; ++i) {
+    for (int j = 0; j < 4; ++j) {
+      matrix1.coeffRef(i, j) = i * 4 + j + 1;
+    }
+  }
+
+  math::Matrix<std::uint32_t, 4, 4, math::Options::RowMajor> matrix2 = matrix1;
+
+  EXPECT_TRUE(matrix1 == matrix2);
+}
+
+// Method: matrix equality comparison - failure
+
+TEST(MatrixTest, MatrixEqualityFalseUint32T) {
+  math::Matrix<std::uint32_t, 4, 4, math::Options::RowMajor> matrix1;
+
+  for (int i = 0; i < 4; ++i) {
+    for (int j = 0; j < 4; ++j) {
+      matrix1.coeffRef(i, j) = i * 4 + j + 1;
+    }
+  }
+
+  math::Matrix<std::uint32_t, 4, 4, math::Options::RowMajor> matrix2  = matrix1;
+  matrix2.coeffRef(0, 0)                                            += 1;
+
+  EXPECT_FALSE(matrix1 == matrix2);
+}
+
+// Method: matrix equality with very small numbers
+
+TEST(MatrixTest, MatrixEqualityTrueUint32TSmallNumbers) {
+  math::Matrix<std::uint32_t, 1, 2, math::Options::RowMajor> matrix1;
+  matrix1.coeffRef(0, 0) = std::numeric_limits<std::uint32_t>::min();
+  matrix1.coeffRef(0, 1) = std::numeric_limits<std::uint32_t>::min();
+
+  math::Matrix<std::uint32_t, 1, 2, math::Options::RowMajor> matrix2 = matrix1;
+
+  EXPECT_TRUE(matrix1 == matrix2);
+}
+
+// Method: matrix equality with very large numbers
+
+TEST(MatrixTest, MatrixEqualityTrueUint32TLargeNumbers) {
+  math::Matrix<std::uint32_t, 1, 2, math::Options::RowMajor> matrix1;
+  matrix1.coeffRef(0, 0) = std::numeric_limits<std::uint32_t>::max();
+  matrix1.coeffRef(0, 1) = std::numeric_limits<std::uint32_t>::max();
+
+  math::Matrix<std::uint32_t, 1, 2, math::Options::RowMajor> matrix2 = matrix1;
+
+  EXPECT_TRUE(matrix1 == matrix2);
+}
+
+// Method: matrix equality with numbers close to each other
+
+TEST(MatrixTest, MatrixEqualityTrueUint32TCloseNumbers) {
+  math::Matrix<std::uint32_t, 1, 2, math::Options::RowMajor> matrix1;
+  matrix1.coeffRef(0, 0) = 1;
+  matrix1.coeffRef(0, 1) = 1;
+
+  math::Matrix<std::uint32_t, 1, 2, math::Options::RowMajor> matrix2 = matrix1;
+  matrix2.coeffRef(0, 0) += std::numeric_limits<std::uint32_t>::epsilon();
+  matrix2.coeffRef(0, 1) += std::numeric_limits<std::uint32_t>::epsilon();
+
+  EXPECT_TRUE(matrix1 == matrix2);
+}
+
+TEST(MatrixTest, MatrixEqualityFailSmallDifferencesUint32T) {
+  math::Matrix<std::uint32_t, 1, 1, math::Options::RowMajor> matrix1;
+  math::Matrix<std::uint32_t, 1, 1, math::Options::RowMajor> matrix2;
+
+  matrix1.coeffRef(0, 0) = std::numeric_limits<std::uint32_t>::epsilon() / 2;
+  matrix2.coeffRef(0, 0) = -std::numeric_limits<std::uint32_t>::epsilon() / 2;
+
+  // Pay attention: this test case should fail since the difference between the
+  // two numbers
+  EXPECT_TRUE(matrix1 == matrix2);
+}
+
+// Method: matrix equality comparison
+
+TEST(MatrixTest, MatrixEqualityLargeNumbersUint32T) {
+  math::Matrix<std::uint32_t, 1, 1, math::Options::RowMajor> matrix1;
+  math::Matrix<std::uint32_t, 1, 1, math::Options::RowMajor> matrix2;
+
+  matrix1.coeffRef(0, 0) = 1e10f;
+  matrix2.coeffRef(0, 0) = 1e10f + 1e-5f;
+
+  // Pay attention:
+  // Even though the relative difference between the two numbers is negligible,
+  // they are considered not equal because the absolute difference exceeds
+  // epsilon
+  EXPECT_TRUE(matrix1 == matrix2);
+}
+
+// Method: matrix inequality comparison
+
+TEST(MatrixTest, MatrixInequalityTrueUint32T) {
+  math::Matrix<std::uint32_t, 4, 4, math::Options::RowMajor> matrix1;
+
+  for (int i = 0; i < 4; ++i) {
+    for (int j = 0; j < 4; ++j) {
+      matrix1.coeffRef(i, j) = i * 4 + j + 1;
+    }
+  }
+
+  math::Matrix<std::uint32_t, 4, 4, math::Options::RowMajor> matrix2  = matrix1;
+  matrix2.coeffRef(0, 0)                                            += 1;
+
+  EXPECT_TRUE(matrix1 != matrix2);
+}
+
+// Method: matrix inequality with very small numbers
+
+TEST(MatrixTest, MatrixInequalityFalseUint32TSmallNumbers) {
+  math::Matrix<std::uint32_t, 1, 2, math::Options::RowMajor> matrix1;
+  matrix1.coeffRef(0, 0) = std::numeric_limits<std::uint32_t>::min();
+  matrix1.coeffRef(0, 1) = std::numeric_limits<std::uint32_t>::min();
+
+  math::Matrix<std::uint32_t, 1, 2, math::Options::RowMajor> matrix2 = matrix1;
+
+  EXPECT_FALSE(matrix1 != matrix2);
+}
+
+// Method: matrix inequality with very large numbers
+
+TEST(MatrixTest, MatrixInequalityFalseUint32TLargeNumbers) {
+  math::Matrix<std::uint32_t, 1, 2, math::Options::RowMajor> matrix1;
+  matrix1.coeffRef(0, 0) = std::numeric_limits<std::uint32_t>::max();
+  matrix1.coeffRef(0, 1) = std::numeric_limits<std::uint32_t>::max();
+
+  math::Matrix<std::uint32_t, 1, 2, math::Options::RowMajor> matrix2 = matrix1;
+
+  EXPECT_FALSE(matrix1 != matrix2);
+}
+
+// Method: matrix inequality with numbers close to each other
+
+TEST(MatrixTest, MatrixInequalityFalseUint32TCloseNumbers) {
+  math::Matrix<std::uint32_t, 1, 2, math::Options::RowMajor> matrix1;
+  matrix1.coeffRef(0, 0) = 1;
+  matrix1.coeffRef(0, 1) = 1;
+
+  math::Matrix<std::uint32_t, 1, 2, math::Options::RowMajor> matrix2 = matrix1;
+  matrix2.coeffRef(0, 0) += std::numeric_limits<std::uint32_t>::epsilon();
+  matrix2.coeffRef(0, 1) += std::numeric_limits<std::uint32_t>::epsilon();
+
+  EXPECT_FALSE(matrix1 != matrix2);
+}
+
+// Method: matrix inequality comparison
+
+TEST(MatrixTest, MatrixInequalityFalseUint32T) {
+  math::Matrix<std::uint32_t, 4, 4, math::Options::RowMajor> matrix1;
+
+  for (int i = 0; i < 4; ++i) {
+    for (int j = 0; j < 4; ++j) {
+      matrix1.coeffRef(i, j) = i * 4 + j + 1;
+    }
+  }
+
+  math::Matrix<std::uint32_t, 4, 4, math::Options::RowMajor> matrix2 = matrix1;
+
+  EXPECT_FALSE(matrix1 != matrix2);
+}
+
+// Method: transpose
+
+TEST(MatrixTest, TransposeUint32T) {
+  math::Matrix<std::uint32_t, 2, 2> matrix1(1, 2, 3, 4);
+  auto                             matrix2 = matrix1.transpose();
+
+  ASSERT_EQ(matrix2(0, 0), 1);
+  ASSERT_EQ(matrix2(0, 1), 3);
+  ASSERT_EQ(matrix2(1, 0), 2);
+  ASSERT_EQ(matrix2(1, 1), 4);
+}
+
+// Method: reshape
+
+TEST(MatrixTest, ReshapeUint32T) {
+  math::Matrix<std::uint32_t, 2, 2> matrix1(1, 2, 3, 4);
+  auto                             matrix2 = matrix1.reshape<4, 1>();
+
+  ASSERT_EQ(matrix2(0, 0), 1);
+  ASSERT_EQ(matrix2(1, 0), 2);
+  ASSERT_EQ(matrix2(2, 0), 3);
+  ASSERT_EQ(matrix2(3, 0), 4);
+}
+
+// Method: determinant
+
+TEST(MatrixTest, DeterminantUint32T) {
+  math::Matrix<std::uint32_t, 2, 2> matrix;
+  matrix(0, 0) = 1;
+  matrix(0, 1) = 2;
+  matrix(1, 0) = 3;
+  matrix(1, 1) = 4;
+
+  // Expected determinant is 1*4 - 2*3 = -2
+  auto det = matrix.determinant();
+  EXPECT_FLOAT_EQ(matrix.determinant(), -2);
+}
+
+// Method: determinant - failure
+
+TEST(MatrixTest, DeterminantFailureUint32T) {
+  math::Matrix<std::uint32_t, 2, 2> matrix;
+  matrix(0, 0) = 1;
+  matrix(0, 1) = 2;
+  matrix(1, 0) = 3;
+  matrix(1, 1) = 4;
+
+  // Incorrect determinant is -3, the actual determinant is -2
+  EXPECT_NE(matrix.determinant(), -3);
+}
+
+// Method: determinant - 4x4 matrix
+
+TEST(MatrixTest, DeterminantUint32T_1) {
+  // Create a 4x4 matrix with arbitrary values
+  math::Matrix<std::uint32_t, 4, 4> matrix;
+  matrix << 5, 7, 6, 1, 2, 8, 4, 6, 3, 4, 2, 7, 7, 3, 5, 1;
+
+  EXPECT_FLOAT_EQ(matrix.determinant(), -52);
+}
+
+// Method: inverse - this is not reasonable since std::uint32_t
+
+// Method: rank - 2 test
+
+TEST(MatrixTest, RankUint32T_2) {
+  math::Matrix<std::uint32_t, 3, 3> matrix;
+  matrix(0, 0) = 1;
+  matrix(0, 1) = 2;
+  matrix(0, 2) = 3;
+  matrix(1, 0) = 4;
+  matrix(1, 1) = 5;
+  matrix(1, 2) = 6;
+  matrix(2, 0) = 7;
+  matrix(2, 1) = 8;
+  matrix(2, 2) = 9;
+
+  // This matrix has full rank (rank = min(m, n) = 3) as no row is a linear
+  // combination of others
+  EXPECT_EQ(matrix.rank(), 2);
+}
+
+// Method: rank - full
+
+TEST(MatrixTest, RankFullUint32T) {
+  math::Matrix<std::uint32_t, 3, 3> matrix;
+  matrix(0, 0) = 1;
+  matrix(0, 1) = 0;
+  matrix(0, 2) = 0;
+  matrix(1, 0) = 0;
+  matrix(1, 1) = 1;
+  matrix(1, 2) = 0;
+  matrix(2, 0) = 0;
+  matrix(2, 1) = 0;
+  matrix(2, 2) = 1;
+
+  // This matrix has full rank (rank = min(m, n) = 3) as no row is a linear
+  // combination of others
+  EXPECT_EQ(matrix.rank(), 3);
+}
+
+// Method: rank - failure
+
+TEST(MatrixTest, RankFailureUint32T) {
+  math::Matrix<std::uint32_t, 3, 3> matrix;
+  matrix(0, 0) = 1;
+  matrix(0, 1) = 2;
+  matrix(0, 2) = 3;
+  matrix(1, 0) = 2;
+  matrix(1, 1) = 4;
+  matrix(1, 2) = 6;
+  matrix(2, 0) = 3;
+  matrix(2, 1) = 6;
+  matrix(2, 2) = 9;
+
+  // The actual rank is 1, not 2
+  EXPECT_NE(matrix.rank(), 2);
+}
+
+// Method: rank - 2 test - failure
+
+TEST(MatrixTest, RankFailureUint32T_2) {
+  math::Matrix<std::uint32_t, 3, 3> matrix;
+  matrix(0, 0) = 1;
+  matrix(0, 1) = 2;
+  matrix(0, 2) = 3;
+  matrix(1, 0) = 4;
+  matrix(1, 1) = 5;
+  matrix(1, 2) = 6;
+  matrix(2, 0) = 7;
+  matrix(2, 1) = 8;
+  matrix(2, 2) = 9;
+
+  // The actual rank is 3, not 2
+  EXPECT_NE(matrix.rank(), 3);
+}
+
+// Method: magnitude
+
+TEST(MatrixTest, MagnitudeUint32T) {
+  math::Matrix<std::uint32_t, 3, 1> vector(2, 2, 1);  // 3D vector
+
+  auto magnitude = vector.magnitude();
+  // Expected magnitude is sqrt(2^2 + 2^2 + 1^2) = sqrt(9) = 3
+  EXPECT_FLOAT_EQ(vector.magnitude(), 3);
+}
+
+// Method: magnitude - failure
+
+TEST(MatrixTest, MagnitudeFailureUint32T) {
+  math::Matrix<std::uint32_t, 3, 1> vector(2, 2, 1);  // 3D vector
+
+  // Incorrect magnitude is 2, the actual magnitude is 3
+  EXPECT_NE(vector.magnitude(), 2);
+}
+
+// Method: normalize
+
+TEST(MatrixTest, NormalizeUint32T) {
+  math::Matrix<std::uint32_t, 3, 1> vector(2, 2, 1);  // 3D vector
+
+#ifdef MATH_LIBRARY_USE_NORMALIZE_IN_PLACE
+  vector.normalize();
+  auto& normalizedVector = vector;
+#else
+  auto normalizedVector = vector.normalize();
+#endif
+
+  // The expected normalized vector is (2/3, 2/3, 1/3)
+  EXPECT_NEAR(normalizedVector(0, 0), 2 / 3, 1e-5);
+  EXPECT_NEAR(normalizedVector(1, 0), 2 / 3, 1e-5);
+  EXPECT_NEAR(normalizedVector(2, 0), 1 / 3, 1e-5);
+}
+
+// Method: normalize - failure
+
+TEST(MatrixTest, NormalizeFailureUint32T) {
+  math::Matrix<std::uint32_t, 3, 1> vector(2, 2, 1);  // 3D vector
+
+#ifdef MATH_LIBRARY_USE_NORMALIZE_IN_PLACE
+  vector.normalize();
+  auto& normalizedVector = vector;
+#else
+  auto normalizedVector = vector.normalize();
+#endif
+
+  vector *= 2;
+
+  // The incorrect normalized vector is (1, 1, 0.5), the actual normalized
+  // vector is (2/3, 2/3, 1/3)
+  EXPECT_NE(normalizedVector(0, 0), 1);
+  EXPECT_NE(normalizedVector(1, 0), 1);
+  EXPECT_NE(normalizedVector(2, 0), 0.5);
+}
+
+#ifdef _DEBUG
+
+// Method: normalize - zero vector
+
+TEST(MatrixTest, NormalizeZeroVectorUint32T) {
+  math::Matrix<std::uint32_t, 3, 1> vector(0, 0, 0);  // Zero vector
+
+  // Trying to normalize a zero vector should throw an assertion
+  EXPECT_DEATH(
+      vector.normalize(),
+      "Normalization error: magnitude is zero, implying a zero matrix/vector");
+}
+
+#endif  // _DEBUG
+
+// Method: trace
+
+TEST(MatrixTest, TraceUint32T) {
+  math::Matrix<std::uint32_t, 3, 3> matrix;
+  matrix(0, 0) = 1;
+  matrix(0, 1) = 2;
+  matrix(0, 2) = 3;
+  matrix(1, 0) = 4;
+  matrix(1, 1) = 5;
+  matrix(1, 2) = 6;
+  matrix(2, 0) = 7;
+  matrix(2, 1) = 8;
+  matrix(2, 2) = 9;
+
+  // The trace of the matrix is the sum of the elements on the main diagonal
+  // For this matrix, the trace is 1 + 5 + 9 = 15
+  EXPECT_FLOAT_EQ(matrix.trace(), 15);
+}
+
+// Method: trace - failure
+
+TEST(MatrixTest, TraceFailureUint32T) {
+  math::Matrix<std::uint32_t, 3, 3> matrix;
+  matrix(0, 0) = 1;
+  matrix(0, 1) = 2;
+  matrix(0, 2) = 3;
+  matrix(1, 0) = 4;
+  matrix(1, 1) = 5;
+  matrix(1, 2) = 6;
+  matrix(2, 0) = 7;
+  matrix(2, 1) = 8;
+  matrix(2, 2) = 9;
+
+  // The incorrect trace is 14, the actual trace is 15
+  EXPECT_NE(matrix.trace(), 14);
+}
+
+// Method: determinant
+
+// 1. Perpendicular vectors
+TEST(MatrixTest, DotProductUint32TPerpendicular) {
+  math::Matrix<std::uint32_t, 3, 1, math::Options::RowMajor> vector1;
+  math::Matrix<std::uint32_t, 3, 1, math::Options::RowMajor> vector2;
+
+  vector1.coeffRef(0, 0) = 1;
+  vector1.coeffRef(1, 0) = 0;
+  vector1.coeffRef(2, 0) = 0;
+
+  vector2.coeffRef(0, 0) = 0;
+  vector2.coeffRef(1, 0) = 1;
+  vector2.coeffRef(2, 0) = 0;
+
+  std::uint32_t result = vector1.dot(vector2);
+  EXPECT_EQ(result, 0);
+}
+
+// 2. Parallel vectors
+TEST(MatrixTest, DotProductUint32TParallel) {
+  math::Matrix<std::uint32_t, 3, 1, math::Options::RowMajor> vector1;
+  math::Matrix<std::uint32_t, 3, 1, math::Options::RowMajor> vector2;
+
+  vector1.coeffRef(0, 0) = 2;
+  vector1.coeffRef(1, 0) = 2;
+  vector1.coeffRef(2, 0) = 2;
+
+  vector2.coeffRef(0, 0) = 2;
+  vector2.coeffRef(1, 0) = 2;
+  vector2.coeffRef(2, 0) = 2;
+
+  std::uint32_t result = vector1.dot(vector2);
+  EXPECT_EQ(result, 12);
+}
+
+// 3. Zero vector
+TEST(MatrixTest, DotProductUint32TZeroVector) {
+  math::Matrix<std::uint32_t, 3, 1, math::Options::RowMajor> vector1;
+  math::Matrix<std::uint32_t, 3, 1, math::Options::RowMajor> zeroVector(0);
+
+  vector1.coeffRef(0, 0) = 5;
+  vector1.coeffRef(1, 0) = 3;
+  vector1.coeffRef(2, 0) = 2;
+
+  std::uint32_t result = vector1.dot(zeroVector);
+  EXPECT_EQ(result, 0);
+}
+
+// 4. Unit vectors - can't do for unsigned types
+
+// 5. Negative vectors
+TEST(MatrixTest, DotProductUint32TNegative) {
+  math::Matrix<std::uint32_t, 3, 1, math::Options::RowMajor> vector1;
+  math::Matrix<std::uint32_t, 3, 1, math::Options::RowMajor> vector2;
+
+  vector1.coeffRef(0, 0) = -2;
+  vector1.coeffRef(1, 0) = 3;
+  vector1.coeffRef(2, 0) = -4;
+
+  vector2.coeffRef(0, 0) = 5;
+  vector2.coeffRef(1, 0) = -6;
+  vector2.coeffRef(2, 0) = 7;
+
+  std::uint32_t result          = vector1.dot(vector2);
+  std::uint32_t expected_result = (-2 * 5 + 3 * (-6) + (-4 * 7));
+  EXPECT_EQ(result, expected_result);
+}
+
+// 6. Random vectors
+TEST(MatrixTest, DotProductUint32TRandom) {
+  math::Matrix<std::uint32_t, 3, 1, math::Options::RowMajor> vector1;
+  math::Matrix<std::uint32_t, 3, 1, math::Options::RowMajor> vector2;
+
+  for (int i = 0; i < 3; ++i) {
+    vector1.coeffRef(i, 0) = static_cast<std::uint32_t>(rand()) / RAND_MAX;
+    vector2.coeffRef(i, 0) = static_cast<std::uint32_t>(rand()) / RAND_MAX;
+  }
+
+  std::uint32_t result          = vector1.dot(vector2);
+  std::uint32_t expected_result = 0;
+  for (int i = 0; i < 3; ++i) {
+    expected_result += vector1.coeff(i, 0) * vector2.coeff(i, 0);
+  }
+  EXPECT_NEAR(result, expected_result, 1e-5);
+}
+
+// Method: cross
+
+// 1. Perpendicular vectors
+TEST(MatrixTest, CrossProductUint32TPerpendicular) {
+  math::Matrix<std::uint32_t, 3, 1, math::Options::RowMajor> vector1;
+  math::Matrix<std::uint32_t, 3, 1, math::Options::RowMajor> vector2;
+
+  vector1.coeffRef(0, 0) = 1;
+  vector1.coeffRef(1, 0) = 0;
+  vector1.coeffRef(2, 0) = 0;
+
+  vector2.coeffRef(0, 0) = 0;
+  vector2.coeffRef(1, 0) = 1;
+  vector2.coeffRef(2, 0) = 0;
+
+  auto result = vector1.cross(vector2);
+
+  EXPECT_EQ(result.coeffRef(0, 0), 0);
+  EXPECT_EQ(result.coeffRef(1, 0), 0);
+  EXPECT_EQ(result.coeffRef(2, 0), 1);
+}
+
+// 2. Parallel vectors
+TEST(MatrixTest, CrossProductUint32TParallel) {
+  math::Matrix<std::uint32_t, 3, 1, math::Options::RowMajor> vector1;
+  math::Matrix<std::uint32_t, 3, 1, math::Options::RowMajor> vector2;
+
+  vector1.coeffRef(0, 0) = 2;
+  vector1.coeffRef(1, 0) = 2;
+  vector1.coeffRef(2, 0) = 2;
+
+  vector2.coeffRef(0, 0) = 2;
+  vector2.coeffRef(1, 0) = 2;
+  vector2.coeffRef(2, 0) = 2;
+
+  auto result = vector1.cross(vector2);
+
+  EXPECT_EQ(result.coeffRef(0, 0), 0);
+  EXPECT_EQ(result.coeffRef(1, 0), 0);
+  EXPECT_EQ(result.coeffRef(2, 0), 0);
+}
+
+// 3. Zero vector
+TEST(MatrixTest, CrossProductUint32TZeroVector) {
+  math::Matrix<std::uint32_t, 3, 1, math::Options::RowMajor> vector1;
+  math::Matrix<std::uint32_t, 3, 1, math::Options::RowMajor> zeroVector(0);
+
+  vector1.coeffRef(0, 0) = 5;
+  vector1.coeffRef(1, 0) = 3;
+  vector1.coeffRef(2, 0) = 2;
+
+  auto result = vector1.cross(zeroVector);
+
+  EXPECT_EQ(result.coeffRef(0, 0), 0);
+  EXPECT_EQ(result.coeffRef(1, 0), 0);
+  EXPECT_EQ(result.coeffRef(2, 0), 0);
+}
+
+// 4. Unit vectors
+TEST(MatrixTest, CrossProductUint32TUnitVectors) {
+  math::Matrix<std::uint32_t, 3, 1, math::Options::RowMajor> unitVector1(
+      1 / sqrt(3));
+  math::Matrix<std::uint32_t, 3, 1, math::Options::RowMajor> unitVector2(
+      1 / sqrt(3));
+
+  auto result = unitVector1.cross(unitVector2);
+
+  EXPECT_NEAR(result.coeffRef(0, 0), 0, 1e-5);
+  EXPECT_NEAR(result.coeffRef(1, 0), 0, 1e-5);
+  EXPECT_NEAR(result.coeffRef(2, 0), 0, 1e-5);
+}
+
+// 5. Negative vectors
+TEST(MatrixTest, CrossProductUint32TNegative) {
+  math::Matrix<std::uint32_t, 3, 1, math::Options::RowMajor> vector1;
+  math::Matrix<std::uint32_t, 3, 1, math::Options::RowMajor> vector2;
+
+  vector1.coeffRef(0, 0) = -2;
+  vector1.coeffRef(1, 0) = 3;
+  vector1.coeffRef(2, 0) = -4;
+
+  vector2.coeffRef(0, 0) = 5;
+  vector2.coeffRef(1, 0) = -6;
+  vector2.coeffRef(2, 0) = 7;
+
+  auto result = vector1.cross(vector2);
+
+  EXPECT_EQ(result.coeffRef(0, 0), 3 * 7 - (-4) * (-6));
+  EXPECT_EQ(result.coeffRef(1, 0), -4 * 5 - (-2) * 7);
+  EXPECT_EQ(result.coeffRef(2, 0), -2 * (-6) - 3 * 5);
+}
+
+// 6. Random vectors
+TEST(MatrixTest, CrossProductUint32TRandom) {
+  math::Matrix<std::uint32_t, 3, 1, math::Options::RowMajor> vector1;
+  math::Matrix<std::uint32_t, 3, 1, math::Options::RowMajor> vector2;
+
+  for (int i = 0; i < 3; ++i) {
+    vector1.coeffRef(i, 0) = static_cast<std::uint32_t>(rand()) / RAND_MAX;
+    vector2.coeffRef(i, 0) = static_cast<std::uint32_t>(rand()) / RAND_MAX;
+  }
+
+  auto result = vector1.cross(vector2);
+  math::Matrix<std::uint32_t, 3, 1, math::Options::RowMajor> expected_result;
+  expected_result.coeffRef(0, 0) = vector1.coeff(1, 0) * vector2.coeff(2, 0)
+                                 - vector1.coeff(2, 0) * vector2.coeff(1, 0);
+  expected_result.coeffRef(1, 0) = vector1.coeff(2, 0) * vector2.coeff(0, 0)
+                                 - vector1.coeff(0, 0) * vector2.coeff(2, 0);
+  expected_result.coeffRef(2, 0) = vector1.coeff(0, 0) * vector2.coeff(1, 0)
+                                 - vector1.coeff(1, 0) * vector2.coeff(0, 0);
+
+  for (int i = 0; i < 3; ++i) {
+    EXPECT_NEAR(result.coeff(i, 0), expected_result.coeff(i, 0), 1e-5);
+  }
+}
 
 #endif
