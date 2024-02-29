@@ -8,6 +8,7 @@
 #include "../../src/lib/options/options.h"
 #include "../../src/lib/simd/instruction_set/instruction_set.h"
 #include "../../src/lib/utils/concepts.h"
+#include "../../src/lib/utils/utils.h"
 
 #include <math.h>
 
@@ -250,10 +251,10 @@ class Matrix {
     // Perform Gauss-Jordan elimination
     for (unsigned int i = 0; i < Rows; ++i) {
       // Search for maximum in this column
-      T            maxEl  = std::abs(augmentedMatrix(i, i));
+      T            maxEl  = math::abs(augmentedMatrix(i, i));
       unsigned int maxRow = i;
       for (unsigned int k = i + 1; k < Rows; ++k) {
-        if (std::abs(augmentedMatrix(k, i)) > maxEl) {
+        if (math::abs(augmentedMatrix(k, i)) > maxEl) {
           maxEl  = augmentedMatrix(k, i);
           maxRow = k;
         }
