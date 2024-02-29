@@ -132,6 +132,15 @@ class Dimension {
     return *this;
   }
 
+  auto operator/(const T& scalar) const -> Dimension {
+    return Dimension(m_dataStorage_ / scalar);
+  }
+
+  auto operator/=(const T& scalar) -> Dimension& {
+    m_dataStorage_ /= scalar;
+    return *this;
+  }
+
   friend auto operator<<(std::ostream& os, const Dimension& dimension)
       -> std::ostream& {
     return os << dimension.m_dataStorage_;
