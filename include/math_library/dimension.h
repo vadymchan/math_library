@@ -38,6 +38,19 @@ class Dimension {
     return *this;
   }
 
+  explicit Dimension(const Vector<T, Size, Option>& vector)
+      : m_dataStorage_(vector) {}
+
+  explicit Dimension(Vector<T, Size, Option>&& vector) noexcept
+      : m_dataStorage_(std::move(vector)) {}
+
+  auto operator=(const Vector<T, Size, Option>& vector) -> Dimension& {
+    if (m_dataStorage_ != vector) {
+      m_dataStorage_ = vector;
+    }
+    return *this;
+  }
+
   template <typename... Args>
     requires AllSameAs<T, Args...> && ArgsSizeGreaterThanCount<1, Args...>
   Dimension(Args... args)
