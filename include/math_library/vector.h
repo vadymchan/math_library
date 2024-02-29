@@ -58,9 +58,10 @@ class Vector {
   }
 
   template <typename... Args>
-    requires AllSameAs<T, Args...> && ArgsSizeGreaterThanCount<1, Args...>
+    requires AllConvertibleTo<T, Args...>
+          && ArgsSizeGreaterThanCount<1, Args...>
   Vector(Args... args)
-      : m_dataStorage_(args...) {}
+      : m_dataStorage_(static_cast<T>(args)...) {}
 
   template <std::input_iterator InputIt>
   Vector(InputIt first, InputIt last)
