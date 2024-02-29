@@ -6,6 +6,7 @@
 #define MATH_LIBRARY_INSTRUCTION_SET_INT_H
 
 #include "../../options/options.h"
+#include "../precompiled/simd_defines.h"
 
 #include <immintrin.h>
 
