@@ -644,12 +644,12 @@ class InstructionSet<float> {
         size_t innerIndex = 0;
         for (; innerIndex + s_kAvxSimdWidth - 1 < kColsARowsB;
              innerIndex += s_kAvxSimdWidth) {
-          __m256 a_vec
-              = LoadA<Option>(a, currentRowA, innerIndex, kRowsA, kColsARowsB);
-          __m256 b_vec
-              = LoadB<Option>(b, innerIndex, currentColB, kColsB, kColsARowsB);
+          __m256 aVec = LoadAAvx<Option>(
+              a, currentRowA, innerIndex, kRowsA, kColsARowsB);
+          __m256 bVec = LoadBAvx<Option>(
+              b, innerIndex, currentColB, kColsB, kColsARowsB);
 
-          sum = _mm256_fmadd_ps(a_vec, b_vec, sum);
+          sum = _mm256_fmadd_ps(aVec, bVec, sum);
         }
         float tmp[s_kAvxSimdWidth];
         _mm256_storeu_ps(tmp, sum);

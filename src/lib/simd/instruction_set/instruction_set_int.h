@@ -620,14 +620,14 @@ class InstructionSet<int> {
         size_t  innerIndex = 0;
         for (; innerIndex + s_kAvxSimdWidth - 1 < kColsARowsB;
              innerIndex += s_kAvxSimdWidth) {
-          __m256i a_vec = _mm256_loadu_si256(
+          __m256i aVec = _mm256_loadu_si256(
               reinterpret_cast<const __m256i*>(&a[IndexA<Option>(
                   currentRowA, innerIndex, kRowsA, kColsARowsB)]));
-          __m256i b_vec = _mm256_loadu_si256(
+          __m256i bVec = _mm256_loadu_si256(
               reinterpret_cast<const __m256i*>(&b[IndexB<Option>(
                   innerIndex, currentColB, kColsB, kColsARowsB)]));
 
-          sum = _mm256_add_epi32(sum, _mm256_mullo_epi32(a_vec, b_vec));
+          sum = _mm256_add_epi32(sum, _mm256_mullo_epi32(aVec, bVec));
         }
         int tmp[s_kAvxSimdWidth];
         _mm256_storeu_si256(reinterpret_cast<__m256i*>(tmp), sum);
