@@ -122,6 +122,16 @@ class Dimension {
   auto data() -> T* { return m_dataStorage_.data(); }
 
   [[nodiscard]] auto data() const -> const T* { return m_dataStorage_.data(); }
+
+  auto operator*(const T& scalar) const -> Dimension {
+    return Dimension(m_dataStorage_ * scalar);
+  }
+
+  auto operator*=(const T& scalar) -> Dimension& {
+    m_dataStorage_ *= scalar;
+    return *this;
+  }
+
   friend auto operator<<(std::ostream& os, const Dimension& dimension)
       -> std::ostream& {
     return os << dimension.m_dataStorage_;
@@ -138,6 +148,18 @@ class Dimension {
   private:
   Vector<T, Size, Option> m_dataStorage_;
 };
+
+/**
+ * @brief Performs scalar multiplication on a Dimension, where the scalar
+ value is
+ * the left-hand operand. (scalar * Dimension)
+ */
+template <typename ScalarType, typename T, unsigned int Size, Options Option>
+auto operator*(const ScalarType&                 scalar,
+               const Dimension<T, Size, Option>& dimension)
+    -> Dimension<T, Size, Option> {
+  return dimension * static_cast<T>(scalar);
+}
 
 // Dimension of floats
 template <unsigned int Size, Options Option = Options::RowMajor>
