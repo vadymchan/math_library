@@ -52,7 +52,8 @@ class Dimension {
   }
 
   template <typename... Args>
-    requires AllSameAs<T, Args...> && ArgsSizeGreaterThanCount<1, Args...>
+    requires AllConvertibleTo<T, Args...>
+          && ArgsSizeGreaterThanCount<1, Args...>
   Dimension(Args... args)
       : m_dataStorage_(args...) {}
 
