@@ -310,6 +310,8 @@ class Vector {
     return os;
   }
 
+#ifdef FEATURE_VECTOR_INITIALIZER
+
   /**
    * @brief Helper class for initializing Vector elements using the comma
    * operator (operator,).
@@ -339,6 +341,18 @@ class Vector {
     this->operator()(0) = value;
     return VectorInitializer(*this, 1);
   }
+
+#else
+
+  auto operator<<(const T& value) ->
+      typename Matrix<T,
+                      Option == Options::RowMajor ? 1 : Size,
+                      Option == Options::RowMajor ? Size : 1,
+                      Option>::MatrixInitializer {
+    return m_dataStorage_ << value;
+  }
+
+#endif  // FEATURE_VECTOR_INITIALIZER
 
   template <typename T1,
             unsigned int Rows,
