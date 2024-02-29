@@ -395,6 +395,16 @@ inline auto operator*(const Matrix<T, Rows, Columns, Option>& matrix,
   return Vector<T, Rows, Option>(matrix * vector.m_dataStorage_);
 }
 
+/**
+ * @brief Performs scalar multiplication on a Vector, where the scalar value is
+ * the left-hand operand. (scalar * Vector)
+ */
+template <typename ScalarType, typename T, unsigned int Size, Options Option>
+auto operator*(const ScalarType& scalar, const Vector<T, Size, Option>& vector)
+    -> Vector<T, Size, Option> {
+  return vector * static_cast<T>(scalar);
+}
+
 // Vector of floats
 template <unsigned int Size, Options Option = Options::RowMajor>
 using VectorNf = Vector<float, Size, Option>;
