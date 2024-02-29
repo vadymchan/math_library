@@ -71,6 +71,25 @@ class Vector {
   Vector(const Range& range)
       : m_dataStorage_(range) {}
 
+  template <typename... Elements>
+  Vector(const Vector<T, Size - sizeof...(Elements), Option>& base,
+         Elements&&... elements)
+      : Vector() {
+    static_assert((std::is_convertible_v<Elements, T> && ...),
+                  "All additional elements must be convertible to the Vector's "
+                  "element type");
+
+    constexpr size_t kBaseSize = Size - sizeof...(Elements);
+
+    // copy vector
+    const T* baseData = base.data();
+    std::copy(baseData, baseData + kBaseSize, this->data());
+
+    // copy elements
+    const T kExtra[] = {static_cast<T>(std::forward<Elements>(elements))...};
+    std::copy(std::begin(kExtra), std::end(kExtra), this->data() + kBaseSize);
+  }
+
   auto x() -> T&
     requires ValueAtLeast<Size, 1>
   {
