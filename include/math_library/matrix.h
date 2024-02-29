@@ -97,7 +97,8 @@ class Matrix {
   }
 
   template <typename... Args>
-    requires AllSameAs<T, Args...> && ArgsSizeGreaterThanCount<1, Args...>
+    requires AllConvertibleTo<T, Args...>
+          && ArgsSizeGreaterThanCount<1, Args...>
   Matrix(Args... args) {
     static_assert(
         sizeof...(Args) == static_cast<unsigned long long>(Rows) * Columns,
