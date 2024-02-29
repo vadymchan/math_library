@@ -424,7 +424,7 @@ class Matrix {
                       Matrix<T, OtherRows, OtherColumns>>
   [[nodiscard]] auto dot(const Matrix<T, OtherRows, OtherColumns>& other) const
       -> T {
-    float                  result           = NAN;
+    T                      result           = NAN;
     constexpr unsigned int kVectorDimention = 1;
     constexpr unsigned int kMatrixSize      = Rows * Columns;
     auto mulFunc = InstructionSet<T>::template GetMulFunc<Option>();
