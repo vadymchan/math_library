@@ -342,88 +342,76 @@ auto g_orthoLh(T left, T right, T bottom, T top, T nearPlane, T farPlane)
 
 // TODO: consider moving directional vector variables to a separate file
 
-// TODO: consider use another approach for defining these vectors (e.g. static methods, functions)
-
 // TODO: make these constexpr
-template <typename T, Options Option = Options::RowMajor>
-const Vector<T, 3, Option> g_kUpVector = {0, 1, 0};
 
-template <typename T, Options Option = Options::RowMajor>
-const Vector<T, 3, Option> g_kDownVector = {0, -1, 0};
+template <typename T, unsigned int Size, Options Option = Options::RowMajor>
+  requires ValueAtLeast<Size, 2>
+auto g_upVector() -> const Vector<T, Size, Option> {
+  Vector<T, Size, Option> vec(0);
+  vec.y() = 1;
+  return vec;
+}
 
-template <typename T, Options Option = Options::RowMajor>
-const Vector<T, 3, Option> g_kForwardVector = {0, 0, 1};
+template <typename T, unsigned int Size, Options Option = Options::RowMajor>
+  requires ValueAtLeast<Size, 2>
+auto g_downVector() -> const Vector<T, Size, Option> {
+  Vector<T, Size, Option> vec(0);
+  vec.y() = -1;
+  return vec;
+}
 
-template <typename T, Options Option = Options::RowMajor>
-const Vector<T, 3, Option> g_kBackwardVector = {0, 0, -1};
+template <typename T, unsigned int Size, Options Option = Options::RowMajor>
+  requires ValueAtLeast<Size, 2>
+auto g_rightVector() -> const Vector<T, Size, Option> {
+  Vector<T, Size, Option> vec(0);
+  vec.x() = 1;
+  return vec;
+}
 
-template <typename T, Options Option = Options::RowMajor>
-const Vector<T, 3, Option> g_kRightVector = {1, 0, 0};
+template <typename T, unsigned int Size, Options Option = Options::RowMajor>
+  requires ValueAtLeast<Size, 2>
+auto g_leftVector() -> const Vector<T, Size, Option> {
+  Vector<T, Size, Option> vec(0);
+  vec.x() = -1;
+  return vec;
+}
 
-template <typename T, Options Option = Options::RowMajor>
-const Vector<T, 3, Option> g_kLeftVector = {-1, 0, 0};
+template <typename T, unsigned int Size, Options Option = Options::RowMajor>
+  requires ValueAtLeast<Size, 3>
+auto g_forwardVector() -> const Vector<T, Size, Option> {
+  Vector<T, Size, Option> vec(0);
+  vec.z() = 1;
+  return vec;
+}
 
-template <typename T, Options Option = Options::RowMajor>
-const auto g_kZeroVector = Vector<T, 3, Option>(0);
+template <typename T, unsigned int Size, Options Option = Options::RowMajor>
+  requires ValueAtLeast<Size, 3>
+auto g_backwardVector() -> const Vector<T, Size, Option> {
+  Vector<T, Size, Option> vec(0);
+  vec.z() = -1;
+  return vec;
+}
 
-template <typename T, Options Option = Options::RowMajor>
-const auto g_kOneVector = Vector<T, 3, Option>(1);
+template <typename T, unsigned int Size, Options Option = Options::RowMajor>
+auto g_zeroVector() -> const Vector<T, Size, Option> {
+  return Vector<T, Size, Option>(0);
+}
 
-/**
- * @brief Normalized one vector.
- */
-template <typename T, Options Option = Options::RowMajor>
-const auto g_kUnitVector = Vector<T, 3, Option>(0.57735026919);
+template <typename T, unsigned int Size, Options Option = Options::RowMajor>
+auto g_oneVector() -> const Vector<T, Size, Option> {
+  return Vector<T, Size, Option>(1);
+}
 
-// TODO: type postfix naming is not the best. Maybe use a different approach
-
-// I wanted to use this approach, but because of 'static initialization order
-// fiasco' it wasn't possible. template <Options Option = Options::RowMajor>
-// const auto& g_kUpVectorf = g_kUpVector<float, Option>();
-// template <Options Option = Options::RowMajor>
-// const auto g_kDownVectorf = g_kDownVector<float, Option>;
-// template <Options Option = Options::RowMajor>
-// const auto g_kForwardVectorf = g_kForwardVector<float, Option>;
-// template <Options Option = Options::RowMajor>
-// const auto g_kBackwardVectorf = g_kBackwardVector<float, Option>;
-// template <Options Option = Options::RowMajor>
-// const auto g_kRightVectorf = g_kRightVector<float, Option>;
-// template <Options Option = Options::RowMajor>
-// const auto g_kLeftVectorf = g_kLeftVector<float, Option>;
-//
-// template <Options Option = Options::RowMajor>
-// const auto g_kUpVectord = g_kUpVector<double, Option>;
-// template <Options Option = Options::RowMajor>
-// const auto g_kDownVectord = g_kDownVector<double, Option>;
-// template <Options Option = Options::RowMajor>
-// const auto g_kForwardVectord = g_kForwardVector<double, Option>;
-// template <Options Option = Options::RowMajor>
-// const auto g_kBackwardVectord = g_kBackwardVector<double, Option>;
-// template <Options Option = Options::RowMajor>
-// const auto g_kRightVectord = g_kRightVector<double, Option>;
-//
-// template <Options Option = Options::RowMajor>
-// const auto g_kUpVectori = g_kUpVector<int, Option>;
-// template <Options Option = Options::RowMajor>
-// const auto g_kDownVectori = g_kDownVector<int, Option>;
-// template <Options Option = Options::RowMajor>
-// const auto g_kForwardVectori = g_kForwardVector<int, Option>;
-// template <Options Option = Options::RowMajor>
-// const auto g_kBackwardVectori = g_kBackwardVector<int, Option>;
-// template <Options Option = Options::RowMajor>
-// const auto g_kRightVectori = g_kRightVector<int, Option>;
-// template <Options Option = Options::RowMajor>
-// const auto g_kLeftVectori = g_kLeftVector<int, Option>;
-
-// BTW, if you want to know how to resolve this problem, here's the solution (it
-// just didn't fit to my vision) template <typename T, Options Option =
-// Options::RowMajor> const Vector<T, 3, Option>& GetUpVector() {
-//   static const Vector<T, 3, Option> instance{0, 1, 0};
-//   return instance;
-// }
-//
-// template <Options Option = Options::RowMajor>
-// const auto& g_kUpVectorf = GetUpVector<float, Option>();
+template <typename T, unsigned int Size, Options Option = Options::RowMajor>
+auto g_unitVector() -> const Vector<T, Size, Option> {
+  Vector<T, Size, Option> vec(1);
+#ifdef MATH_LIBRARY_USE_NORMALIZE_IN_PLACE
+  vec.normalize();
+  return vec;
+#else
+  return vec.normalize();
+#endif  // MATH_LIBRARY_USE_NORMALIZE_IN_PLACE
+}
 
 }  // namespace math
 
