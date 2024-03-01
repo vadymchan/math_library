@@ -117,6 +117,10 @@ class Dimension {
 
   static constexpr auto GetSize() -> unsigned int { return Size; }
 
+  static constexpr auto GetDataSize() -> unsigned int {
+    return Vector<T, Size, Option>::GetDataSize();
+  }
+
   static constexpr auto GetOption() -> Options { return Option; }
 
   auto data() -> T* { return m_dataStorage_.data(); }

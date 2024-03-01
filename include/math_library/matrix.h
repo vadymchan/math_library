@@ -174,6 +174,13 @@ class Matrix {
 
   static constexpr auto GetColumns() -> unsigned int { return Columns; }
 
+  /**
+   * @brief Calculates the total size in bytes of the matrix data.
+   */
+  static constexpr auto GetDataSize() -> unsigned int {
+    return sizeof(T) * GetRows() * GetColumns();
+  }
+
   static constexpr auto GetOption() -> Options { return Option; }
 
   auto data() -> T* { return m_data_; }
@@ -319,12 +326,11 @@ class Matrix {
     // TODO: using float matrix - temp solution
     Matrix<float, Rows, Columns, Option> copy;
     // TODO: consider moving convert type logic to separate method
-    std::transform(this->data(),
-                   this->data() + Rows * Columns,
-                   copy.data(),
-                   [](const T& element) -> float {
-                     return static_cast<float>(element);
-                   });
+    std::transform(
+        this->data(),
+        this->data() + Rows * Columns,
+        copy.data(),
+        [](const T& element) -> float { return static_cast<float>(element); });
 
     // Apply Gaussian elimination
     int rank = 0;
