@@ -25,6 +25,9 @@ namespace math {
 
 constexpr unsigned int g_kStackAllocationLimit = 16;  // 4 by 4 matrix
 
+template <typename T, unsigned int Size, Options Option>
+class Vector;
+
 template <typename T,
           unsigned int Rows,
           unsigned int Columns,
