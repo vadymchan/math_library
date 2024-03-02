@@ -109,7 +109,7 @@ class Matrix {
     if constexpr (s_kUseHeap) {
       m_data_ = new T[static_cast<unsigned long long>(Rows) * Columns];
     }
-    T arr[] = {args...};
+    T arr[] = {[&args] { return static_cast<T>(args); }()...};
     std::copy(std::begin(arr), std::end(arr), m_data_);
   }
 
