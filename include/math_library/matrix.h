@@ -186,6 +186,26 @@ class Matrix {
 
   static constexpr auto GetOption() -> Options { return Option; }
 
+  template <unsigned int Row>
+    requires ValueLessThan<Row, Rows>
+  Vector<T, Columns, Option> getRow() const {
+    Vector<T, Columns, Option> rowVector;
+    for (unsigned int col = 0; col < Columns; ++col) {
+      rowVector(col) = this->operator()(Row, col);
+    }
+    return rowVector;
+  }
+
+  template <unsigned int Col>
+    requires ValueLessThan<Col, Columns>
+  Vector<T, Rows, Option> getColumn() const {
+    Vector<T, Rows, Option> columnVector;
+    for (unsigned int row = 0; row < Rows; ++row) {
+      columnVector(row) = this->operator()(row, Col);
+    }
+    return columnVector;
+  }
+
   auto data() -> T* { return m_data_; }
 
   [[nodiscard]] auto data() const -> const T* { return m_data_; }
