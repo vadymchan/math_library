@@ -717,6 +717,10 @@ template <unsigned int Rows,
           Options      Option = Options::RowMajor>
 using MatrixNi = Matrix<int, Rows, Columns, Option>;
 
+// TODO: add Option template parameter to the alias below (may introduce the
+// problem with adding <> to the end of the alias - e.g. Matrix2f<> for default
+// value)
+
 // Specific size matrices and vectors
 using Matrix2f = MatrixNf<2, 2>;
 using Matrix3f = MatrixNf<3, 3>;
