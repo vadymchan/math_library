@@ -12,6 +12,9 @@ namespace math {
 template <auto Value, auto MinValue>
 concept ValueAtLeast = Value >= MinValue;
 
+template <auto Value, auto Limit>
+concept ValueLessThan = Value < Limit;
+
 template <auto Value, auto ExactValue>
 concept ValueEqualTo = Value == ExactValue;
 
