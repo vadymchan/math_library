@@ -123,6 +123,12 @@ class Dimension {
 
   static constexpr auto GetOption() -> Options { return Option; }
 
+  template <unsigned int TargetSize>
+  auto resizedCopy() const -> Dimension<T, TargetSize, Option> {
+    return Dimension<T, TargetSize, Option>(
+        m_dataStorage_.resizedCopy<TargetSize>());
+  }
+
   auto data() -> T* { return m_dataStorage_.data(); }
 
   [[nodiscard]] auto data() const -> const T* { return m_dataStorage_.data(); }

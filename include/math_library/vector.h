@@ -178,6 +178,22 @@ class Vector {
 
   static constexpr auto GetOption() -> Options { return Option; }
 
+  template <unsigned int TargetSize>
+  auto resizedCopy() const -> Vector<T, TargetSize, Option> {
+    Vector<T, TargetSize, Option> result;
+
+    constexpr unsigned int numElementsToCopy
+        = (TargetSize < Size) ? TargetSize : Size;
+    std::copy_n(this->data(), numElementsToCopy, result.data());
+
+    if constexpr (TargetSize > Size) {
+      constexpr unsigned int numElementsToInitialize = TargetSize - Size;
+      std::fill_n(result.data() + Size, numElementsToInitialize, T());
+    }
+
+    return result;
+  }
+
   auto data() -> T* { return m_dataStorage_.data(); }
 
   [[nodiscard]] auto data() const -> const T* { return m_dataStorage_.data(); }
