@@ -638,10 +638,13 @@ class Matrix {
   friend auto operator<<(std::ostream& os, const Matrix& matrix)
       -> std::ostream& {
     for (unsigned int i = 0; i < Rows; ++i) {
-      for (unsigned int j = 0; j < Columns; ++j) {
-        os << matrix(i, j) << ' ';
+      os << matrix(i, 0);
+      for (unsigned int j = 1; j < Columns; ++j) {
+        os << ' ' << matrix(i, j);
       }
-      os << '\n';
+      if (i < Rows - 1) {
+        os << '\n';
+      }
     }
     return os;
   }
