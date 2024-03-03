@@ -2425,8 +2425,7 @@ TEST(MatrixTest, ScalarDivisionFailureUnsignedInt) {
 
   for (unsigned int i = 0; i < 4; ++i) {
     for (unsigned int j = 0; j < 4; ++j) {
-      matrix1.coeffRef(i, j)
-          = (i * 4 + j + 1) * 110; 
+      matrix1.coeffRef(i, j) = (i * 4 + j + 1) * 110;
     }
   }
 
@@ -2434,7 +2433,6 @@ TEST(MatrixTest, ScalarDivisionFailureUnsignedInt) {
 
   for (unsigned int i = 0; i < 4; ++i) {
     for (unsigned int j = 0; j < 4; ++j) {
-
       EXPECT_NE(matrix2.coeff(i, j), matrix1.coeff(i, j) / 11);
     }
   }
@@ -2715,8 +2713,7 @@ TEST(MatrixTest, DeterminantUnsignedInt_1) {
   EXPECT_FLOAT_EQ(matrix.determinant(), -52);
 }
 
-// Method: inverse - this is not reasonable since unsigned int 
-
+// Method: inverse - this is not reasonable since unsigned int
 
 // Method: rank - 2 test
 
@@ -3407,9 +3404,10 @@ TEST(MatrixTest, SubtractionUint32T) {
     for (int j = 0; j < kColumns; ++j) {
       EXPECT_NEAR(
           matrix3.coeff(i, j), matrix1.coeff(i, j) - matrix2.coeff(i, j), 1e-5);
-      // Alternatively, for exact std::uint32_ting-point comparisons (which might
-      // be risky due to precision issues): EXPECT_FLOAT_EQ(matrix3.coeff(i, j),
-      // matrix1.coeff(i, j) - matrix2.coeff(i, j));
+      // Alternatively, for exact std::uint32_ting-point comparisons (which
+      // might be risky due to precision issues):
+      // EXPECT_FLOAT_EQ(matrix3.coeff(i, j), matrix1.coeff(i, j) -
+      // matrix2.coeff(i, j));
     }
   }
 }
@@ -3828,7 +3826,7 @@ TEST(MatrixTest, MatrixEqualityFalseUint32T) {
   }
 
   math::Matrix<std::uint32_t, 4, 4, math::Options::RowMajor> matrix2  = matrix1;
-  matrix2.coeffRef(0, 0)                                            += 1;
+  matrix2.coeffRef(0, 0)                                             += 1;
 
   EXPECT_FALSE(matrix1 == matrix2);
 }
@@ -3911,7 +3909,7 @@ TEST(MatrixTest, MatrixInequalityTrueUint32T) {
   }
 
   math::Matrix<std::uint32_t, 4, 4, math::Options::RowMajor> matrix2  = matrix1;
-  matrix2.coeffRef(0, 0)                                            += 1;
+  matrix2.coeffRef(0, 0)                                             += 1;
 
   EXPECT_TRUE(matrix1 != matrix2);
 }
@@ -3974,7 +3972,7 @@ TEST(MatrixTest, MatrixInequalityFalseUint32T) {
 
 TEST(MatrixTest, TransposeUint32T) {
   math::Matrix<std::uint32_t, 2, 2> matrix1(1, 2, 3, 4);
-  auto                             matrix2 = matrix1.transpose();
+  auto                              matrix2 = matrix1.transpose();
 
   ASSERT_EQ(matrix2(0, 0), 1);
   ASSERT_EQ(matrix2(0, 1), 3);
@@ -3986,7 +3984,7 @@ TEST(MatrixTest, TransposeUint32T) {
 
 TEST(MatrixTest, ReshapeUint32T) {
   math::Matrix<std::uint32_t, 2, 2> matrix1(1, 2, 3, 4);
-  auto                             matrix2 = matrix1.reshape<4, 1>();
+  auto                              matrix2 = matrix1.reshape<4, 1>();
 
   ASSERT_EQ(matrix2(0, 0), 1);
   ASSERT_EQ(matrix2(1, 0), 2);
@@ -4418,6 +4416,274 @@ TEST(MatrixTest, CrossProductUint32TRandom) {
   for (int i = 0; i < 3; ++i) {
     EXPECT_NEAR(result.coeff(i, 0), expected_result.coeff(i, 0), 1e-5);
   }
+}
+
+// TODO: add more non trivial view matrix constructions
+// ========================== GRAPHICS ==============================
+
+TEST(ViewMatrixTest, LookAtRhRowMajor) {
+  math::Vector3D<float> eye{0.0f, 0.0f, 1.0f};
+  math::Vector3D<float> target{0.0f, 0.0f, 0.0f};
+  math::Vector3D<float> up{0.0f, 1.0f, 0.0f};
+  auto                  viewMatrix = g_lookAtRh(eye, target, up);
+
+  // Check the right vector
+  EXPECT_FLOAT_EQ(viewMatrix(0, 0), -1.0f);
+  EXPECT_FLOAT_EQ(viewMatrix(0, 1), 0.0f);
+  EXPECT_FLOAT_EQ(viewMatrix(0, 2), 0.0f);
+
+  // Check the up vector
+  EXPECT_FLOAT_EQ(viewMatrix(1, 0), 0.0f);
+  EXPECT_FLOAT_EQ(viewMatrix(1, 1), 1.0f);
+  EXPECT_FLOAT_EQ(viewMatrix(1, 2), 0.0f);
+
+  // Check the forward vector (should be inverted)
+  EXPECT_FLOAT_EQ(viewMatrix(2, 0), 0.0f);
+  EXPECT_FLOAT_EQ(viewMatrix(2, 1), 0.0f);
+  EXPECT_FLOAT_EQ(viewMatrix(2, 2), 1.0f);
+
+  // Check the translation
+  EXPECT_FLOAT_EQ(viewMatrix(3, 0), 0.0f);
+  EXPECT_FLOAT_EQ(viewMatrix(3, 1), 0.0f);
+  EXPECT_FLOAT_EQ(viewMatrix(3, 2), 1.0f);
+
+  // Check the homogenous part of the matrix
+  EXPECT_FLOAT_EQ(viewMatrix(0, 3), 0.0f);
+  EXPECT_FLOAT_EQ(viewMatrix(1, 3), 0.0f);
+  EXPECT_FLOAT_EQ(viewMatrix(2, 3), 0.0f);
+  EXPECT_FLOAT_EQ(viewMatrix(3, 3), 1.0f);
+}
+
+TEST(ViewMatrixTest, LookAtRhColumnMajor) {
+  math::Vector3D<float, math::Options::ColumnMajor> eye{0.0f, 0.0f, 1.0f};
+  math::Vector3D<float, math::Options::ColumnMajor> target{0.0f, 0.0f, 0.0f};
+  math::Vector3D<float, math::Options::ColumnMajor> up{0.0f, 1.0f, 0.0f};
+  auto viewMatrix = g_lookAtRh(eye, target, up);
+
+  // Check the right vector
+  EXPECT_FLOAT_EQ(viewMatrix(0, 0), -1.0f);
+  EXPECT_FLOAT_EQ(viewMatrix(1, 0), 0.0f);
+  EXPECT_FLOAT_EQ(viewMatrix(2, 0), 0.0f);
+
+  // Check the up vector
+  EXPECT_FLOAT_EQ(viewMatrix(0, 1), 0.0f);
+  EXPECT_FLOAT_EQ(viewMatrix(1, 1), 1.0f);
+  EXPECT_FLOAT_EQ(viewMatrix(2, 1), 0.0f);
+
+  // Check the forward vector (should be inverted)
+  EXPECT_FLOAT_EQ(viewMatrix(0, 2), 0.0f);
+  EXPECT_FLOAT_EQ(viewMatrix(1, 2), 0.0f);
+  EXPECT_FLOAT_EQ(viewMatrix(2, 2), 1.0f);
+
+  // Check the translation
+  EXPECT_FLOAT_EQ(viewMatrix(0, 3), 0.0f);
+  EXPECT_FLOAT_EQ(viewMatrix(1, 3), 0.0f);
+  EXPECT_FLOAT_EQ(viewMatrix(2, 3), 1.0f);
+
+  // Check the homogenous part of the matrix
+  EXPECT_FLOAT_EQ(viewMatrix(3, 0), 0.0f);
+  EXPECT_FLOAT_EQ(viewMatrix(3, 1), 0.0f);
+  EXPECT_FLOAT_EQ(viewMatrix(3, 2), 0.0f);
+  EXPECT_FLOAT_EQ(viewMatrix(3, 3), 1.0f);
+}
+
+TEST(ViewMatrixTest, LookToRhRowMajor) {
+  math::Vector3D<float> eye{0.0f, 0.0f, 1.0f};
+  math::Vector3D<float> direction{0.0f, 0.0f, -1.0f};
+  math::Vector3D<float> up{0.0f, 1.0f, 0.0f};
+  auto                  viewMatrix = g_lookToRh(eye, direction, up);
+
+  // Check the right vector
+  EXPECT_FLOAT_EQ(viewMatrix(0, 0), -1.0f);
+  EXPECT_FLOAT_EQ(viewMatrix(0, 1), 0.0f);
+  EXPECT_FLOAT_EQ(viewMatrix(0, 2), 0.0f);
+
+  // Check the up vector
+  EXPECT_FLOAT_EQ(viewMatrix(1, 0), 0.0f);
+  EXPECT_FLOAT_EQ(viewMatrix(1, 1), 1.0f);
+  EXPECT_FLOAT_EQ(viewMatrix(1, 2), 0.0f);
+
+  // Check the forward vector (should be inverted)
+  EXPECT_FLOAT_EQ(viewMatrix(2, 0), 0.0f);
+  EXPECT_FLOAT_EQ(viewMatrix(2, 1), 0.0f);
+  EXPECT_FLOAT_EQ(viewMatrix(2, 2), 1.0f);
+
+  // Check the translation
+  EXPECT_FLOAT_EQ(viewMatrix(3, 0), 0.0f);
+  EXPECT_FLOAT_EQ(viewMatrix(3, 1), 0.0f);
+  EXPECT_FLOAT_EQ(viewMatrix(3, 2), 1.0f);
+
+  // Check the homogenous part of the matrix
+  EXPECT_FLOAT_EQ(viewMatrix(0, 3), 0.0f);
+  EXPECT_FLOAT_EQ(viewMatrix(1, 3), 0.0f);
+  EXPECT_FLOAT_EQ(viewMatrix(2, 3), 0.0f);
+  EXPECT_FLOAT_EQ(viewMatrix(3, 3), 1.0f);
+}
+
+TEST(ViewMatrixTest, LookToRhColumnMajor) {
+  math::Vector3D<float, math::Options::ColumnMajor> eye{0.0f, 0.0f, 1.0f};
+  math::Vector3D<float, math::Options::ColumnMajor> direction{
+    0.0f, 0.0f, -1.0f};
+  math::Vector3D<float, math::Options::ColumnMajor> up{0.0f, 1.0f, 0.0f};
+  auto viewMatrix = g_lookToRh(eye, direction, up);
+
+  // Check the right vector
+  EXPECT_FLOAT_EQ(viewMatrix(0, 0), -1.0f);
+  EXPECT_FLOAT_EQ(viewMatrix(1, 0), 0.0f);
+  EXPECT_FLOAT_EQ(viewMatrix(2, 0), 0.0f);
+
+  // Check the up vector
+  EXPECT_FLOAT_EQ(viewMatrix(0, 1), 0.0f);
+  EXPECT_FLOAT_EQ(viewMatrix(1, 1), 1.0f);
+  EXPECT_FLOAT_EQ(viewMatrix(2, 1), 0.0f);
+
+  // Check the forward vector (should be inverted)
+  EXPECT_FLOAT_EQ(viewMatrix(0, 2), 0.0f);
+  EXPECT_FLOAT_EQ(viewMatrix(1, 2), 0.0f);
+  EXPECT_FLOAT_EQ(viewMatrix(2, 2), 1.0f);
+
+  // Check the translation
+  EXPECT_FLOAT_EQ(viewMatrix(0, 3), 0.0f);
+  EXPECT_FLOAT_EQ(viewMatrix(1, 3), 0.0f);
+  EXPECT_FLOAT_EQ(viewMatrix(2, 3), 1.0f);
+
+  // Check the homogenous part of the matrix
+  EXPECT_FLOAT_EQ(viewMatrix(3, 0), 0.0f);
+  EXPECT_FLOAT_EQ(viewMatrix(3, 1), 0.0f);
+  EXPECT_FLOAT_EQ(viewMatrix(3, 2), 0.0f);
+  EXPECT_FLOAT_EQ(viewMatrix(3, 3), 1.0f);
+}
+
+TEST(ViewMatrixTest, LookAtLhRowMajor) {
+  math::Vector3D<float> eye{0.0f, 0.0f, 1.0f};
+  math::Vector3D<float> target{0.0f, 0.0f, 0.0f};
+  math::Vector3D<float> up{0.0f, 1.0f, 0.0f};
+  auto                  viewMatrix = g_lookAtLh(eye, target, up);
+
+  // Check the right vector
+  EXPECT_FLOAT_EQ(viewMatrix(0, 0), -1.0f);
+  EXPECT_FLOAT_EQ(viewMatrix(0, 1), 0.0f);
+  EXPECT_FLOAT_EQ(viewMatrix(0, 2), 0.0f);
+
+  // Check the up vector
+  EXPECT_FLOAT_EQ(viewMatrix(1, 0), 0.0f);
+  EXPECT_FLOAT_EQ(viewMatrix(1, 1), 1.0f);
+  EXPECT_FLOAT_EQ(viewMatrix(1, 2), 0.0f);
+
+  // Check the forward vector
+  EXPECT_FLOAT_EQ(viewMatrix(2, 0), 0.0f);
+  EXPECT_FLOAT_EQ(viewMatrix(2, 1), 0.0f);
+  EXPECT_FLOAT_EQ(viewMatrix(2, 2), -1.0f);
+
+  // Check the translation
+  EXPECT_FLOAT_EQ(viewMatrix(3, 0), 0.0f);
+  EXPECT_FLOAT_EQ(viewMatrix(3, 1), 0.0f);
+  EXPECT_FLOAT_EQ(viewMatrix(3, 2), 1.0f);
+
+  // Check the homogenous part of the matrix
+  EXPECT_FLOAT_EQ(viewMatrix(0, 3), 0.0f);
+  EXPECT_FLOAT_EQ(viewMatrix(1, 3), 0.0f);
+  EXPECT_FLOAT_EQ(viewMatrix(2, 3), 0.0f);
+  EXPECT_FLOAT_EQ(viewMatrix(3, 3), 1.0f);
+}
+
+TEST(ViewMatrixTest, LookAtLhColumnMajor) {
+  math::Vector3D<float, math::Options::ColumnMajor> eye{0.0f, 0.0f, 1.0f};
+  math::Vector3D<float, math::Options::ColumnMajor> target{0.0f, 0.0f, 0.0f};
+  math::Vector3D<float, math::Options::ColumnMajor> up{0.0f, 1.0f, 0.0f};
+  auto viewMatrix = g_lookAtLh(eye, target, up);
+
+  // Check the right vector
+  EXPECT_FLOAT_EQ(viewMatrix(0, 0), -1.0f);
+  EXPECT_FLOAT_EQ(viewMatrix(1, 0), 0.0f);
+  EXPECT_FLOAT_EQ(viewMatrix(2, 0), 0.0f);
+
+  // Check the up vector
+  EXPECT_FLOAT_EQ(viewMatrix(0, 1), 0.0f);
+  EXPECT_FLOAT_EQ(viewMatrix(1, 1), 1.0f);
+  EXPECT_FLOAT_EQ(viewMatrix(2, 1), 0.0f);
+
+  // Check the forward vector
+  EXPECT_FLOAT_EQ(viewMatrix(0, 2), 0.0f);
+  EXPECT_FLOAT_EQ(viewMatrix(1, 2), 0.0f);
+  EXPECT_FLOAT_EQ(viewMatrix(2, 2), -1.0f);
+
+  // Check the translation
+  EXPECT_FLOAT_EQ(viewMatrix(0, 3), 0.0f);
+  EXPECT_FLOAT_EQ(viewMatrix(1, 3), 0.0f);
+  EXPECT_FLOAT_EQ(viewMatrix(2, 3), 1.0f);
+
+  // Check the homogenous part of the matrix
+  EXPECT_FLOAT_EQ(viewMatrix(3, 0), 0.0f);
+  EXPECT_FLOAT_EQ(viewMatrix(3, 1), 0.0f);
+  EXPECT_FLOAT_EQ(viewMatrix(3, 2), 0.0f);
+  EXPECT_FLOAT_EQ(viewMatrix(3, 3), 1.0f);
+}
+
+TEST(ViewMatrixTest, LookToLhRowMajor) {
+  math::Vector3D<float> eye{0.0f, 0.0f, 1.0f};
+  math::Vector3D<float> direction{0.0f, 0.0f, -1.0f};
+  math::Vector3D<float> up{0.0f, 1.0f, 0.0f};
+  auto                  viewMatrix = g_lookToLh(eye, direction, up);
+
+  // Check the right vector
+  EXPECT_FLOAT_EQ(viewMatrix(0, 0), -1.0f);
+  EXPECT_FLOAT_EQ(viewMatrix(0, 1), 0.0f);
+  EXPECT_FLOAT_EQ(viewMatrix(0, 2), 0.0f);
+
+  // Check the up vector
+  EXPECT_FLOAT_EQ(viewMatrix(1, 0), 0.0f);
+  EXPECT_FLOAT_EQ(viewMatrix(1, 1), 1.0f);
+  EXPECT_FLOAT_EQ(viewMatrix(1, 2), 0.0f);
+
+  // Check the forward vector
+  EXPECT_FLOAT_EQ(viewMatrix(2, 0), 0.0f);
+  EXPECT_FLOAT_EQ(viewMatrix(2, 1), 0.0f);
+  EXPECT_FLOAT_EQ(viewMatrix(2, 2), -1.0f);
+
+  // Check the translation
+  EXPECT_FLOAT_EQ(viewMatrix(3, 0), 0.0f);
+  EXPECT_FLOAT_EQ(viewMatrix(3, 1), 0.0f);
+  EXPECT_FLOAT_EQ(viewMatrix(3, 2), 1.0f);
+
+  // Check the homogenous part of the matrix
+  EXPECT_FLOAT_EQ(viewMatrix(0, 3), 0.0f);
+  EXPECT_FLOAT_EQ(viewMatrix(1, 3), 0.0f);
+  EXPECT_FLOAT_EQ(viewMatrix(2, 3), 0.0f);
+  EXPECT_FLOAT_EQ(viewMatrix(3, 3), 1.0f);
+}
+
+TEST(ViewMatrixTest, LookToLhColumnMajor) {
+  math::Vector3D<float, math::Options::ColumnMajor> eye{0.0f, 0.0f, 1.0f};
+  math::Vector3D<float, math::Options::ColumnMajor> direction{0.0f, 0.0f, -1.0f};
+  math::Vector3D<float, math::Options::ColumnMajor> up{0.0f, 1.0f, 0.0f};
+  auto viewMatrix = g_lookToLh(eye, direction, up);
+
+  // Check the right vector
+  EXPECT_FLOAT_EQ(viewMatrix(0, 0), -1.0f);
+  EXPECT_FLOAT_EQ(viewMatrix(1, 0), 0.0f);
+  EXPECT_FLOAT_EQ(viewMatrix(2, 0), 0.0f);
+
+  // Check the up vector
+  EXPECT_FLOAT_EQ(viewMatrix(0, 1), 0.0f);
+  EXPECT_FLOAT_EQ(viewMatrix(1, 1), 1.0f);
+  EXPECT_FLOAT_EQ(viewMatrix(2, 1), 0.0f);
+
+  // Check the forward vector
+  EXPECT_FLOAT_EQ(viewMatrix(0, 2), 0.0f);
+  EXPECT_FLOAT_EQ(viewMatrix(1, 2), 0.0f);
+  EXPECT_FLOAT_EQ(viewMatrix(2, 2), -1.0f);
+
+  // Check the translation
+  EXPECT_FLOAT_EQ(viewMatrix(0, 3), 0.0f);
+  EXPECT_FLOAT_EQ(viewMatrix(1, 3), 0.0f);
+  EXPECT_FLOAT_EQ(viewMatrix(2, 3), 1.0f);
+
+  // Check the homogenous part of the matrix
+  EXPECT_FLOAT_EQ(viewMatrix(3, 0), 0.0f);
+  EXPECT_FLOAT_EQ(viewMatrix(3, 1), 0.0f);
+  EXPECT_FLOAT_EQ(viewMatrix(3, 2), 0.0f);
+  EXPECT_FLOAT_EQ(viewMatrix(3, 3), 1.0f);
 }
 
 #endif
