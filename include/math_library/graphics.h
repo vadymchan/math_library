@@ -13,91 +13,105 @@ namespace math {
 // lookAtLH(eyePosition, centerPosition, upDirection)
 
 template <typename T, Options Option = Options::RowMajor>
-auto g_lookAtRH(const Matrix<T, 3, 1>& eye,
-                const Matrix<T, 3, 1>& target,
-                const Matrix<T, 3, 1>& worldUp) -> Matrix<T, 4, 4> {
-  Matrix<T, 3, 1> forward = (eye - target).normalize();
-  Matrix<T, 3, 1> right   = worldUp.cross(forward).normalize();
-  Matrix<T, 3, 1> up      = forward.cross(right);
+auto g_lookAtRh(const Vector3D<T, Option>& eye,
+                const Vector3D<T, Option>& target,
+                const Vector3D<T, Option>& worldUp) -> Matrix<T, 4, 4, Option> {
+#ifdef MATH_LIBRARY_USE_NORMALIZE_IN_PLACE
+  auto forward = target - eye;
+  forward.normalize();
+  auto right = worldUp.cross(forward);
+  right.normalize();
+#else
+  auto forward = (target - eye).normalize();
+  auto right   = worldUp.cross(forward).normalize();
+#endif
+  auto up = forward.cross(right);
 
-  Matrix<T, 4, 4> viewMatrix = Matrix<T, 4, 4>::Identity();
+  auto viewMatrix = Matrix<T, 4, 4, Option>::Identity();
 
   if constexpr (Option == Options::RowMajor) {
-    viewMatrix(0, 0) = right(0, 0);
-    viewMatrix(1, 0) = right(1, 0);
-    viewMatrix(2, 0) = right(2, 0);
-    viewMatrix(0, 3) = -right.dot(eye);
-
-    viewMatrix(1, 1) = up(0, 0);
-    viewMatrix(2, 1) = up(1, 0);
-    viewMatrix(3, 1) = up(2, 0);
-    viewMatrix(1, 3) = -up.dot(eye);
-
-    viewMatrix(1, 2) = forward(0, 0);
-    viewMatrix(2, 2) = forward(1, 0);
-    viewMatrix(3, 2) = forward(2, 0);
-    viewMatrix(2, 3) = -forward.dot(eye);
-  } else if constexpr (Option == Options::ColumnMajor) {
-    viewMatrix(0, 0) = right(0, 0);
-    viewMatrix(0, 1) = right(1, 0);
-    viewMatrix(0, 2) = right(2, 0);
+    viewMatrix(0, 0) = right.x();
+    viewMatrix(0, 1) = right.y();
+    viewMatrix(0, 2) = right.z();
     viewMatrix(3, 0) = -right.dot(eye);
 
-    viewMatrix(1, 0) = up(0, 0);
-    viewMatrix(1, 1) = up(1, 0);
-    viewMatrix(1, 2) = up(2, 0);
+    viewMatrix(1, 0) = up.x();
+    viewMatrix(1, 1) = up.y();
+    viewMatrix(1, 2) = up.z();
     viewMatrix(3, 1) = -up.dot(eye);
 
-    viewMatrix(2, 0) = forward(0, 0);
-    viewMatrix(2, 1) = forward(1, 0);
-    viewMatrix(2, 2) = forward(2, 0);
+    viewMatrix(2, 0) = -forward.x();
+    viewMatrix(2, 1) = -forward.y();
+    viewMatrix(2, 2) = -forward.z();
     viewMatrix(3, 2) = -forward.dot(eye);
+  } else if constexpr (Option == Options::ColumnMajor) {
+    viewMatrix(0, 0) = right.x();
+    viewMatrix(1, 0) = right.y();
+    viewMatrix(2, 0) = right.z();
+    viewMatrix(0, 3) = -right.dot(eye);
+
+    viewMatrix(0, 1) = up.x();
+    viewMatrix(1, 1) = up.y();
+    viewMatrix(2, 1) = up.z();
+    viewMatrix(1, 3) = -up.dot(eye);
+
+    viewMatrix(0, 2) = -forward.x();
+    viewMatrix(1, 2) = -forward.y();
+    viewMatrix(2, 2) = -forward.z();
+    viewMatrix(2, 3) = -forward.dot(eye);
   }
 
   return viewMatrix;
 }
 
 template <typename T, Options Option = Options::RowMajor>
-auto g_lookAtLh(const Matrix<T, 3, 1>& eye,
-                const Matrix<T, 3, 1>& target,
-                const Matrix<T, 3, 1>& worldUp) -> Matrix<T, 4, 4> {
-  Matrix<T, 3, 1> forward = (target - eye).normalize();
-  Matrix<T, 3, 1> right   = worldUp.cross(forward).normalize();
-  Matrix<T, 3, 1> up      = forward.cross(right);
+auto g_lookAtLh(const Vector3D<T, Option>& eye,
+                const Vector3D<T, Option>& target,
+                const Vector3D<T, Option>& worldUp) -> Matrix<T, 4, 4, Option> {
+#ifdef MATH_LIBRARY_USE_NORMALIZE_IN_PLACE
+  auto forward = target - eye;
+  forward.normalize();
+  auto right = worldUp.cross(forward);
+  right.normalize();
+#else
+  auto forward = (target - eye).normalize();
+  auto right   = worldUp.cross(forward).normalize();
+#endif
 
-  Matrix<T, 4, 4> viewMatrix = Matrix<T, 4, 4>::Identity();
+  auto up = forward.cross(right);
+
+  auto viewMatrix = Matrix<T, 4, 4, Option>::Identity();
 
   if constexpr (Option == Options::RowMajor) {
-    viewMatrix(0, 0) = right(0, 0);
-    viewMatrix(0, 1) = right(1, 0);
-    viewMatrix(0, 2) = right(2, 0);
-    viewMatrix(0, 3) = -right.dot(eye);
-
-    viewMatrix(1, 0) = up(0, 0);
-    viewMatrix(1, 1) = up(1, 0);
-    viewMatrix(1, 2) = up(2, 0);
-    viewMatrix(1, 3) = -up.dot(eye);
-
-    viewMatrix(2, 0) = forward(0, 0);
-    viewMatrix(2, 1) = forward(1, 0);
-    viewMatrix(2, 2) = forward(2, 0);
-    viewMatrix(2, 3) = -forward.dot(eye);
-  } else  // COLUMN_MAJOR
-  {
-    viewMatrix(0, 0) = right(0, 0);
-    viewMatrix(1, 0) = right(1, 0);
-    viewMatrix(2, 0) = right(2, 0);
+    viewMatrix(0, 0) = right.x();
+    viewMatrix(0, 1) = right.y();
+    viewMatrix(0, 2) = right.z();
     viewMatrix(3, 0) = -right.dot(eye);
 
-    viewMatrix(0, 1) = up(0, 0);
-    viewMatrix(1, 1) = up(1, 0);
-    viewMatrix(2, 1) = up(2, 0);
+    viewMatrix(1, 0) = up.x();
+    viewMatrix(1, 1) = up.y();
+    viewMatrix(1, 2) = up.z();
     viewMatrix(3, 1) = -up.dot(eye);
 
-    viewMatrix(0, 2) = forward(0, 0);
-    viewMatrix(1, 2) = forward(1, 0);
-    viewMatrix(2, 2) = forward(2, 0);
+    viewMatrix(2, 0) = forward.x();
+    viewMatrix(2, 1) = forward.y();
+    viewMatrix(2, 2) = forward.z();
     viewMatrix(3, 2) = -forward.dot(eye);
+  } else if constexpr (Option == Options::ColumnMajor) {
+    viewMatrix(0, 0) = right.x();
+    viewMatrix(1, 0) = right.y();
+    viewMatrix(2, 0) = right.z();
+    viewMatrix(0, 3) = -right.dot(eye);
+
+    viewMatrix(0, 1) = up.x();
+    viewMatrix(1, 1) = up.y();
+    viewMatrix(2, 1) = up.z();
+    viewMatrix(1, 3) = -up.dot(eye);
+
+    viewMatrix(0, 2) = forward.x();
+    viewMatrix(1, 2) = forward.y();
+    viewMatrix(2, 2) = forward.z();
+    viewMatrix(2, 3) = -forward.dot(eye);
   }
 
   return viewMatrix;
@@ -107,90 +121,104 @@ auto g_lookAtLh(const Matrix<T, 3, 1>& eye,
 // lookToLH(eyePosition, centerPosition, upDirection)
 
 template <typename T, Options Option>
-auto g_lookToRh(const Matrix<T, 3, 1>& eye,
-                const Matrix<T, 3, 1>& direction,
-                const Matrix<T, 3, 1>& worldUp) -> Matrix<T, 4, 4> {
-  Matrix<T, 3, 1> forward = direction.normalize();
-  Matrix<T, 3, 1> right   = worldUp.cross(forward).normalize();
-  Matrix<T, 3, 1> up      = forward.cross(right);
+auto g_lookToRh(const Vector3D<T, Option>& eye,
+                const Vector3D<T, Option>& direction,
+                const Vector3D<T, Option>& worldUp) -> Matrix<T, 4, 4, Option> {
+#ifdef MATH_LIBRARY_USE_NORMALIZE_IN_PLACE
+  auto forward = direction;
+  forward.normalize();
+  auto right = worldUp.cross(forward);
+  right.normalize();
+#else
+  auto forward = direction.normalize();
+  auto right   = worldUp.cross(forward).normalize();
+#endif
+  auto up = forward.cross(right);
 
-  Matrix<T, 4, 4> viewMatrix = Matrix<T, 4, 4>::Identity();
+  auto viewMatrix = Matrix<T, 4, 4, Option>::Identity();
 
   if constexpr (Option == Options::RowMajor) {
-    viewMatrix(0, 0) = right(0, 0);
-    viewMatrix(0, 1) = right(1, 0);
-    viewMatrix(0, 2) = right(2, 0);
-    viewMatrix(0, 3) = -right.dot(eye);
-
-    viewMatrix(1, 0) = up(0, 0);
-    viewMatrix(1, 1) = up(1, 0);
-    viewMatrix(1, 2) = up(2, 0);
-    viewMatrix(1, 3) = -up.dot(eye);
-
-    viewMatrix(2, 0) = -forward(0, 0);
-    viewMatrix(2, 1) = -forward(1, 0);
-    viewMatrix(2, 2) = -forward(2, 0);
-    viewMatrix(2, 3) = forward.dot(eye);
-  } else if constexpr (Option == Options::ColumnMajor) {
-    viewMatrix(0, 0) = right(0, 0);
-    viewMatrix(1, 0) = right(1, 0);
-    viewMatrix(2, 0) = right(2, 0);
+    viewMatrix(0, 0) = right.x();
+    viewMatrix(0, 1) = right.y();
+    viewMatrix(0, 2) = right.z();
     viewMatrix(3, 0) = -right.dot(eye);
 
-    viewMatrix(0, 1) = up(0, 0);
-    viewMatrix(1, 1) = up(1, 0);
-    viewMatrix(2, 1) = up(2, 0);
+    viewMatrix(1, 0) = up.x();
+    viewMatrix(1, 1) = up.y();
+    viewMatrix(1, 2) = up.z();
     viewMatrix(3, 1) = -up.dot(eye);
 
-    viewMatrix(0, 2) = -forward(0, 0);
-    viewMatrix(1, 2) = -forward(1, 0);
-    viewMatrix(2, 2) = -forward(2, 0);
-    viewMatrix(3, 2) = forward.dot(eye);
+    viewMatrix(2, 0) = -forward.x();
+    viewMatrix(2, 1) = -forward.y();
+    viewMatrix(2, 2) = -forward.z();
+    viewMatrix(3, 2) = -forward.dot(eye);
+  } else if constexpr (Option == Options::ColumnMajor) {
+    viewMatrix(0, 0) = right.x();
+    viewMatrix(1, 0) = right.y();
+    viewMatrix(2, 0) = right.z();
+    viewMatrix(0, 3) = -right.dot(eye);
+
+    viewMatrix(0, 1) = up.x();
+    viewMatrix(1, 1) = up.y();
+    viewMatrix(2, 1) = up.z();
+    viewMatrix(1, 3) = -up.dot(eye);
+
+    viewMatrix(0, 2) = -forward.x();
+    viewMatrix(1, 2) = -forward.y();
+    viewMatrix(2, 2) = -forward.z();
+    viewMatrix(2, 3) = -forward.dot(eye);
   }
 
   return viewMatrix;
 }
 
 template <typename T, Options Option = Options::RowMajor>
-auto g_lookToLh(const Matrix<T, 3, 1>& eye,
-                const Matrix<T, 3, 1>& direction,
-                const Matrix<T, 3, 1>& worldUp) -> Matrix<T, 4, 4> {
-  Matrix<T, 3, 1> forward = direction.normalize();
-  Matrix<T, 3, 1> right   = worldUp.cross(forward).normalize();
-  Matrix<T, 3, 1> up      = forward.cross(right);
+auto g_lookToLh(const Vector3D<T, Option>& eye,
+                const Vector3D<T, Option>& direction,
+                const Vector3D<T, Option>& worldUp) -> Matrix<T, 4, 4, Option> {
+#ifdef MATH_LIBRARY_USE_NORMALIZE_IN_PLACE
+  auto forward = direction;
+  forward.normalize();
+  auto right = worldUp.cross(forward);
+  right.normalize();
+#else
+  auto forward = direction.normalize();
+  auto right   = worldUp.cross(forward).normalize();
+#endif
+  auto up = forward.cross(right);
 
-  Matrix<T, 4, 4> viewMatrix = Matrix<T, 4, 4>::Identity();
+  auto viewMatrix = Matrix<T, 4, 4, Option>::Identity();
 
   if constexpr (Option == Options::RowMajor) {
-    viewMatrix(0, 0) = right(0, 0);
-    viewMatrix(0, 1) = right(1, 0);
-    viewMatrix(0, 2) = right(2, 0);
-    viewMatrix(0, 3) = -right.dot(eye);
-
-    viewMatrix(1, 0) = up(0, 0);
-    viewMatrix(1, 1) = up(1, 0);
-    viewMatrix(1, 2) = up(2, 0);
-    viewMatrix(1, 3) = -up.dot(eye);
-
-    viewMatrix(2, 0) = forward(0, 0);
-    viewMatrix(2, 1) = forward(1, 0);
-    viewMatrix(2, 2) = forward(2, 0);
-    viewMatrix(2, 3) = forward.dot(eye);
-  } else if constexpr (Option == Options::ColumnMajor) {
-    viewMatrix(0, 0) = right(0, 0);
-    viewMatrix(1, 0) = right(1, 0);
-    viewMatrix(2, 0) = right(2, 0);
+    viewMatrix(0, 0) = right.x();
+    viewMatrix(0, 1) = right.y();
+    viewMatrix(0, 2) = right.z();
     viewMatrix(3, 0) = -right.dot(eye);
 
-    viewMatrix(0, 1) = up(0, 0);
-    viewMatrix(1, 1) = up(1, 0);
-    viewMatrix(2, 1) = up(2, 0);
+    viewMatrix(1, 0) = up.x();
+    viewMatrix(1, 1) = up.y();
+    viewMatrix(1, 2) = up.z();
     viewMatrix(3, 1) = -up.dot(eye);
 
-    viewMatrix(0, 2) = forward(0, 0);
-    viewMatrix(1, 2) = forward(1, 0);
-    viewMatrix(2, 2) = forward(2, 0);
-    viewMatrix(3, 2) = forward.dot(eye);
+    viewMatrix(2, 0) = forward.x();
+    viewMatrix(2, 1) = forward.y();
+    viewMatrix(2, 2) = forward.z();
+    viewMatrix(3, 2) = -forward.dot(eye);
+  } else if constexpr (Option == Options::ColumnMajor) {
+    viewMatrix(0, 0) = right.x();
+    viewMatrix(1, 0) = right.y();
+    viewMatrix(2, 0) = right.z();
+    viewMatrix(0, 3) = -right.dot(eye);
+
+    viewMatrix(0, 1) = up.x();
+    viewMatrix(1, 1) = up.y();
+    viewMatrix(2, 1) = up.z();
+    viewMatrix(1, 3) = -up.dot(eye);
+
+    viewMatrix(0, 2) = forward.x();
+    viewMatrix(1, 2) = forward.y();
+    viewMatrix(2, 2) = forward.z();
+    viewMatrix(2, 3) = -forward.dot(eye);
   }
 
   return viewMatrix;
