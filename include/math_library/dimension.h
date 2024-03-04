@@ -65,6 +65,8 @@ class Dimension {
   Dimension(const Range& range)
       : m_dataStorage_(range) {}
 
+  ~Dimension() = default;
+
   auto width() -> T&
     requires ValueAtLeast<Size, 1>
   {

@@ -188,7 +188,7 @@ class Matrix {
 
   template <unsigned int Row>
     requires ValueLessThan<Row, Rows>
-  Vector<T, Columns, Option> getRow() const {
+  [[nodiscard]] auto getRow() const -> Vector<T, Columns, Option> {
     Vector<T, Columns, Option> rowVector;
     for (unsigned int col = 0; col < Columns; ++col) {
       rowVector(col) = this->operator()(Row, col);
@@ -198,7 +198,7 @@ class Matrix {
 
   template <unsigned int Col>
     requires ValueLessThan<Col, Columns>
-  Vector<T, Rows, Option> getColumn() const {
+  [[nodiscard]] auto getColumn() const -> Vector<T, Rows, Option> {
     Vector<T, Rows, Option> columnVector;
     for (unsigned int row = 0; row < Rows; ++row) {
       columnVector(row) = this->operator()(row, Col);
