@@ -9,9 +9,6 @@
 
 namespace math {
 
-// lookAtRH(eyePosition, centerPosition, upDirection)
-// lookAtLH(eyePosition, centerPosition, upDirection)
-
 template <typename T, Options Option = Options::RowMajor>
 auto g_lookAtRh(const Vector3D<T, Option>& eye,
                 const Vector3D<T, Option>& target,
@@ -117,9 +114,6 @@ auto g_lookAtLh(const Vector3D<T, Option>& eye,
   return viewMatrix;
 }
 
-// lookToRH(eyePosition, centerPosition, upDirection)
-// lookToLH(eyePosition, centerPosition, upDirection)
-
 template <typename T, Options Option>
 auto g_lookToRh(const Vector3D<T, Option>& eye,
                 const Vector3D<T, Option>& direction,
@@ -224,8 +218,6 @@ auto g_lookToLh(const Vector3D<T, Option>& eye,
   return viewMatrix;
 }
 
-// perspectiveFovRH(fov, aspectRatio, nearPlane, farPlane)
-// perspectiveFovLH(fov, aspectRatio, nearPlane, farPlane)
 template <typename T, Options Option = Options::RowMajor>
 auto g_perspectiveFovRh(T fov, T aspectRatio, T nearPlane, T farPlane)
     -> Matrix<T, 4, 4> {
@@ -274,8 +266,6 @@ auto g_perspectiveFovLh(T fov, T aspectRatio, T nearPlane, T farPlane)
   return result;
 }
 
-// perspectiveOffCenter(left, right, bottom, top, nearPlane, farPlane)
-
 template <typename T, Options Option = Options::RowMajor>
 auto g_perspectiveOffCenter(
     T left, T right, T bottom, T top, T nearPlane, T farPlane)
@@ -308,9 +298,6 @@ auto g_perspectiveOffCenter(
 
   return result;
 }
-
-// orthoRH(left, right, bottom, top, nearPlane, farPlane)
-// orthoLH(left, right, bottom, top, nearPlane, farPlane)
 
 template <typename T, Options Option = Options::RowMajor>
 auto g_orthoRh(T left, T right, T bottom, T top, T nearPlane, T farPlane)
