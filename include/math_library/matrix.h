@@ -206,6 +206,50 @@ class Matrix {
     return columnVector;
   }
 
+  template <unsigned int Index>
+    requires(Option == Options::RowMajor ? ValueLessThan<Index, Rows>
+                                         : ValueLessThan<Index, Columns>)
+  void setBasis(
+      const Vector<T, (Option == Options::RowMajor ? Columns : Rows), Option>&
+          vector) {
+    if constexpr (Option == Options::RowMajor) {
+      for (unsigned int col = 0; col < Columns; ++col) {
+        this->operator()(Index, col) = vector(col);
+      }
+    } else {
+      for (unsigned int row = 0; row < Rows; ++row) {
+        this->operator()(row, Index) = vector(row);
+      }
+    }
+  }
+
+  void setBasisX(
+      const Vector<T, (Option == Options::RowMajor ? Columns : Rows), Option>&
+          vector)
+    requires(Option == Options::RowMajor ? ValueLessThan<0, Columns>
+                                         : ValueLessThan<0, Rows>)
+  {
+    setBasis<0>(vector);
+  }
+
+  void setBasisY(
+      const Vector<T, (Option == Options::RowMajor ? Columns : Rows), Option>&
+          vector)
+    requires(Option == Options::RowMajor ? ValueLessThan<1, Columns>
+                                         : ValueLessThan<1, Rows>)
+  {
+    setBasis<1>(vector);
+  }
+
+  void setBasisZ(
+      const Vector<T, (Option == Options::RowMajor ? Columns : Rows), Option>&
+          vector)
+    requires(Option == Options::RowMajor ? ValueLessThan<2, Columns>
+                                         : ValueLessThan<2, Rows>)
+  {
+    setBasis<2>(vector);
+  }
+
   auto data() -> T* { return m_data_; }
 
   [[nodiscard]] auto data() const -> const T* { return m_data_; }
