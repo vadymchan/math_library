@@ -1442,6 +1442,68 @@ TEST(MatrixTest, CrossProductFloatRandom) {
   }
 }
 
+// Method: set basis X
+
+TEST(MatrixTest, SetBasisX) {
+  math::MatrixNf<3, 3>                      matrix;
+  math::Vector<float, 3, math::Options::RowMajor> xBasis(1.0f, 0.0f, 0.0f);
+  matrix.setBasisX(xBasis);
+
+  // Verify that the first row (X basis) is correctly set
+  for (unsigned int col = 0; col < 3; ++col) {
+    EXPECT_EQ(matrix(0, col), xBasis(col));
+  }
+}
+
+// Method: set basis Y
+
+TEST(MatrixTest, SetBasisY) {
+  math::MatrixNf<3, 3>                      matrix;
+  math::Vector<float, 3, math::Options::RowMajor> yBasis(0.0f, 1.0f, 0.0f);
+  matrix.setBasisY(yBasis);
+
+  // Verify that the second row (Y basis) is correctly set
+  for (unsigned int col = 0; col < 3; ++col) {
+    EXPECT_EQ(matrix(1, col), yBasis(col));
+  }
+}
+
+// Method: set basis Z
+
+TEST(MatrixTest, SetBasisZ) {
+  math::MatrixNf<3, 3>                      matrix;
+  math::Vector<float, 3, math::Options::RowMajor> zBasis(0.0f, 0.0f, 1.0f);
+  matrix.setBasisZ(zBasis);
+
+  // Verify that the third row (Z basis) is correctly set
+  for (unsigned int col = 0; col < 3; ++col) {
+    EXPECT_EQ(matrix(2, col), zBasis(col));
+  }
+}
+
+// Method: set basis general
+
+TEST(MatrixTest, GeneralizedSetBasis) {
+  math::MatrixNf<3, 3>                      matrix;
+  math::Vector<float, 3, math::Options::RowMajor> basisVector(1.0f, 2.0f, 3.0f);
+
+  // Test setting each basis individually
+  matrix.setBasis<0>(basisVector);
+  for (unsigned int col = 0; col < 3; ++col) {
+    EXPECT_EQ(matrix(0, col), basisVector(col));
+  }
+
+  matrix.setBasis<1>(basisVector);
+  for (unsigned int col = 0; col < 3; ++col) {
+    EXPECT_EQ(matrix(1, col), basisVector(col));
+  }
+
+  matrix.setBasis<2>(basisVector);
+  for (unsigned int col = 0; col < 3; ++col) {
+    EXPECT_EQ(matrix(2, col), basisVector(col));
+  }
+}
+
 // ============================== DOUBLE ==================================
 
 // Matrix equality with very small numbers
