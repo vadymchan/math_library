@@ -232,6 +232,125 @@ auto g_lookToLh(const Vector3D<T, Option>& eye,
 // END: view matrix creation functions
 // ----------------------------------------------------------------------------
 
+// clang-format off
+
+// BEGIN: perspective projection creation matrix
+// ----------------------------------------------------------------------------
+
+/**
+ * Generates a right-handed perspective projection matrix with a depth range of zero to one.
+ * @note RH-ZO - Right-Handed, Zero to One depth range.
+ */
+template <typename T, Options Option = Options::RowMajor>
+auto g_perspectiveRhZo(T fovY, T aspect, T zNear, T zFar)
+    -> Matrix<T, 4, 4, Option> {
+  // validate aspect ratio to prevent division by zero
+  assert(std::abs(aspect - std::numeric_limits<T>::epsilon()) > static_cast<T>(0));
+
+  const T tanHalfFovY = std::tan(fovY / static_cast<T>(2));
+
+  Matrix<T, 4, 4, Option> perspeciveMatrix(0);
+  perspeciveMatrix(0, 0) = static_cast<T>(1) / (aspect * tanHalfFovY);
+  perspeciveMatrix(1, 1) = static_cast<T>(1) / (tanHalfFovY);
+  perspeciveMatrix(2, 2) = zFar / (zNear - zFar);  // not the same (depends on handness + NO / LO)
+  if constexpr (Option == Options::RowMajor) {
+    perspeciveMatrix(3, 2) = -(zFar * zNear) / (zFar - zNear);  // depends on NO / LO
+    perspeciveMatrix(2, 3) = -static_cast<T>(1);                // depends on handness (-z)
+  } else if (Option == Options::ColumnMajor) {
+    perspeciveMatrix(2, 3) = -(zFar * zNear) / (zFar - zNear);  // depends on handness (-z)
+    perspeciveMatrix(3, 2) = -static_cast<T>(1);                // depends on NO / LO
+  }
+  return perspeciveMatrix;
+}
+
+/**
+ * Generates a right-handed perspective projection matrix with a depth range of negative one to one.
+ * @note RH-NO - Right-Handed, Negative One to One depth range.
+ */
+template <typename T, Options Option = Options::RowMajor>
+auto g_perspectiveRhNo(T fovY, T aspect, T zNear, T zFar)
+    -> Matrix<T, 4, 4, Option> {
+  // validate aspect ratio to prevent division by zero
+  assert(std::abs(aspect - std::numeric_limits<T>::epsilon()) > static_cast<T>(0));
+
+  const T tanHalfFovY = std::tan(fovY / static_cast<T>(2));
+
+  Matrix<T, 4, 4, Option> perspeciveMatrix(0);
+  perspeciveMatrix(0, 0) = static_cast<T>(1) / (aspect * tanHalfFovY);
+  perspeciveMatrix(1, 1) = static_cast<T>(1) / (tanHalfFovY);
+  perspeciveMatrix(2, 2) = -(zFar + zNear) / (zFar - zNear); // not the same (depends on handness + NO / LO)
+  if constexpr (Option == Options::RowMajor) {
+    perspeciveMatrix(3, 2) = -(static_cast<T>(2) * zFar * zNear) / (zFar - zNear); // depends on NO / LO
+    perspeciveMatrix(2, 3) = -static_cast<T>(1);                                   // depends on handness (-z)
+  } else if (Option == Options::ColumnMajor) {
+    perspeciveMatrix(2, 3) = -(static_cast<T>(2) * zFar * zNear) / (zFar - zNear); // depends on handness (-z)
+    perspeciveMatrix(3, 2) = -static_cast<T>(1);                                   // depends on NO / LO
+  }
+  return perspeciveMatrix;
+}
+
+/**
+ * Generates a left-handed perspective projection matrix with a depth range of zero to one.
+ * @note LH-ZO - Left-Handed, Zero to One depth range.
+ */
+template <typename T, Options Option = Options::RowMajor>
+auto g_perspectiveLhZo(T fovY, T aspect, T zNear, T zFar)
+    -> Matrix<T, 4, 4, Option> {
+  assert(std::abs(aspect - std::numeric_limits<T>::epsilon()) > static_cast<T>(0));
+
+  const T tanHalfFovY = std::tan(fovY / static_cast<T>(2));
+
+  Matrix<T, 4, 4, Option> perspeciveMatrix(0);
+  perspeciveMatrix(0, 0) = static_cast<T>(1) / (aspect * tanHalfFovY);
+  perspeciveMatrix(1, 1) = static_cast<T>(1) / (tanHalfFovY);
+  perspeciveMatrix(2, 2) = zFar / (zFar - zNear);  // not the same (depends on handness + NO / LO)
+  if constexpr (Option == Options::RowMajor) {
+    perspeciveMatrix(3, 2) = (zFar * zNear) / (zFar - zNear); // depends on NO / LO
+    perspeciveMatrix(2, 3) = static_cast<T>(1);               // depends on handness (z, not -z)
+  } else if (Option == Options::ColumnMajor) {
+    perspeciveMatrix(2, 3) = (zFar * zNear) / (zFar - zNear); // depends on NO / LO
+    perspeciveMatrix(3, 2) = static_cast<T>(1);               // depends on handness (z, not -z)
+  }
+  return perspeciveMatrix;
+}
+
+/**
+ * Generates a left-handed perspective projection matrix with a depth range of negative one to one.
+ * @note LH-NO - Left-Handed, Negative One to One depth range.
+ */
+template <typename T, Options Option = Options::RowMajor>
+auto g_perspectiveLhNo(T fovY, T aspect, T zNear, T zFar)
+    -> Matrix<T, 4, 4, Option> {
+  assert(std::abs(aspect - std::numeric_limits<T>::epsilon()) > static_cast<T>(0));
+
+  const T tanHalfFovY = std::tan(fovY / static_cast<T>(2));
+
+  Matrix<T, 4, 4, Option> perspeciveMatrix(0);
+  perspeciveMatrix(0, 0) = static_cast<T>(1) / (aspect * tanHalfFovY);
+  perspeciveMatrix(1, 1) = static_cast<T>(1) / (tanHalfFovY);
+  perspeciveMatrix(2, 2) = (zFar + zNear)    / (zFar - zNear);  // not the same (depends on handness + NO / LO)
+  if constexpr (Option == Options::RowMajor) {
+    perspeciveMatrix(3, 2) = -(static_cast<T>(2) * zFar * zNear) / (zFar - zNear); // depends on NO / LO
+    perspeciveMatrix(2, 3) = static_cast<T>(1);  // depends on handness (z, not -z)
+  } else if (Option == Options::ColumnMajor) {
+    perspeciveMatrix(2, 3) = -(static_cast<T>(2) * zFar * zNear) / (zFar - zNear); // depends on NO / LO
+    perspeciveMatrix(3, 2) = static_cast<T>(1);  // depends on handness (z, not -z)
+  }
+  return perspeciveMatrix;
+}
+
+/**
+ * Generates a right-handed perspective projection matrix based on field of
+ * view, width, and height with a depth range of zero to one.
+ * @note RH-ZO - Right-Handed, Zero to One depth range.
+ */
+template <typename T, Options Option = Options::RowMajor>
+auto g_perspectiveRhZo(T fovY, T width, T height, T zNear, T zFar)
+    -> Matrix<T, 4, 4, Option> {
+  auto aspectRatio       = width / height;
+  auto perspectiveMatrix = g_perspectiveRhZo(fovY, aspectRatio, zNear, zFar);
+  return perspectiveMatrix;
+}
 template <typename T, Options Option = Options::RowMajor>
 auto g_perspectiveFovRh(T fov, T aspectRatio, T nearPlane, T farPlane)
     -> Matrix<T, 4, 4> {
@@ -368,6 +487,7 @@ auto g_orthoLh(T left, T right, T bottom, T top, T nearPlane, T farPlane)
 
   return result;
 }
+// clang-format on
 
 // TODO: consider moving directional vector variables to a separate file
 
