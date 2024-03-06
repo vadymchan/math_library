@@ -614,34 +614,10 @@ auto g_orthoRhNo(T left, T right, T bottom, T top, T zNear, T zFar)
 // END: orthographic projection creation matrix
 // ----------------------------------------------------------------------------
 
-template <typename T, Options Option = Options::RowMajor>
-auto g_orthoLh(T left, T right, T bottom, T top, T nearPlane, T farPlane)
-    -> Matrix<T, 4, 4> {
-  assert(abs(right - left) > std::numeric_limits<T>::epsilon()
-         && "Right and left values cannot be equal");
-  assert(abs(top - bottom) > std::numeric_limits<T>::epsilon()
-         && "Top and bottom values cannot be equal");
-  assert(abs(farPlane - nearPlane) > std::numeric_limits<T>::epsilon()
-         && "Far and near plane values cannot be equal");
-
-  Matrix<T, 4, 4> result = Matrix<T, 4, 4>::Identity();
-  result(0, 0)           = static_cast<T>(2) / (right - left);
-  result(1, 1)           = static_cast<T>(2) / (top - bottom);
-  result(2, 2)           = static_cast<T>(2) / (farPlane - nearPlane);
-
-  if constexpr (Option == Options::RowMajor) {
-    result(0, 3) = -(right + left) / (right - left);
-    result(1, 3) = -(top + bottom) / (top - bottom);
-    result(2, 3) = -(farPlane + nearPlane) / (farPlane - nearPlane);
-  } else if constexpr (Option == Options::ColumnMajor) {
-    result(3, 0) = -(right + left) / (right - left);
-    result(3, 1) = -(top + bottom) / (top - bottom);
-    result(3, 2) = -(farPlane + nearPlane) / (farPlane - nearPlane);
-  }
-
-  return result;
-}
 // clang-format on
+
+// BEGIN: global util vector objects
+// ----------------------------------------------------------------------------
 
 // TODO: consider moving directional vector variables to a separate file
 
@@ -715,6 +691,9 @@ auto g_unitVector() -> const Vector<T, Size, Option> {
   return vec.normalize();
 #endif  // MATH_LIBRARY_USE_NORMALIZE_IN_PLACE
 }
+
+// END: global util vector objects
+// ----------------------------------------------------------------------------
 
 }  // namespace math
 
