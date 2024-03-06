@@ -509,6 +509,111 @@ auto g_frustumLhNo(T left, T right, T bottom, T top, T nearVal, T farVal)
 
 // END: frustrum (perspective projection matrix that off center) creation functions
 // ----------------------------------------------------------------------------
+
+// BEGIN: orthographic projection creation matrix
+// ----------------------------------------------------------------------------
+
+// TODO: add ortho functions (LH/RH) that takes (left, right, bottom, top) w/o near / far  
+
+/**
+ * Generates a left-handed orthographic projection matrix with a depth range of
+ * zero to one.
+ * @note LH-ZO - Left-Handed, Zero to One depth range.
+ */
+template <typename T, Options Option = Options::RowMajor>
+auto g_orthoLhZo(T left, T right, T bottom, T top, T zNear, T zFar)
+    -> Matrix<T, 4, 4, Option> {
+  auto orthographicMat  = Matrix<T, 4, 4, Option>::Identity();
+  orthographicMat(0, 0) = static_cast<T>(2) / (right - left);
+  orthographicMat(1, 1) = static_cast<T>(2) / (top - bottom);
+  orthographicMat(2, 2) = static_cast<T>(1) / (zFar - zNear);  // depends on handness
+  if constexpr (Option == Options::RowMajor) {
+    orthographicMat(3, 0) = -(right + left) / (right - left);
+    orthographicMat(3, 1) = -(top + bottom) / (top - bottom);
+    orthographicMat(3, 2) = -zNear / (zFar - zNear);  // depends on ZO / NO
+  } else if (Option == Options::ColumnMajor) {
+    orthographicMat(0, 3) = -(right + left) / (right - left);
+    orthographicMat(1, 3) = -(top + bottom) / (top - bottom);
+    orthographicMat(2, 3) = -zNear / (zFar - zNear);  // depends on ZO / NO
+  }
+  return orthographicMat;
+}
+
+/**
+ * Generates a left-handed orthographic projection matrix with a depth range of
+ * negative one to one.
+ * @note LH-NO - Left-Handed, Negative One to One depth range.
+ */
+template <typename T, Options Option = Options::RowMajor>
+auto g_orthoLhNo(T left, T right, T bottom, T top, T zNear, T zFar)
+    -> Matrix<T, 4, 4, Option> {
+  auto orthographicMat  = Matrix<T, 4, 4, Option>::Identity();
+  orthographicMat(0, 0) = static_cast<T>(2) / (right - left);
+  orthographicMat(1, 1) = static_cast<T>(2) / (top - bottom);
+  orthographicMat(2, 2) = static_cast<T>(2) / (zFar - zNear);  // depends on handness
+  if constexpr (Option == Options::RowMajor) {
+    orthographicMat(3, 0) = -(right + left) / (right - left);
+    orthographicMat(3, 1) = -(top + bottom) / (top - bottom);
+    orthographicMat(3, 2) = -(zFar + zNear) / (zFar - zNear);  // depends on ZO / NO
+  } else if (Option == Options::ColumnMajor) {
+    orthographicMat(0, 3) = -(right + left) / (right - left);
+    orthographicMat(1, 3) = -(top + bottom) / (top - bottom);
+    orthographicMat(2, 3) = -(zFar + zNear) / (zFar - zNear);  // depends on ZO / NO
+  }
+  return orthographicMat;
+}
+
+/**
+ * Generates a right-handed orthographic projection matrix with a depth range of
+ * zero to one.
+ * @note RH-ZO - Right-Handed, Zero to One depth range.
+ */
+template <typename T, Options Option = Options::RowMajor>
+auto g_orthoRhZo(T left, T right, T bottom, T top, T zNear, T zFar)
+    -> Matrix<T, 4, 4, Option> {
+  auto orthographicMat  = Matrix<T, 4, 4, Option>::Identity();
+  orthographicMat(0, 0) = static_cast<T>(2) / (right - left);
+  orthographicMat(1, 1) = static_cast<T>(2) / (top - bottom);
+  orthographicMat(2, 2) = -static_cast<T>(1) / (zFar - zNear);  // depends on handness
+  if constexpr (Option == Options::RowMajor) {
+    orthographicMat(3, 0) = -(right + left) / (right - left);
+    orthographicMat(3, 1) = -(top + bottom) / (top - bottom);
+    orthographicMat(3, 2) = -zNear / (zFar - zNear);  // depends on ZO / NO
+  } else if (Option == Options::ColumnMajor) {
+    orthographicMat(0, 3) = -(right + left) / (right - left);
+    orthographicMat(1, 3) = -(top + bottom) / (top - bottom);
+    orthographicMat(2, 3) = -zNear / (zFar - zNear);  // depends on ZO / NO
+  }
+  return orthographicMat;
+}
+
+/**
+ * Generates a right-handed orthographic projection matrix with a depth range of
+ * negative one to one.
+ * @note RH-NO - Right-Handed, Negative One to One depth range.
+ */
+template <typename T, Options Option = Options::RowMajor>
+auto g_orthoRhNo(T left, T right, T bottom, T top, T zNear, T zFar)
+    -> Matrix<T, 4, 4, Option> {
+  auto orthographicMat  = Matrix<T, 4, 4, Option>::Identity();
+  orthographicMat(0, 0) = static_cast<T>(2) / (right - left);
+  orthographicMat(1, 1) = static_cast<T>(2) / (top - bottom);
+  orthographicMat(2, 2) = -static_cast<T>(2) / (zFar - zNear);  // depends on handness
+  if constexpr (Option == Options::RowMajor) {
+    orthographicMat(3, 0) = -(right + left) / (right - left);
+    orthographicMat(3, 1) = -(top + bottom) / (top - bottom);
+    orthographicMat(3, 2) = -(zFar + zNear) / (zFar - zNear);  // depends on ZO / NO
+  } else if (Option == Options::ColumnMajor) {
+    orthographicMat(0, 3) = -(right + left) / (right - left);
+    orthographicMat(1, 3) = -(top + bottom) / (top - bottom);
+    orthographicMat(2, 3) = -(zFar + zNear) / (zFar - zNear);  // depends on ZO / NO
+  }
+  return orthographicMat;
+}
+
+// END: orthographic projection creation matrix
+// ----------------------------------------------------------------------------
+
 template <typename T, Options Option = Options::RowMajor>
 auto g_orthoLh(T left, T right, T bottom, T top, T nearPlane, T farPlane)
     -> Matrix<T, 4, 4> {
