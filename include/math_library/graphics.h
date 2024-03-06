@@ -9,6 +9,9 @@
 
 namespace math {
 
+// BEGIN: view matrix creation functions
+// ----------------------------------------------------------------------------
+
 template <typename T, Options Option = Options::RowMajor>
 auto g_lookAtRh(const Vector3D<T, Option>& eye,
                 const Vector3D<T, Option>& target,
@@ -37,6 +40,7 @@ auto g_lookAtRh(const Vector3D<T, Option>& eye,
     viewMatrix(1, 2) = up.z();
     viewMatrix(3, 1) = -up.dot(eye);
 
+    // forward - depends on handness
     viewMatrix(2, 0) = -forward.x();
     viewMatrix(2, 1) = -forward.y();
     viewMatrix(2, 2) = -forward.z();
@@ -52,6 +56,7 @@ auto g_lookAtRh(const Vector3D<T, Option>& eye,
     viewMatrix(2, 1) = up.z();
     viewMatrix(1, 3) = -up.dot(eye);
 
+    // forward - depends on handness
     viewMatrix(0, 2) = -forward.x();
     viewMatrix(1, 2) = -forward.y();
     viewMatrix(2, 2) = -forward.z();
@@ -90,6 +95,7 @@ auto g_lookAtLh(const Vector3D<T, Option>& eye,
     viewMatrix(1, 2) = up.z();
     viewMatrix(3, 1) = -up.dot(eye);
 
+    // forward - depends on handness
     viewMatrix(2, 0) = forward.x();
     viewMatrix(2, 1) = forward.y();
     viewMatrix(2, 2) = forward.z();
@@ -105,6 +111,7 @@ auto g_lookAtLh(const Vector3D<T, Option>& eye,
     viewMatrix(2, 1) = up.z();
     viewMatrix(1, 3) = -up.dot(eye);
 
+    // forward - depends on handness
     viewMatrix(0, 2) = forward.x();
     viewMatrix(1, 2) = forward.y();
     viewMatrix(2, 2) = forward.z();
@@ -142,6 +149,7 @@ auto g_lookToRh(const Vector3D<T, Option>& eye,
     viewMatrix(1, 2) = up.z();
     viewMatrix(3, 1) = -up.dot(eye);
 
+    // forward - depends on handness
     viewMatrix(2, 0) = -forward.x();
     viewMatrix(2, 1) = -forward.y();
     viewMatrix(2, 2) = -forward.z();
@@ -157,6 +165,7 @@ auto g_lookToRh(const Vector3D<T, Option>& eye,
     viewMatrix(2, 1) = up.z();
     viewMatrix(1, 3) = -up.dot(eye);
 
+    // forward - depends on handness
     viewMatrix(0, 2) = -forward.x();
     viewMatrix(1, 2) = -forward.y();
     viewMatrix(2, 2) = -forward.z();
@@ -194,6 +203,7 @@ auto g_lookToLh(const Vector3D<T, Option>& eye,
     viewMatrix(1, 2) = up.z();
     viewMatrix(3, 1) = -up.dot(eye);
 
+    // forward - depends on handness
     viewMatrix(2, 0) = forward.x();
     viewMatrix(2, 1) = forward.y();
     viewMatrix(2, 2) = forward.z();
@@ -209,6 +219,7 @@ auto g_lookToLh(const Vector3D<T, Option>& eye,
     viewMatrix(2, 1) = up.z();
     viewMatrix(1, 3) = -up.dot(eye);
 
+    // forward - depends on handness
     viewMatrix(0, 2) = forward.x();
     viewMatrix(1, 2) = forward.y();
     viewMatrix(2, 2) = forward.z();
@@ -217,6 +228,9 @@ auto g_lookToLh(const Vector3D<T, Option>& eye,
 
   return viewMatrix;
 }
+
+// END: view matrix creation functions
+// ----------------------------------------------------------------------------
 
 template <typename T, Options Option = Options::RowMajor>
 auto g_perspectiveFovRh(T fov, T aspectRatio, T nearPlane, T farPlane)
