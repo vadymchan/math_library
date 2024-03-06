@@ -393,105 +393,122 @@ auto g_perspectiveLhNo(T fovY, T width, T height, T zNear, T zFar)
 
 // END: perspective projection creation matrix
 // ----------------------------------------------------------------------------
-  result(1, 1) = static_cast<T>(1) / (tanHalfFovy);
-  result(2, 2) = farPlane / (nearPlane - farPlane);
 
-  if constexpr (Option == Options::RowMajor) {
-    result(2, 3) = -1;
-    result(3, 2) = -(farPlane * nearPlane) / (farPlane - nearPlane);
-  } else if constexpr (Option == Options::ColumnMajor) {
-    result(2, 3) = -(farPlane * nearPlane) / (farPlane - nearPlane);
-    result(3, 2) = -1;
-  }
+// BEGIN: frustrum (perspective projection matrix that off center) creation functions
+// ----------------------------------------------------------------------------
 
-  return result;
-}
-
+/**
+ * Generates a right-handed frustum projection matrix with a depth range of zero
+ * to one.
+ * @note RH-ZO - Right-Handed, Zero to One depth range.
+ */
 template <typename T, Options Option = Options::RowMajor>
-auto g_perspectiveFovLh(T fov, T aspectRatio, T nearPlane, T farPlane)
-    -> Matrix<T, 4, 4> {
-  assert(abs(aspectRatio - std::numeric_limits<T>::epsilon())
-         > static_cast<T>(0));
-
-  T tanHalfFovy = tan(fov / static_cast<T>(2));
-
-  Matrix<T, 4, 4> result(0);
-  result(0, 0) = static_cast<T>(1) / (aspectRatio * tanHalfFovy);
-  result(1, 1) = static_cast<T>(1) / (tanHalfFovy);
-  result(2, 2) = farPlane / (farPlane - nearPlane);
+auto g_frustumRhZo(T left, T right, T bottom, T top, T nearVal, T farVal)
+    -> Matrix<T, 4, 4, Option> {
+  Matrix<T, 4, 4, Option> frustrum(0);
+  frustrum(0, 0) = (static_cast<T>(2) * nearVal) / (right - left);
+  frustrum(1, 1) = (static_cast<T>(2) * nearVal) / (top - bottom);
+  frustrum(2, 2) = farVal / (nearVal - farVal);        // depends on NO / ZO
 
   if constexpr (Option == Options::RowMajor) {
-    result(2, 3) = 1;
-    result(3, 2) = -(farPlane * nearPlane) / (farPlane - nearPlane);
-  } else if constexpr (Option == Options::ColumnMajor) {
-    result(3, 2) = 1;
-    result(2, 3) = -(farPlane * nearPlane) / (farPlane - nearPlane);
+    frustrum(2, 0) = (right + left) / (right - left);  // depends on handness
+    frustrum(2, 1) = (top + bottom) / (top - bottom);  // depends on handness
+    frustrum(3, 2) = -(farVal * nearVal) / (farVal - nearVal); // depends on NO / ZO
+    frustrum(2, 3) = -static_cast<T>(1);               // depends on handness
+  } else if (Option == Options::ColumnMajor) {
+    frustrum(0, 2) = (right + left) / (right - left);  // depends on handness
+    frustrum(1, 2) = (top + bottom) / (top - bottom);  // depends on handness
+    frustrum(2, 3) = -(farVal * nearVal) / (farVal - nearVal); // depends on NO / ZO
+    frustrum(3, 2) = -static_cast<T>(1);               // depends on handness
   }
-
-  return result;
+  return frustrum;
 }
 
+/**
+ * Generates a right-handed frustum projection matrix with a depth range of
+ * negative one to one.
+ * @note RH-NO - Right-Handed, Negative One to One depth range.
+ */
 template <typename T, Options Option = Options::RowMajor>
-auto g_perspectiveOffCenter(
-    T left, T right, T bottom, T top, T nearPlane, T farPlane)
-    -> Matrix<T, 4, 4> {
-  assert(abs(right - left) > std::numeric_limits<T>::epsilon()
-         && "Right and left values cannot be equal");
-  assert(abs(top - bottom) > std::numeric_limits<T>::epsilon()
-         && "Top and bottom values cannot be equal");
-  assert(abs(farPlane - nearPlane) > std::numeric_limits<T>::epsilon()
-         && "Far and near plane values cannot be equal");
-
-  Matrix<T, 4, 4> result(0);
-  result(0, 0) = (static_cast<T>(2) * nearPlane) / (right - left);
-  result(1, 1) = (static_cast<T>(2) * nearPlane) / (top - bottom);
-  result(2, 2) = -(farPlane + nearPlane) / (farPlane - nearPlane);
+auto g_frustumRhNo(T left, T right, T bottom, T top, T nearVal, T farVal)
+    -> Matrix<T, 4, 4, Option> {
+  Matrix<T, 4, 4, Option> frustrum(0);
+  frustrum(0, 0) = (static_cast<T>(2) * nearVal) / (right - left);
+  frustrum(1, 1) = (static_cast<T>(2) * nearVal) / (top - bottom);
+  frustrum(2, 2)
+      = -(farVal + nearVal) / (farVal - nearVal);    // depends on NO / ZO
 
   if constexpr (Option == Options::RowMajor) {
-    result(2, 0) = (right + left) / (right - left);
-    result(2, 1) = (top + bottom) / (top - bottom);
-    result(2, 3) = -1;
-    result(3, 2)
-        = -(static_cast<T>(2) * farPlane * nearPlane) / (farPlane - nearPlane);
-  } else if constexpr (Option == Options::ColumnMajor) {
-    result(0, 2) = (right + left) / (right - left);
-    result(1, 2) = (top + bottom) / (top - bottom);
-    result(3, 2) = -1;
-    result(2, 3)
-        = -(static_cast<T>(2) * farPlane * nearPlane) / (farPlane - nearPlane);
+    frustrum(2, 0) = (right + left) / (right - left);  // depends on handness
+    frustrum(2, 1) = (top + bottom) / (top - bottom);  // depends on handness
+    frustrum(3, 2) = -(static_cast<T>(2) * farVal * nearVal) / (farVal - nearVal); // depends on NO / ZO
+    frustrum(2, 3) = -static_cast<T>(1);               // depends on handness
+  } else if (Option == Options::ColumnMajor) {
+    frustrum(0, 2) = (right + left) / (right - left);  // depends on handness
+    frustrum(1, 2) = (top + bottom) / (top - bottom);  // depends on handness
+    frustrum(2, 3) = -(static_cast<T>(2) * farVal * nearVal) / (farVal - nearVal); // depends on NO / ZO
+    frustrum(3, 2) = -static_cast<T>(1);               // depends on handness
   }
-
-  return result;
+  return frustrum;
 }
 
+/**
+ * Generates a left-handed frustum projection matrix with a depth range of zero
+ * to one.
+ * @note LH-ZO - Left-Handed, Zero to One depth range.
+ */
 template <typename T, Options Option = Options::RowMajor>
-auto g_orthoRh(T left, T right, T bottom, T top, T nearPlane, T farPlane)
-    -> Matrix<T, 4, 4> {
-  assert(abs(right - left) > std::numeric_limits<T>::epsilon()
-         && "Right and left values cannot be equal");
-  assert(abs(top - bottom) > std::numeric_limits<T>::epsilon()
-         && "Top and bottom values cannot be equal");
-  assert(abs(farPlane - nearPlane) > std::numeric_limits<T>::epsilon()
-         && "Far and near plane values cannot be equal");
-
-  Matrix<T, 4, 4> result = Matrix<T, 4, 4>::Identity();
-  result(0, 0)           = static_cast<T>(2) / (right - left);
-  result(1, 1)           = static_cast<T>(2) / (top - bottom);
-  result(2, 2)           = -static_cast<T>(2) / (farPlane - nearPlane);
+auto g_frustumLhZo(T left, T right, T bottom, T top, T nearVal, T farVal)
+    -> Matrix<T, 4, 4, Option> {
+  Matrix<T, 4, 4, Option> frustrum(0);
+  frustrum(0, 0) = (static_cast<T>(2) * nearVal) / (right - left);
+  frustrum(1, 1) = (static_cast<T>(2) * nearVal) / (top - bottom);
+  frustrum(2, 2) = farVal / (farVal - nearVal);         // depends on NO / ZO
 
   if constexpr (Option == Options::RowMajor) {
-    result(0, 3) = -(right + left) / (right - left);
-    result(1, 3) = -(top + bottom) / (top - bottom);
-    result(2, 3) = -(farPlane + nearPlane) / (farPlane - nearPlane);
-  } else if constexpr (Option == Options::ColumnMajor) {
-    result(3, 0) = -(right + left) / (right - left);
-    result(3, 1) = -(top + bottom) / (top - bottom);
-    result(3, 2) = -(farPlane + nearPlane) / (farPlane - nearPlane);
+    frustrum(2, 0) = -(right + left) / (right - left);  // depends on handness
+    frustrum(2, 1) = -(top + bottom) / (top - bottom);  // depends on handness
+    frustrum(3, 2) = -(farVal * nearVal) / (farVal - nearVal); // depends on NO / ZO
+    frustrum(2, 3) = static_cast<T>(1);                 // depends on handness
+  } else if (Option == Options::ColumnMajor) {
+    frustrum(0, 2) = -(right + left) / (right - left);  // depends on handness
+    frustrum(1, 2) = -(top + bottom) / (top - bottom);  // depends on handness
+    frustrum(2, 3) = -(farVal * nearVal) / (farVal - nearVal); // depends on NO / ZO
+    frustrum(3, 2) = static_cast<T>(1);                 // depends on handness
   }
-
-  return result;
+  return frustrum;
 }
 
+/**
+ * Generates a left-handed frustum projection matrix with a depth range of
+ * negative one to one.
+ * @note LH-NO - Left-Handed, Negative One to One depth range.
+ */
+template <typename T, Options Option = Options::RowMajor>
+auto g_frustumLhNo(T left, T right, T bottom, T top, T nearVal, T farVal)
+    -> Matrix<T, 4, 4, Option> {
+  Matrix<T, 4, 4, Option> frustrum(0);
+  frustrum(0, 0) = (static_cast<T>(2) * nearVal) / (right - left);
+  frustrum(1, 1) = (static_cast<T>(2) * nearVal) / (top - bottom);
+  frustrum(2, 2) = (farVal + nearVal) / (farVal - nearVal);  // depends on NO / ZO
+
+  if constexpr (Option == Options::RowMajor) {
+    frustrum(2, 0) = -(right + left) / (right - left);  // depends on handness
+    frustrum(2, 1) = -(top + bottom) / (top - bottom);  // depends on handness
+    frustrum(3, 2) = -(static_cast<T>(2) * farVal * nearVal) / (farVal - nearVal); // depends on NO / ZO
+    frustrum(2, 3) = static_cast<T>(1);                 // depends on handness
+  } else if (Option == Options::ColumnMajor) {
+    frustrum(0, 2) = -(right + left) / (right - left);  // depends on handness
+    frustrum(1, 2) = -(top + bottom) / (top - bottom);  // depends on handness
+    frustrum(2, 3) = -(static_cast<T>(2) * farVal * nearVal) / (farVal - nearVal); // depends on NO / ZO
+    frustrum(3, 2) = static_cast<T>(1);                 // depends on handness
+  }
+
+  return frustrum;
+}
+
+// END: frustrum (perspective projection matrix that off center) creation functions
+// ----------------------------------------------------------------------------
 template <typename T, Options Option = Options::RowMajor>
 auto g_orthoLh(T left, T right, T bottom, T top, T nearPlane, T farPlane)
     -> Matrix<T, 4, 4> {
