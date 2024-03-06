@@ -9,6 +9,11 @@
 
 namespace math {
 
+namespace internal {
+template <typename T, unsigned int Size, Options Option>
+class VectorUtility;
+}  // namespace internal
+
 template <typename T, unsigned int Size, Options Option = Options::RowMajor>
 class Vector {
   public:
@@ -396,14 +401,15 @@ class Vector {
 
 #endif  // FEATURE_VECTOR_INITIALIZER
 
-  template <typename T1,
-            unsigned int Rows,
-            unsigned int Columns,
-            Options      Option1,
-            unsigned int Size1>
-  friend auto operator*(const Matrix<T1, Rows, Columns, Option1>& matrix,
-                        const Vector<T1, Size1, Option1>&         vector)
-      -> Vector<T1, Rows, Option1>;
+  // this is not working );
+  //template <typename T1,
+  //          unsigned int Rows1,
+  //          unsigned int Columns1,
+  //          Options      Option1,
+  //          unsigned int Size1>
+  //friend auto operator*(const Matrix<T1, Rows1, Columns1, Option1>& matrix,
+  //                      const Vector<T1, Size1, Option1>&           vector)
+  //    -> Vector<T1, Rows1, Option1>;
 
   private:
   using UnderlyingType = std::conditional_t<Option == Options::RowMajor,
@@ -411,7 +417,19 @@ class Vector {
                                             Matrix<T, Size, 1, Option>>;
 
   UnderlyingType m_dataStorage_;
+
+  friend class internal::VectorUtility<T, Size, Option>;
 };
+
+namespace internal {
+template <typename T, unsigned int Size, Options Option>
+class VectorUtility {
+  public:
+  static auto& getDataStorage(const Vector<T, Size, Option>& vector) {
+    return vector.m_dataStorage_;
+  }
+};
+}  // namespace internal
 
 /**
  * @brief Multiplies a matrix by a vector in a column-major context (matrix *
@@ -431,10 +449,12 @@ template <typename T,
           Options      Option,
           unsigned int Size>
   requires ValueEqualTo<Columns, Size> && (Option == Options::ColumnMajor)
-inline auto operator*(const Matrix<T, Rows, Columns, Option>& matrix,
-                      const Vector<T, Size, Option>&          vector)
+auto operator*(const Matrix<T, Rows, Columns, Option>& matrix,
+               const Vector<T, Size, Option>&          vector)
     -> Vector<T, Rows, Option> {
-  return Vector<T, Rows, Option>(matrix * vector.m_dataStorage_);
+  return Vector<T, Rows, Option>(
+      matrix
+      * internal::VectorUtility<T, Size, Option>::getDataStorage(vector));
 }
 
 /**
