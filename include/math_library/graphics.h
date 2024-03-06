@@ -351,16 +351,48 @@ auto g_perspectiveRhZo(T fovY, T width, T height, T zNear, T zFar)
   auto perspectiveMatrix = g_perspectiveRhZo(fovY, aspectRatio, zNear, zFar);
   return perspectiveMatrix;
 }
+
+/**
+ * Generates a right-handed perspective projection matrix based on field of
+ * view, width, and height with a depth range of negative one to one.
+ * @note RH-NO - Right-Handed, Negative One to One depth range.
+ */
 template <typename T, Options Option = Options::RowMajor>
-auto g_perspectiveFovRh(T fov, T aspectRatio, T nearPlane, T farPlane)
-    -> Matrix<T, 4, 4> {
-  assert(abs(aspectRatio - std::numeric_limits<T>::epsilon())
-         > static_cast<T>(0));
+auto g_perspectiveRhNo(T fovY, T width, T height, T zNear, T zFar)
+    -> Matrix<T, 4, 4, Option> {
+  auto aspectRatio       = width / height;
+  auto perspectiveMatrix = g_perspectiveRhNo(fovY, aspectRatio, zNear, zFar);
+  return perspectiveMatrix;
+}
 
-  T tanHalfFovy = tan(fov / static_cast<T>(2));
+/**
+ * Generates a left-handed perspective projection matrix based on field of view,
+ * width, and height with a depth range of zero to one.
+ * @note LH-ZO - Left-Handed, Zero to One depth range.
+ */
+template <typename T, Options Option = Options::RowMajor>
+auto g_perspectiveLhZo(T fovY, T width, T height, T zNear, T zFar)
+    -> Matrix<T, 4, 4, Option> {
+  auto aspectRatio       = width / height;
+  auto perspectiveMatrix = g_perspectiveLhZo(fovY, aspectRatio, zNear, zFar);
+  return perspectiveMatrix;
+}
 
-  Matrix<T, 4, 4> result(0);
-  result(0, 0) = static_cast<T>(1) / (aspectRatio * tanHalfFovy);
+/**
+ * Generates a left-handed perspective projection matrix based on field of view,
+ * width, and height with a depth range of negative one to one.
+ * @note LH-NO - Left-Handed, Negative One to One depth range.
+ */
+template <typename T, Options Option = Options::RowMajor>
+auto g_perspectiveLhNo(T fovY, T width, T height, T zNear, T zFar)
+    -> Matrix<T, 4, 4, Option> {
+  auto aspectRatio       = width / height;
+  auto perspectiveMatrix = g_perspectiveLhNo(fovY, aspectRatio, zNear, zFar);
+  return perspectiveMatrix;
+}
+
+// END: perspective projection creation matrix
+// ----------------------------------------------------------------------------
   result(1, 1) = static_cast<T>(1) / (tanHalfFovy);
   result(2, 2) = farPlane / (nearPlane - farPlane);
 
