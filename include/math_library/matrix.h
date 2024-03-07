@@ -254,13 +254,9 @@ class Matrix {
       const Vector<T, (Option == Options::RowMajor ? Columns : Rows), Option>&
           vector) {
     if constexpr (Option == Options::RowMajor) {
-      for (unsigned int col = 0; col < Columns; ++col) {
-        this->operator()(Index, col) = vector(col);
-      }
-    } else {
-      for (unsigned int row = 0; row < Rows; ++row) {
-        this->operator()(row, Index) = vector(row);
-      }
+      setRow<Index>(vector);
+    } else if (Option == Options::ColumnMajor) {
+      setColumn<Index>(vector);
     }
   }
 
