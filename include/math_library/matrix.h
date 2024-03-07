@@ -744,24 +744,60 @@ class Matrix {
    */
   class MatrixInitializer {
     Matrix&      m_matrix_;
-    unsigned int m_index_;
+    unsigned int m_row_;
+    unsigned int m_col_;
 
     public:
-    MatrixInitializer(Matrix& matrix, unsigned int index)
+    MatrixInitializer(Matrix& matrix)
         : m_matrix_(matrix)
-        , m_index_(index) {}
+        , m_row_(0)
+        , m_col_(0) {}
 
     auto operator,(const T& value) -> MatrixInitializer& {
-      auto data        = m_matrix_.data();
-      data[m_index_++] = value;
+      m_matrix_.operator()(m_row_, m_col_) = value;
+
+      ++m_col_;
+      if (m_col_ == Columns) {
+        m_col_ = 0;
+        ++m_row_;
+      }
 
       return *this;
     }
   };
 
+  /**
+   * @brief overload operator << for initializing Matrix elements in an
+   * intuitive manner using the comma operator.
+   *
+   * Usage example for a row-major matrix:
+   * @code
+   * math::MatrixNf<2, 3, math::Options::RowMajor> m1;
+   * m1 << 1, 2, 3,
+   *       4, 5, 6;
+   * // Output : 1, 2, 3,
+   *             4, 5, 6
+   * @endcode
+   *
+   * Usage example for a column-major matrix:
+   * @code
+   * math::MatrixNf<3, 2, math::Options::ColumnMajor> m2;
+   * m2 << 1, 4,
+   *       2, 5,
+   *       3, 6;
+   * // Output : 1, 2,
+   *             3, 4,
+   *             5, 6,
+   * @endcode
+   *
+   * @note Initialization through the << operator does not assign elements based
+   * on how they will be stored in memory, as Matrix(Args...) does.
+   */
   auto operator<<(const T& value) -> MatrixInitializer {
-    this->operator()(0, 0) = value;
-    return MatrixInitializer(*this, 1);
+    // Resetting the matrix initializer with every new << operation
+    MatrixInitializer initializer(*this);
+    initializer, value;  // Start the chain of insertions
+    return initializer;
   }
 };
 
