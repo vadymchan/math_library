@@ -699,6 +699,86 @@ auto g_orthoRhNo(T left, T right, T bottom, T top, T zNear, T zFar)
   return orthographicMat;
 }
 
+// TODO: remove code duplication from the functions below
+
+/**
+ * Generates a left-handed orthographic projection matrix based on the given width and height,
+ * with a depth range of zero to one. This simplifies setting up the projection by directly
+ * specifying the viewport dimensions and the near and far clipping planes.
+ * @note LH-ZO - Left-Handed, Zero to One depth range.
+ */
+template <typename T, Options Option = Options::RowMajor>
+auto g_orthoLhZo(T width, T height, T zNear, T zFar) -> Matrix<T, 4, 4, Option> {
+    T halfWidth = width / static_cast<T>(2);
+    T halfHeight = height / static_cast<T>(2);
+
+    T left = -halfWidth;
+    T right = halfWidth;
+    T bottom = -halfHeight;
+    T top = halfHeight;
+
+    return g_orthoLhZo<T, Option>(left, right, bottom, top, zNear, zFar);
+}
+
+/**
+ * Generates a left-handed orthographic projection matrix based on the given width and height,
+ * with a depth range of negative one to one. This simplifies setting up the projection by
+ * directly specifying the viewport dimensions and the near and far clipping planes.
+ * @note LH-NO - Left-Handed, Negative One to One depth range.
+ */
+template <typename T, Options Option = Options::RowMajor>
+auto g_orthoLhNo(T width, T height, T zNear, T zFar) -> Matrix<T, 4, 4, Option> {
+    T halfWidth = width / static_cast<T>(2);
+    T halfHeight = height / static_cast<T>(2);
+
+    T left = -halfWidth;
+    T right = halfWidth;
+    T bottom = -halfHeight;
+    T top = halfHeight;
+
+    return g_orthoLhNo<T, Option>(left, right, bottom, top, zNear, zFar);
+}
+
+/**
+ * Generates a right-handed orthographic projection matrix based on the given width and height,
+ * with a depth range of zero to one. This simplifies setting up the projection by directly
+ * specifying the viewport dimensions and the near and far clipping planes.
+ * @note RH-ZO - Right-Handed, Zero to One depth range.
+ */
+template <typename T, Options Option = Options::RowMajor>
+auto g_orthoRhZo(T width, T height, T zNear, T zFar) -> Matrix<T, 4, 4, Option> {
+    T halfWidth = width / static_cast<T>(2);
+    T halfHeight = height / static_cast<T>(2);
+
+    T left = -halfWidth;
+    T right = halfWidth;
+    T bottom = -halfHeight;
+    T top = halfHeight;
+
+    return g_orthoRhZo<T, Option>(left, right, bottom, top, zNear, zFar);
+}
+
+/**
+ * Generates a right-handed orthographic projection matrix based on the given width and height,
+ * with a depth range of negative one to one. This simplifies setting up the projection by
+ * directly specifying the viewport dimensions and the near and far clipping planes.
+ * @note RH-NO - Right-Handed, Negative One to One depth range.
+ */
+template <typename T, Options Option = Options::RowMajor>
+auto g_orthoRhNo(T width, T height, T zNear, T zFar) -> Matrix<T, 4, 4, Option> {
+    T halfWidth = width / static_cast<T>(2);
+    T halfHeight = height / static_cast<T>(2);
+
+    T left = -halfWidth;
+    T right = halfWidth;
+    T bottom = -halfHeight;
+    T top = halfHeight;
+
+    return g_orthoRhNo<T, Option>(left, right, bottom, top, zNear, zFar);
+}
+
+
+
 // END: orthographic projection creation matrix
 // ----------------------------------------------------------------------------
 
