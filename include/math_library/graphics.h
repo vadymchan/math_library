@@ -9,6 +9,94 @@
 
 namespace math {
 
+// clang-format off
+
+// BEGIN: rotation matrix creation functions
+// ----------------------------------------------------------------------------
+
+template <typename T, Options Option = Options::RowMajor>
+auto g_rotateRhX(T angle) -> Matrix<T, 4, 4, Option> {
+  const T cosAngle = std::cos(angle);
+  const T sinAngle = std::sin(angle);
+
+  Matrix<T, 4, 4, Option> rotateMat;
+
+  if constexpr (Option == Options::RowMajor) {
+    rotateMat << 1,   0,          0,          0,
+                 0,   cosAngle,   sinAngle,   0,
+                 0,  -sinAngle,   cosAngle,   0,
+                 0,   0,          0,          1;
+  } else {
+    rotateMat << 1,   0,          0,          0,
+                 0,   cosAngle,  -sinAngle,   0,
+                 0,   sinAngle,   cosAngle,   0,
+                 0,   0,          0,          1;
+  }
+  return rotateMat;
+}
+
+template <typename T, Options Option = Options::RowMajor>
+auto g_rotateRhY(T angle) -> Matrix<T, 4, 4, Option> {
+  const T cosAngle = std::cos(angle);
+  const T sinAngle = std::sin(angle);
+
+  Matrix<T, 4, 4, Option> rotateMat;
+
+  if constexpr (Option == Options::RowMajor) {
+    rotateMat <<  cosAngle,   0,  -sinAngle,   0,
+                  0,          1,   0,          0,
+                  sinAngle,   0,   cosAngle,   0,
+                  0,          0,   0,          1;
+  } else {
+    rotateMat <<  cosAngle,   0,   sinAngle,   0,
+                  0,          1,   0,          0,
+                 -sinAngle,   0,   cosAngle,   0,
+                  0,          0,   0,          1;
+  }
+  return rotateMat;
+}
+
+template <typename T, Options Option = Options::RowMajor>
+auto g_rotateRhZ(T angle) -> Matrix<T, 4, 4, Option> {
+  const T cosAngle = std::cos(angle);
+  const T sinAngle = std::sin(angle);
+
+  Matrix<T, 4, 4, Option> rotateMat;
+
+  if constexpr (Option == Options::RowMajor) {
+    rotateMat <<  cosAngle,     sinAngle,  0,  0,
+                 -sinAngle,     cosAngle,  0,  0,
+                  0,            0,         1,  0,
+                  0,            0,         0,  1;
+  } else {
+    rotateMat <<  cosAngle,    -sinAngle,  0,  0,
+                  sinAngle,     cosAngle,  0,  0,
+                  0,            0,         1,  0,
+                  0,            0,         0,  1;
+  }
+  return rotateMat;
+}
+
+template <typename T, Options Option = Options::RowMajor>
+auto g_rotateLhX(T angle) -> Matrix<T, 4, 4, Option> {
+  return g_rotateRhX<T, Option>(-angle);
+}
+
+template <typename T, Options Option = Options::RowMajor>
+auto g_rotateLhY(T angle) -> Matrix<T, 4, 4, Option> {
+  return g_rotateRhY<T, Option>(-angle);
+}
+
+template <typename T, Options Option = Options::RowMajor>
+auto g_rotateLhZ(T angle) -> Matrix<T, 4, 4, Option> {
+  return g_rotateRhZ<T, Option>(-angle);
+}
+
+// END: rotation matrix creation functions
+// ----------------------------------------------------------------------------
+
+// clang-format on
+
 // BEGIN: view matrix creation functions
 // ----------------------------------------------------------------------------
 
