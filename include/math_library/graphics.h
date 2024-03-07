@@ -209,7 +209,7 @@ auto g_lookAtLh(const Vector3D<T, Option>& eye,
   return viewMatrix;
 }
 
-template <typename T, Options Option>
+template <typename T, Options Option = Options::RowMajor>
 auto g_lookToRh(const Vector3D<T, Option>& eye,
                 const Vector3D<T, Option>& direction,
                 const Vector3D<T, Option>& worldUp) -> Matrix<T, 4, 4, Option> {
@@ -393,10 +393,10 @@ auto g_perspectiveLhZo(T fovY, T aspect, T zNear, T zFar)
   perspeciveMatrix(1, 1) = static_cast<T>(1) / (tanHalfFovY);
   perspeciveMatrix(2, 2) = zFar / (zFar - zNear);  // not the same (depends on handness + NO / LO)
   if constexpr (Option == Options::RowMajor) {
-    perspeciveMatrix(3, 2) = (zFar * zNear) / (zFar - zNear); // depends on NO / LO
+    perspeciveMatrix(3, 2) = -(zFar * zNear) / (zFar - zNear); // depends on NO / LO
     perspeciveMatrix(2, 3) = static_cast<T>(1);               // depends on handness (z, not -z)
   } else if (Option == Options::ColumnMajor) {
-    perspeciveMatrix(2, 3) = (zFar * zNear) / (zFar - zNear); // depends on NO / LO
+    perspeciveMatrix(2, 3) = -(zFar * zNear) / (zFar - zNear); // depends on NO / LO
     perspeciveMatrix(3, 2) = static_cast<T>(1);               // depends on handness (z, not -z)
   }
   return perspeciveMatrix;
@@ -614,7 +614,7 @@ auto g_orthoLhZo(T left, T right, T bottom, T top, T zNear, T zFar)
   auto orthographicMat  = Matrix<T, 4, 4, Option>::Identity();
   orthographicMat(0, 0) = static_cast<T>(2) / (right - left);
   orthographicMat(1, 1) = static_cast<T>(2) / (top - bottom);
-  orthographicMat(2, 2) = static_cast<T>(1) / (zFar - zNear);  // depends on handness
+  orthographicMat(2, 2) = static_cast<T>(1) / (zFar - zNear);  // depends on handness + ZO / NO
   if constexpr (Option == Options::RowMajor) {
     orthographicMat(3, 0) = -(right + left) / (right - left);
     orthographicMat(3, 1) = -(top + bottom) / (top - bottom);
@@ -638,7 +638,7 @@ auto g_orthoLhNo(T left, T right, T bottom, T top, T zNear, T zFar)
   auto orthographicMat  = Matrix<T, 4, 4, Option>::Identity();
   orthographicMat(0, 0) = static_cast<T>(2) / (right - left);
   orthographicMat(1, 1) = static_cast<T>(2) / (top - bottom);
-  orthographicMat(2, 2) = static_cast<T>(2) / (zFar - zNear);  // depends on handness
+  orthographicMat(2, 2) = static_cast<T>(2) / (zFar - zNear);  // depends on handness + ZO / NO
   if constexpr (Option == Options::RowMajor) {
     orthographicMat(3, 0) = -(right + left) / (right - left);
     orthographicMat(3, 1) = -(top + bottom) / (top - bottom);
@@ -662,7 +662,7 @@ auto g_orthoRhZo(T left, T right, T bottom, T top, T zNear, T zFar)
   auto orthographicMat  = Matrix<T, 4, 4, Option>::Identity();
   orthographicMat(0, 0) = static_cast<T>(2) / (right - left);
   orthographicMat(1, 1) = static_cast<T>(2) / (top - bottom);
-  orthographicMat(2, 2) = -static_cast<T>(1) / (zFar - zNear);  // depends on handness
+  orthographicMat(2, 2) = -static_cast<T>(1) / (zFar - zNear);  // depends on handness + ZO / NO
   if constexpr (Option == Options::RowMajor) {
     orthographicMat(3, 0) = -(right + left) / (right - left);
     orthographicMat(3, 1) = -(top + bottom) / (top - bottom);
@@ -686,7 +686,7 @@ auto g_orthoRhNo(T left, T right, T bottom, T top, T zNear, T zFar)
   auto orthographicMat  = Matrix<T, 4, 4, Option>::Identity();
   orthographicMat(0, 0) = static_cast<T>(2) / (right - left);
   orthographicMat(1, 1) = static_cast<T>(2) / (top - bottom);
-  orthographicMat(2, 2) = -static_cast<T>(2) / (zFar - zNear);  // depends on handness
+  orthographicMat(2, 2) = -static_cast<T>(2) / (zFar - zNear);  // depends on handness + ZO / NO
   if constexpr (Option == Options::RowMajor) {
     orthographicMat(3, 0) = -(right + left) / (right - left);
     orthographicMat(3, 1) = -(top + bottom) / (top - bottom);
