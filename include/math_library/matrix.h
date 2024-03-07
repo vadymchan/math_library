@@ -363,10 +363,10 @@ class Matrix {
     // Perform Gauss-Jordan elimination
     for (unsigned int i = 0; i < Rows; ++i) {
       // Search for maximum in this column
-      T            maxEl  = math::abs(augmentedMatrix(i, i));
+      T            maxEl  = math::g_abs(augmentedMatrix(i, i));
       unsigned int maxRow = i;
       for (unsigned int k = i + 1; k < Rows; ++k) {
-        if (math::abs(augmentedMatrix(k, i)) > maxEl) {
+        if (math::g_abs(augmentedMatrix(k, i)) > maxEl) {
           maxEl  = augmentedMatrix(k, i);
           maxRow = k;
         }
@@ -440,11 +440,11 @@ class Matrix {
     int rank = 0;
     for (int row = 0; row < Rows; ++row) {
       // Find the maximum element in this column
-      auto maxEl  = math::abs(copy(row, rank));
+      auto maxEl  = math::g_abs(copy(row, rank));
       int  maxRow = row;
       for (int i = row + 1; i < Rows; ++i) {
-        if (math::abs(copy(i, rank)) > maxEl) {
-          maxEl  = math::abs(copy(i, rank));
+        if (math::g_abs(copy(i, rank)) > maxEl) {
+          maxEl  = math::g_abs(copy(i, rank));
           maxRow = i;
         }
       }
