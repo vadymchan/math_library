@@ -1442,10 +1442,115 @@ TEST(MatrixTest, CrossProductFloatRandom) {
   }
 }
 
+// Method: get row
+TEST(MatrixTest, GetRow) {
+  math::MatrixNf<3, 3> matrix;
+  // Initialize matrix for the test
+  matrix << 1.0f, 2.0f, 3.0f, 4.0f, 5.0f, 6.0f, 7.0f, 8.0f, 9.0f;
+
+  auto rowVector = matrix.getRow<1>();  // Get the second row
+
+  // Verify that the second row is correctly retrieved
+  EXPECT_FLOAT_EQ(rowVector(0), 4.0f);
+  EXPECT_FLOAT_EQ(rowVector(1), 5.0f);
+  EXPECT_FLOAT_EQ(rowVector(2), 6.0f);
+}
+
+// Method: get row from column-major matrix
+TEST(MatrixTest, GetRowColumnMajor) {
+  math::MatrixNf<3, 3, math::Options::ColumnMajor> matrix;
+  matrix << 1.0f, 4.0f, 7.0f, 2.0f, 5.0f, 8.0f, 3.0f, 6.0f, 9.0f;
+
+  auto rowVector = matrix.getRow<1>();  // Get the second row
+
+  // Verify that the second row is correctly retrieved
+  EXPECT_FLOAT_EQ(rowVector(0), 4.0f);
+  EXPECT_FLOAT_EQ(rowVector(1), 5.0f);
+  EXPECT_FLOAT_EQ(rowVector(2), 6.0f);
+}
+
+// Method: get column
+TEST(MatrixTest, GetColumn) {
+  math::MatrixNf<3, 3, math::Options::ColumnMajor> matrix;
+  matrix << 1.0f, 4.0f, 7.0f, 2.0f, 5.0f, 8.0f, 3.0f, 6.0f, 9.0f;
+
+  auto columnVector = matrix.getColumn<1>();  // Get the second column
+
+  // Verify that the second column is correctly retrieved
+  EXPECT_FLOAT_EQ(columnVector(0), 2.0f);
+  EXPECT_FLOAT_EQ(columnVector(1), 5.0f);
+  EXPECT_FLOAT_EQ(columnVector(2), 8.0f);
+}
+
+// Method: get column from row-major matrix
+TEST(MatrixTest, GetColumnRowMajor) {
+  math::MatrixNf<3, 3> matrix;
+  matrix << 1.0f, 2.0f, 3.0f, 4.0f, 5.0f, 6.0f, 7.0f, 8.0f, 9.0f;
+
+  auto columnVector = matrix.getColumn<1>();  // Get the second column
+
+  // Verify that the second column is correctly retrieved
+  EXPECT_FLOAT_EQ(columnVector(0), 2.0f);
+  EXPECT_FLOAT_EQ(columnVector(1), 5.0f);
+  EXPECT_FLOAT_EQ(columnVector(2), 8.0f);
+}
+
+// Method: set row
+TEST(MatrixTest, SetRow) {
+  math::MatrixNf<3, 3>                            matrix;
+  math::Vector<float, 3, math::Options::RowMajor> rowVector(1.0f, 2.0f, 3.0f);
+  matrix.setRow<1>(rowVector);  // Set the second row
+
+  // Verify that the second row is correctly set
+  for (unsigned int col = 0; col < 3; ++col) {
+    EXPECT_FLOAT_EQ(matrix(1, col), rowVector(col));
+  }
+}
+
+// Method: set row in column-major matrix
+TEST(MatrixTest, SetRowColumnMajor) {
+  math::MatrixNf<3, 3, math::Options::ColumnMajor>   matrix;
+  math::Vector<float, 3, math::Options::ColumnMajor> rowVector(
+      1.0f, 2.0f, 3.0f);
+  matrix.setRow<1>(rowVector);  // Set the second row
+
+  // Verify that the second row is correctly set
+  for (unsigned int col = 0; col < 3; ++col) {
+    EXPECT_FLOAT_EQ(matrix(1, col), rowVector(col));
+  }
+}
+
+
+// Method: set column
+TEST(MatrixTest, SetColumn) {
+  math::MatrixNf<3, 3, math::Options::ColumnMajor>   matrix;
+  math::Vector<float, 3, math::Options::ColumnMajor> columnVector(
+      4.0f, 5.0f, 6.0f);
+  matrix.setColumn<2>(columnVector);  // Set the third column
+
+  // Verify that the third column is correctly set
+  for (unsigned int row = 0; row < 3; ++row) {
+    EXPECT_FLOAT_EQ(matrix(row, 2), columnVector(row));
+  }
+}
+
+// Method: set column in row-major matrix
+TEST(MatrixTest, SetColumnRowMajor) {
+  math::MatrixNf<3, 3, math::Options::RowMajor>   matrix;
+  math::Vector<float, 3, math::Options::RowMajor> columnVector(
+      4.0f, 5.0f, 6.0f);
+  matrix.setColumn<2>(columnVector);  // Set the third column
+
+  // Verify that the third column is correctly set
+  for (unsigned int row = 0; row < 3; ++row) {
+    EXPECT_FLOAT_EQ(matrix(row, 2), columnVector(row));
+  }
+}
+
 // Method: set basis X
 
 TEST(MatrixTest, SetBasisX) {
-  math::MatrixNf<3, 3>                      matrix;
+  math::MatrixNf<3, 3>                            matrix;
   math::Vector<float, 3, math::Options::RowMajor> xBasis(1.0f, 0.0f, 0.0f);
   matrix.setBasisX(xBasis);
 
@@ -1458,7 +1563,7 @@ TEST(MatrixTest, SetBasisX) {
 // Method: set basis Y
 
 TEST(MatrixTest, SetBasisY) {
-  math::MatrixNf<3, 3>                      matrix;
+  math::MatrixNf<3, 3>                            matrix;
   math::Vector<float, 3, math::Options::RowMajor> yBasis(0.0f, 1.0f, 0.0f);
   matrix.setBasisY(yBasis);
 
@@ -1471,7 +1576,7 @@ TEST(MatrixTest, SetBasisY) {
 // Method: set basis Z
 
 TEST(MatrixTest, SetBasisZ) {
-  math::MatrixNf<3, 3>                      matrix;
+  math::MatrixNf<3, 3>                            matrix;
   math::Vector<float, 3, math::Options::RowMajor> zBasis(0.0f, 0.0f, 1.0f);
   matrix.setBasisZ(zBasis);
 
@@ -1484,7 +1589,7 @@ TEST(MatrixTest, SetBasisZ) {
 // Method: set basis general
 
 TEST(MatrixTest, GeneralizedSetBasis) {
-  math::MatrixNf<3, 3>                      matrix;
+  math::MatrixNf<3, 3>                            matrix;
   math::Vector<float, 3, math::Options::RowMajor> basisVector(1.0f, 2.0f, 3.0f);
 
   // Test setting each basis individually
@@ -4717,7 +4822,8 @@ TEST(ViewMatrixTest, LookToLhRowMajor) {
 
 TEST(ViewMatrixTest, LookToLhColumnMajor) {
   math::Vector3D<float, math::Options::ColumnMajor> eye{0.0f, 0.0f, 1.0f};
-  math::Vector3D<float, math::Options::ColumnMajor> direction{0.0f, 0.0f, -1.0f};
+  math::Vector3D<float, math::Options::ColumnMajor> direction{
+    0.0f, 0.0f, -1.0f};
   math::Vector3D<float, math::Options::ColumnMajor> up{0.0f, 1.0f, 0.0f};
   auto viewMatrix = g_lookToLh(eye, direction, up);
 
