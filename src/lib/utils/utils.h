@@ -8,8 +8,8 @@
 namespace math {
 
 template <typename T>
-auto abs(T value) -> T {
-  if constexpr (std::is_integral<T>::value) {
+auto g_abs(T value) -> T {
+  if constexpr (std::is_integral_v<T>) {
     return value;
   } else {
     return std::abs(value);
