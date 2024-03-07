@@ -730,18 +730,6 @@ class Matrix {
     return os;
   }
 
-  /**
-   * @brief Helper class for initializing Matrix elements using the comma
-   * operator.
-   *
-   *
-   * Usage example:
-   *    Matrix<float, 3, 3> mat;
-   *    mat << 1.0f, 0.0f, 0.0f,
-   *           0.0f, 1.0f, 0.0f,
-   *           0.0f, 0.0f, 1.0f; // Initializes a 3x3 identity matrix
-   *
-   */
   class MatrixInitializer {
     Matrix&      m_matrix_;
     unsigned int m_row_;
