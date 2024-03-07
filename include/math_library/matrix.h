@@ -220,6 +220,33 @@ class Matrix {
     return columnVector;
   }
 
+  template <unsigned int Row>
+    requires ValueLessThan<Row, Rows>
+  void setRow(const Vector<T, Columns, Option>& vector) {
+    if constexpr (Option == Options::RowMajor) {
+      // more optimized due to layout
+      std::copy(
+          vector.data(), vector.data() + Columns, this->data() + Row * Columns);
+    } else if (Option == Options::ColumnMajor) {
+      for (unsigned int col = 0; col < Columns; ++col) {
+        operator()(Row, col) = vector(col);
+      }
+    }
+  }
+
+  template <unsigned int Col>
+    requires ValueLessThan<Col, Columns>
+  void setColumn(const Vector<T, Rows, Option>& vector) {
+    if constexpr (Option == Options::ColumnMajor) {
+      // more optimized due to layout
+      std::copy(vector.data(), vector.data() + Rows, this->data() + Col * Rows);
+    } else if (Option == Options::RowMajor) {
+      for (unsigned int row = 0; row < Rows; ++row) {
+        operator()(row, Col) = vector(row);
+      }
+    }
+  }
+
   template <unsigned int Index>
     requires(Option == Options::RowMajor ? ValueLessThan<Index, Rows>
                                          : ValueLessThan<Index, Columns>)
