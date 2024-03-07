@@ -190,8 +190,15 @@ class Matrix {
     requires ValueLessThan<Row, Rows>
   [[nodiscard]] auto getRow() const -> Vector<T, Columns, Option> {
     Vector<T, Columns, Option> rowVector;
-    for (unsigned int col = 0; col < Columns; ++col) {
-      rowVector(col) = this->operator()(Row, col);
+    if constexpr (Option == Options::RowMajor) {
+      // more optimized due to layout
+      std::copy(this->data() + Row * Columns,
+                this->data() + (Row + 1) * Columns,
+                rowVector.data());
+    } else if (Option == Options::ColumnMajor) {
+      for (unsigned int col = 0; col < Columns; ++col) {
+        rowVector(col) = this->operator()(Row, col);
+      }
     }
     return rowVector;
   }
@@ -200,8 +207,15 @@ class Matrix {
     requires ValueLessThan<Col, Columns>
   [[nodiscard]] auto getColumn() const -> Vector<T, Rows, Option> {
     Vector<T, Rows, Option> columnVector;
-    for (unsigned int row = 0; row < Rows; ++row) {
-      columnVector(row) = this->operator()(row, Col);
+    if constexpr (Option == Options::ColumnMajor) {
+      // more optimized due to layout
+      std::copy(this->data() + Col * Rows,
+                this->data() + (Col + 1) * Rows,
+                columnVector.data());
+    } else if (Option == Options::RowMajor) {
+      for (unsigned int row = 0; row < Rows; ++row) {
+        columnVector(row) = this->operator()(row, Col);
+      }
     }
     return columnVector;
   }
