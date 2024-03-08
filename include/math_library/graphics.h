@@ -11,6 +11,25 @@ namespace math {
 
 // clang-format off
 
+template <typename T, Options Option = Options::RowMajor>
+auto g_translate(T dx, T dy, T dz) -> Matrix<T, 4, 4, Option> {
+  Matrix<T, 4, 4, Option> translateMat{T()};
+  if constexpr (Option == Options::RowMajor) {
+    translateMat <<
+      1,   0,   0,   0,
+      0,   1,   0,   0,
+      0,   0,   1,   0,
+      dx,  dy,  dz,  1;
+  } else if constexpr (Option == Options::ColumnMajor) {
+    translateMat <<
+      1,   0,   0,   dx,
+      0,   1,   0,   dy,
+      0,   0,   1,   dz,
+      0,   0,   0,   1;
+  }
+  return translateMat;
+}
+
 // BEGIN: rotation matrix creation functions
 // ----------------------------------------------------------------------------
 
