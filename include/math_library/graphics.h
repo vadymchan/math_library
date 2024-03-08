@@ -159,6 +159,55 @@ auto g_rotateRh(const Vector<T, 3, Option>& angles) -> Matrix<T, 4, 4, Option> {
     return g_rotateRh<T, Option>(angles.x(), angles.y(), angles.z());
 }
 
+/**
+ * @brief Creates a rotation matrix for rotation around an arbitrary axis in a
+ * right-handed coordinate system.
+ *
+ * Utilizes Rodrigues' rotation formula to generate a 4x4 rotation matrix given
+ * an arbitrary axis and rotation angle. The axis does not need to be normalized
+ * as the function will normalize it.
+ *
+ * @param axis The 3D vector representing the axis of rotation.
+ * @param angle The rotation angle around the axis, in radians.
+ *
+ * @note This function is designed for right-handed coordinate systems. It
+ * automatically normalizes the axis of rotation.
+ */
+template <typename T, Options Option = Options::RowMajor>
+auto g_rotateRh(const Vector<T, 3, Option>& axis, T angle)
+    -> Matrix<T, 4, 4, Option> {
+  const T kCosAngle    = std::cos(angle);
+  const T kSinAngle    = std::sin(angle);
+  const T kOneMinusCos = 1 - kCosAngle;
+
+#ifdef MATH_LIBRARY_USE_NORMALIZE_IN_PLACE
+  auto normalizedAxis = axis;
+  normalizedAxis.normalize();
+#else
+  auto normalizedAxis = axis.normalize();
+#endif
+  const T& x = normalizedAxis.x();
+  const T& y = normalizedAxis.y();
+  const T& z = normalizedAxis.z();
+
+  Matrix<T, 4, 4, Option> rotateMat{T()};
+
+  if constexpr (Option == Options::RowMajor) {
+    rotateMat <<
+      kCosAngle  +  x*x*kOneMinusCos,   x*y*kOneMinusCos - z*kSinAngle,   x*z*kOneMinusCos + y*kSinAngle,   0,              
+      y*x*kOneMinusCos + z*kSinAngle,   kCosAngle  +  y*y*kOneMinusCos,   y*z*kOneMinusCos - x*kSinAngle,   0,
+      z*x*kOneMinusCos - y*kSinAngle,   z*y*kOneMinusCos + x*kSinAngle,   kCosAngle  +  z*z*kOneMinusCos,   0, 
+      0,                                0,                                0,                                1;
+  } else if constexpr (Option == Options::ColumnMajor) {
+    rotateMat <<
+      kCosAngle  +  x*x*kOneMinusCos,   y*x*kOneMinusCos + z*kSinAngle,   z*x*kOneMinusCos - y*kSinAngle,   0, 
+      x*y*kOneMinusCos - z*kSinAngle,   kCosAngle  +  y*y*kOneMinusCos,   z*y*kOneMinusCos + x*kSinAngle,   0,
+      x*z*kOneMinusCos + y*kSinAngle,   y*z*kOneMinusCos - x*kSinAngle,   kCosAngle  +  z*z*kOneMinusCos,   0, 
+      0,                                0,                                0,                                1;
+  }
+  return rotateMat;
+}
+
 template <typename T, Options Option = Options::RowMajor>
 auto g_rotateLhX(T angle) -> Matrix<T, 4, 4, Option> {
   return g_rotateRhX<T, Option>(-angle);
