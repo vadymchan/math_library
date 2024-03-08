@@ -657,10 +657,123 @@ auto g_perspectiveLhZo(T fovY, T width, T height, T zNear, T zFar)
 }
 
 template <typename T, Options Option = Options::RowMajor>
-auto g_perspectiveLhNo(T fovY, T width, T height, T zNear, T zFar)
+auto g_perspectiveRhNoInf(T fovY, T aspect, T zNear)
     -> Matrix<T, 4, 4, Option> {
-  auto aspectRatio       = width / height;
-  auto perspectiveMatrix = g_perspectiveLhNo(fovY, aspectRatio, zNear, zFar);
+  assert(std::abs(aspect - std::numeric_limits<T>::epsilon()) > static_cast<T>(0));
+
+  // Explanation of matrix structure.
+  // We use default perspective projection creation matrices, but for infinite 
+  // far plane we need to change matrix a little bit. As far approaches 
+  // infinity, (far / (far - near)) approaches 1, and (near / (far - near)) 
+  // approaches 0. Thus:
+  // 1) -(far + near) / (far - near) => -1
+  // 2) -(2 * far * near) / (far - near) => -2 * near
+
+  const T tanHalfFovY = std::tan(fovY / static_cast<T>(2));
+
+  Matrix<T, 4, 4, Option> perspectiveMatrix{T()};
+  perspectiveMatrix(0, 0) =  static_cast<T>(1) / (tanHalfFovY * aspect);
+  perspectiveMatrix(1, 1) =  static_cast<T>(1) /  tanHalfFovY;
+  perspectiveMatrix(2, 2) = -static_cast<T>(1); // depends on handness (-z)
+
+  if constexpr (Option == Options::RowMajor) {
+    perspectiveMatrix(2, 3) = -static_cast<T>(1);         // depends on handness (-z)
+    perspectiveMatrix(3, 2) = -static_cast<T>(2) * zNear; // depends on NO / LO
+  } else if constexpr (Option == Options::ColumnMajor) {
+    perspectiveMatrix(3, 2) = -static_cast<T>(1);         // depends on handness (-z)
+    perspectiveMatrix(2, 3) = -static_cast<T>(2) * zNear; // depends on NO / LO
+  }
+  return perspectiveMatrix;
+}
+
+template <typename T, Options Option = Options::RowMajor>
+auto g_perspectiveRhZoInf(T fovY, T aspect, T zNear)
+    -> Matrix<T, 4, 4, Option> {
+  assert(std::abs(aspect - std::numeric_limits<T>::epsilon()) > static_cast<T>(0));
+
+  // Explanation of matrix structure.
+  // We use default perspective projection creation matrices, but for infinite 
+  // far plane we need to change matrix a little bit. As far approaches 
+  // infinity, (far / (far - near)) approaches 1, and (near / (far - near)) 
+  // approaches 0. Thus:
+  // 1) -far / (far - near) => -1
+  // 2) -(far * near) / (far - near) => -near
+
+  const T tanHalfFovY = std::tan(fovY / static_cast<T>(2));
+
+  Matrix<T, 4, 4, Option> perspectiveMatrix{T()};
+  perspectiveMatrix(0, 0) =  static_cast<T>(1) / (tanHalfFovY * aspect);
+  perspectiveMatrix(1, 1) =  static_cast<T>(1) /  tanHalfFovY;
+  perspectiveMatrix(2, 2) = -static_cast<T>(1); // depends on handness (-z)
+
+  if constexpr (Option == Options::RowMajor) {
+    perspectiveMatrix(2, 3) = -static_cast<T>(1); // depends on handness (-z)
+    perspectiveMatrix(3, 2) = -zNear;             // depends on NO / LO
+  } else if constexpr (Option == Options::ColumnMajor) {
+    perspectiveMatrix(3, 2) = -static_cast<T>(1); // depends on handness (-z)
+    perspectiveMatrix(2, 3) = -zNear;             // depends on NO / LO
+  }
+  return perspectiveMatrix;
+}
+
+template <typename T, Options Option = Options::RowMajor>
+auto g_perspectiveLhNoInf(T fovY, T aspect, T zNear)
+    -> Matrix<T, 4, 4, Option> {
+  assert(std::abs(aspect - std::numeric_limits<T>::epsilon()) > static_cast<T>(0));
+
+  // Explanation of matrix structure.
+  // We use default perspective projection creation matrices, but for infinite 
+  // far plane we need to change matrix a little bit. As far approaches 
+  // infinity, (far / (far - near)) approaches 1, and (near / (far - near)) 
+  // approaches 0. Thus:
+  // 1) (far + near) / (far - near) => 1
+  // 2) -(2 * far * near) / (far - near) => -2 * near
+
+  const T tanHalfFovY = std::tan(fovY / static_cast<T>(2));
+
+  Matrix<T, 4, 4, Option> perspectiveMatrix{T()};
+  perspectiveMatrix(0, 0) = static_cast<T>(1) / (tanHalfFovY * aspect);
+  perspectiveMatrix(1, 1) = static_cast<T>(1) /  tanHalfFovY;
+  perspectiveMatrix(2, 2) = static_cast<T>(1); // depends on handness (z, not -z)
+
+  if constexpr (Option == Options::RowMajor) {
+    perspectiveMatrix(2, 3) =  static_cast<T>(1);         // depends on handness (z, not -z)
+    perspectiveMatrix(3, 2) = -static_cast<T>(2) * zNear; // depends on NO / LO
+  } else if constexpr (Option == Options::ColumnMajor) {
+    perspectiveMatrix(3, 2) =  static_cast<T>(1);         // depends on handness (z, not -z)
+    perspectiveMatrix(2, 3) = -static_cast<T>(2) * zNear; // depends on NO / LO
+  }
+  return perspectiveMatrix;
+}
+
+template <typename T, Options Option = Options::RowMajor>
+auto g_perspectiveLhZoInf(T fovY, T aspect, T zNear)
+    -> Matrix<T, 4, 4, Option> {
+  assert(std::abs(aspect - std::numeric_limits<T>::epsilon()) > static_cast<T>(0));
+
+  // Explanation of matrix structure.
+  // We use default perspective projection creation matrices, but for infinite 
+  // far plane we need to change matrix a little bit. As far approaches 
+  // infinity, (far / (far - near)) approaches 1, and (near / (far - near)) 
+  // approaches 0. Thus:
+  // 1) far / (far - near) => 1
+  // 2) -(far * near) / (far - near) => -near
+
+  const T tanHalfFovY = std::tan(fovY / static_cast<T>(2));
+
+  Matrix<T, 4, 4, Option> perspectiveMatrix{T()};
+  perspectiveMatrix(0, 0) = static_cast<T>(1) / (tanHalfFovY * aspect);
+  perspectiveMatrix(1, 1) = static_cast<T>(1) /  tanHalfFovY;
+  perspectiveMatrix(2, 2) = static_cast<T>(1); // depends on handness (z, not -z)
+
+  if constexpr (Option == Options::RowMajor) {
+    perspectiveMatrix(2, 3) =  static_cast<T>(1); // depends on handness (z, not -z)
+    perspectiveMatrix(3, 2) = -zNear;             // depends on NO / LO
+  } else if constexpr (Option == Options::ColumnMajor) {
+    perspectiveMatrix(3, 2) =  static_cast<T>(1); // depends on handness (z, not -z)
+    perspectiveMatrix(2, 3) = -zNear;             // depends on NO / LO
+  }
+
   return perspectiveMatrix;
 }
 
