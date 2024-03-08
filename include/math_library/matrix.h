@@ -195,7 +195,7 @@ class Matrix {
       std::copy(this->data() + Row * Columns,
                 this->data() + (Row + 1) * Columns,
                 rowVector.data());
-    } else if (Option == Options::ColumnMajor) {
+    } else if constexpr (Option == Options::ColumnMajor) {
       for (unsigned int col = 0; col < Columns; ++col) {
         rowVector(col) = this->operator()(Row, col);
       }
@@ -212,7 +212,7 @@ class Matrix {
       std::copy(this->data() + Col * Rows,
                 this->data() + (Col + 1) * Rows,
                 columnVector.data());
-    } else if (Option == Options::RowMajor) {
+    } else if constexpr (Option == Options::RowMajor) {
       for (unsigned int row = 0; row < Rows; ++row) {
         columnVector(row) = this->operator()(row, Col);
       }
@@ -227,7 +227,7 @@ class Matrix {
       // more optimized due to layout
       std::copy(
           vector.data(), vector.data() + Columns, this->data() + Row * Columns);
-    } else if (Option == Options::ColumnMajor) {
+    } else if constexpr (Option == Options::ColumnMajor) {
       for (unsigned int col = 0; col < Columns; ++col) {
         operator()(Row, col) = vector(col);
       }
@@ -240,7 +240,7 @@ class Matrix {
     if constexpr (Option == Options::ColumnMajor) {
       // more optimized due to layout
       std::copy(vector.data(), vector.data() + Rows, this->data() + Col * Rows);
-    } else if (Option == Options::RowMajor) {
+    } else if constexpr (Option == Options::RowMajor) {
       for (unsigned int row = 0; row < Rows; ++row) {
         operator()(row, Col) = vector(row);
       }
@@ -255,7 +255,7 @@ class Matrix {
           vector) {
     if constexpr (Option == Options::RowMajor) {
       setRow<Index>(vector);
-    } else if (Option == Options::ColumnMajor) {
+    } else if constexpr (Option == Options::ColumnMajor) {
       setColumn<Index>(vector);
     }
   }
