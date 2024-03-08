@@ -51,66 +51,65 @@ auto g_scale(const Vector<T, 3, Option>& scale) -> Matrix<T, 4, 4, Option> {
 
 // BEGIN: rotation matrix creation functions
 // ----------------------------------------------------------------------------
-
 template <typename T, Options Option = Options::RowMajor>
 auto g_rotateRhX(T angle) -> Matrix<T, 4, 4, Option> {
-  const T cosAngle = std::cos(angle);
-  const T sinAngle = std::sin(angle);
+  const T kCosAngle = std::cos(angle);
+  const T kSinAngle = std::sin(angle);
 
-  Matrix<T, 4, 4, Option> rotateMat;
+  Matrix<T, 4, 4, Option> rotateMat{T()};
 
   if constexpr (Option == Options::RowMajor) {
-    rotateMat << 1,   0,          0,          0,
-                 0,   cosAngle,   sinAngle,   0,
-                 0,  -sinAngle,   cosAngle,   0,
-                 0,   0,          0,          1;
-  } else {
-    rotateMat << 1,   0,          0,          0,
-                 0,   cosAngle,  -sinAngle,   0,
-                 0,   sinAngle,   cosAngle,   0,
-                 0,   0,          0,          1;
+    rotateMat << 1,   0,           0,          0,
+                 0,   kCosAngle,   kSinAngle,  0,
+                 0,  -kSinAngle,   kCosAngle,  0,
+                 0,   0,           0,          1;
+  } else if constexpr (Option == Options::ColumnMajor) {
+    rotateMat << 1,   0,           0,          0,
+                 0,   kCosAngle,  -kSinAngle,  0,
+                 0,   kSinAngle,   kCosAngle,  0,
+                 0,   0,           0,          1;
   }
   return rotateMat;
 }
 
 template <typename T, Options Option = Options::RowMajor>
 auto g_rotateRhY(T angle) -> Matrix<T, 4, 4, Option> {
-  const T cosAngle = std::cos(angle);
-  const T sinAngle = std::sin(angle);
+  const T kCosAngle = std::cos(angle);
+  const T kSinAngle = std::sin(angle);
 
-  Matrix<T, 4, 4, Option> rotateMat;
+  Matrix<T, 4, 4, Option> rotateMat{T()};
 
   if constexpr (Option == Options::RowMajor) {
-    rotateMat <<  cosAngle,   0,  -sinAngle,   0,
-                  0,          1,   0,          0,
-                  sinAngle,   0,   cosAngle,   0,
-                  0,          0,   0,          1;
-  } else {
-    rotateMat <<  cosAngle,   0,   sinAngle,   0,
-                  0,          1,   0,          0,
-                 -sinAngle,   0,   cosAngle,   0,
-                  0,          0,   0,          1;
+    rotateMat <<  kCosAngle,   0,  -kSinAngle,  0,
+                  0,           1,   0,          0,
+                  kSinAngle,   0,   kCosAngle,  0,
+                  0,           0,   0,          1;
+  } else if constexpr (Option == Options::ColumnMajor) {
+    rotateMat <<  kCosAngle,   0,   kSinAngle,  0,
+                  0,           1,   0,          0,
+                 -kSinAngle,   0,   kCosAngle,  0,
+                  0,           0,   0,          1;
   }
   return rotateMat;
 }
 
 template <typename T, Options Option = Options::RowMajor>
 auto g_rotateRhZ(T angle) -> Matrix<T, 4, 4, Option> {
-  const T cosAngle = std::cos(angle);
-  const T sinAngle = std::sin(angle);
+  const T kCosAngle = std::cos(angle);
+  const T kSinAngle = std::sin(angle);
 
-  Matrix<T, 4, 4, Option> rotateMat;
+  Matrix<T, 4, 4, Option> rotateMat{T()};
 
   if constexpr (Option == Options::RowMajor) {
-    rotateMat <<  cosAngle,     sinAngle,  0,  0,
-                 -sinAngle,     cosAngle,  0,  0,
-                  0,            0,         1,  0,
-                  0,            0,         0,  1;
-  } else {
-    rotateMat <<  cosAngle,    -sinAngle,  0,  0,
-                  sinAngle,     cosAngle,  0,  0,
-                  0,            0,         1,  0,
-                  0,            0,         0,  1;
+    rotateMat <<  kCosAngle,   kSinAngle,  0,  0,
+                 -kSinAngle,   kCosAngle,  0,  0,
+                  0,           0,          1,  0,
+                  0,           0,          0,  1;
+  } else if constexpr (Option == Options::ColumnMajor) {
+    rotateMat <<  kCosAngle,  -kSinAngle,  0,  0,
+                  kSinAngle,   kCosAngle,  0,  0,
+                  0,           0,          1,  0,
+                  0,           0,          0,  1;
   }
   return rotateMat;
 }
