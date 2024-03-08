@@ -223,6 +223,52 @@ auto g_rotateLhZ(T angle) -> Matrix<T, 4, 4, Option> {
   return g_rotateRhZ<T, Option>(-angle);
 }
 
+/**
+ * @brief Creates a combined rotation matrix around X, Y, and Z axes in the
+ * left-handed coordinate system.
+ *
+ * This function generates a 4x4 rotation matrix that represents the combined
+ * rotation around the X, Y, and Z axes (pitch, yaw, and roll) in the order of 
+ * Z (roll) -> X (pitch) -> Y (yaw) using the right-handed function but inverts
+ * the angles for left-handed coordinate system adaptation.
+ *
+ * @param angleX The rotation angle around the X-axis (pitch) in radians.
+ * @param angleY The rotation angle around the Y-axis (yaw) in radians.
+ * @param angleZ The rotation angle around the Z-axis (roll) in radians.
+ *
+ * @return A 4x4 rotation matrix that operates in the left-handed coordinate
+ * system.
+ */
+template <typename T, Options Option = Options::RowMajor>
+auto g_rotateLh(T angleX, T angleY, T angleZ) -> Matrix<T, 4, 4, Option> {
+  return g_rotateRh<T, Option>(-angleX, -angleY, -angleZ);
+}
+
+template <typename T, Options Option = Options::RowMajor>
+auto g_rotateLh(const Vector<T, 3, Option>& angles) -> Matrix<T, 4, 4, Option> {
+    return g_rotateLh<T, Option>(angles.x(), angles.y(), angles.z());
+}
+
+/**
+ * @brief Creates a rotation matrix for rotation around an arbitrary axis in a
+ * left-handed coordinate system.
+ *
+ * Utilizes Rodrigues' rotation formula to generate a 4x4 rotation matrix given
+ * an arbitrary axis and rotation angle. The function inverts the angle for
+ * adaptation to left-handed coordinate systems but maintains the axis
+ * direction.
+ *
+ * @param axis The 3D vector representing the axis of rotation.
+ * @param angle The rotation angle around the axis, in radians.
+ *
+ * @note This function normalizes the axis of rotation automatically.
+ */
+template <typename T, Options Option = Options::RowMajor>
+auto g_rotateLh(const Vector<T, 3, Option>& axis, T angle)
+    -> Matrix<T, 4, 4, Option> {
+  return g_rotateRh<T, Option>(axis, -angle);
+}
+
 // END: rotation matrix creation functions
 // ----------------------------------------------------------------------------
 
