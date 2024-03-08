@@ -791,7 +791,7 @@ auto g_perspectiveLhZoInf(T fovY, T aspect, T zNear)
 template <typename T, Options Option = Options::RowMajor>
 auto g_frustumRhZo(T left, T right, T bottom, T top, T nearVal, T farVal)
     -> Matrix<T, 4, 4, Option> {
-  Matrix<T, 4, 4, Option> frustrum(0);
+  Matrix<T, 4, 4, Option> frustrum{T()};
   frustrum(0, 0) = (static_cast<T>(2) * nearVal) / (right - left);
   frustrum(1, 1) = (static_cast<T>(2) * nearVal) / (top - bottom);
   frustrum(2, 2) = farVal / (nearVal - farVal);        // depends on NO / ZO
@@ -801,7 +801,7 @@ auto g_frustumRhZo(T left, T right, T bottom, T top, T nearVal, T farVal)
     frustrum(2, 1) = (top + bottom) / (top - bottom);  // depends on handness
     frustrum(3, 2) = -(farVal * nearVal) / (farVal - nearVal); // depends on NO / ZO
     frustrum(2, 3) = -static_cast<T>(1);               // depends on handness
-  } else if (Option == Options::ColumnMajor) {
+  } else if constexpr (Option == Options::ColumnMajor) {
     frustrum(0, 2) = (right + left) / (right - left);  // depends on handness
     frustrum(1, 2) = (top + bottom) / (top - bottom);  // depends on handness
     frustrum(2, 3) = -(farVal * nearVal) / (farVal - nearVal); // depends on NO / ZO
@@ -818,7 +818,7 @@ auto g_frustumRhZo(T left, T right, T bottom, T top, T nearVal, T farVal)
 template <typename T, Options Option = Options::RowMajor>
 auto g_frustumRhNo(T left, T right, T bottom, T top, T nearVal, T farVal)
     -> Matrix<T, 4, 4, Option> {
-  Matrix<T, 4, 4, Option> frustrum(0);
+  Matrix<T, 4, 4, Option> frustrum{T()};
   frustrum(0, 0) = (static_cast<T>(2) * nearVal) / (right - left);
   frustrum(1, 1) = (static_cast<T>(2) * nearVal) / (top - bottom);
   frustrum(2, 2)
@@ -829,7 +829,7 @@ auto g_frustumRhNo(T left, T right, T bottom, T top, T nearVal, T farVal)
     frustrum(2, 1) = (top + bottom) / (top - bottom);  // depends on handness
     frustrum(3, 2) = -(static_cast<T>(2) * farVal * nearVal) / (farVal - nearVal); // depends on NO / ZO
     frustrum(2, 3) = -static_cast<T>(1);               // depends on handness
-  } else if (Option == Options::ColumnMajor) {
+  } else if constexpr (Option == Options::ColumnMajor) {
     frustrum(0, 2) = (right + left) / (right - left);  // depends on handness
     frustrum(1, 2) = (top + bottom) / (top - bottom);  // depends on handness
     frustrum(2, 3) = -(static_cast<T>(2) * farVal * nearVal) / (farVal - nearVal); // depends on NO / ZO
@@ -846,7 +846,7 @@ auto g_frustumRhNo(T left, T right, T bottom, T top, T nearVal, T farVal)
 template <typename T, Options Option = Options::RowMajor>
 auto g_frustumLhZo(T left, T right, T bottom, T top, T nearVal, T farVal)
     -> Matrix<T, 4, 4, Option> {
-  Matrix<T, 4, 4, Option> frustrum(0);
+  Matrix<T, 4, 4, Option> frustrum{T()};
   frustrum(0, 0) = (static_cast<T>(2) * nearVal) / (right - left);
   frustrum(1, 1) = (static_cast<T>(2) * nearVal) / (top - bottom);
   frustrum(2, 2) = farVal / (farVal - nearVal);         // depends on NO / ZO
@@ -856,7 +856,7 @@ auto g_frustumLhZo(T left, T right, T bottom, T top, T nearVal, T farVal)
     frustrum(2, 1) = -(top + bottom) / (top - bottom);  // depends on handness
     frustrum(3, 2) = -(farVal * nearVal) / (farVal - nearVal); // depends on NO / ZO
     frustrum(2, 3) = static_cast<T>(1);                 // depends on handness
-  } else if (Option == Options::ColumnMajor) {
+  } else if constexpr (Option == Options::ColumnMajor) {
     frustrum(0, 2) = -(right + left) / (right - left);  // depends on handness
     frustrum(1, 2) = -(top + bottom) / (top - bottom);  // depends on handness
     frustrum(2, 3) = -(farVal * nearVal) / (farVal - nearVal); // depends on NO / ZO
@@ -873,7 +873,7 @@ auto g_frustumLhZo(T left, T right, T bottom, T top, T nearVal, T farVal)
 template <typename T, Options Option = Options::RowMajor>
 auto g_frustumLhNo(T left, T right, T bottom, T top, T nearVal, T farVal)
     -> Matrix<T, 4, 4, Option> {
-  Matrix<T, 4, 4, Option> frustrum(0);
+  Matrix<T, 4, 4, Option> frustrum{T()};
   frustrum(0, 0) = (static_cast<T>(2) * nearVal) / (right - left);
   frustrum(1, 1) = (static_cast<T>(2) * nearVal) / (top - bottom);
   frustrum(2, 2) = (farVal + nearVal) / (farVal - nearVal);  // depends on NO / ZO
@@ -883,7 +883,7 @@ auto g_frustumLhNo(T left, T right, T bottom, T top, T nearVal, T farVal)
     frustrum(2, 1) = -(top + bottom) / (top - bottom);  // depends on handness
     frustrum(3, 2) = -(static_cast<T>(2) * farVal * nearVal) / (farVal - nearVal); // depends on NO / ZO
     frustrum(2, 3) = static_cast<T>(1);                 // depends on handness
-  } else if (Option == Options::ColumnMajor) {
+  } else if constexpr (Option == Options::ColumnMajor) {
     frustrum(0, 2) = -(right + left) / (right - left);  // depends on handness
     frustrum(1, 2) = -(top + bottom) / (top - bottom);  // depends on handness
     frustrum(2, 3) = -(static_cast<T>(2) * farVal * nearVal) / (farVal - nearVal); // depends on NO / ZO
@@ -917,7 +917,7 @@ auto g_orthoLhZo(T left, T right, T bottom, T top, T zNear, T zFar)
     orthographicMat(3, 0) = -(right + left) / (right - left);
     orthographicMat(3, 1) = -(top + bottom) / (top - bottom);
     orthographicMat(3, 2) = -zNear / (zFar - zNear);  // depends on ZO / NO
-  } else if (Option == Options::ColumnMajor) {
+  } else if constexpr (Option == Options::ColumnMajor) {
     orthographicMat(0, 3) = -(right + left) / (right - left);
     orthographicMat(1, 3) = -(top + bottom) / (top - bottom);
     orthographicMat(2, 3) = -zNear / (zFar - zNear);  // depends on ZO / NO
@@ -941,7 +941,7 @@ auto g_orthoLhNo(T left, T right, T bottom, T top, T zNear, T zFar)
     orthographicMat(3, 0) = -(right + left) / (right - left);
     orthographicMat(3, 1) = -(top + bottom) / (top - bottom);
     orthographicMat(3, 2) = -(zFar + zNear) / (zFar - zNear);  // depends on ZO / NO
-  } else if (Option == Options::ColumnMajor) {
+  } else if constexpr (Option == Options::ColumnMajor) {
     orthographicMat(0, 3) = -(right + left) / (right - left);
     orthographicMat(1, 3) = -(top + bottom) / (top - bottom);
     orthographicMat(2, 3) = -(zFar + zNear) / (zFar - zNear);  // depends on ZO / NO
@@ -965,7 +965,7 @@ auto g_orthoRhZo(T left, T right, T bottom, T top, T zNear, T zFar)
     orthographicMat(3, 0) = -(right + left) / (right - left);
     orthographicMat(3, 1) = -(top + bottom) / (top - bottom);
     orthographicMat(3, 2) = -zNear / (zFar - zNear);  // depends on ZO / NO
-  } else if (Option == Options::ColumnMajor) {
+  } else if constexpr (Option == Options::ColumnMajor) {
     orthographicMat(0, 3) = -(right + left) / (right - left);
     orthographicMat(1, 3) = -(top + bottom) / (top - bottom);
     orthographicMat(2, 3) = -zNear / (zFar - zNear);  // depends on ZO / NO
@@ -989,7 +989,7 @@ auto g_orthoRhNo(T left, T right, T bottom, T top, T zNear, T zFar)
     orthographicMat(3, 0) = -(right + left) / (right - left);
     orthographicMat(3, 1) = -(top + bottom) / (top - bottom);
     orthographicMat(3, 2) = -(zFar + zNear) / (zFar - zNear);  // depends on ZO / NO
-  } else if (Option == Options::ColumnMajor) {
+  } else if constexpr (Option == Options::ColumnMajor) {
     orthographicMat(0, 3) = -(right + left) / (right - left);
     orthographicMat(1, 3) = -(top + bottom) / (top - bottom);
     orthographicMat(2, 3) = -(zFar + zNear) / (zFar - zNear);  // depends on ZO / NO
