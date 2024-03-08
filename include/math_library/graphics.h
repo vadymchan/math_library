@@ -30,6 +30,11 @@ auto g_translate(T dx, T dy, T dz) -> Matrix<T, 4, 4, Option> {
   return translateMat;
 }
 
+template <typename T, Options Option = Options::RowMajor>
+auto g_translate(const Vector<T, 3, Option>& translation) -> Matrix<T, 4, 4, Option> {
+  return g_translate<T, Option>(translation.x(), translation.y(), translation.z());
+}
+
 // BEGIN: rotation matrix creation functions
 // ----------------------------------------------------------------------------
 
