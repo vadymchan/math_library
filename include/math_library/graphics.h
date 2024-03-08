@@ -114,6 +114,51 @@ auto g_rotateRhZ(T angle) -> Matrix<T, 4, 4, Option> {
   return rotateMat;
 }
 
+/**
+ * @brief Creates a rotation matrix in the right-handed coordinate system.
+ *
+ * This function generates a 4x4 rotation matrix that represents the combined
+ * rotation around the X, Y, and Z axes. The rotation order applied is 
+ * Z (roll) -> X (pitch) -> Y (yaw)
+ *
+ * @param angleX The rotation angle around the X-axis (roll) in radians.
+ * @param angleY The rotation angle around the Y-axis (pitch) in radians.
+ * @param angleZ The rotation angle around the Z-axis (yaw) in radians.
+ *
+ * @return A 4x4 rotation matrix in the right-handed coordinate system.
+ */
+template <typename T, Options Option = Options::RowMajor>
+auto g_rotateRh(T angleX, T angleY, T angleZ) -> Matrix<T, 4, 4, Option> {
+  const T kSX = std::sin(angleX);
+  const T kCX = std::cos(angleX);
+  const T kSY = std::sin(angleY);
+  const T kCY = std::cos(angleY);
+  const T kSZ = std::sin(angleZ);
+  const T kCZ = std::cos(angleZ);
+
+  Matrix<T, 4, 4, Option> rotateMat{T()};
+
+  if constexpr (Option == Options::RowMajor) {
+    rotateMat <<
+      kCY * kCZ + kSY * kSX * kSZ,    kCX * kSZ,    kCY * kSX * kSZ - kSY * kCZ,   0,
+      kCZ * kSY * kSX - kCY * kSZ,    kCX * kCZ,    kSY * kSZ + kCY * kSX * kCZ,   0,
+      kCX * kSY,                     -kSX,          kCY * kCX,                     0,
+      0,                              0,            0,                             1;
+  } else if constexpr (Option == Options::ColumnMajor) {
+    rotateMat <<
+      kCY * kCZ + kSY * kSX * kSZ,    kCZ * kSY * kSX - kCY * kSZ,    kCX * kSY,   0,
+      kCX * kSZ,                      kCX * kCZ,                     -kSX,         0,
+      kCY * kSX * kSZ - kSY * kCZ,    kSY * kSZ + kCY * kSX * kCZ,    kCY * kCX,   0,
+      0,                              0,                              0,           1;
+  }
+  return rotateMat;
+}
+
+template <typename T, Options Option = Options::RowMajor>
+auto g_rotateRh(const Vector<T, 3, Option>& angles) -> Matrix<T, 4, 4, Option> {
+    return g_rotateRh<T, Option>(angles.x(), angles.y(), angles.z());
+}
+
 template <typename T, Options Option = Options::RowMajor>
 auto g_rotateLhX(T angle) -> Matrix<T, 4, 4, Option> {
   return g_rotateRhX<T, Option>(-angle);
