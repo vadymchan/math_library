@@ -44,6 +44,10 @@ auto g_scale(T sx, T sy, T sz) -> Matrix<T, 4, 4, Option> {
     0,    0,    0,    1};
 }
 
+template <typename T, Options Option = Options::RowMajor>
+auto g_scale(const Vector<T, 3, Option>& scale) -> Matrix<T, 4, 4, Option> {
+  return g_scale<T, Option>(scale.x(), scale.y(), scale.z());
+}
 
 // BEGIN: rotation matrix creation functions
 // ----------------------------------------------------------------------------
