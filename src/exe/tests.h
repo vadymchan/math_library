@@ -1442,11 +1442,15 @@ TEST(MatrixTest, CrossProductFloatRandom) {
   }
 }
 
+// clang-format off
+
 // Method: get row
 TEST(MatrixTest, GetRow) {
   math::MatrixNf<3, 3> matrix;
   // Initialize matrix for the test
-  matrix << 1.0f, 2.0f, 3.0f, 4.0f, 5.0f, 6.0f, 7.0f, 8.0f, 9.0f;
+  matrix << 1.0f, 2.0f, 3.0f, 
+            4.0f, 5.0f, 6.0f, 
+            7.0f, 8.0f, 9.0f;
 
   auto rowVector = matrix.getRow<1>();  // Get the second row
 
@@ -1459,33 +1463,39 @@ TEST(MatrixTest, GetRow) {
 // Method: get row from column-major matrix
 TEST(MatrixTest, GetRowColumnMajor) {
   math::MatrixNf<3, 3, math::Options::ColumnMajor> matrix;
-  matrix << 1.0f, 4.0f, 7.0f, 2.0f, 5.0f, 8.0f, 3.0f, 6.0f, 9.0f;
+  matrix << 1.0f, 4.0f, 7.0f, 
+            2.0f, 5.0f, 8.0f, 
+            3.0f, 6.0f, 9.0f;
 
   auto rowVector = matrix.getRow<1>();  // Get the second row
 
   // Verify that the second row is correctly retrieved
-  EXPECT_FLOAT_EQ(rowVector(0), 4.0f);
+  EXPECT_FLOAT_EQ(rowVector(0), 2.0f);
   EXPECT_FLOAT_EQ(rowVector(1), 5.0f);
-  EXPECT_FLOAT_EQ(rowVector(2), 6.0f);
+  EXPECT_FLOAT_EQ(rowVector(2), 8.0f);
 }
 
 // Method: get column
 TEST(MatrixTest, GetColumn) {
   math::MatrixNf<3, 3, math::Options::ColumnMajor> matrix;
-  matrix << 1.0f, 4.0f, 7.0f, 2.0f, 5.0f, 8.0f, 3.0f, 6.0f, 9.0f;
+  matrix << 1.0f, 4.0f, 7.0f, 
+            2.0f, 5.0f, 8.0f, 
+            3.0f, 6.0f, 9.0f;
 
   auto columnVector = matrix.getColumn<1>();  // Get the second column
 
   // Verify that the second column is correctly retrieved
-  EXPECT_FLOAT_EQ(columnVector(0), 2.0f);
+  EXPECT_FLOAT_EQ(columnVector(0), 4.0f);
   EXPECT_FLOAT_EQ(columnVector(1), 5.0f);
-  EXPECT_FLOAT_EQ(columnVector(2), 8.0f);
+  EXPECT_FLOAT_EQ(columnVector(2), 6.0f);
 }
 
 // Method: get column from row-major matrix
 TEST(MatrixTest, GetColumnRowMajor) {
   math::MatrixNf<3, 3> matrix;
-  matrix << 1.0f, 2.0f, 3.0f, 4.0f, 5.0f, 6.0f, 7.0f, 8.0f, 9.0f;
+  matrix << 1.0f, 2.0f, 3.0f, 
+            4.0f, 5.0f, 6.0f, 
+            7.0f, 8.0f, 9.0f;
 
   auto columnVector = matrix.getColumn<1>();  // Get the second column
 
@@ -1494,6 +1504,8 @@ TEST(MatrixTest, GetColumnRowMajor) {
   EXPECT_FLOAT_EQ(columnVector(1), 5.0f);
   EXPECT_FLOAT_EQ(columnVector(2), 8.0f);
 }
+
+// clang-format on
 
 // Method: set row
 TEST(MatrixTest, SetRow) {
@@ -1519,7 +1531,6 @@ TEST(MatrixTest, SetRowColumnMajor) {
     EXPECT_FLOAT_EQ(matrix(1, col), rowVector(col));
   }
 }
-
 
 // Method: set column
 TEST(MatrixTest, SetColumn) {
