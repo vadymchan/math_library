@@ -1180,6 +1180,39 @@ auto g_orthoRhNo(T width, T height, T zNear, T zFar) -> Matrix<T, 4, 4, Option> 
 
 // clang-format on
 
+/**
+ * @brief Transforms a 3D point using a specified transformation matrix and
+ * applies perspective division.
+ *
+ * @param point The point to be transformed. When a Vector object is passed, it
+ * is treated as a point with the homogeneous coordinate set to 1.
+ *
+ * @note This function automatically applies perspective division for points
+ * transformed with a perspective projection matrix. The default tolerance is
+ * used for g_perspectiveDivide. Consider adding a parameter to adjust this if
+ * needed.
+ */
+template <typename T, Options Option = Options::RowMajor>
+  requires std::floating_point<T>
+Point<T, 3, Option> g_transformPoint(const Point<T, 3, Option>&     point,
+                                     const Matrix<T, 4, 4, Option>& matrix) {
+  // TODO: currently in this implementation default tolerance used for
+  // g_perspectiveDivide. Consider add pararmeter if there will be a need
+  Point<T, 4, Option> result  = Point<T, 4, Option>(point, 1);
+  result                     *= matrix;
+  // applied when perspective projection matrix is used
+  result = g_perspectiveDivide(result);
+  return result.resizedCopy<3>();
+}
+
+template <typename T, Options Option = Options::RowMajor>
+Vector<T, 3, Option> g_transformVector(const Vector<T, 3, Option>&    vector,
+                                       const Matrix<T, 4, 4, Option>& matrix) {
+  auto result  = Vector<T, 4, Option>(vector, 0);
+  result      *= matrix;
+  return result.resizedCopy<3>();
+}
+
 // BEGIN: global util vector objects
 // ----------------------------------------------------------------------------
 
