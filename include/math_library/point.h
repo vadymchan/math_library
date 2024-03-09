@@ -2,8 +2,8 @@
  * @file point.h
  */
 
-#ifndef MATH_LIBRARY_POINT
-#define MATH_LIBRARY_POINT
+#ifndef MATH_LIBRARY_POINT_H
+#define MATH_LIBRARY_POINT_H
 
 #include "vector.h"
 

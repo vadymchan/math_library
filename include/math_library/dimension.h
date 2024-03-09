@@ -2,8 +2,8 @@
  * @file dimension.h
  */
 
-#ifndef MATH_LIBRARY_DIMENSION
-#define MATH_LIBRARY_DIMENSION
+#ifndef MATH_LIBRARY_DIMENSION_H
+#define MATH_LIBRARY_DIMENSION_H
 
 #include "vector.h"
 
