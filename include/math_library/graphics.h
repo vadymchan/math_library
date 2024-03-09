@@ -699,6 +699,12 @@ auto g_perspectiveLhZo(T fovY, T width, T height, T zNear, T zFar)
   return perspectiveMatrix;
 }
 
+/**
+ * Generates a right-handed perspective projection matrix optimized for
+ * rendering scenes with an infinite far plane.
+ * @note RH-NO-Inf - Right-Handed, Negative One to One depth range, Infinite far
+ * plane.
+ */
 template <typename T, Options Option = Options::RowMajor>
 auto g_perspectiveRhNoInf(T fovY, T aspect, T zNear)
     -> Matrix<T, 4, 4, Option> {
@@ -729,6 +735,11 @@ auto g_perspectiveRhNoInf(T fovY, T aspect, T zNear)
   return perspectiveMatrix;
 }
 
+/**
+ * Generates a right-handed perspective projection matrix for scenes with an
+ * infinite far plane, optimized for a zero to one depth range.
+ * @note RH-ZO-Inf - Right-Handed, Zero to One depth range, Infinite far plane.
+ */
 template <typename T, Options Option = Options::RowMajor>
 auto g_perspectiveRhZoInf(T fovY, T aspect, T zNear)
     -> Matrix<T, 4, 4, Option> {
@@ -759,6 +770,12 @@ auto g_perspectiveRhZoInf(T fovY, T aspect, T zNear)
   return perspectiveMatrix;
 }
 
+/**
+ * Generates a left-handed perspective projection matrix for rendering with an
+ * infinite far plane, using a depth range of negative one to one.
+ * @note LH-NO-Inf - Left-Handed, Negative One to One depth range, Infinite far
+ * plane.
+ */
 template <typename T, Options Option = Options::RowMajor>
 auto g_perspectiveLhNoInf(T fovY, T aspect, T zNear)
     -> Matrix<T, 4, 4, Option> {
@@ -789,6 +806,11 @@ auto g_perspectiveLhNoInf(T fovY, T aspect, T zNear)
   return perspectiveMatrix;
 }
 
+/**
+ * Produces a left-handed perspective projection matrix optimized for scenes
+ * with an infinite far plane, and a depth range of zero to one.
+ * @note LH-ZO-Inf - Left-Handed, Zero to One depth range, Infinite far plane.
+ */
 template <typename T, Options Option = Options::RowMajor>
 auto g_perspectiveLhZoInf(T fovY, T aspect, T zNear)
     -> Matrix<T, 4, 4, Option> {
