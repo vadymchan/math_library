@@ -86,7 +86,7 @@ class Vector {
     std::copy(baseData, baseData + kBaseSize, this->data());
 
     // copy elements
-    const T kExtra[] = {std::forward<Elements>(elements)...};
+    const T kExtra[] = {static_cast<T>(std::forward<Elements>(elements))...};
     std::copy(std::begin(kExtra), std::end(kExtra), this->data() + kBaseSize);
   }
 
