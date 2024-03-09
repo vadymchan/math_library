@@ -202,6 +202,8 @@ class Vector {
 
   auto magnitude() -> T { return m_dataStorage_.magnitude(); }
 
+  auto magnitudeSquared() -> T { return m_dataStorage_.magnitudeSquared(); }
+
 #ifdef MATH_LIBRARY_USE_NORMALIZE_IN_PLACE
 
   void normalize() { m_dataStorage_.normalize(); }

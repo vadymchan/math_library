@@ -500,6 +500,26 @@ class Matrix {
     return std::sqrt(sum);
   }
 
+  /**
+   * \brief Calculates the squared Frobenius norm (squared magnitude) of a
+   * matrix.
+   */
+  [[nodiscard]] auto magnitudeSquared() const -> T
+    requires OneDimensional<Rows, Columns>
+  {
+    T                      result           = 0;
+    constexpr unsigned int kVectorDimention = 1;
+    constexpr unsigned int kMatrixSize      = Rows * Columns;
+    auto mulFunc = InstructionSet<T>::template GetMulFunc<Option>();
+    mulFunc(&result,
+            m_data_,
+            m_data_,
+            kVectorDimention,
+            kVectorDimention,
+            kMatrixSize);
+    return result;
+  }
+
 #ifdef MATH_LIBRARY_USE_NORMALIZE_IN_PLACE
   /**
    * \brief Normalizes the matrix based on its Frobenius norm.
