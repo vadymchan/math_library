@@ -550,7 +550,8 @@ class Matrix {
 #endif  // USE_NORMALIZE_IN_PLACE
 
   template <unsigned int OtherRows, unsigned int OtherColumns>
-    requires OneDimensional<Rows, Columns> && OneDimensional<Rows, Columns>
+    requires OneDimensional<Rows, Columns>
+          && OneDimensional<OtherRows, OtherColumns>
           && SameSize<Matrix<T, Rows, Columns>,
                       Matrix<T, OtherRows, OtherColumns>>
   [[nodiscard]] auto dot(const Matrix<T, OtherRows, OtherColumns>& other) const
