@@ -6,6 +6,8 @@
 #define MATH_LIBRARY_GRAPHICS_H
 
 #include "matrix.h"
+#include "point.h"
+#include "vector.h"
 
 // TODO:
 // - for matrix initialization, use << operator instead of operator(row,
@@ -844,6 +846,37 @@ auto g_perspectiveLhZoInf(T fovY, T aspect, T zNear)
 
 // END: perspective projection creation matrix
 // ----------------------------------------------------------------------------
+
+/**
+ * @brief Applies perspective division to a 4D vector for clip space and NDC
+ * transformations.
+ *
+ * This function applies perspective division to a four-dimensional vector to
+ * facilitate the transformation of points between clip space and normalized
+ * device coordinates (NDC), essential for rendering 3D scenes with correct
+ * perspective. The operation is crucial both for projecting points into NDC
+ * during rendering and for reconstructing 3D positions from screen coordinates
+ * through inverted transformations.
+ *
+ * @param tolerance The tolerance within which the w component is considered
+ * effectively zero, preventing division in cases where it might lead to
+ * numerical instability. This additional parameter is crucial for handling
+ * floating-point inaccuracies, as dividing by values very close to zero can
+ * result in Infinity or NaN values. The tolerance allows for a margin of error
+ * in floating-point comparisons, ensuring that the division only occurs when
+ * the w component is significantly different from zero.
+ *
+ * @tparam T A floating-point type representing the vector's element type.
+ */
+template <typename T, Options Option = Options::RowMajor>
+  requires std::floating_point<T>
+Vector<T, 4, Option> g_perspectiveDivide(const Vector<T, 4, Option>& vector,
+                                         T tolerance = g_kDefaultTolerance) {
+  if (!g_isNearlyZero(vector.w(), tolerance)) {
+    return vector / vector.w();
+  }
+  return vector;
+}
 
 // BEGIN: frustrum (perspective projection matrix that off center) creation functions
 // ----------------------------------------------------------------------------
