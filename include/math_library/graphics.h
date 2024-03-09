@@ -7,6 +7,14 @@
 
 #include "matrix.h"
 
+// TODO:
+// - for matrix initialization, use << operator instead of operator(row,
+// column);
+// - add additional functions that will take matrix as an argument and use it as
+// a return value (to remove things like math::g_someFunction<float,
+// math::Options::ColumnMajor>(...)
+// - add general recomendations (what functions to use and how)
+
 namespace math {
 
 // clang-format off
