@@ -872,7 +872,7 @@ template <typename T, Options Option = Options::RowMajor>
   requires std::floating_point<T>
 Vector<T, 4, Option> g_perspectiveDivide(const Vector<T, 4, Option>& vector,
                                          T tolerance = g_kDefaultTolerance) {
-  if (!g_isNearlyZero(vector.w(), tolerance)) {
+  if (static_cast<T>(1) != vector.w() && !g_isNearlyZero(vector.w(), tolerance)) {
     return vector / vector.w();
   }
   return vector;
