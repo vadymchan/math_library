@@ -54,6 +54,22 @@ void g_addTranslate(Matrix<T, 4, 4, Option>&    matrix,
   g_addTranslate(matrix, translation.x(), translation.y(), translation.z());
 }
 
+template <typename T, Options Option>
+void g_setTranslate(Matrix<T, 4, 4, Option>& matrix, T dx, T dy, T dz) {
+  Vector<T, 4, Option> translation(dx, dy, dz, matrix(3, 3));
+  if constexpr (Option == Options::RowMajor) {
+    matrix.setRow<3>(translation);
+  } else if constexpr (Option == Options::ColumnMajor) {
+    matrix.setColumn<3>(translation);
+  }
+}
+
+template <typename T, Options Option>
+void g_setTranslate(Matrix<T, 4, 4, Option>&    matrix,
+                      const Vector<T, 3, Option>& translation) {
+  g_setTranslate(matrix, translation.x(), translation.y(), translation.z());
+}
+
 template <typename T, Options Option = Options::RowMajor>
 auto g_scale(T sx, T sy, T sz) -> Matrix<T, 4, 4, Option> {
   return Matrix<T, 4, 4, Option>{
