@@ -8,6 +8,7 @@
 namespace math {
 
 constexpr float g_kPi               = 3.141592653f;
+constexpr float g_kDefaultTolerance = 1e-8f;
 
 template <typename T>
   requires std::floating_point<T>
@@ -30,6 +31,19 @@ auto g_abs(T value) -> T {
   } else {
     return std::abs(value);
   }
+}
+
+template <typename T>
+  requires std::floating_point<T>
+constexpr auto g_isNearlyEqual(T a, T b, T tolerance = g_kDefaultTolerance)
+    -> bool {
+  return g_abs(a - b) <= tolerance;
+}
+
+template <typename T>
+  requires std::floating_point<T>
+constexpr auto g_isNearlyZero(T a, T tolerance = g_kDefaultTolerance) -> bool {
+  return g_abs(a) <= tolerance;
 }
 
 }  // namespace math
