@@ -7,7 +7,7 @@
 
 namespace math {
 
-static constexpr float g_kPi = 3.141592653f;
+constexpr float g_kPi               = 3.141592653f;
 
 template <typename T>
   requires std::floating_point<T>
