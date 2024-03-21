@@ -187,6 +187,26 @@ class InstructionSet<unsigned int> {
 #endif
   }
 
+  using CmpFunc = int (*)(const unsigned int*, const unsigned int*, size_t);
+
+  static auto GetCmpFunc() -> CmpFunc {
+#ifdef SUPPORTS_AVX2
+    return CmpAvx2;
+#elif defined(SUPPORTS_AVX)
+    return CmpAvx;
+#elif defined(SUPPORTS_SSE4_2)
+    return CmpSse42;
+#elif defined(SUPPORTS_SSE4_1)
+    return CmpSse41;
+#elif defined(SUPPORTS_SSSE3)
+    return CmpSsse3;
+#elif defined(SUPPORTS_SSE3)
+    return CmpSse3;
+#else
+    return CmpFallback;
+#endif
+  }
+
   private:
   static constexpr size_t s_kAvxSimdWidth
       = sizeof(__m256i) / sizeof(unsigned int);  // 8
@@ -746,12 +766,12 @@ class InstructionSet<unsigned int> {
   }
 
   template <Options Option>
-  static void MulFallback(unsigned int* result,
-                          const unsigned int*    a,
-                          const unsigned int*    b,
-                          const size_t           kRowsA,
-                          const size_t           kColsB,
-                          const size_t           kColsARowsB) {
+  static void MulFallback(unsigned int*       result,
+                          const unsigned int* a,
+                          const unsigned int* b,
+                          const size_t        kRowsA,
+                          const size_t        kColsB,
+                          const size_t        kColsARowsB) {
     for (size_t i = 0; i < kRowsA; ++i) {
       for (size_t j = 0; j < kColsB; ++j) {
         unsigned int sum = 0;
@@ -935,6 +955,135 @@ class InstructionSet<unsigned int> {
   }
 
   // END: division scalar
+  //----------------------------------------------------------------------------
+
+  // BEGIN : comparison static array
+  //----------------------------------------------------------------------------
+
+  static int CmpAvx2(const unsigned int* a,
+                     const unsigned int* b,
+                     size_t              size) {
+    return CmpAvx(a, b, size);
+  }
+
+  static int CmpAvx(const unsigned int* a, const unsigned int* b, size_t size) {
+    const size_t kAvxLimit = size - (size % s_kAvxSimdWidth);
+    size_t       i         = 0;
+
+    for (; i < kAvxLimit; i += s_kAvxSimdWidth) {
+      __m256i aVec = _mm256_loadu_si256((__m256i*)(a + i));
+      __m256i bVec = _mm256_loadu_si256((__m256i*)(b + i));
+
+      __m256i signBit  = _mm256_set1_epi32(0x80'00'00'00);
+      __m256i aVecSign = _mm256_xor_si256(aVec, signBit);
+      __m256i bVecSign = _mm256_xor_si256(bVec, signBit);
+
+      __m256i cmpResult = _mm256_cmpgt_epi32(bVecSign, aVecSign);
+      int     mask      = _mm256_movemask_ps(_mm256_castsi256_ps(cmpResult));
+      if (mask != 0) {
+        return -1;
+      }
+
+      cmpResult = _mm256_cmpgt_epi32(aVecSign, bVecSign);
+      mask      = _mm256_movemask_ps(_mm256_castsi256_ps(cmpResult));
+      if (mask != 0) {
+        return 1;
+      }
+
+      cmpResult = _mm256_cmpeq_epi32(aVec, bVec);
+      mask      = _mm256_movemask_ps(_mm256_castsi256_ps(cmpResult));
+      if (mask == 0xFF) {
+        return 0;
+      }
+    }
+
+    // Handle any remainder
+    for (; i < size; ++i) {
+      if (a[i] < b[i]) {
+        return -1;
+      } else if (a[i] > b[i]) {
+        return 1;
+      }
+    }
+    return 0;
+  }
+
+  static int CmpSse42(const unsigned int* a,
+                      const unsigned int* b,
+                      size_t              size) {
+    return CmpSse3(a, b, size);
+  }
+
+  static int CmpSse41(const unsigned int* a,
+                      const unsigned int* b,
+                      size_t              size) {
+    return CmpSse3(a, b, size);
+  }
+
+  static int CmpSsse3(const unsigned int* a,
+                      const unsigned int* b,
+                      size_t              size) {
+    return CmpSse3(a, b, size);
+  }
+
+  static int CmpSse3(const unsigned int* a,
+                     const unsigned int* b,
+                     size_t              size) {
+    const size_t kSseLimit = size - (size % s_kSseSimdWidth);
+    size_t       i         = 0;
+
+    for (; i < kSseLimit; i += s_kSseSimdWidth) {
+      __m128i aVec = _mm_loadu_si128((__m128i*)(a + i));
+      __m128i bVec = _mm_loadu_si128((__m128i*)(b + i));
+
+      __m128i signBit  = _mm_set1_epi32(0x80'00'00'00);
+      __m128i aVecSign = _mm_xor_si128(aVec, signBit);
+      __m128i bVecSign = _mm_xor_si128(bVec, signBit);
+
+      __m128i cmpResult = _mm_cmpgt_epi32(bVecSign, aVecSign);
+      int     mask      = _mm_movemask_ps(_mm_castsi128_ps(cmpResult));
+      if (mask != 0) {
+        return -1;
+      }
+
+      cmpResult = _mm_cmpgt_epi32(aVecSign, bVecSign);
+      mask      = _mm_movemask_ps(_mm_castsi128_ps(cmpResult));
+      if (mask != 0) {
+        return 1;
+      }
+
+      cmpResult = _mm_cmpeq_epi32(aVec, bVec);
+      mask      = _mm_movemask_ps(_mm_castsi128_ps(cmpResult));
+      if (mask == 0xF) {
+        return 0;
+      }
+    }
+
+    // Handle any remainder
+    for (; i < size; ++i) {
+      if (a[i] < b[i]) {
+        return -1;
+      } else if (a[i] > b[i]) {
+        return 1;
+      }
+    }
+    return 0;
+  }
+
+  static int CmpFallback(const unsigned int* a,
+                         const unsigned int* b,
+                         size_t              size) {
+    for (size_t i = 0; i < size; ++i) {
+      if (a[i] < b[i]) {
+        return -1;
+      } else if (a[i] > b[i]) {
+        return 1;
+      }
+    }
+    return 0;
+  }
+
+  // END: comparison array
   //----------------------------------------------------------------------------
 };
 
