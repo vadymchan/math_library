@@ -337,6 +337,69 @@ class Vector {
     return *this;
   }
 
+  // TODO: for comparison consider:
+  // - comparison for vector with different dimension
+  // - optional tolerance parameter (useful for floating point types)
+  // - comparison for different major (row-major and column-major comparison)
+
+  /**
+   * @brief Lexicographical less than operator.
+   *
+   * Compares two vectors lexicographically.
+   *
+   * @param other The vector to compare against.
+   * @return True if this vector is lexicographically less than the other
+   * vector, false otherwise.
+   */
+  auto operator<(const Vector& other) const -> bool {
+    auto cmpFunc = InstructionSet<T>::GetCmpFunc();
+    return cmpFunc(this->data(), other.data(), Size) == -1;
+  }
+
+  /**
+   * @brief Lexicographical greater than operator.
+   *
+   * Compares two vectors lexicographically.
+   *
+   * @param other The vector to compare against.
+   * @return True if this vector is lexicographically greater than the other
+   * vector, false otherwise.
+   */
+  auto operator>(const Vector& other) const -> bool {
+    auto cmpFunc = InstructionSet<T>::GetCmpFunc();
+    return cmpFunc(this->data(), other.data(), Size) == 1;
+  }
+
+  /**
+   * @brief Lexicographical less than or equal to operator.
+   *
+   * Compares two vectors lexicographically.
+   *
+   * @param other The vector to compare against.
+   * @return True if this vector is lexicographically less than or equal to the
+   * other vector, false otherwise.
+   */
+  auto operator<=(const Vector& other) const -> bool {
+    auto cmpFunc = InstructionSet<T>::GetCmpFunc();
+    int  result  = cmpFunc(this->data(), other.data(), Size);
+    return result == -1 || result == 0;
+  }
+
+  /**
+   * @brief Lexicographical greater than or equal to operator.
+   *
+   * Compares two vectors lexicographically.
+   *
+   * @param other The vector to compare against.
+   * @return True if this vector is lexicographically greater than or equal to
+   * the other vector, false otherwise.
+   */
+  auto operator>=(const Vector& other) const -> bool {
+    auto cmpFunc = InstructionSet<T>::GetCmpFunc();
+    int  result  = cmpFunc(this->data(), other.data(), Size);
+    return result == 1 || result == 0;
+  }
+
   auto operator==(const Vector& other) const -> bool {
     return m_dataStorage_ == other.m_dataStorage_;
   }
