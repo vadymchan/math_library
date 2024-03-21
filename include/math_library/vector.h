@@ -246,7 +246,7 @@ class Vector {
   }
 
   auto operator+=(const Vector& other) -> Vector& {
-    m_dataStorage_ += other;
+    m_dataStorage_ += other.m_dataStorage_;
     return *this;
   }
 
