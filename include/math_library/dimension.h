@@ -153,6 +153,66 @@ class Dimension {
     return *this;
   }
 
+    /**
+   * @brief Lexicographical less than operator.
+   *
+   * Compares two dimensions lexicographically.
+   *
+   * @param other The dimension to compare against.
+   * @return True if this dimension is lexicographically less than the other
+   * dimension, false otherwise.
+   */
+  auto operator<(const Dimension& other) const -> bool {
+    return this->m_dataStorage_ < other.m_dataStorage_ ;
+  }
+
+  /**
+   * @brief Lexicographical greater than operator.
+   *
+   * Compares two dimensions lexicographically.
+   *
+   * @param other The dimension to compare against.
+   * @return True if this dimension is lexicographically greater than the other
+   * dimension, false otherwise.
+   */
+  auto operator>(const Dimension& other) const -> bool {
+    return this->m_dataStorage_ > other.m_dataStorage_;
+  }
+
+  /**
+   * @brief Lexicographical less than or equal to operator.
+   *
+   * Compares two dimensions lexicographically.
+   *
+   * @param other The dimension to compare against.
+   * @return True if this dimension is lexicographically less than or equal to the
+   * other dimension, false otherwise.
+   */
+  auto operator<=(const Dimension& other) const -> bool {
+    return this->m_dataStorage_ <= other.m_dataStorage_;
+  }
+
+  /**
+   * @brief Lexicographical greater than or equal to operator.
+   *
+   * Compares two dimensions lexicographically.
+   *
+   * @param other The dimension to compare against.
+   * @return True if this dimension is lexicographically greater than or equal to
+   * the other dimension, false otherwise.
+   */
+  auto operator>=(const Dimension& other) const -> bool {
+    return this->m_dataStorage_ >= other.m_dataStorage_;
+  }
+
+  auto operator==(const Dimension& other) const -> bool {
+    return m_dataStorage_ == other.m_dataStorage_;
+  }
+
+  auto operator!=(const Dimension& other) const -> bool {
+    return m_dataStorage_ != other.m_dataStorage_;
+  }
+
   friend auto operator<<(std::ostream& os, const Dimension& dimension)
       -> std::ostream& {
     return os << dimension.m_dataStorage_;
