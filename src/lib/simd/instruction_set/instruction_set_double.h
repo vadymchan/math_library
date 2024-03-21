@@ -185,6 +185,26 @@ class InstructionSet<double> {
 #endif
   }
 
+  using CmpFunc = int (*)(const double*, const double*, size_t);
+
+  static auto GetCmpFunc() -> CmpFunc {
+#ifdef SUPPORTS_AVX2
+    return CmpAvx2;
+#elif defined(SUPPORTS_AVX)
+    return CmpAvx;
+#elif defined(SUPPORTS_SSE4_2)
+    return CmpSse42;
+#elif defined(SUPPORTS_SSE4_1)
+    return CmpSse41;
+#elif defined(SUPPORTS_SSSE3)
+    return CmpSsse3;
+#elif defined(SUPPORTS_SSE3)
+    return CmpSse3;
+#else
+    return CmpFallback;
+#endif
+  }
+
   private:
   static constexpr size_t s_kAvxSimdWidth
       = sizeof(__m256d) / sizeof(double);  // 4
@@ -823,6 +843,109 @@ class InstructionSet<double> {
   }
 
   // END: division scalar
+  //----------------------------------------------------------------------------
+
+    // BEGIN: comparison array
+  //----------------------------------------------------------------------------
+
+  static int CmpAvx2(const double* a, const double* b, size_t size) {
+    return CmpAvx(a, b, size);
+  }
+
+  static int CmpAvx(const double* a, const double* b, size_t size) {
+    const size_t kAvxLimit = size - (size % s_kAvxSimdWidth);
+    size_t       i         = 0;
+
+    for (; i < kAvxLimit; i += s_kAvxSimdWidth) {
+      __m256d aVec      = _mm256_loadu_pd(a + i);
+      __m256d bVec      = _mm256_loadu_pd(b + i);
+      __m256d cmpResult = _mm256_cmp_pd(aVec, bVec, _CMP_LT_OQ);
+      int     mask      = _mm256_movemask_pd(cmpResult);
+      if (mask != 0) {
+        return -1;
+      }
+      cmpResult = _mm256_cmp_pd(aVec, bVec, _CMP_GT_OQ);
+      mask      = _mm256_movemask_pd(cmpResult);
+      if (mask != 0) {
+        return 1;
+      }
+      cmpResult = _mm256_cmp_pd(aVec, bVec, _CMP_NEQ_OQ);
+      mask      = _mm256_movemask_pd(cmpResult);
+      if (mask == 0) {
+        return 0;
+      }
+    }
+
+    // Handle any remainder
+    for (; i < size; ++i) {
+      if (a[i] < b[i]) {
+        return -1;
+      } else if (a[i] > b[i]) {
+        return 1;
+      }
+    }
+    return 0;
+  }
+
+  static int CmpSse42(const double* a, const double* b, size_t size) {
+    return CmpSse3(a, b, size);
+  }
+
+  static int CmpSse41(const double* a, const double* b, size_t size) {
+    return CmpSse3(a, b, size);
+  }
+
+  static int CmpSsse3(const double* a, const double* b, size_t size) {
+    return CmpSse3(a, b, size);
+  }
+
+  static int CmpSse3(const double* a, const double* b, size_t size) {
+    const size_t kSseLimit = size - (size % s_kSseSimdWidth);
+    size_t       i         = 0;
+
+    for (; i < kSseLimit; i += s_kSseSimdWidth) {
+      __m128d aVec      = _mm_loadu_pd(a + i);
+      __m128d bVec      = _mm_loadu_pd(b + i);
+      __m128d cmpResult = _mm_cmplt_pd(aVec, bVec);
+      int     mask      = _mm_movemask_pd(cmpResult);
+      if (mask != 0) {
+        return -1;
+      }
+      cmpResult = _mm_cmpgt_pd(aVec, bVec);
+      mask      = _mm_movemask_pd(cmpResult);
+      if (mask != 0) {
+        return 1;
+      }
+      cmpResult = _mm_cmpeq_pd(aVec, bVec);
+      mask      = _mm_movemask_pd(cmpResult);
+      if (mask == 0x3) {
+        return 0;
+      }
+    }
+
+    // Handle any remainder
+    for (; i < size; ++i) {
+      if (a[i] < b[i]) {
+        return -1;
+      } else if (a[i] > b[i]) {
+        return 1;
+      }
+    }
+    return 0;
+  }
+
+  static int CmpFallback(const double* a, const double* b, size_t size) {
+    for (size_t i = 0; i < size; ++i) {
+      if (a[i] < b[i]) {
+        return -1;
+      } else if (a[i] > b[i]) {
+        return 1;
+      }
+    }
+    return 0;
+  }
+
+  // END: comparison array
   //----------------------------------------------------------------------------
 };
 }  // namespace math
