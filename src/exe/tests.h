@@ -5213,5 +5213,352 @@ TEST(VectorComparisonTest, GreaterThanOrEqualToOperatorUint32LargeValues) {
   EXPECT_FALSE(vec2 >= vec1);
 }
 
+// ========================== DIMENSION: FLOAT ==============================
+
+TEST(DimensionComparisonTest, LessThanOperator) {
+  math::Dimension3Df vec1(1.0f, 2.0f, 3.0f);
+  math::Dimension3Df vec2(4.0f, 5.0f, 6.0f);
+
+  EXPECT_TRUE(vec1 < vec2);
+  EXPECT_FALSE(vec2 < vec1);
+}
+
+TEST(DimensionComparisonTest, LessThanOperatorEqual) {
+  math::Dimension3Df vec1(1.0f, 2.0f, 3.0f);
+  math::Dimension3Df vec2(1.0f, 2.0f, 3.0f);
+
+  EXPECT_FALSE(vec1 < vec2);
+  EXPECT_FALSE(vec2 < vec1);
+}
+
+TEST(DimensionComparisonTest, GreaterThanOperator) {
+  math::Dimension3Df vec1(4.0f, 5.0f, 6.0f);
+  math::Dimension3Df vec2(1.0f, 2.0f, 3.0f);
+
+  EXPECT_TRUE(vec1 > vec2);
+  EXPECT_FALSE(vec2 > vec1);
+}
+
+TEST(DimensionComparisonTest, GreaterThanOperatorEqual) {
+  math::Dimension3Df vec1(1.0f, 2.0f, 3.0f);
+  math::Dimension3Df vec2(1.0f, 2.0f, 3.0f);
+
+  EXPECT_FALSE(vec1 > vec2);
+  EXPECT_FALSE(vec2 > vec1);
+}
+
+TEST(DimensionComparisonTest, LessThanOrEqualToOperator) {
+  math::Dimension3Df vec1(1.0f, 2.0f, 3.0f);
+  math::Dimension3Df vec2(4.0f, 5.0f, 6.0f);
+  math::Dimension3Df vec3(1.0f, 2.0f, 3.0f);
+
+  EXPECT_TRUE(vec1 <= vec2);
+  EXPECT_FALSE(vec2 <= vec1);
+  EXPECT_TRUE(vec1 <= vec3);
+  EXPECT_TRUE(vec3 <= vec1);
+}
+
+TEST(DimensionComparisonTest, GreaterThanOrEqualToOperator) {
+  math::Dimension3Df vec1(4.0f, 5.0f, 6.0f);
+  math::Dimension3Df vec2(1.0f, 2.0f, 3.0f);
+  math::Dimension3Df vec3(4.0f, 5.0f, 6.0f);
+
+  EXPECT_TRUE(vec1 >= vec2);
+  EXPECT_FALSE(vec2 >= vec1);
+  EXPECT_TRUE(vec1 >= vec3);
+  EXPECT_TRUE(vec3 >= vec1);
+}
+
+// ========================== DIMENSION: DOUBLE ==============================
+
+TEST(DimensionComparisonTest, LessThanOperatorDouble) {
+  math::Dimension3D<double> vec1(1.0, 2.0, 3.0);
+  math::Dimension3D<double> vec2(4.0, 5.0, 6.0);
+
+  EXPECT_TRUE(vec1 < vec2);
+  EXPECT_FALSE(vec2 < vec1);
+}
+
+TEST(DimensionComparisonTest, LessThanOperatorEqualDouble) {
+  math::Dimension3D<double> vec1(1.0, 2.0, 3.0);
+  math::Dimension3D<double> vec2(1.0, 2.0, 3.0);
+
+  EXPECT_FALSE(vec1 < vec2);
+  EXPECT_FALSE(vec2 < vec1);
+}
+
+TEST(DimensionComparisonTest, GreaterThanOperatorDouble) {
+  math::Dimension3D<double> vec1(4.0, 5.0, 6.0);
+  math::Dimension3D<double> vec2(1.0, 2.0, 3.0);
+
+  EXPECT_TRUE(vec1 > vec2);
+  EXPECT_FALSE(vec2 > vec1);
+}
+
+TEST(DimensionComparisonTest, GreaterThanOperatorEqualDouble) {
+  math::Dimension3D<double> vec1(1.0, 2.0, 3.0);
+  math::Dimension3D<double> vec2(1.0, 2.0, 3.0);
+
+  EXPECT_FALSE(vec1 > vec2);
+  EXPECT_FALSE(vec2 > vec1);
+}
+
+TEST(DimensionComparisonTest, LessThanOrEqualToOperatorDouble) {
+  math::Dimension3D<double> vec1(1.0, 2.0, 3.0);
+  math::Dimension3D<double> vec2(4.0, 5.0, 6.0);
+  math::Dimension3D<double> vec3(1.0, 2.0, 3.0);
+
+  EXPECT_TRUE(vec1 <= vec2);
+  EXPECT_FALSE(vec2 <= vec1);
+  EXPECT_TRUE(vec1 <= vec3);
+  EXPECT_TRUE(vec3 <= vec1);
+}
+
+TEST(DimensionComparisonTest, GreaterThanOrEqualToOperatorDouble) {
+  math::Dimension3D<double> vec1(4.0, 5.0, 6.0);
+  math::Dimension3D<double> vec2(1.0, 2.0, 3.0);
+  math::Dimension3D<double> vec3(4.0, 5.0, 6.0);
+
+  EXPECT_TRUE(vec1 >= vec2);
+  EXPECT_FALSE(vec2 >= vec1);
+  EXPECT_TRUE(vec1 >= vec3);
+  EXPECT_TRUE(vec3 >= vec1);
+}
+
+// ========================== DIMENSION: INT ==============================
+
+TEST(DimensionComparisonTest, LessThanOperatorInt) {
+  math::Dimension3Di vec1(1, 2, 3);
+  math::Dimension3Di vec2(4, 5, 6);
+
+  EXPECT_TRUE(vec1 < vec2);
+  EXPECT_FALSE(vec2 < vec1);
+}
+
+TEST(DimensionComparisonTest, LessThanOperatorEqualInt) {
+  math::Dimension3Di vec1(1, 2, 3);
+  math::Dimension3Di vec2(1, 2, 3);
+
+  EXPECT_FALSE(vec1 < vec2);
+  EXPECT_FALSE(vec2 < vec1);
+}
+
+TEST(DimensionComparisonTest, GreaterThanOperatorInt) {
+  math::Dimension3Di vec1(4, 5, 6);
+  math::Dimension3Di vec2(1, 2, 3);
+
+  EXPECT_TRUE(vec1 > vec2);
+  EXPECT_FALSE(vec2 > vec1);
+}
+
+TEST(DimensionComparisonTest, GreaterThanOperatorEqualInt) {
+  math::Dimension3Di vec1(1, 2, 3);
+  math::Dimension3Di vec2(1, 2, 3);
+
+  EXPECT_FALSE(vec1 > vec2);
+  EXPECT_FALSE(vec2 > vec1);
+}
+
+TEST(DimensionComparisonTest, LessThanOrEqualToOperatorInt) {
+  math::Dimension3Di vec1(1, 2, 3);
+  math::Dimension3Di vec2(4, 5, 6);
+  math::Dimension3Di vec3(1, 2, 3);
+
+  EXPECT_TRUE(vec1 <= vec2);
+  EXPECT_FALSE(vec2 <= vec1);
+  EXPECT_TRUE(vec1 <= vec3);
+  EXPECT_TRUE(vec3 <= vec1);
+}
+
+TEST(DimensionComparisonTest, GreaterThanOrEqualToOperatorInt) {
+  math::Dimension3Di vec1(4, 5, 6);
+  math::Dimension3Di vec2(1, 2, 3);
+  math::Dimension3Di vec3(4, 5, 6);
+
+  EXPECT_TRUE(vec1 >= vec2);
+  EXPECT_FALSE(vec2 >= vec1);
+  EXPECT_TRUE(vec1 >= vec3);
+  EXPECT_TRUE(vec3 >= vec1);
+}
+
+// ======================= DIMENSION: UNSIGNED INT ===========================
+
+TEST(DimensionComparisonTest, LessThanOperatorUnsignedInt) {
+  math::Dimension3D<unsigned int> vec1(1, 2, 3);
+  math::Dimension3D<unsigned int> vec2(4, 5, 6);
+
+  EXPECT_TRUE(vec1 < vec2);
+  EXPECT_FALSE(vec2 < vec1);
+}
+
+TEST(DimensionComparisonTest, LessThanOperatorEqualUnsignedInt) {
+  math::Dimension3D<unsigned int> vec1(1, 2, 3);
+  math::Dimension3D<unsigned int> vec2(1, 2, 3);
+
+  EXPECT_FALSE(vec1 < vec2);
+  EXPECT_FALSE(vec2 < vec1);
+}
+
+TEST(DimensionComparisonTest, GreaterThanOperatorUnsignedInt) {
+  math::Dimension3D<unsigned int> vec1(4, 5, 6);
+  math::Dimension3D<unsigned int> vec2(1, 2, 3);
+
+  EXPECT_TRUE(vec1 > vec2);
+  EXPECT_FALSE(vec2 > vec1);
+}
+
+TEST(DimensionComparisonTest, GreaterThanOperatorEqualUnsignedInt) {
+  math::Dimension3D<unsigned int> vec1(1, 2, 3);
+  math::Dimension3D<unsigned int> vec2(1, 2, 3);
+
+  EXPECT_FALSE(vec1 > vec2);
+  EXPECT_FALSE(vec2 > vec1);
+}
+
+TEST(DimensionComparisonTest, LessThanOrEqualToOperatorUnsignedInt) {
+  math::Dimension3D<unsigned int> vec1(1, 2, 3);
+  math::Dimension3D<unsigned int> vec2(4, 5, 6);
+  math::Dimension3D<unsigned int> vec3(1, 2, 3);
+
+  EXPECT_TRUE(vec1 <= vec2);
+  EXPECT_FALSE(vec2 <= vec1);
+  EXPECT_TRUE(vec1 <= vec3);
+  EXPECT_TRUE(vec3 <= vec1);
+}
+
+TEST(DimensionComparisonTest, GreaterThanOrEqualToOperatorUnsignedInt) {
+  math::Dimension3D<unsigned int> vec1(4, 5, 6);
+  math::Dimension3D<unsigned int> vec2(1, 2, 3);
+  math::Dimension3D<unsigned int> vec3(4, 5, 6);
+
+  EXPECT_TRUE(vec1 >= vec2);
+  EXPECT_FALSE(vec2 >= vec1);
+  EXPECT_TRUE(vec1 >= vec3);
+  EXPECT_TRUE(vec3 >= vec1);
+}
+
+TEST(DimensionComparisonTest, LessThanOperatorUnsignedIntLargeValues) {
+  math::Dimension3D<unsigned int> vec1(
+      0xFF'FF'FF'FF, 0xFF'FF'FF'FF, 0xFF'FF'FF'FF);
+  math::Dimension3D<unsigned int> vec2(0, 0, 0);
+
+  EXPECT_FALSE(vec1 < vec2);
+  EXPECT_TRUE(vec2 < vec1);
+}
+
+TEST(DimensionComparisonTest, GreaterThanOperatorUnsignedIntLargeValues) {
+  math::Dimension3D<unsigned int> vec1(
+      0xFF'FF'FF'FF, 0xFF'FF'FF'FF, 0xFF'FF'FF'FF);
+  math::Dimension3D<unsigned int> vec2(0, 0, 0);
+
+  EXPECT_TRUE(vec1 > vec2);
+  EXPECT_FALSE(vec2 > vec1);
+}
+
+TEST(DimensionComparisonTest, LessThanOrEqualToOperatorUnsignedIntLargeValues) {
+  math::Dimension3D<unsigned int> vec1(
+      0xFF'FF'FF'FF, 0xFF'FF'FF'FF, 0xFF'FF'FF'FF);
+  math::Dimension3D<unsigned int> vec2(0, 0, 0);
+
+  EXPECT_FALSE(vec1 <= vec2);
+  EXPECT_TRUE(vec2 <= vec1);
+}
+
+TEST(DimensionComparisonTest, GreaterThanOrEqualToOperatorUnsignedIntLargeValues) {
+  math::Dimension3D<unsigned int> vec1(
+      0xFF'FF'FF'FF, 0xFF'FF'FF'FF, 0xFF'FF'FF'FF);
+  math::Dimension3D<unsigned int> vec2(0, 0, 0);
+
+  EXPECT_FALSE(vec2 >= vec1);
+  EXPECT_TRUE(vec1 >= vec2);
+}
+
+// ========================== DIMENSION: UINT32_T ==============================
+
+TEST(DimensionComparisonTest, LessThanOperatorUint32) {
+  math::Dimension<std::uint32_t, 10> vec1 = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
+  math::Dimension<std::uint32_t, 10> vec2 = {4, 5, 6, 7, 8, 9, 10, 11, 12, 13};
+
+  EXPECT_TRUE(vec1 < vec2);
+  EXPECT_FALSE(vec2 < vec1);
+}
+
+TEST(DimensionComparisonTest, LessThanOperatorEqualUint32) {
+  math::Dimension<std::uint32_t, 10> vec1 = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
+  math::Dimension<std::uint32_t, 10> vec2 = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
+
+  EXPECT_FALSE(vec1 < vec2);
+  EXPECT_FALSE(vec2 < vec1);
+}
+
+TEST(DimensionComparisonTest, GreaterThanOperatorUint32) {
+  math::Dimension<std::uint32_t, 10> vec1 = {4, 5, 6, 7, 8, 9, 10, 11, 12, 13};
+  math::Dimension<std::uint32_t, 10> vec2 = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
+
+  EXPECT_TRUE(vec1 > vec2);
+  EXPECT_FALSE(vec2 > vec1);
+}
+
+TEST(DimensionComparisonTest, GreaterThanOperatorEqualUint32) {
+  math::Dimension<std::uint32_t, 10> vec1 = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
+  math::Dimension<std::uint32_t, 10> vec2 = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
+
+  EXPECT_FALSE(vec1 > vec2);
+  EXPECT_FALSE(vec2 > vec1);
+}
+
+TEST(DimensionComparisonTest, LessThanOrEqualToOperatorUint32) {
+  math::Dimension<std::uint32_t, 10> vec1 = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
+  math::Dimension<std::uint32_t, 10> vec2 = {4, 5, 6, 7, 8, 9, 10, 11, 12, 13};
+  math::Dimension<std::uint32_t, 10> vec3 = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
+
+  EXPECT_TRUE(vec1 <= vec2);
+  EXPECT_FALSE(vec2 <= vec1);
+  EXPECT_TRUE(vec1 <= vec3);
+  EXPECT_TRUE(vec3 <= vec1);
+}
+
+TEST(DimensionComparisonTest, GreaterThanOrEqualToOperatorUint32) {
+  math::Dimension<std::uint32_t, 10> vec1 = {4, 5, 6, 7, 8, 9, 10, 11, 12, 13};
+  math::Dimension<std::uint32_t, 10> vec2 = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
+  math::Dimension<std::uint32_t, 10> vec3 = {4, 5, 6, 7, 8, 9, 10, 11, 12, 13};
+
+  EXPECT_TRUE(vec1 >= vec2);
+  EXPECT_FALSE(vec2 >= vec1);
+  EXPECT_TRUE(vec1 >= vec3);
+  EXPECT_TRUE(vec3 >= vec1);
+}
+
+TEST(DimensionComparisonTest, LessThanOperatorUint32LargeValues) {
+  math::Dimension<std::uint32_t, 10> vec1(0xFF'FF'FF'FF);
+  math::Dimension<std::uint32_t, 10> vec2(0);
+
+  EXPECT_FALSE(vec1 < vec2);
+  EXPECT_TRUE(vec2 < vec1);
+}
+
+TEST(DimensionComparisonTest, GreaterThanOperatorUint32LargeValues) {
+  math::Dimension<std::uint32_t, 10> vec1(0xFF'FF'FF'FF);
+  math::Dimension<std::uint32_t, 10> vec2(0);
+
+  EXPECT_TRUE(vec1 > vec2);
+  EXPECT_FALSE(vec2 > vec1);
+}
+
+TEST(DimensionComparisonTest, LessThanOrEqualToOperatorUint32LargeValues) {
+  math::Dimension<std::uint32_t, 10> vec1(0xFF'FF'FF'FF);
+  math::Dimension<std::uint32_t, 10> vec2(0);
+
+  EXPECT_FALSE(vec1 <= vec2);
+  EXPECT_TRUE(vec2 <= vec1);
+}
+
+TEST(DimensionComparisonTest, GreaterThanOrEqualToOperatorUint32LargeValues) {
+  math::Dimension<std::uint32_t, 10> vec1(0xFF'FF'FF'FF);
+  math::Dimension<std::uint32_t, 10> vec2(0);
+
+  EXPECT_TRUE(vec1 >= vec2);
+  EXPECT_FALSE(vec2 >= vec1);
+}
 
 #endif
