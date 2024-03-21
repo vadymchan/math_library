@@ -191,6 +191,26 @@ class InstructionSet {
 #endif
   }
 
+  using CmpFunc = int (*)(const T*, const T*, size_t);
+
+  static auto GetCmpFunc() -> CmpFunc {
+#ifdef SUPPORTS_AVX2
+    return CmpAvx2;
+#elif defined(SUPPORTS_AVX)
+    return CmpAvx;
+#elif defined(SUPPORTS_SSE4_2)
+    return CmpSse42;
+#elif defined(SUPPORTS_SSE4_1)
+    return CmpSse41;
+#elif defined(SUPPORTS_SSSE3)
+    return CmpSsse3;
+#elif defined(SUPPORTS_SSE3)
+    return CmpSse3;
+#else
+    return CmpFallback;
+#endif
+  }
+
   private:
   // BEGIN: add two arrays
   //----------------------------------------------------------------------------
@@ -550,6 +570,47 @@ class InstructionSet {
 
   // END: division scalar
   //----------------------------------------------------------------------------
+
+  // BEGIN: comparison array
+  //----------------------------------------------------------------------------
+
+  static int CmpAvx2(const T* a, const T* b, size_t size) {
+    return CmpAvx(a, b, size);
+  }
+
+  static int CmpAvx(const T* a, const T* b, size_t size) {
+    return CmpFallback(a, b, size);
+  }
+
+  static int CmpSse42(const T* a, const T* b, size_t size) {
+    return CmpSse3(a, b, size);
+  }
+
+  static int CmpSse41(const T* a, const T* b, size_t size) {
+    return CmpSse3(a, b, size);
+  }
+
+  static int CmpSsse3(const T* a, const T* b, size_t size) {
+    return CmpSse3(a, b, size);
+  }
+
+  static int CmpSse3(const T* a, const T* b, size_t size) {
+    return CmpFallback(a, b, size);
+  }
+
+  static int CmpFallback(const T* a, const T* b, size_t size) {
+    for (size_t i = 0; i < size; ++i) {
+      if (a[i] < b[i]) {
+        return -1;
+      } else if (a[i] > b[i]) {
+        return 1;
+      }
+    }
+    return 0;
+  }
+
+  // END: comparison array
+  //----------------------------------------------------------------------------
 };
 
 }  // namespace math
@@ -557,6 +618,6 @@ class InstructionSet {
 #include "instruction_set_double.h"
 #include "instruction_set_float.h"
 #include "instruction_set_int.h"
-#include "instruction_set_unsigned_int.h"
+#include "instruction_set_uint32_t.h"
 
 #endif
