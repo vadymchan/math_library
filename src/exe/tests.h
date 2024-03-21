@@ -4865,4 +4865,353 @@ TEST(ViewMatrixTest, LookToLhColumnMajor) {
   EXPECT_FLOAT_EQ(viewMatrix(3, 3), 1.0f);
 }
 
+// ========================== VECTOR: FLOAT ==============================
+
+TEST(VectorComparisonTest, LessThanOperator) {
+  math::Vector3Df vec1(1.0f, 2.0f, 3.0f);
+  math::Vector3Df vec2(4.0f, 5.0f, 6.0f);
+
+  EXPECT_TRUE(vec1 < vec2);
+  EXPECT_FALSE(vec2 < vec1);
+}
+
+TEST(VectorComparisonTest, LessThanOperatorEqual) {
+  math::Vector3Df vec1(1.0f, 2.0f, 3.0f);
+  math::Vector3Df vec2(1.0f, 2.0f, 3.0f);
+
+  EXPECT_FALSE(vec1 < vec2);
+  EXPECT_FALSE(vec2 < vec1);
+}
+
+TEST(VectorComparisonTest, GreaterThanOperator) {
+  math::Vector3Df vec1(4.0f, 5.0f, 6.0f);
+  math::Vector3Df vec2(1.0f, 2.0f, 3.0f);
+
+  EXPECT_TRUE(vec1 > vec2);
+  EXPECT_FALSE(vec2 > vec1);
+}
+
+TEST(VectorComparisonTest, GreaterThanOperatorEqual) {
+  math::Vector3Df vec1(1.0f, 2.0f, 3.0f);
+  math::Vector3Df vec2(1.0f, 2.0f, 3.0f);
+
+  EXPECT_FALSE(vec1 > vec2);
+  EXPECT_FALSE(vec2 > vec1);
+}
+
+TEST(VectorComparisonTest, LessThanOrEqualToOperator) {
+  math::Vector3Df vec1(1.0f, 2.0f, 3.0f);
+  math::Vector3Df vec2(4.0f, 5.0f, 6.0f);
+  math::Vector3Df vec3(1.0f, 2.0f, 3.0f);
+
+  EXPECT_TRUE(vec1 <= vec2);
+  EXPECT_FALSE(vec2 <= vec1);
+  EXPECT_TRUE(vec1 <= vec3);
+  EXPECT_TRUE(vec3 <= vec1);
+}
+
+TEST(VectorComparisonTest, GreaterThanOrEqualToOperator) {
+  math::Vector3Df vec1(4.0f, 5.0f, 6.0f);
+  math::Vector3Df vec2(1.0f, 2.0f, 3.0f);
+  math::Vector3Df vec3(4.0f, 5.0f, 6.0f);
+
+  EXPECT_TRUE(vec1 >= vec2);
+  EXPECT_FALSE(vec2 >= vec1);
+  EXPECT_TRUE(vec1 >= vec3);
+  EXPECT_TRUE(vec3 >= vec1);
+}
+
+// ========================== VECTOR: DOUBLE ==============================
+
+TEST(VectorComparisonTest, LessThanOperatorDouble) {
+  math::Vector3D<double> vec1(1.0, 2.0, 3.0);
+  math::Vector3D<double> vec2(4.0, 5.0, 6.0);
+
+  EXPECT_TRUE(vec1 < vec2);
+  EXPECT_FALSE(vec2 < vec1);
+}
+
+TEST(VectorComparisonTest, LessThanOperatorEqualDouble) {
+  math::Vector3D<double> vec1(1.0, 2.0, 3.0);
+  math::Vector3D<double> vec2(1.0, 2.0, 3.0);
+
+  EXPECT_FALSE(vec1 < vec2);
+  EXPECT_FALSE(vec2 < vec1);
+}
+
+TEST(VectorComparisonTest, GreaterThanOperatorDouble) {
+  math::Vector3D<double> vec1(4.0, 5.0, 6.0);
+  math::Vector3D<double> vec2(1.0, 2.0, 3.0);
+
+  EXPECT_TRUE(vec1 > vec2);
+  EXPECT_FALSE(vec2 > vec1);
+}
+
+TEST(VectorComparisonTest, GreaterThanOperatorEqualDouble) {
+  math::Vector3D<double> vec1(1.0, 2.0, 3.0);
+  math::Vector3D<double> vec2(1.0, 2.0, 3.0);
+
+  EXPECT_FALSE(vec1 > vec2);
+  EXPECT_FALSE(vec2 > vec1);
+}
+
+TEST(VectorComparisonTest, LessThanOrEqualToOperatorDouble) {
+  math::Vector3D<double> vec1(1.0, 2.0, 3.0);
+  math::Vector3D<double> vec2(4.0, 5.0, 6.0);
+  math::Vector3D<double> vec3(1.0, 2.0, 3.0);
+
+  EXPECT_TRUE(vec1 <= vec2);
+  EXPECT_FALSE(vec2 <= vec1);
+  EXPECT_TRUE(vec1 <= vec3);
+  EXPECT_TRUE(vec3 <= vec1);
+}
+
+TEST(VectorComparisonTest, GreaterThanOrEqualToOperatorDouble) {
+  math::Vector3D<double> vec1(4.0, 5.0, 6.0);
+  math::Vector3D<double> vec2(1.0, 2.0, 3.0);
+  math::Vector3D<double> vec3(4.0, 5.0, 6.0);
+
+  EXPECT_TRUE(vec1 >= vec2);
+  EXPECT_FALSE(vec2 >= vec1);
+  EXPECT_TRUE(vec1 >= vec3);
+  EXPECT_TRUE(vec3 >= vec1);
+}
+
+// ========================== VECTOR: INT ==============================
+
+TEST(VectorComparisonTest, LessThanOperatorInt) {
+  math::Vector3Di vec1(1, 2, 3);
+  math::Vector3Di vec2(4, 5, 6);
+
+  EXPECT_TRUE(vec1 < vec2);
+  EXPECT_FALSE(vec2 < vec1);
+}
+
+TEST(VectorComparisonTest, LessThanOperatorEqualInt) {
+  math::Vector3Di vec1(1, 2, 3);
+  math::Vector3Di vec2(1, 2, 3);
+
+  EXPECT_FALSE(vec1 < vec2);
+  EXPECT_FALSE(vec2 < vec1);
+}
+
+TEST(VectorComparisonTest, GreaterThanOperatorInt) {
+  math::Vector3Di vec1(4, 5, 6);
+  math::Vector3Di vec2(1, 2, 3);
+
+  EXPECT_TRUE(vec1 > vec2);
+  EXPECT_FALSE(vec2 > vec1);
+}
+
+TEST(VectorComparisonTest, GreaterThanOperatorEqualInt) {
+  math::Vector3Di vec1(1, 2, 3);
+  math::Vector3Di vec2(1, 2, 3);
+
+  EXPECT_FALSE(vec1 > vec2);
+  EXPECT_FALSE(vec2 > vec1);
+}
+
+TEST(VectorComparisonTest, LessThanOrEqualToOperatorInt) {
+  math::Vector3Di vec1(1, 2, 3);
+  math::Vector3Di vec2(4, 5, 6);
+  math::Vector3Di vec3(1, 2, 3);
+
+  EXPECT_TRUE(vec1 <= vec2);
+  EXPECT_FALSE(vec2 <= vec1);
+  EXPECT_TRUE(vec1 <= vec3);
+  EXPECT_TRUE(vec3 <= vec1);
+}
+
+TEST(VectorComparisonTest, GreaterThanOrEqualToOperatorInt) {
+  math::Vector3Di vec1(4, 5, 6);
+  math::Vector3Di vec2(1, 2, 3);
+  math::Vector3Di vec3(4, 5, 6);
+
+  EXPECT_TRUE(vec1 >= vec2);
+  EXPECT_FALSE(vec2 >= vec1);
+  EXPECT_TRUE(vec1 >= vec3);
+  EXPECT_TRUE(vec3 >= vec1);
+}
+
+// ========================= VECTOR: UNSIGNED INT =============================
+
+TEST(VectorComparisonTest, LessThanOperatorUnsignedInt) {
+  math::Vector3D<unsigned int> vec1(1, 2, 3);
+  math::Vector3D<unsigned int> vec2(4, 5, 6);
+
+  EXPECT_TRUE(vec1 < vec2);
+  EXPECT_FALSE(vec2 < vec1);
+}
+
+TEST(VectorComparisonTest, LessThanOperatorEqualUnsignedInt) {
+  math::Vector3D<unsigned int> vec1(1, 2, 3);
+  math::Vector3D<unsigned int> vec2(1, 2, 3);
+
+  EXPECT_FALSE(vec1 < vec2);
+  EXPECT_FALSE(vec2 < vec1);
+}
+
+TEST(VectorComparisonTest, GreaterThanOperatorUnsignedInt) {
+  math::Vector3D<unsigned int> vec1(4, 5, 6);
+  math::Vector3D<unsigned int> vec2(1, 2, 3);
+
+  EXPECT_TRUE(vec1 > vec2);
+  EXPECT_FALSE(vec2 > vec1);
+}
+
+TEST(VectorComparisonTest, GreaterThanOperatorEqualUnsignedInt) {
+  math::Vector3D<unsigned int> vec1(1, 2, 3);
+  math::Vector3D<unsigned int> vec2(1, 2, 3);
+
+  EXPECT_FALSE(vec1 > vec2);
+  EXPECT_FALSE(vec2 > vec1);
+}
+
+TEST(VectorComparisonTest, LessThanOrEqualToOperatorUnsignedInt) {
+  math::Vector3D<unsigned int> vec1(1, 2, 3);
+  math::Vector3D<unsigned int> vec2(4, 5, 6);
+  math::Vector3D<unsigned int> vec3(1, 2, 3);
+
+  EXPECT_TRUE(vec1 <= vec2);
+  EXPECT_FALSE(vec2 <= vec1);
+  EXPECT_TRUE(vec1 <= vec3);
+  EXPECT_TRUE(vec3 <= vec1);
+}
+
+TEST(VectorComparisonTest, GreaterThanOrEqualToOperatorUnsignedInt) {
+  math::Vector3D<unsigned int> vec1(4, 5, 6);
+  math::Vector3D<unsigned int> vec2(1, 2, 3);
+  math::Vector3D<unsigned int> vec3(4, 5, 6);
+
+  EXPECT_TRUE(vec1 >= vec2);
+  EXPECT_FALSE(vec2 >= vec1);
+  EXPECT_TRUE(vec1 >= vec3);
+  EXPECT_TRUE(vec3 >= vec1);
+}
+
+TEST(VectorComparisonTest, LessThanOperatorUnsignedIntLargeValues) {
+  math::Vector3D<unsigned int> vec1(
+      0xFF'FF'FF'FF, 0xFF'FF'FF'FF, 0xFF'FF'FF'FF);
+  math::Vector3D<unsigned int> vec2(0, 0, 0);
+
+  EXPECT_FALSE(vec1 < vec2);
+  EXPECT_TRUE(vec2 < vec1);
+}
+
+TEST(VectorComparisonTest, GreaterThanOperatorUnsignedIntLargeValues) {
+  math::Vector3D<unsigned int> vec1(
+      0xFF'FF'FF'FF, 0xFF'FF'FF'FF, 0xFF'FF'FF'FF);
+  math::Vector3D<unsigned int> vec2(0, 0, 0);
+
+  EXPECT_TRUE(vec1 > vec2);
+  EXPECT_FALSE(vec2 > vec1);
+}
+
+TEST(VectorComparisonTest, LessThanOrEqualToOperatorUnsignedIntLargeValues) {
+  math::Vector3D<unsigned int> vec1(
+      0xFF'FF'FF'FF, 0xFF'FF'FF'FF, 0xFF'FF'FF'FF);
+  math::Vector3D<unsigned int> vec2(0, 0, 0);
+
+  EXPECT_FALSE(vec1 <= vec2);
+  EXPECT_TRUE(vec2 <= vec1);
+}
+
+TEST(VectorComparisonTest, GreaterThanOrEqualToOperatorUnsignedIntLargeValues) {
+  math::Vector3D<unsigned int> vec1(
+      0xFF'FF'FF'FF, 0xFF'FF'FF'FF, 0xFF'FF'FF'FF);
+  math::Vector3D<unsigned int> vec2(0, 0, 0);
+
+  EXPECT_FALSE(vec2 >= vec1);
+  EXPECT_TRUE(vec1 >= vec2);
+}
+
+// ========================== VECTOR: UINT32_T ==============================
+
+TEST(VectorComparisonTest, LessThanOperatorUint32) {
+  math::Vector<std::uint32_t, 10> vec1 = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
+  math::Vector<std::uint32_t, 10> vec2 = {4, 5, 6, 7, 8, 9, 10, 11, 12, 13};
+
+  EXPECT_TRUE(vec1 < vec2);
+  EXPECT_FALSE(vec2 < vec1);
+}
+
+TEST(VectorComparisonTest, LessThanOperatorEqualUint32) {
+  math::Vector<std::uint32_t, 10> vec1 = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
+  math::Vector<std::uint32_t, 10> vec2 = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
+
+  EXPECT_FALSE(vec1 < vec2);
+  EXPECT_FALSE(vec2 < vec1);
+}
+
+TEST(VectorComparisonTest, GreaterThanOperatorUint32) {
+  math::Vector<std::uint32_t, 10> vec1 = {4, 5, 6, 7, 8, 9, 10, 11, 12, 13};
+  math::Vector<std::uint32_t, 10> vec2 = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
+
+  EXPECT_TRUE(vec1 > vec2);
+  EXPECT_FALSE(vec2 > vec1);
+}
+
+TEST(VectorComparisonTest, GreaterThanOperatorEqualUint32) {
+  math::Vector<std::uint32_t, 10> vec1 = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
+  math::Vector<std::uint32_t, 10> vec2 = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
+
+  EXPECT_FALSE(vec1 > vec2);
+  EXPECT_FALSE(vec2 > vec1);
+}
+
+TEST(VectorComparisonTest, LessThanOrEqualToOperatorUint32) {
+  math::Vector<std::uint32_t, 10> vec1 = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
+  math::Vector<std::uint32_t, 10> vec2 = {4, 5, 6, 7, 8, 9, 10, 11, 12, 13};
+  math::Vector<std::uint32_t, 10> vec3 = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
+
+  EXPECT_TRUE(vec1 <= vec2);
+  EXPECT_FALSE(vec2 <= vec1);
+  EXPECT_TRUE(vec1 <= vec3);
+  EXPECT_TRUE(vec3 <= vec1);
+}
+
+TEST(VectorComparisonTest, GreaterThanOrEqualToOperatorUint32) {
+  math::Vector<std::uint32_t, 10> vec1 = {4, 5, 6, 7, 8, 9, 10, 11, 12, 13};
+  math::Vector<std::uint32_t, 10> vec2 = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
+  math::Vector<std::uint32_t, 10> vec3 = {4, 5, 6, 7, 8, 9, 10, 11, 12, 13};
+
+  EXPECT_TRUE(vec1 >= vec2);
+  EXPECT_FALSE(vec2 >= vec1);
+  EXPECT_TRUE(vec1 >= vec3);
+  EXPECT_TRUE(vec3 >= vec1);
+}
+
+TEST(VectorComparisonTest, LessThanOperatorUint32LargeValues) {
+  math::Vector<std::uint32_t, 10> vec1(0xFF'FF'FF'FF);
+  math::Vector<std::uint32_t, 10> vec2(0);
+
+  EXPECT_FALSE(vec1 < vec2);
+  EXPECT_TRUE(vec2 < vec1);
+}
+
+TEST(VectorComparisonTest, GreaterThanOperatorUint32LargeValues) {
+  math::Vector<std::uint32_t, 10> vec1(0xFF'FF'FF'FF);
+  math::Vector<std::uint32_t, 10> vec2(0);
+
+  EXPECT_TRUE(vec1 > vec2);
+  EXPECT_FALSE(vec2 > vec1);
+}
+
+TEST(VectorComparisonTest, LessThanOrEqualToOperatorUint32LargeValues) {
+  math::Vector<std::uint32_t, 10> vec1(0xFF'FF'FF'FF);
+  math::Vector<std::uint32_t, 10> vec2(0);
+
+  EXPECT_FALSE(vec1 <= vec2);
+  EXPECT_TRUE(vec2 <= vec1);
+}
+
+TEST(VectorComparisonTest, GreaterThanOrEqualToOperatorUint32LargeValues) {
+  math::Vector<std::uint32_t, 10> vec1(0xFF'FF'FF'FF);
+  math::Vector<std::uint32_t, 10> vec2(0);
+
+  EXPECT_TRUE(vec1 >= vec2);
+  EXPECT_FALSE(vec2 >= vec1);
+}
+
+
 #endif
