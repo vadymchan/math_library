@@ -1220,7 +1220,7 @@ Vector<T, 3, Option> g_transformVector(const Vector<T, 3, Option>&    vector,
 
 // TODO: make these constexpr
 
-template <typename T, unsigned int Size, Options Option = Options::RowMajor>
+template <typename T, std::size_t Size, Options Option = Options::RowMajor>
   requires ValueAtLeast<Size, 2>
 auto g_upVector() -> const Vector<T, Size, Option> {
   Vector<T, Size, Option> vec(0);
@@ -1228,7 +1228,7 @@ auto g_upVector() -> const Vector<T, Size, Option> {
   return vec;
 }
 
-template <typename T, unsigned int Size, Options Option = Options::RowMajor>
+template <typename T, std::size_t Size, Options Option = Options::RowMajor>
   requires ValueAtLeast<Size, 2>
 auto g_downVector() -> const Vector<T, Size, Option> {
   Vector<T, Size, Option> vec(0);
@@ -1236,7 +1236,7 @@ auto g_downVector() -> const Vector<T, Size, Option> {
   return vec;
 }
 
-template <typename T, unsigned int Size, Options Option = Options::RowMajor>
+template <typename T, std::size_t Size, Options Option = Options::RowMajor>
   requires ValueAtLeast<Size, 2>
 auto g_rightVector() -> const Vector<T, Size, Option> {
   Vector<T, Size, Option> vec(0);
@@ -1244,7 +1244,7 @@ auto g_rightVector() -> const Vector<T, Size, Option> {
   return vec;
 }
 
-template <typename T, unsigned int Size, Options Option = Options::RowMajor>
+template <typename T, std::size_t Size, Options Option = Options::RowMajor>
   requires ValueAtLeast<Size, 2>
 auto g_leftVector() -> const Vector<T, Size, Option> {
   Vector<T, Size, Option> vec(0);
@@ -1252,7 +1252,7 @@ auto g_leftVector() -> const Vector<T, Size, Option> {
   return vec;
 }
 
-template <typename T, unsigned int Size, Options Option = Options::RowMajor>
+template <typename T, std::size_t Size, Options Option = Options::RowMajor>
   requires ValueAtLeast<Size, 3>
 auto g_forwardVector() -> const Vector<T, Size, Option> {
   Vector<T, Size, Option> vec(0);
@@ -1260,7 +1260,7 @@ auto g_forwardVector() -> const Vector<T, Size, Option> {
   return vec;
 }
 
-template <typename T, unsigned int Size, Options Option = Options::RowMajor>
+template <typename T, std::size_t Size, Options Option = Options::RowMajor>
   requires ValueAtLeast<Size, 3>
 auto g_backwardVector() -> const Vector<T, Size, Option> {
   Vector<T, Size, Option> vec(0);
@@ -1268,17 +1268,17 @@ auto g_backwardVector() -> const Vector<T, Size, Option> {
   return vec;
 }
 
-template <typename T, unsigned int Size, Options Option = Options::RowMajor>
+template <typename T, std::size_t Size, Options Option = Options::RowMajor>
 auto g_zeroVector() -> const Vector<T, Size, Option> {
   return Vector<T, Size, Option>(0);
 }
 
-template <typename T, unsigned int Size, Options Option = Options::RowMajor>
+template <typename T, std::size_t Size, Options Option = Options::RowMajor>
 auto g_oneVector() -> const Vector<T, Size, Option> {
   return Vector<T, Size, Option>(1);
 }
 
-template <typename T, unsigned int Size, Options Option = Options::RowMajor>
+template <typename T, std::size_t Size, Options Option = Options::RowMajor>
 auto g_unitVector() -> const Vector<T, Size, Option> {
   Vector<T, Size, Option> vec(1);
 #ifdef MATH_LIBRARY_USE_NORMALIZE_IN_PLACE

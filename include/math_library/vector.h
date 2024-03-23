@@ -9,7 +9,7 @@
 
 namespace math {
 
-template <typename T, unsigned int Size, Options Option = Options::RowMajor>
+template <typename T, std::size_t Size, Options Option = Options::RowMajor>
 class Vector {
   public:
   Vector()
@@ -38,17 +38,17 @@ class Vector {
     return *this;
   }
 
-  template <unsigned int Rows, unsigned int Columns>
+  template <std::size_t Rows, std::size_t Columns>
     requires OneDimensional<Rows, Columns>
   explicit Vector(const Matrix<T, Rows, Columns, Option>& matrix)
       : m_dataStorage_(matrix) {}
 
-  template <unsigned int Rows, unsigned int Columns>
+  template <std::size_t Rows, std::size_t Columns>
     requires OneDimensional<Rows, Columns>
   explicit Vector(Matrix<T, Rows, Columns, Option>&& matrix) noexcept
       : m_dataStorage_(std::move(matrix)) {}
 
-  template <unsigned int Rows, unsigned int Columns>
+  template <std::size_t Rows, std::size_t Columns>
     requires OneDimensional<Rows, Columns>
   auto operator=(const Matrix<T, Rows, Columns, Option>& matrix) -> Vector& {
     if (m_dataStorage_ != matrix) {
@@ -79,7 +79,7 @@ class Vector {
                   "All additional elements must be convertible to the Vector's "
                   "element type");
 
-    constexpr size_t kBaseSize = Size - sizeof...(Elements);
+    constexpr std::size_t kBaseSize = Size - sizeof...(Elements);
 
     // copy vector
     const T* baseData = base.data();
@@ -140,7 +140,7 @@ class Vector {
     return operator()(3);
   }
 
-  auto operator()(unsigned int index) const -> const T& {
+  auto operator()(std::size_t index) const -> const T& {
     if constexpr (Option == Options::RowMajor) {
       return m_dataStorage_(0, index);
     } else {
@@ -148,7 +148,7 @@ class Vector {
     }
   }
 
-  auto operator()(unsigned int index) -> T& {
+  auto operator()(std::size_t index) -> T& {
     if constexpr (Option == Options::RowMajor) {
       return m_dataStorage_(0, index);
     } else {
@@ -156,7 +156,7 @@ class Vector {
     }
   }
 
-  [[nodiscard]] auto coeff(unsigned int index) const -> const T& {
+  [[nodiscard]] auto coeff(std::size_t index) const -> const T& {
     if constexpr (Option == Options::RowMajor) {
       return m_dataStorage_.coeff(0, index);
     } else {
@@ -164,7 +164,7 @@ class Vector {
     }
   }
 
-  auto coeffRef(unsigned int index) -> T& {
+  auto coeffRef(std::size_t index) -> T& {
     if constexpr (Option == Options::RowMajor) {
       return m_dataStorage_.coeffRef(0, index);
     } else {
@@ -172,24 +172,24 @@ class Vector {
     }
   }
 
-  static constexpr auto GetSize() -> unsigned int { return Size; }
+  static constexpr auto GetSize() -> std::size_t { return Size; }
 
-  static constexpr auto GetDataSize() -> unsigned int {
+  static constexpr auto GetDataSize() -> std::size_t {
     return UnderlyingType::GetDataSize();
   }
 
   static constexpr auto GetOption() -> Options { return Option; }
 
-  template <unsigned int TargetSize>
+  template <std::size_t TargetSize>
   auto resizedCopy() const -> Vector<T, TargetSize, Option> {
     Vector<T, TargetSize, Option> result;
 
-    constexpr unsigned int numElementsToCopy
+    constexpr std::size_t numElementsToCopy
         = (TargetSize < Size) ? TargetSize : Size;
     std::copy_n(this->data(), numElementsToCopy, result.data());
 
     if constexpr (TargetSize > Size) {
-      constexpr unsigned int numElementsToInitialize = TargetSize - Size;
+      constexpr std::size_t numElementsToInitialize = TargetSize - Size;
       std::fill_n(result.data() + Size, numElementsToInitialize, T());
     }
 
@@ -217,8 +217,8 @@ class Vector {
 #endif
 
   [[nodiscard]] auto dot(const Vector& other) const -> T {
-    float                  result           = NAN;
-    constexpr unsigned int kVectorDimention = 1;
+    float                 result           = NAN;
+    constexpr std::size_t kVectorDimention = 1;
     auto mulFunc = InstructionSet<T>::template GetMulFunc<Option>();
     mulFunc(&result,
             this->data(),
@@ -291,7 +291,7 @@ class Vector {
    * @note This function is only for row-major vectors where the
    *       size of the vector equals the number of rows in the matrix.
    */
-  template <unsigned int Rows, unsigned int Columns>
+  template <std::size_t Rows, std::size_t Columns>
     requires ValueEqualTo<Rows, Size> && (Option == Options::RowMajor)
   auto operator*(const Matrix<T, Rows, Columns, Option>& matrix) const
       -> Vector<T, Columns, Option> {
@@ -308,7 +308,7 @@ class Vector {
    * and squared.
    *
    */
-  template <unsigned int Rows, unsigned int Columns>
+  template <std::size_t Rows, std::size_t Columns>
     requires SquaredMatrix<Matrix<T, Rows, Columns, Option>>
           && ((ValueEqualTo<Rows, Size> && Option == Options::RowMajor)
               || (ValueEqualTo<Columns, Size> && Option == Options::ColumnMajor))
@@ -381,7 +381,7 @@ class Vector {
    */
   auto operator<=(const Vector& other) const -> bool {
     auto cmpFunc = InstructionSet<T>::GetCmpFunc();
-    int  result  = cmpFunc(this->data(), other.data(), Size);
+    auto result  = cmpFunc(this->data(), other.data(), Size);
     return result == -1 || result == 0;
   }
 
@@ -395,8 +395,8 @@ class Vector {
    * the other vector, false otherwise.
    */
   auto operator>=(const Vector& other) const -> bool {
-    auto cmpFunc = InstructionSet<T>::GetCmpFunc();
-    int  result  = cmpFunc(this->data(), other.data(), Size);
+    auto         cmpFunc = InstructionSet<T>::GetCmpFunc();
+    auto result  = cmpFunc(this->data(), other.data(), Size);
     return result == 1 || result == 0;
   }
 
@@ -410,7 +410,7 @@ class Vector {
 
   friend auto operator<<(std::ostream& os, const Vector& vector)
       -> std::ostream& {
-    for (int i = 0; i < Size; ++i) {
+    for (std::size_t i = 0; i < Size; ++i) {
       os << vector(i) << ' ';
     }
     os << '\n';
@@ -428,11 +428,11 @@ class Vector {
    *    vec << 1.0f, 2.0f, 3.0f; // Initializes vec to [1.0, 2.0, 3.0]
    */
   class VectorInitializer {
-    Vector&      m_vector_;
-    unsigned int m_index_;
+    Vector&     m_vector_;
+    std::size_t m_index_;
 
     public:
-    VectorInitializer(Vector& vector, unsigned int index)
+    VectorInitializer(Vector& vector, std::size_t index)
         : m_vector_(vector)
         , m_index_(index) {}
 
@@ -462,10 +462,10 @@ class Vector {
 #endif  // FEATURE_VECTOR_INITIALIZER
 
   template <typename T1,
-            unsigned int Rows1,
-            unsigned int Columns1,
-            Options      Option1,
-            unsigned int Size1>
+            std::size_t Rows1,
+            std::size_t Columns1,
+            Options     Option1,
+            std::size_t Size1>
     requires ValueEqualTo<Columns1, Size1> && (Option1 == Options::ColumnMajor)
   friend auto operator*(const Matrix<T1, Rows1, Columns1, Option1>& matrix,
                         const Vector<T1, Size1, Option1>&           vector)
@@ -492,10 +492,10 @@ class Vector {
  * columns in the matrix equals the size of the vector.
  */
 template <typename T,
-          unsigned int Rows,
-          unsigned int Columns,
-          Options      Option,
-          unsigned int Size>
+          std::size_t Rows,
+          std::size_t Columns,
+          Options     Option,
+          std::size_t Size>
   requires ValueEqualTo<Columns, Size> && (Option == Options::ColumnMajor)
 auto operator*(const Matrix<T, Rows, Columns, Option>& matrix,
                const Vector<T, Size, Option>&          vector)
@@ -507,23 +507,23 @@ auto operator*(const Matrix<T, Rows, Columns, Option>& matrix,
  * @brief Performs scalar multiplication on a Vector, where the scalar value is
  * the left-hand operand. (scalar * Vector)
  */
-template <typename ScalarType, typename T, unsigned int Size, Options Option>
+template <typename ScalarType, typename T, std::size_t Size, Options Option>
 auto operator*(const ScalarType& scalar, const Vector<T, Size, Option>& vector)
     -> Vector<T, Size, Option> {
   return vector * static_cast<T>(scalar);
 }
 
 // Vector of floats
-template <unsigned int Size, Options Option = Options::RowMajor>
+template <std::size_t Size, Options Option = Options::RowMajor>
 using VectorNf = Vector<float, Size, Option>;
 
 // Vector of doubles
-template <unsigned int Size, Options Option = Options::RowMajor>
+template <std::size_t Size, Options Option = Options::RowMajor>
 using VectorNd = Vector<double, Size, Option>;
 
 // Vector of ints
-template <unsigned int Size, Options Option = Options::RowMajor>
-using VectorNi = Vector<int, Size, Option>;
+template <std::size_t Size, Options Option = Options::RowMajor>
+using VectorNi = Vector<std::int32_t, Size, Option>;
 
 // Templated Vector 2D
 template <typename T, Options Option = Options::RowMajor>
@@ -546,9 +546,9 @@ using Vector2Dd = Vector2D<double>;
 using Vector3Dd = Vector3D<double>;
 using Vector4Dd = Vector4D<double>;
 
-using Vector2Di = Vector2D<int>;
-using Vector3Di = Vector3D<int>;
-using Vector4Di = Vector4D<int>;
+using Vector2Di = Vector2D<std::int32_t>;
+using Vector3Di = Vector3D<std::int32_t>;
+using Vector4Di = Vector4D<std::int32_t>;
 
 }  // namespace math
 

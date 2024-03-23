@@ -9,20 +9,20 @@
 
 namespace math {
 
-template <typename T, unsigned int Size, Options Option = Options::RowMajor>
+template <typename T, std::size_t Size, Options Option = Options::RowMajor>
 using Point = Vector<T, Size, Option>;
 
 // Point of floats
-template <unsigned int Size, Options Option = Options::RowMajor>
+template <std::size_t Size, Options Option = Options::RowMajor>
 using PointNf = Point<float, Size, Option>;
 
 // Point of doubles
-template <unsigned int Size, Options Option = Options::RowMajor>
+template <std::size_t Size, Options Option = Options::RowMajor>
 using PointNd = Point<double, Size, Option>;
 
 // Point of ints
-template <unsigned int Size, Options Option = Options::RowMajor>
-using PointNi = Point<int, Size, Option>;
+template <std::size_t Size, Options Option = Options::RowMajor>
+using PointNi = Point<std::int32_t, Size, Option>;
 
 // Templated Point 2D
 template <typename T, Options Option = Options::RowMajor>
@@ -45,9 +45,9 @@ using Point2Dd = Point2D<double>;
 using Point3Dd = Point3D<double>;
 using Point4Dd = Point4D<double>;
 
-using Point2Di = Point2D<int>;
-using Point3Di = Point3D<int>;
-using Point4Di = Point4D<int>;
+using Point2Di = Point2D<std::int32_t>;
+using Point3Di = Point3D<std::int32_t>;
+using Point4Di = Point4D<std::int32_t>;
 
 }  // namespace math
 

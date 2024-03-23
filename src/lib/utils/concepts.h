@@ -18,7 +18,7 @@ concept ValueLessThan = Value < Limit;
 template <auto Value, auto ExactValue>
 concept ValueEqualTo = Value == ExactValue;
 
-template <unsigned int Rows, unsigned int Columns>
+template <std::size_t Rows, std::size_t Columns>
 concept OneDimensional = (Rows == 1 || Columns == 1);
 
 template <typename U, typename... Args>

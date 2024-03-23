@@ -16,9 +16,8 @@ namespace math {
 
 template <typename T>
 concept SimdSupportedType
-    = std::is_same_v<T, int> || std::is_same_v<T, float>
-   || std::is_same_v<T, double> || std::is_same_v<T, unsigned int>
-   || std::is_same_v<T, std::uint32_t>;
+    = std::is_same_v<T, std::int32_t> || std::is_same_v<T, float>
+   || std::is_same_v<T, double> || std::is_same_v<T, std::uint32_t>;
 
 template <typename T>
 class InstructionSet {
@@ -28,7 +27,7 @@ class InstructionSet {
                 "InstructionSet supports only int, float, and double types");
 #endif
 
-  using AddFunc = void (*)(T*, const T*, size_t);
+  using AddFunc = void (*)(T*, const T*, std::size_t);
 
   static auto GetAddFunc() -> AddFunc {
 #ifdef SUPPORTS_AVX2
@@ -48,7 +47,7 @@ class InstructionSet {
 #endif
   }
 
-  using AddScalarFunc = void (*)(T*, T, size_t);
+  using AddScalarFunc = void (*)(T*, T, std::size_t);
 
   static auto GetAddScalarFunc() -> AddScalarFunc {
 #ifdef SUPPORTS_AVX2
@@ -68,7 +67,7 @@ class InstructionSet {
 #endif
   }
 
-  using SubFunc = void (*)(T*, const T*, size_t);
+  using SubFunc = void (*)(T*, const T*, std::size_t);
 
   static auto GetSubFunc() -> SubFunc {
 #ifdef SUPPORTS_AVX2
@@ -88,7 +87,7 @@ class InstructionSet {
 #endif
   }
 
-  using SubScalarFunc = void (*)(T*, T, size_t);
+  using SubScalarFunc = void (*)(T*, T, std::size_t);
 
   static auto GetSubScalarFunc() -> SubScalarFunc {
 #ifdef SUPPORTS_AVX2
@@ -108,7 +107,7 @@ class InstructionSet {
 #endif
   }
 
-  using NegFunc = void (*)(T*, size_t);
+  using NegFunc = void (*)(T*, std::size_t);
 
   static auto GetNegFunc() -> NegFunc {
 #ifdef SUPPORTS_AVX2
@@ -129,8 +128,12 @@ class InstructionSet {
   }
 
   template <Options Option>
-  using MulFunc = void (*)(
-      T*, const T*, const T*, const size_t, const size_t, const size_t);
+  using MulFunc = void (*)(T*,
+                           const T*,
+                           const T*,
+                           const std::size_t,
+                           const std::size_t,
+                           const std::size_t);
 
   template <Options Option>
   static auto GetMulFunc() -> MulFunc<Option> {
@@ -151,7 +154,7 @@ class InstructionSet {
 #endif
   }
 
-  using MulScalarFunc = void (*)(T*, T, size_t);
+  using MulScalarFunc = void (*)(T*, T, std::size_t);
 
   static auto GetMulScalarFunc() -> MulScalarFunc {
 #ifdef SUPPORTS_AVX2
@@ -171,7 +174,7 @@ class InstructionSet {
 #endif
   }
 
-  using DivScalarFunc = void (*)(T*, T, size_t);
+  using DivScalarFunc = void (*)(T*, T, std::size_t);
 
   static auto GetDivScalarFunc() -> DivScalarFunc {
 #ifdef SUPPORTS_AVX2
@@ -191,7 +194,7 @@ class InstructionSet {
 #endif
   }
 
-  using CmpFunc = int (*)(const T*, const T*, size_t);
+  using CmpFunc = int (*)(const T*, const T*, std::size_t);
 
   static auto GetCmpFunc() -> CmpFunc {
 #ifdef SUPPORTS_AVX2
@@ -215,30 +218,32 @@ class InstructionSet {
   // BEGIN: add two arrays
   //----------------------------------------------------------------------------
 
-  static void AddAvx2(T* a, const T* b, size_t size) {
+  static void AddAvx2(T* a, const T* b, std::size_t size) {
     AddFallback(a, b, size);
   }
 
-  static void AddAvx(T* a, const T* b, size_t size) { AddFallback(a, b, size); }
-
-  static void AddSse42(T* a, const T* b, size_t size) {
+  static void AddAvx(T* a, const T* b, std::size_t size) {
     AddFallback(a, b, size);
   }
 
-  static void AddSse41(T* a, const T* b, size_t size) {
+  static void AddSse42(T* a, const T* b, std::size_t size) {
     AddFallback(a, b, size);
   }
 
-  static void AddSsse3(T* a, const T* b, size_t size) {
+  static void AddSse41(T* a, const T* b, std::size_t size) {
     AddFallback(a, b, size);
   }
 
-  static void AddSse3(T* a, const T* b, size_t size) {
+  static void AddSsse3(T* a, const T* b, std::size_t size) {
     AddFallback(a, b, size);
   }
 
-  static void AddFallback(T* a, const T* b, size_t size) {
-    for (size_t i = 0; i < size; ++i) {
+  static void AddSse3(T* a, const T* b, std::size_t size) {
+    AddFallback(a, b, size);
+  }
+
+  static void AddFallback(T* a, const T* b, std::size_t size) {
+    for (std::size_t i = 0; i < size; ++i) {
       a[i] += b[i];
     }
   }
@@ -249,32 +254,32 @@ class InstructionSet {
   // BEGIN: add scalar
   //----------------------------------------------------------------------------
 
-  static void AddScalarAvx2(T* a, T scalar, size_t size) {
+  static void AddScalarAvx2(T* a, T scalar, std::size_t size) {
     AddScalarFallback(a, scalar, size);
   }
 
-  static void AddScalarAvx(T* a, T scalar, size_t size) {
+  static void AddScalarAvx(T* a, T scalar, std::size_t size) {
     AddScalarFallback(a, scalar, size);
   }
 
-  static void AddScalarSse42(T* a, T scalar, size_t size) {
+  static void AddScalarSse42(T* a, T scalar, std::size_t size) {
     AddScalarFallback(a, scalar, size);
   }
 
-  static void AddScalarSse41(T* a, T scalar, size_t size) {
+  static void AddScalarSse41(T* a, T scalar, std::size_t size) {
     AddScalarFallback(a, scalar, size);
   }
 
-  static void AddScalarSsse3(T* a, T scalar, size_t size) {
+  static void AddScalarSsse3(T* a, T scalar, std::size_t size) {
     AddScalarFallback(a, scalar, size);
   }
 
-  static void AddScalarSse3(T* a, T scalar, size_t size) {
+  static void AddScalarSse3(T* a, T scalar, std::size_t size) {
     AddScalarFallback(a, scalar, size);
   }
 
-  static void AddScalarFallback(T* a, T scalar, size_t size) {
-    for (size_t i = 0; i < size; ++i) {
+  static void AddScalarFallback(T* a, T scalar, std::size_t size) {
+    for (std::size_t i = 0; i < size; ++i) {
       a[i] += scalar;
     }
   }
@@ -285,30 +290,32 @@ class InstructionSet {
   // BEGIN: subtraction array
   //----------------------------------------------------------------------------
 
-  static void SubAvx2(T* a, const T* b, size_t size) {
+  static void SubAvx2(T* a, const T* b, std::size_t size) {
     SubFallback(a, b, size);
   }
 
-  static void SubAvx(T* a, const T* b, size_t size) { SubFallback(a, b, size); }
-
-  static void SubSse42(T* a, const T* b, size_t size) {
+  static void SubAvx(T* a, const T* b, std::size_t size) {
     SubFallback(a, b, size);
   }
 
-  static void SubSse41(T* a, const T* b, size_t size) {
+  static void SubSse42(T* a, const T* b, std::size_t size) {
     SubFallback(a, b, size);
   }
 
-  static void SubSsse3(T* a, const T* b, size_t size) {
+  static void SubSse41(T* a, const T* b, std::size_t size) {
     SubFallback(a, b, size);
   }
 
-  static void SubSse3(T* a, const T* b, size_t size) {
+  static void SubSsse3(T* a, const T* b, std::size_t size) {
     SubFallback(a, b, size);
   }
 
-  static void SubFallback(T* a, const T* b, size_t size) {
-    for (size_t i = 0; i < size; ++i) {
+  static void SubSse3(T* a, const T* b, std::size_t size) {
+    SubFallback(a, b, size);
+  }
+
+  static void SubFallback(T* a, const T* b, std::size_t size) {
+    for (std::size_t i = 0; i < size; ++i) {
       a[i] -= b[i];
     }
   }
@@ -319,32 +326,32 @@ class InstructionSet {
   // BEGIN: subtraction scalar
   //----------------------------------------------------------------------------
 
-  static void SubScalarAvx2(T* a, T scalar, size_t size) {
+  static void SubScalarAvx2(T* a, T scalar, std::size_t size) {
     SubScalarFallback(a, scalar, size);
   }
 
-  static void SubScalarAvx(T* a, T scalar, size_t size) {
+  static void SubScalarAvx(T* a, T scalar, std::size_t size) {
     SubScalarFallback(a, scalar, size);
   }
 
-  static void SubScalarSse42(T* a, T scalar, size_t size) {
+  static void SubScalarSse42(T* a, T scalar, std::size_t size) {
     SubScalarFallback(a, scalar, size);
   }
 
-  static void SubScalarSse41(T* a, T scalar, size_t size) {
+  static void SubScalarSse41(T* a, T scalar, std::size_t size) {
     SubScalarFallback(a, scalar, size);
   }
 
-  static void SubScalarSsse3(T* a, T scalar, size_t size) {
+  static void SubScalarSsse3(T* a, T scalar, std::size_t size) {
     SubScalarFallback(a, scalar, size);
   }
 
-  static void SubScalarSse3(T* a, T scalar, size_t size) {
+  static void SubScalarSse3(T* a, T scalar, std::size_t size) {
     SubScalarFallback(a, scalar, size);
   }
 
-  static void SubScalarFallback(T* a, T scalar, size_t size) {
-    for (size_t i = 0; i < size; ++i) {
+  static void SubScalarFallback(T* a, T scalar, std::size_t size) {
+    for (std::size_t i = 0; i < size; ++i) {
       a[i] -= scalar;
     }
   }
@@ -355,20 +362,20 @@ class InstructionSet {
   // BEGIN: negation array
   //----------------------------------------------------------------------------
 
-  static void NegAvx2(T* a, size_t size) { NegFallback(a, size); }
+  static void NegAvx2(T* a, std::size_t size) { NegFallback(a, size); }
 
-  static void NegAvx(T* a, size_t size) { NegFallback(a, size); }
+  static void NegAvx(T* a, std::size_t size) { NegFallback(a, size); }
 
-  static void NegSse42(T* a, size_t size) { NegFallback(a, size); }
+  static void NegSse42(T* a, std::size_t size) { NegFallback(a, size); }
 
-  static void NegSse41(T* a, size_t size) { NegFallback(a, size); }
+  static void NegSse41(T* a, std::size_t size) { NegFallback(a, size); }
 
-  static void NegSsse3(T* a, size_t size) { NegFallback(a, size); }
+  static void NegSsse3(T* a, std::size_t size) { NegFallback(a, size); }
 
-  static void NegSse3(T* a, size_t size) { NegFallback(a, size); }
+  static void NegSse3(T* a, std::size_t size) { NegFallback(a, size); }
 
-  static void NegFallback(T* a, size_t size) {
-    for (size_t i = 0; i < size; ++i) {
+  static void NegFallback(T* a, std::size_t size) {
+    for (std::size_t i = 0; i < size; ++i) {
       a[i] = -a[i];
     }
   }
@@ -382,10 +389,10 @@ class InstructionSet {
   // BEGIN: multiplication array utility functions
 
   template <Options Option>
-  static inline auto IndexA(const size_t kCurrentRowA,
-                            const size_t kInnerIndex,
-                            const size_t kRowsA,
-                            const size_t kColsARowsB) -> size_t {
+  static inline auto IndexA(const std::size_t kCurrentRowA,
+                            const std::size_t kInnerIndex,
+                            const std::size_t kRowsA,
+                            const std::size_t kColsARowsB) -> std::size_t {
     if constexpr (Option == Options::ColumnMajor) {
       return kCurrentRowA + kInnerIndex * kRowsA;
     } else if constexpr (Option == Options::RowMajor) {
@@ -394,10 +401,10 @@ class InstructionSet {
   }
 
   template <Options Option>
-  static inline auto IndexB(const size_t kInnerIndex,
-                            const size_t kCurrentColB,
-                            const size_t kColsB,
-                            const size_t kColsARowsB) -> size_t {
+  static inline auto IndexB(const std::size_t kInnerIndex,
+                            const std::size_t kCurrentColB,
+                            const std::size_t kColsB,
+                            const std::size_t kColsARowsB) -> std::size_t {
     if constexpr (Option == Options::ColumnMajor) {
       return kInnerIndex + kCurrentColB * kColsARowsB;
     } else if constexpr (Option == Options::RowMajor) {
@@ -406,10 +413,10 @@ class InstructionSet {
   }
 
   template <Options Option>
-  static inline auto IndexResult(const size_t kCurrentRowA,
-                                 const size_t kCurrentColB,
-                                 const size_t kRowsA,
-                                 const size_t kColsB) -> size_t {
+  static inline auto IndexResult(const std::size_t kCurrentRowA,
+                                 const std::size_t kCurrentColB,
+                                 const std::size_t kRowsA,
+                                 const std::size_t kColsB) -> std::size_t {
     if constexpr (Option == Options::ColumnMajor) {
       return kCurrentRowA + kCurrentColB * kRowsA;
     } else if constexpr (Option == Options::RowMajor) {
@@ -420,76 +427,76 @@ class InstructionSet {
   // END: multiplication array utility functions
 
   template <Options Option>
-  static void MulAvx2(T*           result,
-                      const T*     a,
-                      const T*     b,
-                      const size_t kRowsA,
-                      const size_t kColsB,
-                      const size_t kColsARowsB) {
+  static void MulAvx2(T*                result,
+                      const T*          a,
+                      const T*          b,
+                      const std::size_t kRowsA,
+                      const std::size_t kColsB,
+                      const std::size_t kColsARowsB) {
     MulFallback<Option>(result, a, b, kRowsA, kColsB, kColsARowsB);
   }
 
   template <Options Option>
-  static void MulAvx(T*           result,
-                     const T*     a,
-                     const T*     b,
-                     const size_t kRowsA,
-                     const size_t kColsB,
-                     const size_t kColsARowsB) {
+  static void MulAvx(T*                result,
+                     const T*          a,
+                     const T*          b,
+                     const std::size_t kRowsA,
+                     const std::size_t kColsB,
+                     const std::size_t kColsARowsB) {
     MulFallback<Option>(result, a, b, kRowsA, kColsB, kColsARowsB);
   }
 
   template <Options Option>
-  static void MulSse42(T*           result,
-                       const T*     a,
-                       const T*     b,
-                       const size_t kRowsA,
-                       const size_t kColsB,
-                       const size_t kColsARowsB) {
+  static void MulSse42(T*                result,
+                       const T*          a,
+                       const T*          b,
+                       const std::size_t kRowsA,
+                       const std::size_t kColsB,
+                       const std::size_t kColsARowsB) {
     MulFallback<Option>(result, a, b, kRowsA, kColsB, kColsARowsB);
   }
 
   template <Options Option>
-  static void MulSse41(T*           result,
-                       const T*     a,
-                       const T*     b,
-                       const size_t kRowsA,
-                       const size_t kColsB,
-                       const size_t kColsARowsB) {
+  static void MulSse41(T*                result,
+                       const T*          a,
+                       const T*          b,
+                       const std::size_t kRowsA,
+                       const std::size_t kColsB,
+                       const std::size_t kColsARowsB) {
     MulFallback<Option>(result, a, b, kRowsA, kColsB, kColsARowsB);
   }
 
   template <Options Option>
-  static void MulSsse3(T*           result,
-                       const T*     a,
-                       const T*     b,
-                       const size_t kRowsA,
-                       const size_t kColsB,
-                       const size_t kColsARowsB) {
+  static void MulSsse3(T*                result,
+                       const T*          a,
+                       const T*          b,
+                       const std::size_t kRowsA,
+                       const std::size_t kColsB,
+                       const std::size_t kColsARowsB) {
     MulFallback<Option>(result, a, b, kRowsA, kColsB, kColsARowsB);
   }
 
   template <Options Option>
-  static void MulSse3(T*           result,
-                      const T*     a,
-                      const T*     b,
-                      const size_t kRowsA,
-                      const size_t kColsB,
-                      const size_t kColsARowsB) {
+  static void MulSse3(T*                result,
+                      const T*          a,
+                      const T*          b,
+                      const std::size_t kRowsA,
+                      const std::size_t kColsB,
+                      const std::size_t kColsARowsB) {
     MulFallback<Option>(result, a, b, kRowsA, kColsB, kColsARowsB);
   }
 
   template <Options Option>
-  static void MulFallback(T*           result,
-                          const T*     a,
-                          const T*     b,
-                          const size_t kRowsA,
-                          const size_t kColsB,
-                          const size_t kColsARowsB) {
-    for (size_t i = 0; i < kRowsA; ++i) {
-      for (size_t j = 0; j < kColsB; ++j) {
+  static void MulFallback(T*                result,
+                          const T*          a,
+                          const T*          b,
+                          const std::size_t kRowsA,
+                          const std::size_t kColsB,
+                          const std::size_t kColsARowsB) {
+    for (std::size_t i = 0; i < kRowsA; ++i) {
+      for (std::size_t j = 0; j < kColsB; ++j) {
         float sum = 0;
-        for (size_t k = 0; k < kColsARowsB; ++k) {
+        for (std::size_t k = 0; k < kColsARowsB; ++k) {
           sum += a[IndexA<Option>(i, k, kRowsA, kColsARowsB)]
                * b[IndexB<Option>(k, j, kColsB, kColsARowsB)];
         }
@@ -504,30 +511,30 @@ class InstructionSet {
   // BEGIN: multiplication scalar
   //----------------------------------------------------------------------------
 
-  static void MulScalarAvx2(T* a, T scalar, size_t size) {
+  static void MulScalarAvx2(T* a, T scalar, std::size_t size) {
     MulScalarFallback(a, scalar, size);
   }
 
-  static void MulScalarAvx(T* a, T scalar, size_t size) {}
+  static void MulScalarAvx(T* a, T scalar, std::size_t size) {}
 
-  static void MulScalarSse42(T* a, T scalar, size_t size) {
+  static void MulScalarSse42(T* a, T scalar, std::size_t size) {
     MulScalarFallback(a, scalar, size);
   }
 
-  static void MulScalarSse41(T* a, T scalar, size_t size) {
+  static void MulScalarSse41(T* a, T scalar, std::size_t size) {
     MulScalarFallback(a, scalar, size);
   }
 
-  static void MulScalarSsse3(T* a, T scalar, size_t size) {
+  static void MulScalarSsse3(T* a, T scalar, std::size_t size) {
     MulScalarFallback(a, scalar, size);
   }
 
-  static void MulScalarSse3(T* a, T scalar, size_t size) {
+  static void MulScalarSse3(T* a, T scalar, std::size_t size) {
     MulScalarFallback(a, scalar, size);
   }
 
-  static void MulScalarFallback(T* a, T scalar, size_t size) {
-    for (size_t i = 0; i < size; ++i) {
+  static void MulScalarFallback(T* a, T scalar, std::size_t size) {
+    for (std::size_t i = 0; i < size; ++i) {
       a[i] *= scalar;
     }
   }
@@ -538,32 +545,32 @@ class InstructionSet {
   // BEGIN: division scalar
   //----------------------------------------------------------------------------
 
-  static void DivScalarAvx2(T* a, T scalar, size_t size) {
+  static void DivScalarAvx2(T* a, T scalar, std::size_t size) {
     DivScalarFallback(a, scalar, size);
   }
 
-  static void DivScalarAvx(T* a, T scalar, size_t size) {
+  static void DivScalarAvx(T* a, T scalar, std::size_t size) {
     DivScalarFallback(a, scalar, size);
   }
 
-  static void DivScalarSse42(T* a, T scalar, size_t size) {
+  static void DivScalarSse42(T* a, T scalar, std::size_t size) {
     DivScalarFallback(a, scalar, size);
   }
 
-  static void DivScalarSse41(T* a, T scalar, size_t size) {
+  static void DivScalarSse41(T* a, T scalar, std::size_t size) {
     DivScalarFallback(a, scalar, size);
   }
 
-  static void DivScalarSsse3(T* a, T scalar, size_t size) {
+  static void DivScalarSsse3(T* a, T scalar, std::size_t size) {
     DivScalarFallback(a, scalar, size);
   }
 
-  static void DivScalarSse3(T* a, T scalar, size_t size) {
+  static void DivScalarSse3(T* a, T scalar, std::size_t size) {
     DivScalarFallback(a, scalar, size);
   }
 
-  static void DivScalarFallback(T* a, T scalar, size_t size) {
-    for (size_t i = 0; i < size; ++i) {
+  static void DivScalarFallback(T* a, T scalar, std::size_t size) {
+    for (std::size_t i = 0; i < size; ++i) {
       a[i] /= scalar;
     }
   }
@@ -574,32 +581,32 @@ class InstructionSet {
   // BEGIN: comparison array
   //----------------------------------------------------------------------------
 
-  static int CmpAvx2(const T* a, const T* b, size_t size) {
+  static int CmpAvx2(const T* a, const T* b, std::size_t size) {
     return CmpAvx(a, b, size);
   }
 
-  static int CmpAvx(const T* a, const T* b, size_t size) {
+  static int CmpAvx(const T* a, const T* b, std::size_t size) {
     return CmpFallback(a, b, size);
   }
 
-  static int CmpSse42(const T* a, const T* b, size_t size) {
+  static int CmpSse42(const T* a, const T* b, std::size_t size) {
     return CmpSse3(a, b, size);
   }
 
-  static int CmpSse41(const T* a, const T* b, size_t size) {
+  static int CmpSse41(const T* a, const T* b, std::size_t size) {
     return CmpSse3(a, b, size);
   }
 
-  static int CmpSsse3(const T* a, const T* b, size_t size) {
+  static int CmpSsse3(const T* a, const T* b, std::size_t size) {
     return CmpSse3(a, b, size);
   }
 
-  static int CmpSse3(const T* a, const T* b, size_t size) {
+  static int CmpSse3(const T* a, const T* b, std::size_t size) {
     return CmpFallback(a, b, size);
   }
 
-  static int CmpFallback(const T* a, const T* b, size_t size) {
-    for (size_t i = 0; i < size; ++i) {
+  static int CmpFallback(const T* a, const T* b, std::size_t size) {
+    for (std::size_t i = 0; i < size; ++i) {
       if (a[i] < b[i]) {
         return -1;
       } else if (a[i] > b[i]) {

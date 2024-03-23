@@ -9,7 +9,7 @@
 
 namespace math {
 
-template <typename T, unsigned int Size, Options Option = Options::RowMajor>
+template <typename T, std::size_t Size, Options Option = Options::RowMajor>
 class Dimension {
   public:
   Dimension()
@@ -103,29 +103,29 @@ class Dimension {
     return operator()(2);
   }
 
-  auto operator()(unsigned int index) const -> const T& {
+  auto operator()(std::size_t index) const -> const T& {
     return m_dataStorage_(index);
   }
 
-  auto operator()(unsigned int index) -> T& { return m_dataStorage_(index); }
+  auto operator()(std::size_t index) -> T& { return m_dataStorage_(index); }
 
-  [[nodiscard]] auto coeff(unsigned int index) const -> const T& {
+  [[nodiscard]] auto coeff(std::size_t index) const -> const T& {
     return m_dataStorage_.coeff(index);
   }
 
-  auto coeffRef(unsigned int index) -> T& {
+  auto coeffRef(std::size_t index) -> T& {
     return m_dataStorage_.coeffRef(index);
   }
 
-  static constexpr auto GetSize() -> unsigned int { return Size; }
+  static constexpr auto GetSize() -> std::size_t { return Size; }
 
-  static constexpr auto GetDataSize() -> unsigned int {
+  static constexpr auto GetDataSize() -> std::size_t {
     return Vector<T, Size, Option>::GetDataSize();
   }
 
   static constexpr auto GetOption() -> Options { return Option; }
 
-  template <unsigned int TargetSize>
+  template <std::size_t TargetSize>
   auto resizedCopy() const -> Dimension<T, TargetSize, Option> {
     return Dimension<T, TargetSize, Option>(
         m_dataStorage_.resizedCopy<TargetSize>());
@@ -153,7 +153,7 @@ class Dimension {
     return *this;
   }
 
-    /**
+  /**
    * @brief Lexicographical less than operator.
    *
    * Compares two dimensions lexicographically.
@@ -163,7 +163,7 @@ class Dimension {
    * dimension, false otherwise.
    */
   auto operator<(const Dimension& other) const -> bool {
-    return this->m_dataStorage_ < other.m_dataStorage_ ;
+    return this->m_dataStorage_ < other.m_dataStorage_;
   }
 
   /**
@@ -185,8 +185,8 @@ class Dimension {
    * Compares two dimensions lexicographically.
    *
    * @param other The dimension to compare against.
-   * @return True if this dimension is lexicographically less than or equal to the
-   * other dimension, false otherwise.
+   * @return True if this dimension is lexicographically less than or equal to
+   * the other dimension, false otherwise.
    */
   auto operator<=(const Dimension& other) const -> bool {
     return this->m_dataStorage_ <= other.m_dataStorage_;
@@ -198,8 +198,8 @@ class Dimension {
    * Compares two dimensions lexicographically.
    *
    * @param other The dimension to compare against.
-   * @return True if this dimension is lexicographically greater than or equal to
-   * the other dimension, false otherwise.
+   * @return True if this dimension is lexicographically greater than or equal
+   * to the other dimension, false otherwise.
    */
   auto operator>=(const Dimension& other) const -> bool {
     return this->m_dataStorage_ >= other.m_dataStorage_;
@@ -235,7 +235,7 @@ class Dimension {
  value is
  * the left-hand operand. (scalar * Dimension)
  */
-template <typename ScalarType, typename T, unsigned int Size, Options Option>
+template <typename ScalarType, typename T, std::size_t Size, Options Option>
 auto operator*(const ScalarType&                 scalar,
                const Dimension<T, Size, Option>& dimension)
     -> Dimension<T, Size, Option> {
@@ -243,16 +243,16 @@ auto operator*(const ScalarType&                 scalar,
 }
 
 // Dimension of floats
-template <unsigned int Size, Options Option = Options::RowMajor>
+template <std::size_t Size, Options Option = Options::RowMajor>
 using DimensionNf = Dimension<float, Size, Option>;
 
 // Dimension of doubles
-template <unsigned int Size, Options Option = Options::RowMajor>
+template <std::size_t Size, Options Option = Options::RowMajor>
 using DimensionNd = Dimension<double, Size, Option>;
 
 // Dimension of ints
-template <unsigned int Size, Options Option = Options::RowMajor>
-using DimensionNi = Dimension<int, Size, Option>;
+template <std::size_t Size, Options Option = Options::RowMajor>
+using DimensionNi = Dimension<std::int32_t, Size, Option>;
 
 // Templated Dimension 2D
 template <typename T, Options Option = Options::RowMajor>
@@ -275,9 +275,9 @@ using Dimension2Dd = Dimension2D<double>;
 using Dimension3Dd = Dimension3D<double>;
 using Dimension4Dd = Dimension4D<double>;
 
-using Dimension2Di = Dimension2D<int>;
-using Dimension3Di = Dimension3D<int>;
-using Dimension4Di = Dimension4D<int>;
+using Dimension2Di = Dimension2D<std::int32_t>;
+using Dimension3Di = Dimension3D<std::int32_t>;
+using Dimension4Di = Dimension4D<std::int32_t>;
 
 }  // namespace math
 
