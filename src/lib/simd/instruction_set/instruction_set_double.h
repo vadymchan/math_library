@@ -18,7 +18,7 @@ class InstructionSet;
 template <>
 class InstructionSet<double> {
   public:
-  using AddFunc = void (*)(double*, const double*, size_t);
+  using AddFunc = void (*)(double*, const double*, std::size_t);
 
   static auto GetAddFunc() -> AddFunc {
 #ifdef SUPPORTS_AVX2
@@ -38,7 +38,7 @@ class InstructionSet<double> {
 #endif
   }
 
-  using AddScalarFunc = void (*)(double*, double, size_t);
+  using AddScalarFunc = void (*)(double*, double, std::size_t);
 
   static auto GetAddScalarFunc() -> AddScalarFunc {
 #ifdef SUPPORTS_AVX2
@@ -58,7 +58,7 @@ class InstructionSet<double> {
 #endif
   }
 
-  using SubFunc = void (*)(double*, const double*, size_t);
+  using SubFunc = void (*)(double*, const double*, std::size_t);
 
   static auto GetSubFunc() -> SubFunc {
 #ifdef SUPPORTS_AVX2
@@ -78,7 +78,7 @@ class InstructionSet<double> {
 #endif
   }
 
-  using SubScalarFunc = void (*)(double*, double, size_t);
+  using SubScalarFunc = void (*)(double*, double, std::size_t);
 
   static auto GetSubScalarFunc() -> SubScalarFunc {
 #ifdef SUPPORTS_AVX2
@@ -98,7 +98,7 @@ class InstructionSet<double> {
 #endif
   }
 
-  using NegFunc = void (*)(double*, size_t);
+  using NegFunc = void (*)(double*, std::size_t);
 
   static auto GetNegFunc() -> NegFunc {
 #ifdef SUPPORTS_AVX2
@@ -122,9 +122,9 @@ class InstructionSet<double> {
   using MulFunc = void (*)(double*,
                            const double*,
                            const double*,
-                           const size_t,
-                           const size_t,
-                           const size_t);
+                           const std::size_t,
+                           const std::size_t,
+                           const std::size_t);
 
   template <Options Option>
   static auto GetMulFunc() -> MulFunc<Option> {
@@ -145,7 +145,7 @@ class InstructionSet<double> {
 #endif
   }
 
-  using MulScalarFunc = void (*)(double*, double, size_t);
+  using MulScalarFunc = void (*)(double*, double, std::size_t);
 
   static auto GetMulScalarFunc() -> MulScalarFunc {
 #ifdef SUPPORTS_AVX2
@@ -165,7 +165,7 @@ class InstructionSet<double> {
 #endif
   }
 
-  using DivScalarFunc = void (*)(double*, double, size_t);
+  using DivScalarFunc = void (*)(double*, double, std::size_t);
 
   static auto GetDivScalarFunc() -> DivScalarFunc {
 #ifdef SUPPORTS_AVX2
@@ -185,7 +185,7 @@ class InstructionSet<double> {
 #endif
   }
 
-  using CmpFunc = int (*)(const double*, const double*, size_t);
+  using CmpFunc = int (*)(const double*, const double*, std::size_t);
 
   static auto GetCmpFunc() -> CmpFunc {
 #ifdef SUPPORTS_AVX2
@@ -206,21 +206,21 @@ class InstructionSet<double> {
   }
 
   private:
-  static constexpr size_t s_kAvxSimdWidth
+  static constexpr std::size_t s_kAvxSimdWidth
       = sizeof(__m256d) / sizeof(double);  // 4
-  static constexpr size_t s_kSseSimdWidth
+  static constexpr std::size_t s_kSseSimdWidth
       = sizeof(__m128d) / sizeof(double);  // 2
 
   // BEGIN: add two arrays
   //----------------------------------------------------------------------------
 
-  static void AddAvx2(double* a, const double* b, size_t size) {
+  static void AddAvx2(double* a, const double* b, std::size_t size) {
     AddAvx(a, b, size);
   }
 
-  static void AddAvx(double* a, const double* b, size_t size) {
-    const size_t kAvxLimit = size - (size % s_kAvxSimdWidth);
-    size_t       i         = 0;
+  static void AddAvx(double* a, const double* b, std::size_t size) {
+    const std::size_t kAvxLimit = size - (size % s_kAvxSimdWidth);
+    std::size_t       i         = 0;
 
     for (; i < kAvxLimit; i += s_kAvxSimdWidth) {
       __m256d ymm1 = _mm256_loadu_pd(a + i);
@@ -235,9 +235,9 @@ class InstructionSet<double> {
     }
   }
 
-  static void AddSse3(double* a, const double* b, size_t size) {
-    const size_t kSseLimit = size - (size % s_kSseSimdWidth);
-    size_t       i         = 0;
+  static void AddSse3(double* a, const double* b, std::size_t size) {
+    const std::size_t kSseLimit = size - (size % s_kSseSimdWidth);
+    std::size_t       i         = 0;
 
     for (; i < kSseLimit; i += s_kSseSimdWidth) {
       __m128d xmm1 = _mm_loadu_pd(a + i);
@@ -252,8 +252,8 @@ class InstructionSet<double> {
     }
   }
 
-  static void AddFallback(double* a, const double* b, size_t size) {
-    for (size_t i = 0; i < size; ++i) {
+  static void AddFallback(double* a, const double* b, std::size_t size) {
+    for (std::size_t i = 0; i < size; ++i) {
       a[i] += b[i];
     }
   }
@@ -264,14 +264,14 @@ class InstructionSet<double> {
   // BEGIN: add scalar
   //----------------------------------------------------------------------------
 
-  static void AddScalarAvx2(double* a, double scalar, size_t size) {
+  static void AddScalarAvx2(double* a, double scalar, std::size_t size) {
     AddScalarAvx(a, scalar, size);
   }
 
-  static void AddScalarAvx(double* a, double scalar, size_t size) {
+  static void AddScalarAvx(double* a, double scalar, std::size_t size) {
     __m256d      ymm0      = _mm256_set1_pd(scalar);
-    const size_t kAvxLimit = size - (size % s_kAvxSimdWidth);
-    size_t       i         = 0;
+    const std::size_t kAvxLimit = size - (size % s_kAvxSimdWidth);
+    std::size_t       i         = 0;
 
     for (; i < kAvxLimit; i += s_kAvxSimdWidth) {
       __m256d ymm1 = _mm256_loadu_pd(a + i);
@@ -285,11 +285,11 @@ class InstructionSet<double> {
     }
   }
 
-  static void AddScalarSse3(double* a, double scalar, size_t size) {
+  static void AddScalarSse3(double* a, double scalar, std::size_t size) {
     __m128d      xmm0 = _mm_set1_pd(scalar);
-    const size_t kSseLimit
+    const std::size_t kSseLimit
         = size - (size % s_kSseSimdWidth);  // Compute the limit for SSE3 loop
-    size_t i = 0;
+    std::size_t i = 0;
 
     // Process full SSE3 widths
     for (; i < kSseLimit; i += s_kSseSimdWidth) {
@@ -304,9 +304,9 @@ class InstructionSet<double> {
     }
   }
 
-  static void AddScalarFallback(double* a, double scalar, size_t size) {
+  static void AddScalarFallback(double* a, double scalar, std::size_t size) {
     // no SIMD
-    for (size_t i = 0; i < size; ++i) {
+    for (std::size_t i = 0; i < size; ++i) {
       a[i] += scalar;
     }
   }
@@ -317,13 +317,13 @@ class InstructionSet<double> {
   // BEGIN: subtract two arrays
   //----------------------------------------------------------------------------
 
-  static void SubAvx2(double* a, const double* b, size_t size) {
+  static void SubAvx2(double* a, const double* b, std::size_t size) {
     SubAvx(a, b, size);
   }
 
-  static void SubAvx(double* a, const double* b, size_t size) {
-    const size_t kAvxLimit = size - (size % s_kAvxSimdWidth);
-    size_t       i         = 0;
+  static void SubAvx(double* a, const double* b, std::size_t size) {
+    const std::size_t kAvxLimit = size - (size % s_kAvxSimdWidth);
+    std::size_t       i         = 0;
 
     for (; i < kAvxLimit; i += s_kAvxSimdWidth) {
       __m256d ymm1 = _mm256_loadu_pd(a + i);
@@ -338,9 +338,9 @@ class InstructionSet<double> {
     }
   }
 
-  static void SubSse3(double* a, const double* b, size_t size) {
-    const size_t kSseLimit = size - (size % s_kSseSimdWidth);
-    size_t       i         = 0;
+  static void SubSse3(double* a, const double* b, std::size_t size) {
+    const std::size_t kSseLimit = size - (size % s_kSseSimdWidth);
+    std::size_t       i         = 0;
 
     for (; i < kSseLimit; i += s_kSseSimdWidth) {
       __m128d xmm1 = _mm_loadu_pd(a + i);
@@ -355,8 +355,8 @@ class InstructionSet<double> {
     }
   }
 
-  static void SubFallback(double* a, const double* b, size_t size) {
-    for (size_t i = 0; i < size; ++i) {
+  static void SubFallback(double* a, const double* b, std::size_t size) {
+    for (std::size_t i = 0; i < size; ++i) {
       a[i] -= b[i];
     }
   }
@@ -367,14 +367,14 @@ class InstructionSet<double> {
   // BEGIN: subtract scalar
   //----------------------------------------------------------------------------
 
-  static void SubScalarAvx2(double* a, double scalar, size_t size) {
+  static void SubScalarAvx2(double* a, double scalar, std::size_t size) {
     SubScalarAvx(a, scalar, size);
   }
 
-  static void SubScalarAvx(double* a, double scalar, size_t size) {
+  static void SubScalarAvx(double* a, double scalar, std::size_t size) {
     __m256d      ymm0      = _mm256_set1_pd(scalar);
-    const size_t kAvxLimit = size - (size % s_kAvxSimdWidth);
-    size_t       i         = 0;
+    const std::size_t kAvxLimit = size - (size % s_kAvxSimdWidth);
+    std::size_t       i         = 0;
 
     for (; i < kAvxLimit; i += s_kAvxSimdWidth) {
       __m256d ymm1 = _mm256_loadu_pd(a + i);
@@ -387,10 +387,10 @@ class InstructionSet<double> {
     }
   }
 
-  static void SubScalarSse3(double* a, double scalar, size_t size) {
+  static void SubScalarSse3(double* a, double scalar, std::size_t size) {
     __m128d      xmm0      = _mm_set1_pd(scalar);
-    const size_t kSseLimit = size - (size % s_kSseSimdWidth);
-    size_t       i         = 0;
+    const std::size_t kSseLimit = size - (size % s_kSseSimdWidth);
+    std::size_t       i         = 0;
 
     for (; i < kSseLimit; i += s_kSseSimdWidth) {
       __m128d xmm1 = _mm_loadu_pd(a + i);
@@ -403,8 +403,8 @@ class InstructionSet<double> {
     }
   }
 
-  static void SubScalarFallback(double* a, double scalar, size_t size) {
-    for (size_t i = 0; i < size; ++i) {
+  static void SubScalarFallback(double* a, double scalar, std::size_t size) {
+    for (std::size_t i = 0; i < size; ++i) {
       a[i] -= scalar;
     }
   }
@@ -415,12 +415,12 @@ class InstructionSet<double> {
   // BEGIN: negation array
   //----------------------------------------------------------------------------
 
-  static void NegAvx2(double* a, size_t size) { NegAvx(a, size); }
+  static void NegAvx2(double* a, std::size_t size) { NegAvx(a, size); }
 
-  static void NegAvx(double* a, size_t size) {
+  static void NegAvx(double* a, std::size_t size) {
     __m256d      negZero   = _mm256_set1_pd(-0.0);
-    const size_t kAvxLimit = size - (size % s_kAvxSimdWidth);
-    size_t       i         = 0;
+    const std::size_t kAvxLimit = size - (size % s_kAvxSimdWidth);
+    std::size_t       i         = 0;
 
     for (; i < kAvxLimit; i += s_kAvxSimdWidth) {
       __m256d ymm1 = _mm256_loadu_pd(a + i);
@@ -434,16 +434,16 @@ class InstructionSet<double> {
     }
   }
 
-  static void NegSse42(double* a, size_t size) { NegSse3(a, size); }
+  static void NegSse42(double* a, std::size_t size) { NegSse3(a, size); }
 
-  static void NegSse41(double* a, size_t size) { NegSse3(a, size); }
+  static void NegSse41(double* a, std::size_t size) { NegSse3(a, size); }
 
-  static void NegSsse3(double* a, size_t size) { NegSse3(a, size); }
+  static void NegSsse3(double* a, std::size_t size) { NegSse3(a, size); }
 
-  static void NegSse3(double* a, size_t size) {
+  static void NegSse3(double* a, std::size_t size) {
     __m128d      negZero   = _mm_set1_pd(-0.0);
-    const size_t kSseLimit = size - (size % s_kSseSimdWidth);
-    size_t       i         = 0;
+    const std::size_t kSseLimit = size - (size % s_kSseSimdWidth);
+    std::size_t       i         = 0;
 
     for (; i < kSseLimit; i += s_kSseSimdWidth) {
       __m128d xmm1 = _mm_loadu_pd(a + i);
@@ -458,8 +458,8 @@ class InstructionSet<double> {
   }
 
   // Fallback adapted for double type
-  static void NegFallback(double* a, size_t size) {
-    for (size_t i = 0; i < size; ++i) {
+  static void NegFallback(double* a, std::size_t size) {
+    for (std::size_t i = 0; i < size; ++i) {
       a[i] = -a[i];
     }
   }
@@ -473,10 +473,10 @@ class InstructionSet<double> {
   // BEGIN: multiplication array utility functions
 
   template <Options Option>
-  static inline auto IndexA(const size_t kCurrentRowA,
-                            const size_t kInnerIndex,
-                            const size_t kRowsA,
-                            const size_t kColsARowsB) -> size_t {
+  static inline auto IndexA(const std::size_t kCurrentRowA,
+                            const std::size_t kInnerIndex,
+                            const std::size_t kRowsA,
+                            const std::size_t kColsARowsB) -> std::size_t {
     if constexpr (Option == Options::ColumnMajor) {
       return kCurrentRowA + kInnerIndex * kRowsA;
     } else if constexpr (Option == Options::RowMajor) {
@@ -485,10 +485,10 @@ class InstructionSet<double> {
   }
 
   template <Options Option>
-  static inline auto IndexB(const size_t kInnerIndex,
-                            const size_t kCurrentColB,
-                            const size_t kColsB,
-                            const size_t kColsARowsB) -> size_t {
+  static inline auto IndexB(const std::size_t kInnerIndex,
+                            const std::size_t kCurrentColB,
+                            const std::size_t kColsB,
+                            const std::size_t kColsARowsB) -> std::size_t {
     if constexpr (Option == Options::ColumnMajor) {
       return kInnerIndex + kCurrentColB * kColsARowsB;
     } else if constexpr (Option == Options::RowMajor) {
@@ -497,10 +497,10 @@ class InstructionSet<double> {
   }
 
   template <Options Option>
-  static inline auto IndexResult(const size_t kCurrentRowA,
-                                 const size_t kCurrentColB,
-                                 const size_t kRowsA,
-                                 const size_t kColsB) -> size_t {
+  static inline auto IndexResult(const std::size_t kCurrentRowA,
+                                 const std::size_t kCurrentColB,
+                                 const std::size_t kRowsA,
+                                 const std::size_t kColsB) -> std::size_t {
     if constexpr (Option == Options::ColumnMajor) {
       return kCurrentRowA + kCurrentColB * kRowsA;
     } else if constexpr (Option == Options::RowMajor) {
@@ -512,10 +512,10 @@ class InstructionSet<double> {
 
   template <Options Option>
   static inline auto LoadAAvx(const double* a,
-                           const size_t  kCurrentRowA,
-                           const size_t  kInnerIndex,
-                           const size_t  kRowsA,
-                           const size_t  kColsARowsB) -> __m256d {
+                           const std::size_t  kCurrentRowA,
+                           const std::size_t  kInnerIndex,
+                           const std::size_t  kRowsA,
+                           const std::size_t  kColsARowsB) -> __m256d {
     if constexpr (Option == Options::RowMajor) {
       return _mm256_loadu_pd(
           &a[IndexA<Option>(kCurrentRowA, kInnerIndex, kRowsA, kColsARowsB)]);
@@ -530,10 +530,10 @@ class InstructionSet<double> {
 
   template <Options Option>
   static inline auto LoadBAvx(const double* b,
-                           const size_t  kInnerIndex,
-                           const size_t  kCurrentColB,
-                           const size_t  kColsB,
-                           const size_t  kColsARowsB) -> __m256d {
+                           const std::size_t  kInnerIndex,
+                           const std::size_t  kCurrentColB,
+                           const std::size_t  kColsB,
+                           const std::size_t  kColsARowsB) -> __m256d {
     if constexpr (Option == Options::RowMajor) {
       return _mm256_set_pd(
           b[IndexB<Option>(kInnerIndex + 3, kCurrentColB, kColsB, kColsARowsB)],
@@ -552,10 +552,10 @@ class InstructionSet<double> {
 
   template <Options Option>
   static inline auto LoadASse(const double* a,
-                              const size_t  kCurrentRowA,
-                              const size_t  kInnerIndex,
-                              const size_t  kRowsA,
-                              const size_t  kColsARowsB) -> __m128d {
+                              const std::size_t  kCurrentRowA,
+                              const std::size_t  kInnerIndex,
+                              const std::size_t  kRowsA,
+                              const std::size_t  kColsARowsB) -> __m128d {
     if constexpr (Option == Options::RowMajor) {
       return _mm_loadu_pd(
           &a[IndexA<Option>(kCurrentRowA, kInnerIndex, kRowsA, kColsARowsB)]);
@@ -568,10 +568,10 @@ class InstructionSet<double> {
 
   template <Options Option>
   static inline auto LoadBSse(const double* b,
-                              const size_t  kInnerIndex,
-                              const size_t  kCurrentColB,
-                              const size_t  kColsB,
-                              const size_t  kColsARowsB) -> __m128d {
+                              const std::size_t  kInnerIndex,
+                              const std::size_t  kCurrentColB,
+                              const std::size_t  kColsB,
+                              const std::size_t  kColsARowsB) -> __m128d {
     if constexpr (Option == Options::ColumnMajor) {
       return _mm_loadu_pd(
           &b[IndexB<Option>(kInnerIndex, kCurrentColB, kColsB, kColsARowsB)]);
@@ -588,9 +588,9 @@ class InstructionSet<double> {
   static void MulAvx2(double*       result,
                       const double* a,
                       const double* b,
-                      const size_t  kRowsA,
-                      const size_t  kColsB,
-                      const size_t  kColsARowsB) {
+                      const std::size_t  kRowsA,
+                      const std::size_t  kColsB,
+                      const std::size_t  kColsARowsB) {
     MulAvx<Option>(result, a, b, kRowsA, kColsB, kColsARowsB);
   }
 
@@ -598,13 +598,13 @@ class InstructionSet<double> {
   static void MulAvx(double*       result,
                      const double* a,
                      const double* b,
-                     const size_t  kRowsA,
-                     const size_t  kColsB,
-                     const size_t  kColsARowsB) {
-    for (size_t currentRowA = 0; currentRowA < kRowsA; ++currentRowA) {
-      for (size_t currentColB = 0; currentColB < kColsB; ++currentColB) {
+                     const std::size_t  kRowsA,
+                     const std::size_t  kColsB,
+                     const std::size_t  kColsARowsB) {
+    for (std::size_t currentRowA = 0; currentRowA < kRowsA; ++currentRowA) {
+      for (std::size_t currentColB = 0; currentColB < kColsB; ++currentColB) {
         __m256d sum        = _mm256_setzero_pd();
-        size_t  innerIndex = 0;
+        std::size_t  innerIndex = 0;
         for (; innerIndex + s_kAvxSimdWidth - 1 < kColsARowsB;
              innerIndex += s_kAvxSimdWidth) {
           __m256d aVec = LoadAAvx<Option>(
@@ -636,9 +636,9 @@ class InstructionSet<double> {
   static void MulSse42(double*       result,
                        const double* a,
                        const double* b,
-                       const size_t  kRowsA,
-                       const size_t  kColsB,
-                       const size_t  kColsARowsB) {
+                       const std::size_t  kRowsA,
+                       const std::size_t  kColsB,
+                       const std::size_t  kColsARowsB) {
     MulSse3<Option>(result, a, b, kRowsA, kColsB, kColsARowsB);
   }
 
@@ -646,9 +646,9 @@ class InstructionSet<double> {
   static void MulSse41(double*       result,
                        const double* a,
                        const double* b,
-                       const size_t  kRowsA,
-                       const size_t  kColsB,
-                       const size_t  kColsARowsB) {
+                       const std::size_t  kRowsA,
+                       const std::size_t  kColsB,
+                       const std::size_t  kColsARowsB) {
     MulSse3<Option>(result, a, b, kRowsA, kColsB, kColsARowsB);
   }
 
@@ -656,9 +656,9 @@ class InstructionSet<double> {
   static void MulSsse3(double*       result,
                        const double* a,
                        const double* b,
-                       const size_t  kRowsA,
-                       const size_t  kColsB,
-                       const size_t  kColsARowsB) {
+                       const std::size_t  kRowsA,
+                       const std::size_t  kColsB,
+                       const std::size_t  kColsARowsB) {
     MulSse3<Option>(result, a, b, kRowsA, kColsB, kColsARowsB);
   }
 
@@ -666,13 +666,13 @@ class InstructionSet<double> {
   static void MulSse3(double*       result,
                       const double* a,
                       const double* b,
-                      const size_t  kRowsA,
-                      const size_t  kColsB,
-                      const size_t  kColsARowsB) {
-    for (size_t currentRowA = 0; currentRowA < kRowsA; ++currentRowA) {
-      for (size_t currentColB = 0; currentColB < kColsB; ++currentColB) {
+                      const std::size_t  kRowsA,
+                      const std::size_t  kColsB,
+                      const std::size_t  kColsARowsB) {
+    for (std::size_t currentRowA = 0; currentRowA < kRowsA; ++currentRowA) {
+      for (std::size_t currentColB = 0; currentColB < kColsB; ++currentColB) {
         __m128d sum        = _mm_setzero_pd();
-        size_t  innerIndex = 0;
+        std::size_t  innerIndex = 0;
         for (; innerIndex + s_kSseSimdWidth - 1 < kColsARowsB;
              innerIndex += s_kSseSimdWidth) {
           __m128d aVec = LoadASse<Option>(
@@ -703,13 +703,13 @@ class InstructionSet<double> {
   static void MulFallback(double*       result,
                           const double* a,
                           const double* b,
-                          const size_t  kRowsA,
-                          const size_t  kColsB,
-                          const size_t  kColsARowsB) {
-    for (size_t i = 0; i < kRowsA; ++i) {
-      for (size_t j = 0; j < kColsB; ++j) {
+                          const std::size_t  kRowsA,
+                          const std::size_t  kColsB,
+                          const std::size_t  kColsARowsB) {
+    for (std::size_t i = 0; i < kRowsA; ++i) {
+      for (std::size_t j = 0; j < kColsB; ++j) {
         double sum = 0;
-        for (size_t k = 0; k < kColsARowsB; ++k) {
+        for (std::size_t k = 0; k < kColsARowsB; ++k) {
           sum += a[IndexA<Option>(i, k, kRowsA, kColsARowsB)]
                * b[IndexB<Option>(k, j, kColsB, kColsARowsB)];
         }
@@ -724,14 +724,14 @@ class InstructionSet<double> {
   // BEGIN: multiplication scalar
   //----------------------------------------------------------------------------
 
-  static void MulScalarAvx2(double* a, double scalar, size_t size) {
+  static void MulScalarAvx2(double* a, double scalar, std::size_t size) {
     MulScalarAvx(a, scalar, size);
   }
 
-  static void MulScalarAvx(double* a, double scalar, size_t size) {
-    const size_t kAvxLimit = size - (size % s_kAvxSimdWidth);
+  static void MulScalarAvx(double* a, double scalar, std::size_t size) {
+    const std::size_t kAvxLimit = size - (size % s_kAvxSimdWidth);
     __m256d      ymm0      = _mm256_set1_pd(scalar);
-    size_t       i         = 0;
+    std::size_t       i         = 0;
 
     for (; i < kAvxLimit; i += s_kAvxSimdWidth) {
       __m256d ymm1 = _mm256_loadu_pd(a + i);
@@ -745,22 +745,22 @@ class InstructionSet<double> {
     }
   }
 
-  static void MulScalarSse42(double* a, double scalar, size_t size) {
+  static void MulScalarSse42(double* a, double scalar, std::size_t size) {
     MulScalarSse3(a, scalar, size);
   }
 
-  static void MulScalarSse41(double* a, double scalar, size_t size) {
+  static void MulScalarSse41(double* a, double scalar, std::size_t size) {
     MulScalarSse3(a, scalar, size);
   }
 
-  static void MulScalarSsse3(double* a, double scalar, size_t size) {
+  static void MulScalarSsse3(double* a, double scalar, std::size_t size) {
     MulScalarSse3(a, scalar, size);
   }
 
-  static void MulScalarSse3(double* a, double scalar, size_t size) {
-    const size_t kSseLimit = size - (size % s_kSseSimdWidth);
+  static void MulScalarSse3(double* a, double scalar, std::size_t size) {
+    const std::size_t kSseLimit = size - (size % s_kSseSimdWidth);
     __m128d      xmm0      = _mm_set1_pd(scalar);
-    size_t       i         = 0;
+    std::size_t       i         = 0;
 
     for (; i < kSseLimit; i += s_kSseSimdWidth) {
       __m128d xmm1 = _mm_loadu_pd(a + i);
@@ -774,8 +774,8 @@ class InstructionSet<double> {
     }
   }
 
-  static void MulScalarFallback(double* a, double scalar, size_t size) {
-    for (size_t i = 0; i < size; ++i) {
+  static void MulScalarFallback(double* a, double scalar, std::size_t size) {
+    for (std::size_t i = 0; i < size; ++i) {
       a[i] *= scalar;
     }
   }
@@ -786,14 +786,14 @@ class InstructionSet<double> {
   // BEGIN: division scalar
   //----------------------------------------------------------------------------
 
-  static void DivScalarAvx2(double* a, double scalar, size_t size) {
+  static void DivScalarAvx2(double* a, double scalar, std::size_t size) {
     DivScalarAvx(a, scalar, size);
   }
 
-  static void DivScalarAvx(double* a, double scalar, size_t size) {
-    const size_t kAvxLimit = size - (size % s_kAvxSimdWidth);
+  static void DivScalarAvx(double* a, double scalar, std::size_t size) {
+    const std::size_t kAvxLimit = size - (size % s_kAvxSimdWidth);
     __m256d      ymm0      = _mm256_set1_pd(scalar);
-    size_t       i         = 0;
+    std::size_t       i         = 0;
 
     for (; i < kAvxLimit; i += s_kAvxSimdWidth) {
       __m256d ymm1 = _mm256_loadu_pd(a + i);
@@ -807,22 +807,22 @@ class InstructionSet<double> {
     }
   }
 
-  static void DivScalarSse42(double* a, double scalar, size_t size) {
+  static void DivScalarSse42(double* a, double scalar, std::size_t size) {
     DivScalarSse3(a, scalar, size);
   }
 
-  static void DivScalarSse41(double* a, double scalar, size_t size) {
+  static void DivScalarSse41(double* a, double scalar, std::size_t size) {
     DivScalarSse3(a, scalar, size);
   }
 
-  static void DivScalarSsse3(double* a, double scalar, size_t size) {
+  static void DivScalarSsse3(double* a, double scalar, std::size_t size) {
     DivScalarSse3(a, scalar, size);
   }
 
-  static void DivScalarSse3(double* a, double scalar, size_t size) {
-    const size_t kSseLimit = size - (size % s_kSseSimdWidth);
+  static void DivScalarSse3(double* a, double scalar, std::size_t size) {
+    const std::size_t kSseLimit = size - (size % s_kSseSimdWidth);
     __m128d      xmm0      = _mm_set1_pd(scalar);
-    size_t       i         = 0;
+    std::size_t       i         = 0;
 
     for (; i < kSseLimit; i += s_kSseSimdWidth) {
       __m128d xmm1 = _mm_loadu_pd(a + i);
@@ -836,8 +836,8 @@ class InstructionSet<double> {
     }
   }
 
-  static void DivScalarFallback(double* a, double scalar, size_t size) {
-    for (size_t i = 0; i < size; ++i) {
+  static void DivScalarFallback(double* a, double scalar, std::size_t size) {
+    for (std::size_t i = 0; i < size; ++i) {
       a[i] /= scalar;
     }
   }
@@ -848,13 +848,13 @@ class InstructionSet<double> {
     // BEGIN: comparison array
   //----------------------------------------------------------------------------
 
-  static int CmpAvx2(const double* a, const double* b, size_t size) {
+  static int CmpAvx2(const double* a, const double* b, std::size_t size) {
     return CmpAvx(a, b, size);
   }
 
-  static int CmpAvx(const double* a, const double* b, size_t size) {
-    const size_t kAvxLimit = size - (size % s_kAvxSimdWidth);
-    size_t       i         = 0;
+  static int CmpAvx(const double* a, const double* b, std::size_t size) {
+    const std::size_t kAvxLimit = size - (size % s_kAvxSimdWidth);
+    std::size_t       i         = 0;
 
     for (; i < kAvxLimit; i += s_kAvxSimdWidth) {
       __m256d aVec      = _mm256_loadu_pd(a + i);
@@ -887,21 +887,21 @@ class InstructionSet<double> {
     return 0;
   }
 
-  static int CmpSse42(const double* a, const double* b, size_t size) {
+  static int CmpSse42(const double* a, const double* b, std::size_t size) {
     return CmpSse3(a, b, size);
   }
 
-  static int CmpSse41(const double* a, const double* b, size_t size) {
+  static int CmpSse41(const double* a, const double* b, std::size_t size) {
     return CmpSse3(a, b, size);
   }
 
-  static int CmpSsse3(const double* a, const double* b, size_t size) {
+  static int CmpSsse3(const double* a, const double* b, std::size_t size) {
     return CmpSse3(a, b, size);
   }
 
-  static int CmpSse3(const double* a, const double* b, size_t size) {
-    const size_t kSseLimit = size - (size % s_kSseSimdWidth);
-    size_t       i         = 0;
+  static int CmpSse3(const double* a, const double* b, std::size_t size) {
+    const std::size_t kSseLimit = size - (size % s_kSseSimdWidth);
+    std::size_t       i         = 0;
 
     for (; i < kSseLimit; i += s_kSseSimdWidth) {
       __m128d aVec      = _mm_loadu_pd(a + i);
@@ -934,8 +934,8 @@ class InstructionSet<double> {
     return 0;
   }
 
-  static int CmpFallback(const double* a, const double* b, size_t size) {
-    for (size_t i = 0; i < size; ++i) {
+  static int CmpFallback(const double* a, const double* b, std::size_t size) {
+    for (std::size_t i = 0; i < size; ++i) {
       if (a[i] < b[i]) {
         return -1;
       } else if (a[i] > b[i]) {
