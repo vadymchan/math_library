@@ -19,6 +19,9 @@ if(LIB_SOURCES)
     if(MATH_LIBRARY_USE_NORMALIZE_IN_PLACE)
         target_compile_definitions(math_library PUBLIC MATH_LIBRARY_USE_NORMALIZE_IN_PLACE)
     endif()
+
+    source_group(TREE "${CMAKE_CURRENT_SOURCE_DIR}/include/math_library" PREFIX "include" FILES ${PUBLIC_HEADERS})
+    source_group(TREE "${CMAKE_CURRENT_SOURCE_DIR}/src/lib" PREFIX "src" FILES ${LIB_SOURCES} ${PRIVATE_HEADERS})
 else()
     #Header Only
     message(STATUS "Build math library as header only library")
@@ -27,6 +30,9 @@ else()
     if(MATH_LIBRARY_USE_NORMALIZE_IN_PLACE)
         target_compile_definitions(math_library INTERFACE MATH_LIBRARY_USE_NORMALIZE_IN_PLACE)
     endif()
+
+    source_group(TREE "${CMAKE_CURRENT_SOURCE_DIR}/include/math_library" PREFIX "include" FILES ${PUBLIC_HEADERS})
+    source_group(TREE "${CMAKE_CURRENT_SOURCE_DIR}/src/lib" PREFIX "src" FILES ${PRIVATE_HEADERS})
 endif()
 
 #-------- generate_defines ----------------------------------------
@@ -52,15 +58,15 @@ add_dependencies(math_library run_generate_defines)
 option(MATH_LIBRARY_BUILD_TESTS "Build the tests and benchmarks for math_library" OFF)
 
 if(MATH_LIBRARY_BUILD_TESTS)
+    file(GLOB_RECURSE EXE_SOURCES "src/exe/*.cpp")
+    file(GLOB_RECURSE EXE_HEADERS "src/exe/*.h")
+    include_directories(${PROJECT_SOURCE_DIR}/include ${CMAKE_BINARY_DIR})
 
-file(GLOB_RECURSE EXE_SOURCES "src/exe/*.cpp")
-file(GLOB_RECURSE EXE_HEADERS "src/exe/*.h")
-include_directories(${PROJECT_SOURCE_DIR}/include ${CMAKE_BINARY_DIR})
+    add_executable(math_library_exe ${EXE_HEADERS} ${EXE_SOURCES})
 
-add_executable(math_library_exe ${EXE_HEADERS} ${EXE_SOURCES})
+    target_link_libraries(math_library_exe math_library)
 
-target_link_libraries(math_library_exe math_library)
-
+    source_group(TREE "${CMAKE_CURRENT_SOURCE_DIR}/src/exe" PREFIX "src" FILES ${EXE_SOURCES} ${EXE_HEADERS})
 endif()
 
 #-------- fetch content ----------------------------------------
@@ -73,7 +79,6 @@ cmake_dependent_option(MATH_LIBRARY_INCLUDE_G_BENCHMARK "Include the G_BENCHMARK
 
 if(MATH_LIBRARY_BUILD_TESTS)
     
-        
     include(FetchContent)
     set(FETCHCONTENT_BASE_DIR ${CMAKE_SOURCE_DIR}/third_party)
 
