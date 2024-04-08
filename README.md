@@ -87,7 +87,7 @@ math_library
 │           └── utils.h
 │ 
 ├── scripts (for generation instruction for current hardware)
-│   └── GenerateSIMDdefines.cpp
+│   └── generate_simd_defines.cpp
 │
 ├── include (for user)
 │    ├── math_library
