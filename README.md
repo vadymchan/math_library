@@ -30,7 +30,7 @@ header-only math library for computer graphics. Uses SIMD set instructions
 ### Third parties:
 - [Google Test](https://github.com/google/googletest)
 - [Google Benchmark](https://github.com/google/benchmark)
-- [spdlog](https://github.com/gabime/spdlog)
+- [spdlog](https://github.com/gabime/spdlog) - currently not used
 
 ---
 ### How to build:
@@ -69,32 +69,34 @@ math_library
 │   │
 │   └── lib (internal implementation - hidden from the user)
 │       ├── options
-│       │   └── Options.h
-|       |
+│       │   └── options.h
 │       │
 │       ├── simd
 │       │   ├── instruction_set
-│       │   │   ├── InstructionSet.h
-│       │   │   ├── InstructionSetDouble.h
-│       │   │   ├── InstructionSetFloat.h
-│       │   │   └── InstructionSetInt.h
+│       │   │   ├── instruction_set.h
+│       │   │   ├── instruction_set_double.h
+│       │   │   ├── instruction_set_float.h
+│       │   │   ├── instruction_set_int.h
+│       │   │   └── instruction_set_uint32_t.h
 │       │   │
 │       │   └── precompiled
-│       │       └── SIMDdefines.h
+│       │       └── simd_defines.h
 │       │
 │       └── utils
-│           └── Concepts.h
+│           ├── concepts.h
+│           └── utils.h
 │ 
 ├── scripts (for generation instruction for current hardware)
 │   └── GenerateSIMDdefines.cpp
 │
 ├── include (for user)
-│    ├── All.h
-│    ├── Graphics.h
-│    ├── Matrix.h
-│    ├── Vector.h
-│    ├── Point.h
-│    └── Dimention.h
+│    ├── math_library
+│    │   ├── all.h
+│    │   ├── dimension.h
+│    │   ├── graphics.h
+│    │   ├── matrix.h
+│    │   ├── point.h
+│    │   └── vector.h
 │
 └── CMakeLists.txt
 
