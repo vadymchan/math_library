@@ -19,30 +19,34 @@
 
 namespace math {
 
-// clang-format off
-
 template <typename T, Options Option = Options::RowMajor>
 auto g_translate(T dx, T dy, T dz) -> Matrix<T, 4, 4, Option> {
   Matrix<T, 4, 4, Option> translateMat{T()};
   if constexpr (Option == Options::RowMajor) {
+    // clang-format off
     translateMat <<
       1,   0,   0,   0,
       0,   1,   0,   0,
       0,   0,   1,   0,
       dx,  dy,  dz,  1;
+    // clang-format on
   } else if constexpr (Option == Options::ColumnMajor) {
+    // clang-format off
     translateMat <<
       1,   0,   0,   dx,
       0,   1,   0,   dy,
       0,   0,   1,   dz,
       0,   0,   0,   1;
+    // clang-format on
   }
   return translateMat;
 }
 
 template <typename T, Options Option = Options::RowMajor>
-auto g_translate(const Vector<T, 3, Option>& translation) -> Matrix<T, 4, 4, Option> {
-  return g_translate<T, Option>(translation.x(), translation.y(), translation.z());
+auto g_translate(const Vector<T, 3, Option>& translation)
+    -> Matrix<T, 4, 4, Option> {
+  return g_translate<T, Option>(
+      translation.x(), translation.y(), translation.z());
 }
 
 template <typename T, Options Option>
@@ -60,7 +64,7 @@ void g_addTranslate(Matrix<T, 4, 4, Option>& matrix, T dx, T dy, T dz) {
 
 template <typename T, Options Option>
 void g_addTranslate(Matrix<T, 4, 4, Option>&    matrix,
-                      const Vector<T, 3, Option>& translation) {
+                    const Vector<T, 3, Option>& translation) {
   g_addTranslate(matrix, translation.x(), translation.y(), translation.z());
 }
 
@@ -76,17 +80,19 @@ void g_setTranslate(Matrix<T, 4, 4, Option>& matrix, T dx, T dy, T dz) {
 
 template <typename T, Options Option>
 void g_setTranslate(Matrix<T, 4, 4, Option>&    matrix,
-                      const Vector<T, 3, Option>& translation) {
+                    const Vector<T, 3, Option>& translation) {
   g_setTranslate(matrix, translation.x(), translation.y(), translation.z());
 }
 
 template <typename T, Options Option = Options::RowMajor>
 auto g_scale(T sx, T sy, T sz) -> Matrix<T, 4, 4, Option> {
+  // clang-format off
   return Matrix<T, 4, 4, Option>{
     sx,   0,    0,    0, 
     0,    sy,   0,    0,
     0,    0,    sz,   0,
     0,    0,    0,    1};
+  // clang-format on
 }
 
 template <typename T, Options Option = Options::RowMajor>
@@ -104,15 +110,19 @@ auto g_rotateRhX(T angle) -> Matrix<T, 4, 4, Option> {
   Matrix<T, 4, 4, Option> rotateMat{T()};
 
   if constexpr (Option == Options::RowMajor) {
+    // clang-format off
     rotateMat << 1,   0,           0,          0,
                  0,   kCosAngle,   kSinAngle,  0,
                  0,  -kSinAngle,   kCosAngle,  0,
                  0,   0,           0,          1;
+    // clang-format on
   } else if constexpr (Option == Options::ColumnMajor) {
+    // clang-format off
     rotateMat << 1,   0,           0,          0,
                  0,   kCosAngle,  -kSinAngle,  0,
                  0,   kSinAngle,   kCosAngle,  0,
                  0,   0,           0,          1;
+    // clang-format on
   }
   return rotateMat;
 }
@@ -125,15 +135,19 @@ auto g_rotateRhY(T angle) -> Matrix<T, 4, 4, Option> {
   Matrix<T, 4, 4, Option> rotateMat{T()};
 
   if constexpr (Option == Options::RowMajor) {
+    // clang-format off
     rotateMat <<  kCosAngle,   0,  -kSinAngle,  0,
                   0,           1,   0,          0,
                   kSinAngle,   0,   kCosAngle,  0,
                   0,           0,   0,          1;
+    // clang-format on
   } else if constexpr (Option == Options::ColumnMajor) {
+    // clang-format off
     rotateMat <<  kCosAngle,   0,   kSinAngle,  0,
                   0,           1,   0,          0,
                  -kSinAngle,   0,   kCosAngle,  0,
                   0,           0,   0,          1;
+    // clang-format on
   }
   return rotateMat;
 }
@@ -146,15 +160,19 @@ auto g_rotateRhZ(T angle) -> Matrix<T, 4, 4, Option> {
   Matrix<T, 4, 4, Option> rotateMat{T()};
 
   if constexpr (Option == Options::RowMajor) {
+    // clang-format off
     rotateMat <<  kCosAngle,   kSinAngle,  0,  0,
                  -kSinAngle,   kCosAngle,  0,  0,
                   0,           0,          1,  0,
                   0,           0,          0,  1;
+    // clang-format on
   } else if constexpr (Option == Options::ColumnMajor) {
+    // clang-format off
     rotateMat <<  kCosAngle,  -kSinAngle,  0,  0,
                   kSinAngle,   kCosAngle,  0,  0,
                   0,           0,          1,  0,
                   0,           0,          0,  1;
+    // clang-format on
   }
   return rotateMat;
 }
@@ -163,7 +181,7 @@ auto g_rotateRhZ(T angle) -> Matrix<T, 4, 4, Option> {
  * @brief Creates a rotation matrix in the right-handed coordinate system.
  *
  * This function generates a 4x4 rotation matrix that represents the combined
- * rotation around the X, Y, and Z axes. The rotation order applied is 
+ * rotation around the X, Y, and Z axes. The rotation order applied is
  * Z (roll) -> X (pitch) -> Y (yaw)
  *
  * @param angleX The rotation angle around the X-axis (roll) in radians.
@@ -184,24 +202,28 @@ auto g_rotateRh(T angleX, T angleY, T angleZ) -> Matrix<T, 4, 4, Option> {
   Matrix<T, 4, 4, Option> rotateMat{T()};
 
   if constexpr (Option == Options::RowMajor) {
+    // clang-format off
     rotateMat <<
       kCY * kCZ + kSY * kSX * kSZ,    kCX * kSZ,    kCY * kSX * kSZ - kSY * kCZ,   0,
       kCZ * kSY * kSX - kCY * kSZ,    kCX * kCZ,    kSY * kSZ + kCY * kSX * kCZ,   0,
       kCX * kSY,                     -kSX,          kCY * kCX,                     0,
       0,                              0,            0,                             1;
+    // clang-format on
   } else if constexpr (Option == Options::ColumnMajor) {
+    // clang-format off
     rotateMat <<
       kCY * kCZ + kSY * kSX * kSZ,    kCZ * kSY * kSX - kCY * kSZ,    kCX * kSY,   0,
       kCX * kSZ,                      kCX * kCZ,                     -kSX,         0,
       kCY * kSX * kSZ - kSY * kCZ,    kSY * kSZ + kCY * kSX * kCZ,    kCY * kCX,   0,
       0,                              0,                              0,           1;
+    // clang-format on
   }
   return rotateMat;
 }
 
 template <typename T, Options Option = Options::RowMajor>
 auto g_rotateRh(const Vector<T, 3, Option>& angles) -> Matrix<T, 4, 4, Option> {
-    return g_rotateRh<T, Option>(angles.x(), angles.y(), angles.z());
+  return g_rotateRh<T, Option>(angles.x(), angles.y(), angles.z());
 }
 
 /**
@@ -238,17 +260,21 @@ auto g_rotateRh(const Vector<T, 3, Option>& axis, T angle)
   Matrix<T, 4, 4, Option> rotateMat{T()};
 
   if constexpr (Option == Options::RowMajor) {
+    // clang-format off
     rotateMat <<
       kCosAngle  +  x*x*kOneMinusCos,   x*y*kOneMinusCos - z*kSinAngle,   x*z*kOneMinusCos + y*kSinAngle,   0,              
       y*x*kOneMinusCos + z*kSinAngle,   kCosAngle  +  y*y*kOneMinusCos,   y*z*kOneMinusCos - x*kSinAngle,   0,
       z*x*kOneMinusCos - y*kSinAngle,   z*y*kOneMinusCos + x*kSinAngle,   kCosAngle  +  z*z*kOneMinusCos,   0, 
       0,                                0,                                0,                                1;
+    // clang-format on
   } else if constexpr (Option == Options::ColumnMajor) {
+    // clang-format off
     rotateMat <<
       kCosAngle  +  x*x*kOneMinusCos,   y*x*kOneMinusCos + z*kSinAngle,   z*x*kOneMinusCos - y*kSinAngle,   0, 
       x*y*kOneMinusCos - z*kSinAngle,   kCosAngle  +  y*y*kOneMinusCos,   z*y*kOneMinusCos + x*kSinAngle,   0,
       x*z*kOneMinusCos + y*kSinAngle,   y*z*kOneMinusCos - x*kSinAngle,   kCosAngle  +  z*z*kOneMinusCos,   0, 
       0,                                0,                                0,                                1;
+    // clang-format on
   }
   return rotateMat;
 }
@@ -273,7 +299,7 @@ auto g_rotateLhZ(T angle) -> Matrix<T, 4, 4, Option> {
  * left-handed coordinate system.
  *
  * This function generates a 4x4 rotation matrix that represents the combined
- * rotation around the X, Y, and Z axes (pitch, yaw, and roll) in the order of 
+ * rotation around the X, Y, and Z axes (pitch, yaw, and roll) in the order of
  * Z (roll) -> X (pitch) -> Y (yaw) using the right-handed function but inverts
  * the angles for left-handed coordinate system adaptation.
  *
@@ -291,7 +317,7 @@ auto g_rotateLh(T angleX, T angleY, T angleZ) -> Matrix<T, 4, 4, Option> {
 
 template <typename T, Options Option = Options::RowMajor>
 auto g_rotateLh(const Vector<T, 3, Option>& angles) -> Matrix<T, 4, 4, Option> {
-    return g_rotateLh<T, Option>(angles.x(), angles.y(), angles.z());
+  return g_rotateLh<T, Option>(angles.x(), angles.y(), angles.z());
 }
 
 /**
