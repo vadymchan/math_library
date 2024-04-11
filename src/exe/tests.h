@@ -4865,6 +4865,346 @@ TEST(ViewMatrixTest, LookToLhColumnMajor) {
   EXPECT_FLOAT_EQ(viewMatrix(3, 3), 1.0f);
 }
 
+// Test case for g_rotateRh (Euler angles)
+TEST(RotateRhTest, EulerAnglesFloat) {
+  float angleX = math::g_kPi / 6.0f;
+  float angleY = math::g_kPi / 4.0f;
+  float angleZ = math::g_kPi / 3.0f;
+
+  auto rotateMatrix = math::g_rotateRh<float>(angleX, angleY, angleZ);
+
+  //std::cout << rotateMatrix << std::endl;
+
+  EXPECT_NEAR(rotateMatrix(0, 0), 0.65974f, 1e-6f);
+  EXPECT_NEAR(rotateMatrix(0, 1), 0.75f, 1e-6f);
+  EXPECT_NEAR(rotateMatrix(0, 2), -0.0473671f, 1e-6f);
+  EXPECT_FLOAT_EQ(rotateMatrix(0, 3), 0.0f);
+
+  EXPECT_NEAR(rotateMatrix(1, 0), -0.435596f, 1e-6f);
+  EXPECT_NEAR(rotateMatrix(1, 1), 0.433013f, 1e-6f);
+  EXPECT_NEAR(rotateMatrix(1, 2), 0.789149f, 1e-6f);
+  EXPECT_FLOAT_EQ(rotateMatrix(1, 3), 0.0f);
+
+  EXPECT_NEAR(rotateMatrix(2, 0), 0.612372f, 1e-6f);
+  EXPECT_NEAR(rotateMatrix(2, 1), -0.5f, 1e-6f);
+  EXPECT_NEAR(rotateMatrix(2, 2), 0.612372f, 1e-6f);
+  EXPECT_FLOAT_EQ(rotateMatrix(2, 3), 0.0f);
+
+  EXPECT_FLOAT_EQ(rotateMatrix(3, 0), 0.0f);
+  EXPECT_FLOAT_EQ(rotateMatrix(3, 1), 0.0f);
+  EXPECT_FLOAT_EQ(rotateMatrix(3, 2), 0.0f);
+  EXPECT_FLOAT_EQ(rotateMatrix(3, 3), 1.0f);
+}
+
+// Test case for g_rotateRh (axis-angle)
+TEST(RotateRhTest, AxisAngleFloat) {
+  math::Vector<float, 3> axis(2.0f, 1.0f, 3.0f);
+  float                  angle = math::g_kPi / 3.0f;
+
+  auto rotateMatrix = math::g_rotateRh<float>(axis, angle);
+
+  //std::cout << rotateMatrix << std::endl;
+
+  EXPECT_NEAR(rotateMatrix(0, 0), 0.642857f, 1e-6f);
+  EXPECT_NEAR(rotateMatrix(0, 1), -0.622936f, 1e-6f);
+  EXPECT_NEAR(rotateMatrix(0, 2), 0.445741f, 1e-6f);
+  EXPECT_FLOAT_EQ(rotateMatrix(0, 3), 0.0f);
+
+  EXPECT_NEAR(rotateMatrix(1, 0), 0.765794f, 1e-6f);
+  EXPECT_NEAR(rotateMatrix(1, 1), 0.535714f, 1e-6f);
+  EXPECT_NEAR(rotateMatrix(1, 2), -0.355767f, 1e-6f);
+  EXPECT_FLOAT_EQ(rotateMatrix(1, 3), 0.0f);
+
+  EXPECT_NEAR(rotateMatrix(2, 0), -0.0171693f, 1e-6f);
+  EXPECT_NEAR(rotateMatrix(2, 1), 0.570053f, 1e-6f);
+  EXPECT_NEAR(rotateMatrix(2, 2), 0.821429f, 1e-6f);
+  EXPECT_FLOAT_EQ(rotateMatrix(2, 3), 0.0f);
+
+  EXPECT_FLOAT_EQ(rotateMatrix(3, 0), 0.0f);
+  EXPECT_FLOAT_EQ(rotateMatrix(3, 1), 0.0f);
+  EXPECT_FLOAT_EQ(rotateMatrix(3, 2), 0.0f);
+  EXPECT_FLOAT_EQ(rotateMatrix(3, 3), 1.0f);
+}
+
+// Test case for g_rotateRh (Euler angles) - failure
+TEST(RotateRhTest, EulerAnglesFailureFloat) {
+  float angleX = math::g_kPi / 6.0f;
+  float angleY = math::g_kPi / 4.0f;
+  float angleZ = math::g_kPi / 3.0f;
+
+  auto rotateMatrix = math::g_rotateRh<float>(angleX, angleY, angleZ);
+
+  EXPECT_NE(rotateMatrix(0, 0), 0.2f);
+  EXPECT_NE(rotateMatrix(0, 1), 0.1f);
+  EXPECT_NE(rotateMatrix(0, 2), 0.9f);
+  EXPECT_FLOAT_EQ(rotateMatrix(0, 3), 0.0f);
+
+  EXPECT_NE(rotateMatrix(1, 0), -0.8f);
+  EXPECT_NE(rotateMatrix(1, 1), 0.6f);
+  EXPECT_NE(rotateMatrix(1, 2), -0.4f);
+  EXPECT_FLOAT_EQ(rotateMatrix(1, 3), 0.0f);
+
+  EXPECT_NE(rotateMatrix(2, 0), 0.1f);
+  EXPECT_NE(rotateMatrix(2, 1), -0.9f);
+  EXPECT_NE(rotateMatrix(2, 2), 0.2f);
+  EXPECT_FLOAT_EQ(rotateMatrix(2, 3), 0.0f);
+
+  EXPECT_FLOAT_EQ(rotateMatrix(3, 0), 0.0f);
+  EXPECT_FLOAT_EQ(rotateMatrix(3, 1), 0.0f);
+  EXPECT_FLOAT_EQ(rotateMatrix(3, 2), 0.0f);
+  EXPECT_FLOAT_EQ(rotateMatrix(3, 3), 1.0f);
+}
+
+// Test case for g_rotateRh (axis-angle) - failure
+TEST(RotateRhTest, AxisAngleFailureFloat) {
+  math::Vector<float, 3> axis(2.0f, 1.0f, 3.0f);
+  float                  angle = math::g_kPi / 3.0f;
+
+  auto rotateMatrix = math::g_rotateRh<float>(axis, angle);
+
+  EXPECT_NE(rotateMatrix(0, 0), 0.1f);
+  EXPECT_NE(rotateMatrix(0, 1), -0.9f);
+  EXPECT_NE(rotateMatrix(0, 2), 0.8f);
+  EXPECT_FLOAT_EQ(rotateMatrix(0, 3), 0.0f);
+
+  EXPECT_NE(rotateMatrix(1, 0), 0.9f);
+  EXPECT_NE(rotateMatrix(1, 1), 0.2f);
+  EXPECT_NE(rotateMatrix(1, 2), -0.7f);
+  EXPECT_FLOAT_EQ(rotateMatrix(1, 3), 0.0f);
+
+  EXPECT_NE(rotateMatrix(2, 0), -0.8f);
+  EXPECT_NE(rotateMatrix(2, 1), 0.7f);
+  EXPECT_NE(rotateMatrix(2, 2), 0.3f);
+  EXPECT_FLOAT_EQ(rotateMatrix(2, 3), 0.0f);
+
+  EXPECT_FLOAT_EQ(rotateMatrix(3, 0), 0.0f);
+  EXPECT_FLOAT_EQ(rotateMatrix(3, 1), 0.0f);
+  EXPECT_FLOAT_EQ(rotateMatrix(3, 2), 0.0f);
+  EXPECT_FLOAT_EQ(rotateMatrix(3, 3), 1.0f);
+}
+
+// Test case for g_rotateLh (Euler angles)
+TEST(RotateLhTest, EulerAnglesFloat) {
+  float angleX = math::g_kPi / 6.0f;
+  float angleY = math::g_kPi / 4.0f;
+  float angleZ = math::g_kPi / 3.0f;
+
+  auto rotateMatrix = math::g_rotateLh<float>(angleX, angleY, angleZ);
+
+  EXPECT_NEAR(rotateMatrix(0, 0), 0.0473671f, 1e-6f);
+  EXPECT_NEAR(rotateMatrix(0, 1), -0.75f, 1e-6f);
+  EXPECT_NEAR(rotateMatrix(0, 2), 0.65974f, 1e-6f);
+  EXPECT_FLOAT_EQ(rotateMatrix(0, 3), 0.0f);
+
+  EXPECT_NEAR(rotateMatrix(1, 0), 0.789149f, 1e-6f);
+  EXPECT_NEAR(rotateMatrix(1, 1), 0.433013f, 1e-6f);
+  EXPECT_NEAR(rotateMatrix(1, 2), 0.435596f, 1e-6f);
+  EXPECT_FLOAT_EQ(rotateMatrix(1, 3), 0.0f);
+
+  EXPECT_NEAR(rotateMatrix(2, 0), -0.612372f, 1e-6f);
+  EXPECT_NEAR(rotateMatrix(2, 1), 0.5f, 1e-6f);
+  EXPECT_NEAR(rotateMatrix(2, 2), 0.612372f, 1e-6f);
+  EXPECT_FLOAT_EQ(rotateMatrix(2, 3), 0.0f);
+
+  EXPECT_FLOAT_EQ(rotateMatrix(3, 0), 0.0f);
+  EXPECT_FLOAT_EQ(rotateMatrix(3, 1), 0.0f);
+  EXPECT_FLOAT_EQ(rotateMatrix(3, 2), 0.0f);
+  EXPECT_FLOAT_EQ(rotateMatrix(3, 3), 1.0f);
+}
+
+// Test case for g_rotateLh (Euler angles) - failure
+TEST(RotateLhTest, EulerAnglesFailureFloat) {
+  float angleX = math::g_kPi / 6.0f;
+  float angleY = math::g_kPi / 4.0f;
+  float angleZ = math::g_kPi / 3.0f;
+
+  auto rotateMatrix = math::g_rotateLh<float>(angleX, angleY, angleZ);
+
+  EXPECT_NE(rotateMatrix(0, 0), 0.2f);
+  EXPECT_NE(rotateMatrix(0, 1), -0.1f);
+  EXPECT_NE(rotateMatrix(0, 2), -0.9f);
+  EXPECT_FLOAT_EQ(rotateMatrix(0, 3), 0.0f);
+
+  EXPECT_NE(rotateMatrix(1, 0), 0.8f);
+  EXPECT_NE(rotateMatrix(1, 1), -0.6f);
+  EXPECT_NE(rotateMatrix(1, 2), 0.4f);
+  EXPECT_FLOAT_EQ(rotateMatrix(1, 3), 0.0f);
+
+  EXPECT_NE(rotateMatrix(2, 0), -0.1f);
+  EXPECT_NE(rotateMatrix(2, 1), 0.9f);
+  EXPECT_NE(rotateMatrix(2, 2), -0.2f);
+  EXPECT_FLOAT_EQ(rotateMatrix(2, 3), 0.0f);
+
+  EXPECT_FLOAT_EQ(rotateMatrix(3, 0), 0.0f);
+  EXPECT_FLOAT_EQ(rotateMatrix(3, 1), 0.0f);
+  EXPECT_FLOAT_EQ(rotateMatrix(3, 2), 0.0f);
+  EXPECT_FLOAT_EQ(rotateMatrix(3, 3), 1.0f);
+}
+
+// Test case for g_rotateLh (axis-angle)
+TEST(RotateLhTest, AxisAngleFloat) {
+  math::Vector<float, 3> axis(2.0f, 1.0f, 3.0f);
+  float                  angle = math::g_kPi / 3.0f;
+
+  auto rotateMatrix = math::g_rotateLh<float>(axis, angle);
+
+  EXPECT_NEAR(rotateMatrix(0, 0), 0.642857f, 1e-6f);
+  EXPECT_NEAR(rotateMatrix(0, 1), 0.765794f, 1e-6f);
+  EXPECT_NEAR(rotateMatrix(0, 2), -0.0171693f, 1e-6f);
+  EXPECT_FLOAT_EQ(rotateMatrix(0, 3), 0.0f);
+
+  EXPECT_NEAR(rotateMatrix(1, 0), -0.622936f, 1e-6f);
+  EXPECT_NEAR(rotateMatrix(1, 1), 0.535714f, 1e-6f); 
+  EXPECT_NEAR(rotateMatrix(1, 2), 0.570053f, 1e-6f);
+  EXPECT_FLOAT_EQ(rotateMatrix(1, 3), 0.0f);
+
+  EXPECT_NEAR(rotateMatrix(2, 0), 0.445741f, 1e-6f);
+  EXPECT_NEAR(rotateMatrix(2, 1), -0.355767f, 1e-6f);
+  EXPECT_NEAR(rotateMatrix(2, 2), 0.821429f, 1e-6f);
+  EXPECT_FLOAT_EQ(rotateMatrix(2, 3), 0.0f);
+
+  EXPECT_FLOAT_EQ(rotateMatrix(3, 0), 0.0f);
+  EXPECT_FLOAT_EQ(rotateMatrix(3, 1), 0.0f);
+  EXPECT_FLOAT_EQ(rotateMatrix(3, 2), 0.0f);
+  EXPECT_FLOAT_EQ(rotateMatrix(3, 3), 1.0f);
+}
+
+// Test case for g_rotateLh (axis-angle) - failure
+TEST(RotateLhTest, AxisAngleFailureFloat) {
+  math::Vector<float, 3> axis(2.0f, 1.0f, 3.0f);
+  float                  angle = math::g_kPi / 3.0f;
+
+  auto rotateMatrix = math::g_rotateLh<float>(axis, angle);
+
+  EXPECT_NE(rotateMatrix(0, 0), -0.1f);
+  EXPECT_NE(rotateMatrix(0, 1), 0.9f);
+  EXPECT_NE(rotateMatrix(0, 2), -0.8f);
+  EXPECT_FLOAT_EQ(rotateMatrix(0, 3), 0.0f);
+
+  EXPECT_NE(rotateMatrix(1, 0), -0.9f);
+  EXPECT_NE(rotateMatrix(1, 1), -0.2f);
+  EXPECT_NE(rotateMatrix(1, 2), 0.7f);
+  EXPECT_FLOAT_EQ(rotateMatrix(1, 3), 0.0f);
+
+  EXPECT_NE(rotateMatrix(2, 0), 0.8f);
+  EXPECT_NE(rotateMatrix(2, 1), -0.7f);
+  EXPECT_NE(rotateMatrix(2, 2), -0.3f);
+  EXPECT_FLOAT_EQ(rotateMatrix(2, 3), 0.0f);
+
+  EXPECT_FLOAT_EQ(rotateMatrix(3, 0), 0.0f);
+  EXPECT_FLOAT_EQ(rotateMatrix(3, 1), 0.0f);
+  EXPECT_FLOAT_EQ(rotateMatrix(3, 2), 0.0f);
+  EXPECT_FLOAT_EQ(rotateMatrix(3, 3), 1.0f);
+}
+
+// Test case for lookAtRh
+TEST(LookAtTest, LookAtRhFloat) {
+  math::Vector3Df eye(0.0f, 0.0f, 5.0f);
+  math::Vector3Df target(0.0f, 0.0f, 0.0f);
+  math::Vector3Df up(0.0f, 1.0f, 0.0f);
+  math::Matrix4f viewMatrix = math::g_lookAtRh(eye, target, up);
+
+  std::cout << viewMatrix << std::endl;
+
+  EXPECT_FLOAT_EQ(viewMatrix(0, 0), -1.0f);
+  EXPECT_FLOAT_EQ(viewMatrix(0, 1), 0.0f);
+  EXPECT_FLOAT_EQ(viewMatrix(0, 2), 0.0f);
+  EXPECT_FLOAT_EQ(viewMatrix(0, 3), 0.0f);
+  EXPECT_FLOAT_EQ(viewMatrix(1, 0), 0.0f);
+  EXPECT_FLOAT_EQ(viewMatrix(1, 1), 1.0f);
+  EXPECT_FLOAT_EQ(viewMatrix(1, 2), 0.0f);
+  EXPECT_FLOAT_EQ(viewMatrix(1, 3), 0.0f);
+  EXPECT_FLOAT_EQ(viewMatrix(2, 0), 0.0f);
+  EXPECT_FLOAT_EQ(viewMatrix(2, 1), 0.0f);
+  EXPECT_FLOAT_EQ(viewMatrix(2, 2), 1.0f);
+  EXPECT_FLOAT_EQ(viewMatrix(2, 3), 0.0f);
+  EXPECT_FLOAT_EQ(viewMatrix(3, 0), 0.0f);
+  EXPECT_FLOAT_EQ(viewMatrix(3, 1), 0.0f);
+  EXPECT_FLOAT_EQ(viewMatrix(3, 2), 5.0f);
+  EXPECT_FLOAT_EQ(viewMatrix(3, 3), 1.0f);
+}
+
+// Test case for lookAtLh
+TEST(LookAtTest, LookAtLhFloat) {
+  math::Vector3Df eye(0.0f, 0.0f, 5.0f);
+  math::Vector3Df target(0.0f, 0.0f, 0.0f);
+  math::Vector3Df up(0.0f, 1.0f, 0.0f);
+  math::Matrix4f viewMatrix = math::g_lookAtLh(eye, target, up);
+
+  std::cout << viewMatrix << std::endl;
+
+  EXPECT_FLOAT_EQ(viewMatrix(0, 0), -1.0f);
+  EXPECT_FLOAT_EQ(viewMatrix(0, 1), 0.0f);
+  EXPECT_FLOAT_EQ(viewMatrix(0, 2), 0.0f);
+  EXPECT_FLOAT_EQ(viewMatrix(0, 3), 0.0f);
+  EXPECT_FLOAT_EQ(viewMatrix(1, 0), 0.0f);
+  EXPECT_FLOAT_EQ(viewMatrix(1, 1), 1.0f);
+  EXPECT_FLOAT_EQ(viewMatrix(1, 2), 0.0f);
+  EXPECT_FLOAT_EQ(viewMatrix(1, 3), 0.0f);
+  EXPECT_FLOAT_EQ(viewMatrix(2, 0), 0.0f);
+  EXPECT_FLOAT_EQ(viewMatrix(2, 1), 0.0f);
+  EXPECT_FLOAT_EQ(viewMatrix(2, 2), -1.0f);
+  EXPECT_FLOAT_EQ(viewMatrix(2, 3), 0.0f);
+  EXPECT_FLOAT_EQ(viewMatrix(3, 0), 0.0f);
+  EXPECT_FLOAT_EQ(viewMatrix(3, 1), 0.0f);
+  EXPECT_FLOAT_EQ(viewMatrix(3, 2), 5.0f);
+  EXPECT_FLOAT_EQ(viewMatrix(3, 3), 1.0f);
+}
+
+// Test case for lookToRh
+TEST(LookAtTest, LookToRhFloat) {
+  math::Vector3Df eye(0.0f, 0.0f, 5.0f);
+  math::Vector3Df direction(0.0f, 0.0f, -1.0f);
+  math::Vector3Df up(0.0f, 1.0f, 0.0f);
+  math::Matrix4f viewMatrix = math::g_lookToRh(eye, direction, up);
+
+  std::cout << viewMatrix << std::endl;
+
+  EXPECT_FLOAT_EQ(viewMatrix(0, 0), -1.0f);
+  EXPECT_FLOAT_EQ(viewMatrix(0, 1), 0.0f);
+  EXPECT_FLOAT_EQ(viewMatrix(0, 2), 0.0f);
+  EXPECT_FLOAT_EQ(viewMatrix(0, 3), 0.0f);
+  EXPECT_FLOAT_EQ(viewMatrix(1, 0), 0.0f);
+  EXPECT_FLOAT_EQ(viewMatrix(1, 1), 1.0f);
+  EXPECT_FLOAT_EQ(viewMatrix(1, 2), 0.0f);
+  EXPECT_FLOAT_EQ(viewMatrix(1, 3), 0.0f);
+  EXPECT_FLOAT_EQ(viewMatrix(2, 0), 0.0f);
+  EXPECT_FLOAT_EQ(viewMatrix(2, 1), 0.0f);
+  EXPECT_FLOAT_EQ(viewMatrix(2, 2), 1.0f);
+  EXPECT_FLOAT_EQ(viewMatrix(2, 3), 0.0f);
+  EXPECT_FLOAT_EQ(viewMatrix(3, 0), 0.0f);
+  EXPECT_FLOAT_EQ(viewMatrix(3, 1), 0.0f);
+  EXPECT_FLOAT_EQ(viewMatrix(3, 2), 5.0f);
+  EXPECT_FLOAT_EQ(viewMatrix(3, 3), 1.0f);
+}
+
+// Test case for lookToLh
+TEST(LookAtTest, LookToLhFloat) {
+  math::Vector3Df eye(0.0f, 0.0f, 5.0f);
+  math::Vector3Df direction(0.0f, 0.0f, -1.0f);
+  math::Vector3Df up(0.0f, 1.0f, 0.0f);
+  math::Matrix4f viewMatrix = math::g_lookToLh(eye, direction, up);
+
+  std::cout << viewMatrix << std::endl;
+
+  EXPECT_FLOAT_EQ(viewMatrix(0, 0), -1.0f);
+  EXPECT_FLOAT_EQ(viewMatrix(0, 1), 0.0f);
+  EXPECT_FLOAT_EQ(viewMatrix(0, 2), 0.0f);
+  EXPECT_FLOAT_EQ(viewMatrix(0, 3), 0.0f);
+  EXPECT_FLOAT_EQ(viewMatrix(1, 0), 0.0f);
+  EXPECT_FLOAT_EQ(viewMatrix(1, 1), 1.0f);
+  EXPECT_FLOAT_EQ(viewMatrix(1, 2), 0.0f);
+  EXPECT_FLOAT_EQ(viewMatrix(1, 3), 0.0f);
+  EXPECT_FLOAT_EQ(viewMatrix(2, 0), 0.0f);
+  EXPECT_FLOAT_EQ(viewMatrix(2, 1), 0.0f);
+  EXPECT_FLOAT_EQ(viewMatrix(2, 2), -1.0f);
+  EXPECT_FLOAT_EQ(viewMatrix(2, 3), 0.0f);
+  EXPECT_FLOAT_EQ(viewMatrix(3, 0), 0.0f);
+  EXPECT_FLOAT_EQ(viewMatrix(3, 1), 0.0f);
+  EXPECT_FLOAT_EQ(viewMatrix(3, 2), 5.0f);
+  EXPECT_FLOAT_EQ(viewMatrix(3, 3), 1.0f);
+}
+
 // ========================== VECTOR: FLOAT ==============================
 
 TEST(VectorComparisonTest, LessThanOperator) {
@@ -5464,7 +5804,8 @@ TEST(DimensionComparisonTest, LessThanOrEqualToOperatorUnsignedIntLargeValues) {
   EXPECT_TRUE(vec2 <= vec1);
 }
 
-TEST(DimensionComparisonTest, GreaterThanOrEqualToOperatorUnsignedIntLargeValues) {
+TEST(DimensionComparisonTest,
+     GreaterThanOrEqualToOperatorUnsignedIntLargeValues) {
   math::Dimension3D<unsigned int> vec1(
       0xFF'FF'FF'FF, 0xFF'FF'FF'FF, 0xFF'FF'FF'FF);
   math::Dimension3D<unsigned int> vec2(0, 0, 0);
