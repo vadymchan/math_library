@@ -7,7 +7,7 @@
 
 namespace math {
 
-constexpr float g_kPi               = 3.141592653f;
+constexpr float g_kPi               = 3.14159265358979323846f;
 constexpr float g_kDefaultTolerance = 1e-8f;
 
 template <typename T>
