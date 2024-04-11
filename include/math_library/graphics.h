@@ -343,8 +343,6 @@ auto g_rotateLh(const Vector<T, 3, Option>& axis, T angle)
 // END: rotation matrix creation functions
 // ----------------------------------------------------------------------------
 
-// clang-format on
-
 // BEGIN: view matrix creation functions
 // ----------------------------------------------------------------------------
 
@@ -353,50 +351,34 @@ auto g_lookAtRh(const Vector3D<T, Option>& eye,
                 const Vector3D<T, Option>& target,
                 const Vector3D<T, Option>& worldUp) -> Matrix<T, 4, 4, Option> {
 #ifdef MATH_LIBRARY_USE_NORMALIZE_IN_PLACE
-  auto forward = target - eye;
-  forward.normalize();
-  auto right = worldUp.cross(forward);
-  right.normalize();
+  auto f = target - eye;
+  f.normalize();
+  auto r = worldUp.cross(f);
+  r.normalize();
 #else
-  auto forward = (target - eye).normalize();
-  auto right   = worldUp.cross(forward).normalize();
+  auto f = (target - eye).normalize();
+  auto r = worldUp.cross(f).normalize();
 #endif
-  auto up = forward.cross(right);
+  auto u = f.cross(r);
 
-  auto viewMatrix = Matrix<T, 4, 4, Option>::Identity();
+  Matrix<T, 4, 4, Option> viewMatrix;
 
   if constexpr (Option == Options::RowMajor) {
-    viewMatrix(0, 0) = right.x();
-    viewMatrix(0, 1) = right.y();
-    viewMatrix(0, 2) = right.z();
-    viewMatrix(3, 0) = -right.dot(eye);
-
-    viewMatrix(1, 0) = up.x();
-    viewMatrix(1, 1) = up.y();
-    viewMatrix(1, 2) = up.z();
-    viewMatrix(3, 1) = -up.dot(eye);
-
-    // forward - depends on handness
-    viewMatrix(2, 0) = -forward.x();
-    viewMatrix(2, 1) = -forward.y();
-    viewMatrix(2, 2) = -forward.z();
-    viewMatrix(3, 2) = -forward.dot(eye);
+    // clang-format off
+    viewMatrix <<
+       r.x(),        u.x(),       -f.x(),       T(),
+       r.y(),        u.y(),       -f.y(),       T(),
+       r.z(),        u.z(),       -f.z(),       T(),
+      -eye.dot(r),  -eye.dot(u),  -eye.dot(f),  T(1);
+    // clang-format on
   } else if constexpr (Option == Options::ColumnMajor) {
-    viewMatrix(0, 0) = right.x();
-    viewMatrix(1, 0) = right.y();
-    viewMatrix(2, 0) = right.z();
-    viewMatrix(0, 3) = -right.dot(eye);
-
-    viewMatrix(0, 1) = up.x();
-    viewMatrix(1, 1) = up.y();
-    viewMatrix(2, 1) = up.z();
-    viewMatrix(1, 3) = -up.dot(eye);
-
-    // forward - depends on handness
-    viewMatrix(0, 2) = -forward.x();
-    viewMatrix(1, 2) = -forward.y();
-    viewMatrix(2, 2) = -forward.z();
-    viewMatrix(2, 3) = -forward.dot(eye);
+    // clang-format off
+    viewMatrix <<
+       r.x(),   r.y(),   r.z(),  -eye.dot(r),
+       u.x(),   u.y(),   u.z(),  -eye.dot(u),
+      -f.x(),  -f.y(),  -f.z(),  -eye.dot(f),
+       T(),     T(),     T(),     T(1);
+    // clang-format on
   }
 
   return viewMatrix;
@@ -407,51 +389,34 @@ auto g_lookAtLh(const Vector3D<T, Option>& eye,
                 const Vector3D<T, Option>& target,
                 const Vector3D<T, Option>& worldUp) -> Matrix<T, 4, 4, Option> {
 #ifdef MATH_LIBRARY_USE_NORMALIZE_IN_PLACE
-  auto forward = target - eye;
-  forward.normalize();
-  auto right = worldUp.cross(forward);
-  right.normalize();
+  auto f = target - eye;
+  f.normalize();
+  auto r = worldUp.cross(f);
+  r.normalize();
 #else
-  auto forward = (target - eye).normalize();
-  auto right   = worldUp.cross(forward).normalize();
+  auto f = (target - eye).normalize();
+  auto r = worldUp.cross(f).normalize();
 #endif
+  auto u = f.cross(r);
 
-  auto up = forward.cross(right);
-
-  auto viewMatrix = Matrix<T, 4, 4, Option>::Identity();
+  Matrix<T, 4, 4, Option> viewMatrix;
 
   if constexpr (Option == Options::RowMajor) {
-    viewMatrix(0, 0) = right.x();
-    viewMatrix(0, 1) = right.y();
-    viewMatrix(0, 2) = right.z();
-    viewMatrix(3, 0) = -right.dot(eye);
-
-    viewMatrix(1, 0) = up.x();
-    viewMatrix(1, 1) = up.y();
-    viewMatrix(1, 2) = up.z();
-    viewMatrix(3, 1) = -up.dot(eye);
-
-    // forward - depends on handness
-    viewMatrix(2, 0) = forward.x();
-    viewMatrix(2, 1) = forward.y();
-    viewMatrix(2, 2) = forward.z();
-    viewMatrix(3, 2) = -forward.dot(eye);
+    // clang-format off
+    viewMatrix <<
+       r.x(),        u.x(),        f.x(),       T(),
+       r.y(),        u.y(),        f.y(),       T(),
+       r.z(),        u.z(),        f.z(),       T(),
+      -eye.dot(r),  -eye.dot(u),  -eye.dot(f),  T(1);
+    // clang-format on
   } else if constexpr (Option == Options::ColumnMajor) {
-    viewMatrix(0, 0) = right.x();
-    viewMatrix(1, 0) = right.y();
-    viewMatrix(2, 0) = right.z();
-    viewMatrix(0, 3) = -right.dot(eye);
-
-    viewMatrix(0, 1) = up.x();
-    viewMatrix(1, 1) = up.y();
-    viewMatrix(2, 1) = up.z();
-    viewMatrix(1, 3) = -up.dot(eye);
-
-    // forward - depends on handness
-    viewMatrix(0, 2) = forward.x();
-    viewMatrix(1, 2) = forward.y();
-    viewMatrix(2, 2) = forward.z();
-    viewMatrix(2, 3) = -forward.dot(eye);
+    // clang-format off
+    viewMatrix <<
+      r.x(),  r.y(),  r.z(),  -eye.dot(r),
+      u.x(),  u.y(),  u.z(),  -eye.dot(u),
+      f.x(),  f.y(),  f.z(),  -eye.dot(f),
+      T(),    T(),    T(),     T(1);
+    // clang-format on
   }
 
   return viewMatrix;
@@ -462,50 +427,34 @@ auto g_lookToRh(const Vector3D<T, Option>& eye,
                 const Vector3D<T, Option>& direction,
                 const Vector3D<T, Option>& worldUp) -> Matrix<T, 4, 4, Option> {
 #ifdef MATH_LIBRARY_USE_NORMALIZE_IN_PLACE
-  auto forward = direction;
-  forward.normalize();
-  auto right = worldUp.cross(forward);
-  right.normalize();
+  auto f = direction;
+  f.normalize();
+  auto r = worldUp.cross(f);
+  r.normalize();
 #else
-  auto forward = direction.normalize();
-  auto right   = worldUp.cross(forward).normalize();
+  auto f = direction.normalize();
+  auto r = worldUp.cross(f).normalize();
 #endif
-  auto up = forward.cross(right);
+  auto u = f.cross(r);
 
-  auto viewMatrix = Matrix<T, 4, 4, Option>::Identity();
+  Matrix<T, 4, 4, Option> viewMatrix;
 
   if constexpr (Option == Options::RowMajor) {
-    viewMatrix(0, 0) = right.x();
-    viewMatrix(0, 1) = right.y();
-    viewMatrix(0, 2) = right.z();
-    viewMatrix(3, 0) = -right.dot(eye);
-
-    viewMatrix(1, 0) = up.x();
-    viewMatrix(1, 1) = up.y();
-    viewMatrix(1, 2) = up.z();
-    viewMatrix(3, 1) = -up.dot(eye);
-
-    // forward - depends on handness
-    viewMatrix(2, 0) = -forward.x();
-    viewMatrix(2, 1) = -forward.y();
-    viewMatrix(2, 2) = -forward.z();
-    viewMatrix(3, 2) = -forward.dot(eye);
+    // clang-format off
+    viewMatrix <<
+       r.x(),        u.x(),       -f.x(),       T(),
+       r.y(),        u.y(),       -f.y(),       T(),
+       r.z(),        u.z(),       -f.z(),       T(),
+      -eye.dot(r),  -eye.dot(u),  -eye.dot(f),  T(1);
+    // clang-format on
   } else if constexpr (Option == Options::ColumnMajor) {
-    viewMatrix(0, 0) = right.x();
-    viewMatrix(1, 0) = right.y();
-    viewMatrix(2, 0) = right.z();
-    viewMatrix(0, 3) = -right.dot(eye);
-
-    viewMatrix(0, 1) = up.x();
-    viewMatrix(1, 1) = up.y();
-    viewMatrix(2, 1) = up.z();
-    viewMatrix(1, 3) = -up.dot(eye);
-
-    // forward - depends on handness
-    viewMatrix(0, 2) = -forward.x();
-    viewMatrix(1, 2) = -forward.y();
-    viewMatrix(2, 2) = -forward.z();
-    viewMatrix(2, 3) = -forward.dot(eye);
+    // clang-format off
+    viewMatrix <<
+       r.x(),   r.y(),   r.z(),  -eye.dot(r),
+       u.x(),   u.y(),   u.z(),  -eye.dot(u),
+      -f.x(),  -f.y(),  -f.z(),  -eye.dot(f),
+       T(),     T(),     T(),     T(1);
+    // clang-format on
   }
 
   return viewMatrix;
@@ -516,50 +465,34 @@ auto g_lookToLh(const Vector3D<T, Option>& eye,
                 const Vector3D<T, Option>& direction,
                 const Vector3D<T, Option>& worldUp) -> Matrix<T, 4, 4, Option> {
 #ifdef MATH_LIBRARY_USE_NORMALIZE_IN_PLACE
-  auto forward = direction;
-  forward.normalize();
-  auto right = worldUp.cross(forward);
-  right.normalize();
+  auto f = direction;
+  f.normalize();
+  auto r = worldUp.cross(f);
+  r.normalize();
 #else
-  auto forward = direction.normalize();
-  auto right   = worldUp.cross(forward).normalize();
+  auto f = direction.normalize();
+  auto r = worldUp.cross(f).normalize();
 #endif
-  auto up = forward.cross(right);
+  auto u = f.cross(r);
 
-  auto viewMatrix = Matrix<T, 4, 4, Option>::Identity();
+  Matrix<T, 4, 4, Option> viewMatrix;
 
   if constexpr (Option == Options::RowMajor) {
-    viewMatrix(0, 0) = right.x();
-    viewMatrix(0, 1) = right.y();
-    viewMatrix(0, 2) = right.z();
-    viewMatrix(3, 0) = -right.dot(eye);
-
-    viewMatrix(1, 0) = up.x();
-    viewMatrix(1, 1) = up.y();
-    viewMatrix(1, 2) = up.z();
-    viewMatrix(3, 1) = -up.dot(eye);
-
-    // forward - depends on handness
-    viewMatrix(2, 0) = forward.x();
-    viewMatrix(2, 1) = forward.y();
-    viewMatrix(2, 2) = forward.z();
-    viewMatrix(3, 2) = -forward.dot(eye);
+    // clang-format off
+    viewMatrix <<
+       r.x(),        u.x(),        f.x(),       T(),
+       r.y(),        u.y(),        f.y(),       T(),
+       r.z(),        u.z(),        f.z(),       T(),
+      -eye.dot(r),  -eye.dot(u),  -eye.dot(f),  T(1);
+    // clang-format on
   } else if constexpr (Option == Options::ColumnMajor) {
-    viewMatrix(0, 0) = right.x();
-    viewMatrix(1, 0) = right.y();
-    viewMatrix(2, 0) = right.z();
-    viewMatrix(0, 3) = -right.dot(eye);
-
-    viewMatrix(0, 1) = up.x();
-    viewMatrix(1, 1) = up.y();
-    viewMatrix(2, 1) = up.z();
-    viewMatrix(1, 3) = -up.dot(eye);
-
-    // forward - depends on handness
-    viewMatrix(0, 2) = forward.x();
-    viewMatrix(1, 2) = forward.y();
-    viewMatrix(2, 2) = forward.z();
-    viewMatrix(2, 3) = -forward.dot(eye);
+    // clang-format off
+    viewMatrix <<
+      r.x(),  r.y(),  r.z(),  -eye.dot(r),
+      u.x(),  u.y(),  u.z(),  -eye.dot(u),
+      f.x(),  f.y(),  f.z(),  -eye.dot(f),
+      T(),    T(),    T(),     T(1);
+    // clang-format on
   }
 
   return viewMatrix;
@@ -568,110 +501,187 @@ auto g_lookToLh(const Vector3D<T, Option>& eye,
 // END: view matrix creation functions
 // ----------------------------------------------------------------------------
 
-// clang-format off
-
 // BEGIN: perspective projection creation matrix
 // ----------------------------------------------------------------------------
 
 /**
- * Generates a right-handed perspective projection matrix with a depth range of negative one to one.
+ * Generates a right-handed perspective projection matrix with a depth range of
+ * negative one to one.
  * @note RH-NO - Right-Handed, Negative One to One depth range.
  */
 template <typename T, Options Option = Options::RowMajor>
-auto g_perspectiveRhNo(T fovY, T aspect, T zNear, T zFar)
+auto g_perspectiveRhNo(T fovY, T aspect, T nearZ, T farZ)
     -> Matrix<T, 4, 4, Option> {
-  // validate aspect ratio to prevent division by zero
-  assert(std::abs(aspect - std::numeric_limits<T>::epsilon()) > static_cast<T>(0));
+  // Validate aspect ratio to prevent division by zero
+  assert(std::abs(aspect - std::numeric_limits<T>::epsilon())
+         > static_cast<T>(0));
 
   const T tanHalfFovY = std::tan(fovY / static_cast<T>(2));
 
-  Matrix<T, 4, 4, Option> perspeciveMatrix{T()};
-  perspeciveMatrix(0, 0) = static_cast<T>(1) / (tanHalfFovY * aspect);
-  perspeciveMatrix(1, 1) = static_cast<T>(1) / (tanHalfFovY);
-  perspeciveMatrix(2, 2) = -(zFar + zNear) / (zFar - zNear); // not the same (depends on handness + NO / LO)
+  Matrix<T, 4, 4, Option> perspeciveMatrix;
+
+  const T scaleX = static_cast<T>(1) / (tanHalfFovY * aspect);
+  const T scaleY = static_cast<T>(1) / (tanHalfFovY);
+  // clang-format off
+  const T scaleZ          = -(farZ + nearZ) / (farZ - nearZ);                     // not the same (depends on handness + NO / LO)
+  const T translateZ      = -(static_cast<T>(2) * farZ * nearZ) / (farZ - nearZ); // depends on NO / LO
+  const T handednessScale = -static_cast<T>(1);                                   // depends on handness (-z)
+  // clang-format on
+
   if constexpr (Option == Options::RowMajor) {
-    perspeciveMatrix(3, 2) = -(static_cast<T>(2) * zFar * zNear) / (zFar - zNear); // depends on NO / LO
-    perspeciveMatrix(2, 3) = -static_cast<T>(1);                                   // depends on handness (-z)
+    // clang-format off
+    perspeciveMatrix <<
+      scaleX,  T(),     T(),         T(),
+      T(),     scaleY,  T(),         T(),
+      T(),     T(),     scaleZ,      handednessScale,
+      T(),     T(),     translateZ,  T();
+    // clang-format on
   } else if constexpr (Option == Options::ColumnMajor) {
-    perspeciveMatrix(2, 3) = -(static_cast<T>(2) * zFar * zNear) / (zFar - zNear); // depends on handness (-z)
-    perspeciveMatrix(3, 2) = -static_cast<T>(1);                                   // depends on NO / LO
+    // clang-format off
+    perspeciveMatrix <<
+      scaleX,  T(),     T(),              T(),
+      T(),     scaleY,  T(),              T(),
+      T(),     T(),     scaleZ,           translateZ,
+      T(),     T(),     handednessScale,  T();
+
+    // clang-format on
   }
+
   return perspeciveMatrix;
 }
 
 /**
- * Generates a right-handed perspective projection matrix with a depth range of zero to one.
+ * Generates a right-handed perspective projection matrix with a depth range of
+ * zero to one.
  * @note RH-ZO - Right-Handed, Zero to One depth range.
  */
 template <typename T, Options Option = Options::RowMajor>
-auto g_perspectiveRhZo(T fovY, T aspect, T zNear, T zFar)
+auto g_perspectiveRhZo(T fovY, T aspect, T nearZ, T farZ)
     -> Matrix<T, 4, 4, Option> {
-  // validate aspect ratio to prevent division by zero
-  assert(std::abs(aspect - std::numeric_limits<T>::epsilon()) > static_cast<T>(0));
+  // Validate aspect ratio to prevent division by zero
+  assert(std::abs(aspect - std::numeric_limits<T>::epsilon())
+         > static_cast<T>(0));
 
   const T tanHalfFovY = std::tan(fovY / static_cast<T>(2));
 
-  Matrix<T, 4, 4, Option> perspeciveMatrix{T()};
-  perspeciveMatrix(0, 0) = static_cast<T>(1) / (tanHalfFovY * aspect);
-  perspeciveMatrix(1, 1) = static_cast<T>(1) / (tanHalfFovY);
-  perspeciveMatrix(2, 2) = -zFar / (zFar - zNear);  // not the same (depends on handness + NO / LO)
+  Matrix<T, 4, 4, Option> perspeciveMatrix;
+
+  const T scaleX = static_cast<T>(1) / (tanHalfFovY * aspect);
+  const T scaleY = static_cast<T>(1) / (tanHalfFovY);
+  // clang-format off
+  const T scaleZ          = -farZ / (farZ - nearZ);           // not the same (depends on handness + NO / LO)
+  const T translateZ      = -(farZ * nearZ) / (farZ - nearZ); // depends on NO / LO
+  const T handednessScale = -static_cast<T>(1);               // depends on handness (-z)
+  // clang-format on
+
   if constexpr (Option == Options::RowMajor) {
-    perspeciveMatrix(3, 2) = -(zFar * zNear) / (zFar - zNear);  // depends on NO / LO
-    perspeciveMatrix(2, 3) = -static_cast<T>(1);                // depends on handness (-z)
+    // clang-format off
+    perspeciveMatrix <<
+      scaleX,  T(),     T(),         T(),
+      T(),     scaleY,  T(),         T(),
+      T(),     T(),     scaleZ,      handednessScale,
+      T(),     T(),     translateZ,  T();
+    // clang-format on
   } else if constexpr (Option == Options::ColumnMajor) {
-    perspeciveMatrix(2, 3) = -(zFar * zNear) / (zFar - zNear);  // depends on handness (-z)
-    perspeciveMatrix(3, 2) = -static_cast<T>(1);                // depends on NO / LO
+    // clang-format off
+    perspeciveMatrix <<
+      scaleX,  T(),     T(),              T(),
+      T(),     scaleY,  T(),              T(),
+      T(),     T(),     scaleZ,           translateZ,
+      T(),     T(),     handednessScale,  T();
+    // clang-format on
   }
+
   return perspeciveMatrix;
 }
 
 /**
- * Generates a left-handed perspective projection matrix with a depth range of negative one to one.
+ * Generates a left-handed perspective projection matrix with a depth range of
+ * negative one to one.
  * @note LH-NO - Left-Handed, Negative One to One depth range.
  */
 template <typename T, Options Option = Options::RowMajor>
-auto g_perspectiveLhNo(T fovY, T aspect, T zNear, T zFar)
+auto g_perspectiveLhNo(T fovY, T aspect, T nearZ, T farZ)
     -> Matrix<T, 4, 4, Option> {
-  assert(std::abs(aspect - std::numeric_limits<T>::epsilon()) > static_cast<T>(0));
+  // Validate aspect ratio to prevent division by zero
+  assert(std::abs(aspect - std::numeric_limits<T>::epsilon())
+         > static_cast<T>(0));
 
   const T tanHalfFovY = std::tan(fovY / static_cast<T>(2));
 
-  Matrix<T, 4, 4, Option> perspeciveMatrix{T()};
-  perspeciveMatrix(0, 0) = static_cast<T>(1) / (tanHalfFovY * aspect);
-  perspeciveMatrix(1, 1) = static_cast<T>(1) / (tanHalfFovY);
-  perspeciveMatrix(2, 2) = (zFar + zNear)    / (zFar - zNear);  // not the same (depends on handness + NO / LO)
+  Matrix<T, 4, 4, Option> perspeciveMatrix;
+
+  const T scaleX = static_cast<T>(1) / (tanHalfFovY * aspect);
+  const T scaleY = static_cast<T>(1) / (tanHalfFovY);
+  // clang-format off
+  const T scaleZ          =  (farZ + nearZ) / (farZ - nearZ);                     // not the same (depends on handness + NO / LO)
+  const T translateZ      = -(static_cast<T>(2) * farZ * nearZ) / (farZ - nearZ); // depends on NO / LO
+  const T handednessScale =   static_cast<T>(1);                                  // depends on handness (z, not -z)
+  // clang-format on
+
   if constexpr (Option == Options::RowMajor) {
-    perspeciveMatrix(3, 2) = -(static_cast<T>(2) * zFar * zNear) / (zFar - zNear); // depends on NO / LO
-    perspeciveMatrix(2, 3) = static_cast<T>(1);  // depends on handness (z, not -z)
+    // clang-format off
+    perspeciveMatrix <<
+      scaleX,  T(),     T(),         T(),
+      T(),     scaleY,  T(),         T(),
+      T(),     T(),     scaleZ,      handednessScale,
+      T(),     T(),     translateZ,  T();
+    // clang-format on
   } else if constexpr (Option == Options::ColumnMajor) {
-    perspeciveMatrix(2, 3) = -(static_cast<T>(2) * zFar * zNear) / (zFar - zNear); // depends on NO / LO
-    perspeciveMatrix(3, 2) = static_cast<T>(1);  // depends on handness (z, not -z)
+    // clang-format off
+    perspeciveMatrix <<
+      scaleX,  T(),     T(),              T(),
+      T(),     scaleY,  T(),              T(),
+      T(),     T(),     scaleZ,           translateZ,
+      T(),     T(),     handednessScale,  T();
+    // clang-format on
   }
+
   return perspeciveMatrix;
 }
 
 /**
- * Generates a left-handed perspective projection matrix with a depth range of zero to one.
+ * Generates a left-handed perspective projection matrix with a depth range of
+ * zero to one.
  * @note LH-ZO - Left-Handed, Zero to One depth range.
  */
 template <typename T, Options Option = Options::RowMajor>
-auto g_perspectiveLhZo(T fovY, T aspect, T zNear, T zFar)
+auto g_perspectiveLhZo(T fovY, T aspect, T nearZ, T farZ)
     -> Matrix<T, 4, 4, Option> {
-  assert(std::abs(aspect - std::numeric_limits<T>::epsilon()) > static_cast<T>(0));
+  // Validate aspect ratio to prevent division by zero
+  assert(std::abs(aspect - std::numeric_limits<T>::epsilon())
+         > static_cast<T>(0));
 
   const T tanHalfFovY = std::tan(fovY / static_cast<T>(2));
 
-  Matrix<T, 4, 4, Option> perspeciveMatrix{T()};
-  perspeciveMatrix(0, 0) = static_cast<T>(1) / (tanHalfFovY * aspect);
-  perspeciveMatrix(1, 1) = static_cast<T>(1) / (tanHalfFovY);
-  perspeciveMatrix(2, 2) = zFar / (zFar - zNear);  // not the same (depends on handness + NO / LO)
+  Matrix<T, 4, 4, Option> perspeciveMatrix;
+
+  const T scaleX = static_cast<T>(1) / (tanHalfFovY * aspect);
+  const T scaleY = static_cast<T>(1) / (tanHalfFovY);
+  // clang-format off
+  const T scaleZ          =   farZ / (farZ - nearZ);          // not the same (depends on handness + NO / LO)
+  const T translateZ      = -(farZ * nearZ) / (farZ - nearZ); // depends on NO / LO
+  const T handednessScale =   static_cast<T>(1);              // depends on handness (z, not -z)
+  // clang-format on
+
   if constexpr (Option == Options::RowMajor) {
-    perspeciveMatrix(3, 2) = -(zFar * zNear) / (zFar - zNear); // depends on NO / LO
-    perspeciveMatrix(2, 3) = static_cast<T>(1);                // depends on handness (z, not -z)
+    // clang-format off
+    perspeciveMatrix <<
+      scaleX,  T(),     T(),         T(),
+      T(),     scaleY,  T(),         T(),
+      T(),     T(),     scaleZ,      handednessScale,
+      T(),     T(),     translateZ,  T();
+    // clang-format on
   } else if constexpr (Option == Options::ColumnMajor) {
-    perspeciveMatrix(2, 3) = -(zFar * zNear) / (zFar - zNear); // depends on NO / LO
-    perspeciveMatrix(3, 2) = static_cast<T>(1);                // depends on handness (z, not -z)
+    // clang-format off
+    perspeciveMatrix <<
+      scaleX,  T(),     T(),              T(),
+      T(),     scaleY,  T(),              T(),
+      T(),     T(),     scaleZ,           translateZ,
+      T(),     T(),     handednessScale,  T();
+    // clang-format on
   }
+
   return perspeciveMatrix;
 }
 
@@ -734,31 +744,47 @@ auto g_perspectiveLhZo(T fovY, T width, T height, T zNear, T zFar)
  * plane.
  */
 template <typename T, Options Option = Options::RowMajor>
-auto g_perspectiveRhNoInf(T fovY, T aspect, T zNear)
+auto g_perspectiveRhNoInf(T fovY, T aspect, T nearZ)
     -> Matrix<T, 4, 4, Option> {
-  assert(std::abs(aspect - std::numeric_limits<T>::epsilon()) > static_cast<T>(0));
+  assert(std::abs(aspect - std::numeric_limits<T>::epsilon())
+         > static_cast<T>(0));
 
   // Explanation of matrix structure.
-  // We use default perspective projection creation matrices, but for infinite 
-  // far plane we need to change matrix a little bit. As far approaches 
-  // infinity, (far / (far - near)) approaches 1, and (near / (far - near)) 
+  // We use default perspective projection creation matrices, but for infinite
+  // far plane we need to change matrix a little bit. As far approaches
+  // infinity, (far / (far - near)) approaches 1, and (near / (far - near))
   // approaches 0. Thus:
   // 1) -(far + near) / (far - near) => -1
   // 2) -(2 * far * near) / (far - near) => -2 * near
 
   const T tanHalfFovY = std::tan(fovY / static_cast<T>(2));
 
-  Matrix<T, 4, 4, Option> perspectiveMatrix{T()};
-  perspectiveMatrix(0, 0) =  static_cast<T>(1) / (tanHalfFovY * aspect);
-  perspectiveMatrix(1, 1) =  static_cast<T>(1) /  tanHalfFovY;
-  perspectiveMatrix(2, 2) = -static_cast<T>(1); // depends on handness (-z)
+  Matrix<T, 4, 4, Option> perspectiveMatrix;
+
+  const T scaleX = static_cast<T>(1) / (tanHalfFovY * aspect);
+  const T scaleY = static_cast<T>(1) / tanHalfFovY;
+  // clang-format off
+  const T scaleZ          = -static_cast<T>(1);         // depends on handness (-z)
+  const T translateZ      = -static_cast<T>(2) * nearZ; // depends on NO / LO  
+  const T handednessScale = -static_cast<T>(1);         // depends on handness (-z)
+  // clang-format on
 
   if constexpr (Option == Options::RowMajor) {
-    perspectiveMatrix(2, 3) = -static_cast<T>(1);         // depends on handness (-z)
-    perspectiveMatrix(3, 2) = -static_cast<T>(2) * zNear; // depends on NO / LO
+    // clang-format off
+    perspectiveMatrix <<
+      scaleX,  T(),     T(),         T(),
+      T(),     scaleY,  T(),         T(),
+      T(),     T(),     scaleZ,      handednessScale,
+      T(),     T(),     translateZ,  T();
+    // clang-format on
   } else if constexpr (Option == Options::ColumnMajor) {
-    perspectiveMatrix(3, 2) = -static_cast<T>(1);         // depends on handness (-z)
-    perspectiveMatrix(2, 3) = -static_cast<T>(2) * zNear; // depends on NO / LO
+    // clang-format off
+    perspectiveMatrix <<
+      scaleX,  T(),     T(),              T(),
+      T(),     scaleY,  T(),              T(),
+      T(),     T(),     scaleZ,           translateZ,
+      T(),     T(),     handednessScale,  T();
+    // clang-format on
   }
   return perspectiveMatrix;
 }
@@ -769,31 +795,47 @@ auto g_perspectiveRhNoInf(T fovY, T aspect, T zNear)
  * @note RH-ZO-Inf - Right-Handed, Zero to One depth range, Infinite far plane.
  */
 template <typename T, Options Option = Options::RowMajor>
-auto g_perspectiveRhZoInf(T fovY, T aspect, T zNear)
+auto g_perspectiveRhZoInf(T fovY, T aspect, T nearZ)
     -> Matrix<T, 4, 4, Option> {
-  assert(std::abs(aspect - std::numeric_limits<T>::epsilon()) > static_cast<T>(0));
+  assert(std::abs(aspect - std::numeric_limits<T>::epsilon())
+         > static_cast<T>(0));
 
   // Explanation of matrix structure.
-  // We use default perspective projection creation matrices, but for infinite 
-  // far plane we need to change matrix a little bit. As far approaches 
-  // infinity, (far / (far - near)) approaches 1, and (near / (far - near)) 
+  // We use default perspective projection creation matrices, but for infinite
+  // far plane we need to change matrix a little bit. As far approaches
+  // infinity, (far / (far - near)) approaches 1, and (near / (far - near))
   // approaches 0. Thus:
   // 1) -far / (far - near) => -1
   // 2) -(far * near) / (far - near) => -near
 
   const T tanHalfFovY = std::tan(fovY / static_cast<T>(2));
 
-  Matrix<T, 4, 4, Option> perspectiveMatrix{T()};
-  perspectiveMatrix(0, 0) =  static_cast<T>(1) / (tanHalfFovY * aspect);
-  perspectiveMatrix(1, 1) =  static_cast<T>(1) /  tanHalfFovY;
-  perspectiveMatrix(2, 2) = -static_cast<T>(1); // depends on handness (-z)
+  Matrix<T, 4, 4, Option> perspectiveMatrix;
+
+  const T scaleX = static_cast<T>(1) / (tanHalfFovY * aspect);
+  const T scaleY = static_cast<T>(1) / tanHalfFovY;
+  // clang-format off
+  const T scaleZ          = -static_cast<T>(1); // depends on handness (-z) 
+  const T translateZ      = -nearZ;             // depends on NO / LO      
+  const T handednessScale = -static_cast<T>(1); // depends on handness (-z)
+  // clang-format on
 
   if constexpr (Option == Options::RowMajor) {
-    perspectiveMatrix(2, 3) = -static_cast<T>(1); // depends on handness (-z)
-    perspectiveMatrix(3, 2) = -zNear;             // depends on NO / LO
+    // clang-format off
+    perspectiveMatrix <<
+      scaleX,  T(),     T(),         T(),
+      T(),     scaleY,  T(),         T(),
+      T(),     T(),     scaleZ,      handednessScale,
+      T(),     T(),     translateZ,  T();
+    // clang-format on
   } else if constexpr (Option == Options::ColumnMajor) {
-    perspectiveMatrix(3, 2) = -static_cast<T>(1); // depends on handness (-z)
-    perspectiveMatrix(2, 3) = -zNear;             // depends on NO / LO
+    // clang-format off
+    perspectiveMatrix <<
+      scaleX,  T(),     T(),              T(),
+      T(),     scaleY,  T(),              T(),
+      T(),     T(),     scaleZ,           translateZ,
+      T(),     T(),     handednessScale,  T();
+    // clang-format on
   }
   return perspectiveMatrix;
 }
@@ -805,31 +847,47 @@ auto g_perspectiveRhZoInf(T fovY, T aspect, T zNear)
  * plane.
  */
 template <typename T, Options Option = Options::RowMajor>
-auto g_perspectiveLhNoInf(T fovY, T aspect, T zNear)
+auto g_perspectiveLhNoInf(T fovY, T aspect, T nearZ)
     -> Matrix<T, 4, 4, Option> {
-  assert(std::abs(aspect - std::numeric_limits<T>::epsilon()) > static_cast<T>(0));
+  assert(std::abs(aspect - std::numeric_limits<T>::epsilon())
+         > static_cast<T>(0));
 
   // Explanation of matrix structure.
-  // We use default perspective projection creation matrices, but for infinite 
-  // far plane we need to change matrix a little bit. As far approaches 
-  // infinity, (far / (far - near)) approaches 1, and (near / (far - near)) 
+  // We use default perspective projection creation matrices, but for infinite
+  // far plane we need to change matrix a little bit. As far approaches
+  // infinity, (far / (far - near)) approaches 1, and (near / (far - near))
   // approaches 0. Thus:
   // 1) (far + near) / (far - near) => 1
   // 2) -(2 * far * near) / (far - near) => -2 * near
 
   const T tanHalfFovY = std::tan(fovY / static_cast<T>(2));
 
-  Matrix<T, 4, 4, Option> perspectiveMatrix{T()};
-  perspectiveMatrix(0, 0) = static_cast<T>(1) / (tanHalfFovY * aspect);
-  perspectiveMatrix(1, 1) = static_cast<T>(1) /  tanHalfFovY;
-  perspectiveMatrix(2, 2) = static_cast<T>(1); // depends on handness (z, not -z)
+  Matrix<T, 4, 4, Option> perspectiveMatrix;
+
+  const T scaleX = static_cast<T>(1) / (tanHalfFovY * aspect);
+  const T scaleY = static_cast<T>(1) / tanHalfFovY;
+  // clang-format off
+  const T scaleZ          =  static_cast<T>(1);         // depends on handness (z, not -z)
+  const T translateZ      = -static_cast<T>(2) * nearZ; // depends on NO / LO              
+  const T handednessScale =  static_cast<T>(1);         // depends on handness (z, not -z)
+  // clang-format on
 
   if constexpr (Option == Options::RowMajor) {
-    perspectiveMatrix(2, 3) =  static_cast<T>(1);         // depends on handness (z, not -z)
-    perspectiveMatrix(3, 2) = -static_cast<T>(2) * zNear; // depends on NO / LO
+    // clang-format off
+    perspectiveMatrix <<
+      scaleX,  T(),     T(),         T(),
+      T(),     scaleY,  T(),         T(),
+      T(),     T(),     scaleZ,      handednessScale,
+      T(),     T(),     translateZ,  T();
+    // clang-format on
   } else if constexpr (Option == Options::ColumnMajor) {
-    perspectiveMatrix(3, 2) =  static_cast<T>(1);         // depends on handness (z, not -z)
-    perspectiveMatrix(2, 3) = -static_cast<T>(2) * zNear; // depends on NO / LO
+    // clang-format off
+    perspectiveMatrix <<
+      scaleX,  T(),     T(),              T(),
+      T(),     scaleY,  T(),              T(),
+      T(),     T(),     scaleZ,           translateZ,
+      T(),     T(),     handednessScale,  T();
+    // clang-format on
   }
   return perspectiveMatrix;
 }
@@ -840,31 +898,47 @@ auto g_perspectiveLhNoInf(T fovY, T aspect, T zNear)
  * @note LH-ZO-Inf - Left-Handed, Zero to One depth range, Infinite far plane.
  */
 template <typename T, Options Option = Options::RowMajor>
-auto g_perspectiveLhZoInf(T fovY, T aspect, T zNear)
+auto g_perspectiveLhZoInf(T fovY, T aspect, T nearZ)
     -> Matrix<T, 4, 4, Option> {
-  assert(std::abs(aspect - std::numeric_limits<T>::epsilon()) > static_cast<T>(0));
+  assert(std::abs(aspect - std::numeric_limits<T>::epsilon())
+         > static_cast<T>(0));
 
   // Explanation of matrix structure.
-  // We use default perspective projection creation matrices, but for infinite 
-  // far plane we need to change matrix a little bit. As far approaches 
-  // infinity, (far / (far - near)) approaches 1, and (near / (far - near)) 
+  // We use default perspective projection creation matrices, but for infinite
+  // far plane we need to change matrix a little bit. As far approaches
+  // infinity, (far / (far - near)) approaches 1, and (near / (far - near))
   // approaches 0. Thus:
   // 1) far / (far - near) => 1
   // 2) -(far * near) / (far - near) => -near
 
   const T tanHalfFovY = std::tan(fovY / static_cast<T>(2));
 
-  Matrix<T, 4, 4, Option> perspectiveMatrix{T()};
-  perspectiveMatrix(0, 0) = static_cast<T>(1) / (tanHalfFovY * aspect);
-  perspectiveMatrix(1, 1) = static_cast<T>(1) /  tanHalfFovY;
-  perspectiveMatrix(2, 2) = static_cast<T>(1); // depends on handness (z, not -z)
+  Matrix<T, 4, 4, Option> perspectiveMatrix;
+
+  const T scaleX = static_cast<T>(1) / (tanHalfFovY * aspect);
+  const T scaleY = static_cast<T>(1) / tanHalfFovY;
+  // clang-format off
+  const T scaleZ          =  static_cast<T>(1); // depends on handness (z, not -z)
+  const T translateZ      = -nearZ;             // depends on NO / LO              
+  const T handednessScale =  static_cast<T>(1); // depends on handness (z, not -z)
+  // clang-format on
 
   if constexpr (Option == Options::RowMajor) {
-    perspectiveMatrix(2, 3) =  static_cast<T>(1); // depends on handness (z, not -z)
-    perspectiveMatrix(3, 2) = -zNear;             // depends on NO / LO
+    // clang-format off
+    perspectiveMatrix <<
+      scaleX,  T(),     T(),         T(),
+      T(),     scaleY,  T(),         T(),
+      T(),     T(),     scaleZ,      handednessScale,
+      T(),     T(),     translateZ,  T();
+    // clang-format on
   } else if constexpr (Option == Options::ColumnMajor) {
-    perspectiveMatrix(3, 2) =  static_cast<T>(1); // depends on handness (z, not -z)
-    perspectiveMatrix(2, 3) = -zNear;             // depends on NO / LO
+    // clang-format off
+    perspectiveMatrix <<
+      scaleX,  T(),     T(),              T(),
+      T(),     scaleY,  T(),              T(),
+      T(),     T(),     scaleZ,           translateZ,
+      T(),     T(),     handednessScale,  T();
+    // clang-format on
   }
 
   return perspectiveMatrix;
@@ -898,13 +972,15 @@ template <typename T, Options Option = Options::RowMajor>
   requires std::floating_point<T>
 Vector<T, 4, Option> g_perspectiveDivide(const Vector<T, 4, Option>& vector,
                                          T tolerance = g_kDefaultTolerance) {
-  if (static_cast<T>(1) != vector.w() && !g_isNearlyZero(vector.w(), tolerance)) {
+  if (static_cast<T>(1) != vector.w()
+      && !g_isNearlyZero(vector.w(), tolerance)) {
     return vector / vector.w();
   }
   return vector;
 }
 
-// BEGIN: frustrum (perspective projection matrix that off center) creation functions
+// BEGIN: frustrum (perspective projection matrix that off center) creation
+// functions
 // ----------------------------------------------------------------------------
 
 /**
@@ -915,23 +991,43 @@ Vector<T, 4, Option> g_perspectiveDivide(const Vector<T, 4, Option>& vector,
 template <typename T, Options Option = Options::RowMajor>
 auto g_frustumRhZo(T left, T right, T bottom, T top, T nearVal, T farVal)
     -> Matrix<T, 4, 4, Option> {
-  Matrix<T, 4, 4, Option> frustrum{T()};
-  frustrum(0, 0) = (static_cast<T>(2) * nearVal) / (right - left);
-  frustrum(1, 1) = (static_cast<T>(2) * nearVal) / (top - bottom);
-  frustrum(2, 2) = farVal / (nearVal - farVal);        // depends on NO / ZO
+  Matrix<T, 4, 4, Option> frustum;
+
+  const T scaleX = (static_cast<T>(2) * nearVal) / (right - left);
+  const T scaleY = (static_cast<T>(2) * nearVal) / (top - bottom);
+  // depends on NO / ZO
+  const T scaleZ = farVal / (nearVal - farVal);
+
+  // depends on handness
+  const T offsetX = (right + left) / (right - left);
+  // depends on handness
+  const T offsetY = (top + bottom) / (top - bottom);
+
+  // depends on NO / ZO
+  const T translateZ = -(farVal * nearVal) / (farVal - nearVal);
+
+  // depends on handness
+  const T handedness = -static_cast<T>(1);
 
   if constexpr (Option == Options::RowMajor) {
-    frustrum(2, 0) = (right + left) / (right - left);  // depends on handness
-    frustrum(2, 1) = (top + bottom) / (top - bottom);  // depends on handness
-    frustrum(3, 2) = -(farVal * nearVal) / (farVal - nearVal); // depends on NO / ZO
-    frustrum(2, 3) = -static_cast<T>(1);               // depends on handness
+    // clang-format off
+    frustum <<
+      scaleX,   T(),      T(),         T(),
+      T(),      scaleY,   T(),         T(),
+      offsetX,  offsetY,  scaleZ,      handedness,
+      T(),      T(),      translateZ,  T();
+    // clang-format on
   } else if constexpr (Option == Options::ColumnMajor) {
-    frustrum(0, 2) = (right + left) / (right - left);  // depends on handness
-    frustrum(1, 2) = (top + bottom) / (top - bottom);  // depends on handness
-    frustrum(2, 3) = -(farVal * nearVal) / (farVal - nearVal); // depends on NO / ZO
-    frustrum(3, 2) = -static_cast<T>(1);               // depends on handness
+    // clang-format off
+    frustum <<
+      scaleX,  T(),     offsetX,     T(),
+      T(),     scaleY,  offsetY,     T(),
+      T(),     T(),     scaleZ,      translateZ,
+      T(),     T(),     handedness,  T();
+    // clang-format on
   }
-  return frustrum;
+
+  return frustum;
 }
 
 /**
@@ -942,24 +1038,43 @@ auto g_frustumRhZo(T left, T right, T bottom, T top, T nearVal, T farVal)
 template <typename T, Options Option = Options::RowMajor>
 auto g_frustumRhNo(T left, T right, T bottom, T top, T nearVal, T farVal)
     -> Matrix<T, 4, 4, Option> {
-  Matrix<T, 4, 4, Option> frustrum{T()};
-  frustrum(0, 0) = (static_cast<T>(2) * nearVal) / (right - left);
-  frustrum(1, 1) = (static_cast<T>(2) * nearVal) / (top - bottom);
-  frustrum(2, 2)
-      = -(farVal + nearVal) / (farVal - nearVal);    // depends on NO / ZO
+  Matrix<T, 4, 4, Option> frustum;
+
+  const T scaleX = (static_cast<T>(2) * nearVal) / (right - left);
+  const T scaleY = (static_cast<T>(2) * nearVal) / (top - bottom);
+  // depends on NO / ZO
+  const T scaleZ = -(farVal + nearVal) / (farVal - nearVal);
+
+  // depends on handness
+  const T offsetX = (right + left) / (right - left);
+  // depends on handness
+  const T offsetY = (top + bottom) / (top - bottom);
+
+  // depends on NO / ZO
+  const T translateZ
+      = -(static_cast<T>(2) * farVal * nearVal) / (farVal - nearVal);
+
+  // depends on handness
+  const T handedness = -static_cast<T>(1);
 
   if constexpr (Option == Options::RowMajor) {
-    frustrum(2, 0) = (right + left) / (right - left);  // depends on handness
-    frustrum(2, 1) = (top + bottom) / (top - bottom);  // depends on handness
-    frustrum(3, 2) = -(static_cast<T>(2) * farVal * nearVal) / (farVal - nearVal); // depends on NO / ZO
-    frustrum(2, 3) = -static_cast<T>(1);               // depends on handness
+    // clang-format off
+    frustum <<
+      scaleX,   T(),      T(),         T(),
+      T(),      scaleY,   T(),         T(),
+      offsetX,  offsetY,  scaleZ,      handedness,
+      T(),      T(),      translateZ,  T();
+    // clang-format on
   } else if constexpr (Option == Options::ColumnMajor) {
-    frustrum(0, 2) = (right + left) / (right - left);  // depends on handness
-    frustrum(1, 2) = (top + bottom) / (top - bottom);  // depends on handness
-    frustrum(2, 3) = -(static_cast<T>(2) * farVal * nearVal) / (farVal - nearVal); // depends on NO / ZO
-    frustrum(3, 2) = -static_cast<T>(1);               // depends on handness
+    // clang-format off
+    frustum <<
+      scaleX,  T(),     offsetX,     T(),
+      T(),     scaleY,  offsetY,     T(),
+      T(),     T(),     scaleZ,      translateZ,
+      T(),     T(),     handedness,  T();
+    // clang-format on
   }
-  return frustrum;
+  return frustum;
 }
 
 /**
@@ -970,23 +1085,42 @@ auto g_frustumRhNo(T left, T right, T bottom, T top, T nearVal, T farVal)
 template <typename T, Options Option = Options::RowMajor>
 auto g_frustumLhZo(T left, T right, T bottom, T top, T nearVal, T farVal)
     -> Matrix<T, 4, 4, Option> {
-  Matrix<T, 4, 4, Option> frustrum{T()};
-  frustrum(0, 0) = (static_cast<T>(2) * nearVal) / (right - left);
-  frustrum(1, 1) = (static_cast<T>(2) * nearVal) / (top - bottom);
-  frustrum(2, 2) = farVal / (farVal - nearVal);         // depends on NO / ZO
+  Matrix<T, 4, 4, Option> frustum;
+
+  const T scaleX = (static_cast<T>(2) * nearVal) / (right - left);
+  const T scaleY = (static_cast<T>(2) * nearVal) / (top - bottom);
+  // depends on NO / ZO + handness
+  const T scaleZ = farVal / (farVal - nearVal);
+
+  // depends on handness
+  const T offsetX = -(right + left) / (right - left);
+  // depends on handness
+  const T offsetY = -(top + bottom) / (top - bottom);
+
+  // depends on NO / ZO
+  const T translateZ = -(farVal * nearVal) / (farVal - nearVal);
+
+  // depends on handness
+  const T handedness = static_cast<T>(1);
 
   if constexpr (Option == Options::RowMajor) {
-    frustrum(2, 0) = -(right + left) / (right - left);  // depends on handness
-    frustrum(2, 1) = -(top + bottom) / (top - bottom);  // depends on handness
-    frustrum(3, 2) = -(farVal * nearVal) / (farVal - nearVal); // depends on NO / ZO
-    frustrum(2, 3) = static_cast<T>(1);                 // depends on handness
+    // clang-format off
+    frustum <<
+      scaleX,   T(),      T(),         T(),
+      T(),      scaleY,   T(),         T(),
+      offsetX,  offsetY,  scaleZ,      handedness,
+      T(),      T(),      translateZ,  T();
+    // clang-format on
   } else if constexpr (Option == Options::ColumnMajor) {
-    frustrum(0, 2) = -(right + left) / (right - left);  // depends on handness
-    frustrum(1, 2) = -(top + bottom) / (top - bottom);  // depends on handness
-    frustrum(2, 3) = -(farVal * nearVal) / (farVal - nearVal); // depends on NO / ZO
-    frustrum(3, 2) = static_cast<T>(1);                 // depends on handness
+    // clang-format off
+    frustum <<
+      scaleX,  T(),     offsetX,     T(),
+      T(),     scaleY,  offsetY,     T(),
+      T(),     T(),     scaleZ,      translateZ,
+      T(),     T(),     handedness,  T();
+    // clang-format on
   }
-  return frustrum;
+  return frustum;
 }
 
 /**
@@ -997,33 +1131,55 @@ auto g_frustumLhZo(T left, T right, T bottom, T top, T nearVal, T farVal)
 template <typename T, Options Option = Options::RowMajor>
 auto g_frustumLhNo(T left, T right, T bottom, T top, T nearVal, T farVal)
     -> Matrix<T, 4, 4, Option> {
-  Matrix<T, 4, 4, Option> frustrum{T()};
-  frustrum(0, 0) = (static_cast<T>(2) * nearVal) / (right - left);
-  frustrum(1, 1) = (static_cast<T>(2) * nearVal) / (top - bottom);
-  frustrum(2, 2) = (farVal + nearVal) / (farVal - nearVal);  // depends on NO / ZO
+  Matrix<T, 4, 4, Option> frustum;
+
+  const T scaleX = (static_cast<T>(2) * nearVal) / (right - left);
+  const T scaleY = (static_cast<T>(2) * nearVal) / (top - bottom);
+  // depends on NO / ZO
+  const T scaleZ = (farVal + nearVal) / (farVal - nearVal);
+
+  // depends on handness
+  const T offsetX = -(right + left) / (right - left);
+  // depends on handness
+  const T offsetY = -(top + bottom) / (top - bottom);
+
+  // depends on NO / ZO
+  const T translateZ
+      = -(static_cast<T>(2) * farVal * nearVal) / (farVal - nearVal);
+
+  // depends on handness
+  const T handedness = static_cast<T>(1);
 
   if constexpr (Option == Options::RowMajor) {
-    frustrum(2, 0) = -(right + left) / (right - left);  // depends on handness
-    frustrum(2, 1) = -(top + bottom) / (top - bottom);  // depends on handness
-    frustrum(3, 2) = -(static_cast<T>(2) * farVal * nearVal) / (farVal - nearVal); // depends on NO / ZO
-    frustrum(2, 3) = static_cast<T>(1);                 // depends on handness
+    // clang-format off
+    frustum <<
+      scaleX,   T(),      T(),         T(),
+      T(),      scaleY,   T(),         T(),
+      offsetX,  offsetY,  scaleZ,      handedness,
+      T(),      T(),      translateZ,  T();
+    // clang-format on
   } else if constexpr (Option == Options::ColumnMajor) {
-    frustrum(0, 2) = -(right + left) / (right - left);  // depends on handness
-    frustrum(1, 2) = -(top + bottom) / (top - bottom);  // depends on handness
-    frustrum(2, 3) = -(static_cast<T>(2) * farVal * nearVal) / (farVal - nearVal); // depends on NO / ZO
-    frustrum(3, 2) = static_cast<T>(1);                 // depends on handness
+    // clang-format off
+    frustum <<
+      scaleX,  T(),     offsetX,     T(),
+      T(),     scaleY,  offsetY,     T(),
+      T(),     T(),     scaleZ,      translateZ,
+      T(),     T(),     handedness,  T();
+    // clang-format on
   }
 
-  return frustrum;
+  return frustum;
 }
 
-// END: frustrum (perspective projection matrix that off center) creation functions
+// END: frustrum (perspective projection matrix that off center) creation
+// functions
 // ----------------------------------------------------------------------------
 
 // BEGIN: orthographic projection creation matrix
 // ----------------------------------------------------------------------------
 
-// TODO: add ortho functions (LH/RH) that takes (left, right, bottom, top) w/o near / far  
+// TODO: add ortho functions (LH/RH) that takes (left, right, bottom, top) w/o
+// near / far
 
 /**
  * Generates a left-handed orthographic projection matrix with a depth range of
@@ -1031,21 +1187,38 @@ auto g_frustumLhNo(T left, T right, T bottom, T top, T nearVal, T farVal)
  * @note LH-ZO - Left-Handed, Zero to One depth range.
  */
 template <typename T, Options Option = Options::RowMajor>
-auto g_orthoLhZo(T left, T right, T bottom, T top, T zNear, T zFar)
+auto g_orthoLhZo(T left, T right, T bottom, T top, T nearZ, T farZ)
     -> Matrix<T, 4, 4, Option> {
-  auto orthographicMat  = Matrix<T, 4, 4, Option>::Identity();
-  orthographicMat(0, 0) = static_cast<T>(2) / (right - left);
-  orthographicMat(1, 1) = static_cast<T>(2) / (top - bottom);
-  orthographicMat(2, 2) = static_cast<T>(1) / (zFar - zNear);  // depends on handness + ZO / NO
+  Matrix<T, 4, 4, Option> orthographicMat;
+
+  const T scaleX = static_cast<T>(2) / (right - left);
+  const T scaleY = static_cast<T>(2) / (top - bottom);
+  // depends on handness + ZO / NO
+  const T scaleZ = static_cast<T>(1) / (farZ - nearZ);
+
+  const T translateX = -(right + left) / (right - left);
+  const T translateY = -(top + bottom) / (top - bottom);
+  // depends on ZO / NO
+  const T translateZ = -nearZ / (farZ - nearZ);
+
   if constexpr (Option == Options::RowMajor) {
-    orthographicMat(3, 0) = -(right + left) / (right - left);
-    orthographicMat(3, 1) = -(top + bottom) / (top - bottom);
-    orthographicMat(3, 2) = -zNear / (zFar - zNear);  // depends on ZO / NO
+    // clang-format off
+    orthographicMat <<
+      scaleX,      T(),         T(),         T(),
+      T(),         scaleY,      T(),         T(),
+      T(),         T(),         scaleZ,      T(),
+      translateX,  translateY,  translateZ,  T(1);
+    // clang-format on
   } else if constexpr (Option == Options::ColumnMajor) {
-    orthographicMat(0, 3) = -(right + left) / (right - left);
-    orthographicMat(1, 3) = -(top + bottom) / (top - bottom);
-    orthographicMat(2, 3) = -zNear / (zFar - zNear);  // depends on ZO / NO
+    // clang-format off
+    orthographicMat <<
+      scaleX,  T(),     T(),     translateX,
+      T(),     scaleY,  T(),     translateY,
+      T(),     T(),     scaleZ,  translateZ,
+      T(),     T(),     T(),     T(1);
+    // clang-format on
   }
+
   return orthographicMat;
 }
 
@@ -1055,156 +1228,211 @@ auto g_orthoLhZo(T left, T right, T bottom, T top, T zNear, T zFar)
  * @note LH-NO - Left-Handed, Negative One to One depth range.
  */
 template <typename T, Options Option = Options::RowMajor>
-auto g_orthoLhNo(T left, T right, T bottom, T top, T zNear, T zFar)
+auto g_orthoLhNo(T left, T right, T bottom, T top, T nearZ, T farZ)
     -> Matrix<T, 4, 4, Option> {
-  auto orthographicMat  = Matrix<T, 4, 4, Option>::Identity();
-  orthographicMat(0, 0) = static_cast<T>(2) / (right - left);
-  orthographicMat(1, 1) = static_cast<T>(2) / (top - bottom);
-  orthographicMat(2, 2) = static_cast<T>(2) / (zFar - zNear);  // depends on handness + ZO / NO
+  Matrix<T, 4, 4, Option> orthographicMat;
+
+  const T scaleX = static_cast<T>(2) / (right - left);
+  const T scaleY = static_cast<T>(2) / (top - bottom);
+  // depends on handness + ZO / NO
+  const T scaleZ = static_cast<T>(2) / (farZ - nearZ);
+
+  const T translateX = -(right + left) / (right - left);
+  const T translateY = -(top + bottom) / (top - bottom);
+  // depends on ZO / NO
+  const T translateZ = -(farZ + nearZ) / (farZ - nearZ);
+
   if constexpr (Option == Options::RowMajor) {
-    orthographicMat(3, 0) = -(right + left) / (right - left);
-    orthographicMat(3, 1) = -(top + bottom) / (top - bottom);
-    orthographicMat(3, 2) = -(zFar + zNear) / (zFar - zNear);  // depends on ZO / NO
+    // clang-format off
+    orthographicMat <<
+      scaleX,      T(),         T(),         T(),
+      T(),         scaleY,      T(),         T(),
+      T(),         T(),         scaleZ,      T(),
+      translateX,  translateY,  translateZ,  T(1);
+    // clang-format on
   } else if constexpr (Option == Options::ColumnMajor) {
-    orthographicMat(0, 3) = -(right + left) / (right - left);
-    orthographicMat(1, 3) = -(top + bottom) / (top - bottom);
-    orthographicMat(2, 3) = -(zFar + zNear) / (zFar - zNear);  // depends on ZO / NO
+    // clang-format off
+    orthographicMat <<
+      scaleX,  T(),     T(),     translateX,
+      T(),     scaleY,  T(),     translateY,
+      T(),     T(),     scaleZ,  translateZ,
+      T(),     T(),     T(),     T(1);
+    // clang-format on
   }
+
   return orthographicMat;
 }
 
 /**
- * Generates a right-handed orthographic projection matrix with a depth range of
- * zero to one.
+ * Generates a right-handed orthographic projection matrix with a depth range
+ * of zero to one.
  * @note RH-ZO - Right-Handed, Zero to One depth range.
  */
 template <typename T, Options Option = Options::RowMajor>
-auto g_orthoRhZo(T left, T right, T bottom, T top, T zNear, T zFar)
+auto g_orthoRhZo(T left, T right, T bottom, T top, T nearZ, T farZ)
     -> Matrix<T, 4, 4, Option> {
-  auto orthographicMat  = Matrix<T, 4, 4, Option>::Identity();
-  orthographicMat(0, 0) = static_cast<T>(2) / (right - left);
-  orthographicMat(1, 1) = static_cast<T>(2) / (top - bottom);
-  orthographicMat(2, 2) = -static_cast<T>(1) / (zFar - zNear);  // depends on handness + ZO / NO
+  Matrix<T, 4, 4, Option> orthographicMat;
+
+  const T scaleX = static_cast<T>(2) / (right - left);
+  const T scaleY = static_cast<T>(2) / (top - bottom);
+  // depends on handness + ZO / NO
+  const T scaleZ = -static_cast<T>(1) / (farZ - nearZ);
+
+  const T translateX = -(right + left) / (right - left);
+  const T translateY = -(top + bottom) / (top - bottom);
+  // depends on ZO / NO
+  const T translateZ = -nearZ / (farZ - nearZ);
+
   if constexpr (Option == Options::RowMajor) {
-    orthographicMat(3, 0) = -(right + left) / (right - left);
-    orthographicMat(3, 1) = -(top + bottom) / (top - bottom);
-    orthographicMat(3, 2) = -zNear / (zFar - zNear);  // depends on ZO / NO
+    // clang-format off
+    orthographicMat <<
+      scaleX,      T(),         T(),         T(),
+      T(),         scaleY,      T(),         T(),
+      T(),         T(),         scaleZ,      T(),
+      translateX,  translateY,  translateZ,  T(1);
+    // clang-format on
   } else if constexpr (Option == Options::ColumnMajor) {
-    orthographicMat(0, 3) = -(right + left) / (right - left);
-    orthographicMat(1, 3) = -(top + bottom) / (top - bottom);
-    orthographicMat(2, 3) = -zNear / (zFar - zNear);  // depends on ZO / NO
+    // clang-format off
+    orthographicMat <<
+      scaleX,  T(),     T(),     translateX,
+      T(),     scaleY,  T(),     translateY,
+      T(),     T(),     scaleZ,  translateZ,
+      T(),     T(),     T(),     T(1);
+    // clang-format on
   }
+
   return orthographicMat;
 }
 
 /**
- * Generates a right-handed orthographic projection matrix with a depth range of
- * negative one to one.
+ * Generates a right-handed orthographic projection matrix with a depth range
+ * of negative one to one.
  * @note RH-NO - Right-Handed, Negative One to One depth range.
  */
 template <typename T, Options Option = Options::RowMajor>
-auto g_orthoRhNo(T left, T right, T bottom, T top, T zNear, T zFar)
+auto g_orthoRhNo(T left, T right, T bottom, T top, T nearZ, T farZ)
     -> Matrix<T, 4, 4, Option> {
-  auto orthographicMat  = Matrix<T, 4, 4, Option>::Identity();
-  orthographicMat(0, 0) = static_cast<T>(2) / (right - left);
-  orthographicMat(1, 1) = static_cast<T>(2) / (top - bottom);
-  orthographicMat(2, 2) = -static_cast<T>(2) / (zFar - zNear);  // depends on handness + ZO / NO
+  Matrix<T, 4, 4, Option> orthographicMat;
+
+  const T scaleX = static_cast<T>(2) / (right - left);
+  const T scaleY = static_cast<T>(2) / (top - bottom);
+  // depends on handness + ZO / NO
+  const T scaleZ = -static_cast<T>(2) / (farZ - nearZ);
+
+  const T translateX = -(right + left) / (right - left);
+  const T translateY = -(top + bottom) / (top - bottom);
+  // depends on ZO / NO
+  const T translateZ = -(farZ + nearZ) / (farZ - nearZ);
+
   if constexpr (Option == Options::RowMajor) {
-    orthographicMat(3, 0) = -(right + left) / (right - left);
-    orthographicMat(3, 1) = -(top + bottom) / (top - bottom);
-    orthographicMat(3, 2) = -(zFar + zNear) / (zFar - zNear);  // depends on ZO / NO
+    // clang-format off
+    orthographicMat <<
+      scaleX,      T(),         T(),         T(),
+      T(),         scaleY,      T(),         T(),
+      T(),         T(),         scaleZ,      T(),
+      translateX,  translateY,  translateZ,  T(1);
+    // clang-format on
   } else if constexpr (Option == Options::ColumnMajor) {
-    orthographicMat(0, 3) = -(right + left) / (right - left);
-    orthographicMat(1, 3) = -(top + bottom) / (top - bottom);
-    orthographicMat(2, 3) = -(zFar + zNear) / (zFar - zNear);  // depends on ZO / NO
+    // clang-format off
+    orthographicMat <<
+      scaleX,  T(),     T(),     translateX,
+      T(),     scaleY,  T(),     translateY,
+      T(),     T(),     scaleZ,  translateZ,
+      T(),     T(),     T(),     T(1);
+    // clang-format on
   }
+
   return orthographicMat;
 }
 
 // TODO: remove code duplication from the functions below
 
 /**
- * Generates a left-handed orthographic projection matrix based on the given width and height,
- * with a depth range of zero to one. This simplifies setting up the projection by directly
- * specifying the viewport dimensions and the near and far clipping planes.
+ * Generates a left-handed orthographic projection matrix based on the given
+ * width and height, with a depth range of zero to one. This simplifies setting
+ * up the projection by directly specifying the viewport dimensions and the near
+ * and far clipping planes.
  * @note LH-ZO - Left-Handed, Zero to One depth range.
  */
 template <typename T, Options Option = Options::RowMajor>
-auto g_orthoLhZo(T width, T height, T zNear, T zFar) -> Matrix<T, 4, 4, Option> {
-    T halfWidth = width / static_cast<T>(2);
-    T halfHeight = height / static_cast<T>(2);
+auto g_orthoLhZo(T width, T height, T zNear, T zFar)
+    -> Matrix<T, 4, 4, Option> {
+  T halfWidth  = width / static_cast<T>(2);
+  T halfHeight = height / static_cast<T>(2);
 
-    T left = -halfWidth;
-    T right = halfWidth;
-    T bottom = -halfHeight;
-    T top = halfHeight;
+  T left   = -halfWidth;
+  T right  = halfWidth;
+  T bottom = -halfHeight;
+  T top    = halfHeight;
 
-    return g_orthoLhZo<T, Option>(left, right, bottom, top, zNear, zFar);
+  return g_orthoLhZo<T, Option>(left, right, bottom, top, zNear, zFar);
 }
 
 /**
- * Generates a left-handed orthographic projection matrix based on the given width and height,
- * with a depth range of negative one to one. This simplifies setting up the projection by
- * directly specifying the viewport dimensions and the near and far clipping planes.
+ * Generates a left-handed orthographic projection matrix based on the given
+ * width and height, with a depth range of negative one to one. This simplifies
+ * setting up the projection by directly specifying the viewport dimensions and
+ * the near and far clipping planes.
  * @note LH-NO - Left-Handed, Negative One to One depth range.
  */
 template <typename T, Options Option = Options::RowMajor>
-auto g_orthoLhNo(T width, T height, T zNear, T zFar) -> Matrix<T, 4, 4, Option> {
-    T halfWidth = width / static_cast<T>(2);
-    T halfHeight = height / static_cast<T>(2);
+auto g_orthoLhNo(T width, T height, T zNear, T zFar)
+    -> Matrix<T, 4, 4, Option> {
+  T halfWidth  = width / static_cast<T>(2);
+  T halfHeight = height / static_cast<T>(2);
 
-    T left = -halfWidth;
-    T right = halfWidth;
-    T bottom = -halfHeight;
-    T top = halfHeight;
+  T left   = -halfWidth;
+  T right  = halfWidth;
+  T bottom = -halfHeight;
+  T top    = halfHeight;
 
-    return g_orthoLhNo<T, Option>(left, right, bottom, top, zNear, zFar);
+  return g_orthoLhNo<T, Option>(left, right, bottom, top, zNear, zFar);
 }
 
 /**
- * Generates a right-handed orthographic projection matrix based on the given width and height,
- * with a depth range of zero to one. This simplifies setting up the projection by directly
- * specifying the viewport dimensions and the near and far clipping planes.
+ * Generates a right-handed orthographic projection matrix based on the given
+ * width and height, with a depth range of zero to one. This simplifies setting
+ * up the projection by directly specifying the viewport dimensions and the near
+ * and far clipping planes.
  * @note RH-ZO - Right-Handed, Zero to One depth range.
  */
 template <typename T, Options Option = Options::RowMajor>
-auto g_orthoRhZo(T width, T height, T zNear, T zFar) -> Matrix<T, 4, 4, Option> {
-    T halfWidth = width / static_cast<T>(2);
-    T halfHeight = height / static_cast<T>(2);
+auto g_orthoRhZo(T width, T height, T zNear, T zFar)
+    -> Matrix<T, 4, 4, Option> {
+  T halfWidth  = width / static_cast<T>(2);
+  T halfHeight = height / static_cast<T>(2);
 
-    T left = -halfWidth;
-    T right = halfWidth;
-    T bottom = -halfHeight;
-    T top = halfHeight;
+  T left   = -halfWidth;
+  T right  = halfWidth;
+  T bottom = -halfHeight;
+  T top    = halfHeight;
 
-    return g_orthoRhZo<T, Option>(left, right, bottom, top, zNear, zFar);
+  return g_orthoRhZo<T, Option>(left, right, bottom, top, zNear, zFar);
 }
 
 /**
- * Generates a right-handed orthographic projection matrix based on the given width and height,
- * with a depth range of negative one to one. This simplifies setting up the projection by
- * directly specifying the viewport dimensions and the near and far clipping planes.
+ * Generates a right-handed orthographic projection matrix based on the given
+ * width and height, with a depth range of negative one to one. This simplifies
+ * setting up the projection by directly specifying the viewport dimensions and
+ * the near and far clipping planes.
  * @note RH-NO - Right-Handed, Negative One to One depth range.
  */
 template <typename T, Options Option = Options::RowMajor>
-auto g_orthoRhNo(T width, T height, T zNear, T zFar) -> Matrix<T, 4, 4, Option> {
-    T halfWidth = width / static_cast<T>(2);
-    T halfHeight = height / static_cast<T>(2);
+auto g_orthoRhNo(T width, T height, T zNear, T zFar)
+    -> Matrix<T, 4, 4, Option> {
+  T halfWidth  = width / static_cast<T>(2);
+  T halfHeight = height / static_cast<T>(2);
 
-    T left = -halfWidth;
-    T right = halfWidth;
-    T bottom = -halfHeight;
-    T top = halfHeight;
+  T left   = -halfWidth;
+  T right  = halfWidth;
+  T bottom = -halfHeight;
+  T top    = halfHeight;
 
-    return g_orthoRhNo<T, Option>(left, right, bottom, top, zNear, zFar);
+  return g_orthoRhNo<T, Option>(left, right, bottom, top, zNear, zFar);
 }
-
-
 
 // END: orthographic projection creation matrix
 // ----------------------------------------------------------------------------
-
-// clang-format on
 
 /**
  * @brief Transforms a 3D point using a specified transformation matrix and
