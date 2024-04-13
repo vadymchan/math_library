@@ -204,17 +204,29 @@ class Vector {
 
   auto magnitudeSquared() -> T { return m_dataStorage_.magnitudeSquared(); }
 
-#ifdef MATH_LIBRARY_USE_NORMALIZE_IN_PLACE
-
-  void normalize() { m_dataStorage_.normalize(); }
-
-#else
-
-  [[nodiscard]] auto normalize() const -> Vector {
-    return Vector(m_dataStorage_.normalize());
+  /**
+   * @brief Normalizes the vector (in-place).
+   *
+   * @note This method modifies the vector itself.
+   */
+  void normalize() {
+    T mag = magnitude();
+    assert(mag != 0
+           && "Normalization error: magnitude is zero, implying a zero vector");
+    *this /= mag;
   }
 
-#endif
+  /**
+   * @brief Normalizes the vector (non-in-place).
+   *
+   * @return A new normalized vector.
+   */
+  [[nodiscard]] auto normalized() const -> Vector {
+    T mag = magnitude();
+    assert(mag != 0
+           && "Normalization error: magnitude is zero, implying a zero vector");
+    return *this / mag;
+  }
 
   [[nodiscard]] auto dot(const Vector& other) const -> T {
     float                 result           = NAN;
