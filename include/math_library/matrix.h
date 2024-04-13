@@ -519,9 +519,10 @@ class Matrix {
     return result;
   }
 
-#ifdef MATH_LIBRARY_USE_NORMALIZE_IN_PLACE
   /**
-   * \brief Normalizes the matrix based on its Frobenius norm.
+   * @brief Normalizes the matrix based on its Frobenius norm (in-place).
+   *
+   * @note This method modifies the matrix itself.
    */
   void normalize()
     requires OneDimensional<Rows, Columns>
@@ -531,22 +532,18 @@ class Matrix {
     *this /= mag;
   }
 
-#else
   /**
-   * \brief Normalizes the matrix based on its Frobenius norm.
+   * @brief Normalizes the matrix based on its Frobenius norm (non-in-place).
+   *
+   * @return A new normalized matrix.
    */
-  [[nodiscard]] auto normalize() const -> Matrix
+  [[nodiscard]] auto normalized() const -> Matrix
     requires OneDimensional<Rows, Columns>
   {
     T mag = magnitude();
     assert(mag != 0 && "Normalization error: magnitude is zero, implying a zero matrix/vector");
-
-    Matrix<T, Rows, Columns, Option> result(*this);
-    result /= mag;
-    return result;
+    return *this / mag;
   }
-
-#endif  // USE_NORMALIZE_IN_PLACE
 
   template <std::size_t OtherRows, std::size_t OtherColumns>
     requires OneDimensional<Rows, Columns>
