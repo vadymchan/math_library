@@ -200,9 +200,9 @@ class Vector {
 
   [[nodiscard]] auto data() const -> const T* { return m_dataStorage_.data(); }
 
-  auto magnitude() -> T { return m_dataStorage_.magnitude(); }
+  auto magnitude() const -> T { return m_dataStorage_.magnitude(); }
 
-  auto magnitudeSquared() -> T { return m_dataStorage_.magnitudeSquared(); }
+  auto magnitudeSquared() const -> T { return m_dataStorage_.magnitudeSquared(); }
 
   /**
    * @brief Normalizes the vector (in-place).
