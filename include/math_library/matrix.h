@@ -340,6 +340,8 @@ class Matrix {
     }
   }
 
+#ifdef GAUSS_JORDAN_ELIMINATION_MATRIX_INVERSE
+
   [[nodiscard]] auto inverse() const -> Matrix {
     static_assert(Rows == Columns,
                   "Inverse is only defined for square matrices");
@@ -423,6 +425,8 @@ class Matrix {
 
     return inverseMatrix;
   }
+
+#endif  // GAUSS_JORDAN_ELIMINATION_MATRIX_INVERSE
 
   [[nodiscard]] auto rank() const -> std::size_t {
     // Create a copy of the matrix
