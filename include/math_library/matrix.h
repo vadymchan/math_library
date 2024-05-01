@@ -21,6 +21,8 @@
 #include <ranges>
 #include <type_traits>
 
+#define LU_DECOMPOSITION_MATRIX_INVERSE
+
 namespace math {
 
 constexpr std::size_t g_kStackAllocationLimit = 16;  // 4 by 4 matrix
