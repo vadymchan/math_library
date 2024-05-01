@@ -467,16 +467,16 @@ class Matrix {
     }
 
     // Solve LY = I for Y using forward substitution
-     Matrix<T, Rows, Columns, Option> Y;
-     for (std::size_t i = 0; i < Rows; ++i) {
-       for (std::size_t j = 0; j < Columns; ++j) {
-         T sum = 0;
-         for (std::size_t k = 0; k < i; ++k) {
-           sum += L(i, k) * Y(k, j);
-         }
-         Y(i, j) = (i == j ? 1 : 0) - sum;
-       }
-     }
+    Matrix<T, Rows, Columns, Option> Y;
+    for (std::size_t i = 0; i < Rows; ++i) {
+      for (std::size_t j = 0; j < Columns; ++j) {
+        T sum = 0;
+        for (std::size_t k = 0; k < i; ++k) {
+          sum += L(i, k) * Y(k, j);
+        }
+        Y(i, j) = ((i == j ? 1 : 0) - sum) / L(i, i);
+      }
+    }
 
     // Solve UX = Y for X using backward substitution
     // TODO: to save memory can store in Y matrix
