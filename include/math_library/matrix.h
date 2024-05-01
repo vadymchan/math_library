@@ -428,6 +428,11 @@ class Matrix {
 
 #endif  // GAUSS_JORDAN_ELIMINATION_MATRIX_INVERSE
 
+#ifdef LU_DECOMPOSITION_MATRIX_INVERSE
+
+
+#endif  // LU_DECOMPOSITION_MATRIX_INVERSE
+
   [[nodiscard]] auto rank() const -> std::size_t {
     // Create a copy of the matrix
     // TODO: using float matrix - temp solution
