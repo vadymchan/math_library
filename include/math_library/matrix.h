@@ -478,21 +478,19 @@ class Matrix {
       }
     }
 
+
     // Solve UX = Y for X using backward substitution
-    // TODO: to save memory can store in Y matrix
-    Matrix<T, Rows, Columns, Option>X;
-    for (std::int32_t i = Rows - 1; i >= 0; --i) {
-      for (std::size_t j = 0; j < Columns; ++j) {
-        T sum = 0;
-        for (std::size_t k = i + 1; k < Columns; ++k) {
-          sum += U(i, k) * X(k, j);
-        }
-        X(i, j) = (Y(i, j) - sum) / U(i, i);
-      }
-    }
+     for (int i = Rows - 1; i >= 0; --i) {
+       for (std::size_t j = 0; j < Columns; ++j) {
+         T sum = 0;
+         for (std::size_t k = i + 1; k < Columns; ++k) {
+           sum += U(i, k) * Y(k, j);
+         }
+         Y(i, j) = (Y(i, j) - sum) / U(i, i);
+       }
+     }
 
-    return X;
-
+     return Y;
   }
 
 #endif  // LU_DECOMPOSITION_MATRIX_INVERSE
