@@ -430,6 +430,68 @@ class Matrix {
 
 #ifdef LU_DECOMPOSITION_MATRIX_INVERSE
 
+  [[nodiscard]] auto inverse() const -> Matrix {
+    static_assert(Rows == Columns,
+                  "Inverse is only defined for square matrices");
+
+    // Create a copy of the original matrix
+    Matrix<T, Rows, Columns, Option> A = *this;
+
+    // Create an identity matrix of the same size
+    Matrix<T, Rows, Columns, Option> L
+        = Matrix<T, Rows, Columns, Option>::Identity();
+    Matrix<T, Rows, Columns, Option> U
+        = Matrix<T, Rows, Columns, Option>::Identity();
+
+    // Perform LU decomposition
+    for (std::size_t i = 0; i < Rows; ++i) {
+      // Calculate U elements
+      for (std::size_t j = i; j < Columns; ++j) {
+        T sum = 0;
+        for (std::size_t k = 0; k < i; ++k) {
+          sum += L(i, k) * U(k, j);
+        }
+        U(i, j) = A(i, j) - sum;
+      }
+
+      // Calculate L elements
+      for (std::size_t j = i + 1; j < Rows; ++j) {
+        T sum = 0;
+        for (std::size_t k = 0; k < i; ++k) {
+          sum += L(j, k) * U(k, i);
+        }
+        L(j, i) = (A(j, i) - sum) / U(i, i);
+      }
+    }
+
+    // Solve LY = I for Y using forward substitution
+     Matrix<T, Rows, Columns, Option> Y;
+     for (std::size_t i = 0; i < Rows; ++i) {
+       for (std::size_t j = 0; j < Columns; ++j) {
+         T sum = 0;
+         for (std::size_t k = 0; k < i; ++k) {
+           sum += L(i, k) * Y(k, j);
+         }
+         Y(i, j) = (i == j ? 1 : 0) - sum;
+       }
+     }
+
+    // Solve UX = Y for X using backward substitution
+    // TODO: to save memory can store in Y matrix
+    Matrix<T, Rows, Columns, Option>X;
+    for (std::int32_t i = Rows - 1; i >= 0; --i) {
+      for (std::size_t j = 0; j < Columns; ++j) {
+        T sum = 0;
+        for (std::size_t k = i + 1; k < Columns; ++k) {
+          sum += U(i, k) * X(k, j);
+        }
+        X(i, j) = (Y(i, j) - sum) / U(i, i);
+      }
+    }
+
+    return X;
+
+  }
 
 #endif  // LU_DECOMPOSITION_MATRIX_INVERSE
 
