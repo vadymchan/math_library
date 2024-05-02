@@ -447,6 +447,15 @@ class Matrix {
 
     // Perform LU decomposition
     for (std::size_t i = 0; i < Rows; ++i) {
+      // Calculate L elements
+      for (std::size_t j = 0; j < i; ++j) {
+        T sum = 0;
+        for (std::size_t k = 0; k < j; ++k) {
+          sum += L(i, k) * U(k, j);
+        }
+        L(i, j) = (A(i, j) - sum) / U(j, j);
+      }
+
       // Calculate U elements
       for (std::size_t j = i; j < Columns; ++j) {
         T sum = 0;
@@ -454,15 +463,6 @@ class Matrix {
           sum += L(i, k) * U(k, j);
         }
         U(i, j) = A(i, j) - sum;
-      }
-
-      // Calculate L elements
-      for (std::size_t j = i + 1; j < Rows; ++j) {
-        T sum = 0;
-        for (std::size_t k = 0; k < i; ++k) {
-          sum += L(j, k) * U(k, i);
-        }
-        L(j, i) = (A(j, i) - sum) / U(i, i);
       }
     }
 
