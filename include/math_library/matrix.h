@@ -432,6 +432,8 @@ class Matrix {
 
 #ifdef LU_DECOMPOSITION_MATRIX_INVERSE
 
+
+  // TODO: check that works for Column major
   [[nodiscard]] auto inverse() const -> Matrix {
     static_assert(Rows == Columns,
                   "Inverse is only defined for square matrices");
