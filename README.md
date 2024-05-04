@@ -32,6 +32,7 @@ header-only math library for computer graphics. Uses SIMD set instructions
 - Vector
 - Point
 - Dimension
+- Quaternion
 
 ### Third parties:
 
@@ -117,7 +118,7 @@ math_library
 │       └── utils
 │           ├── concepts.h
 │           └── utils.h
-│ 
+│
 ├── scripts (for generation instruction for current hardware)
 │   └── generate_simd_defines.cpp
 │
@@ -128,6 +129,7 @@ math_library
 │    │   ├── graphics.h
 │    │   ├── matrix.h
 │    │   ├── point.h
+│    │   ├── quaternion.h
 │    │   └── vector.h
 │
 └── CMakeLists.txt
