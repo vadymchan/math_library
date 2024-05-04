@@ -29,6 +29,12 @@ static void bmMatrixScalarMultiplicationInPlace(benchmark::State& state);
 static void bmMatrixScalarDivision(benchmark::State& state);
 static void bmMatrixScalarDivisionInPlace(benchmark::State& state);
 static void bmMatrixTrace(benchmark::State& state);
+static void bmMatrixNegation(benchmark::State& state);
+static void bmMatrixDeterminant(benchmark::State& state);
+static void bmMatrixInverse(benchmark::State& state);
+static void bmMatrixRank(benchmark::State& state);
+static void bmMatrixMagnitude(benchmark::State& state);
+static void bmMatrixNormalize(benchmark::State& state);
 
 //=========================================
 //              BENCHMARKING
