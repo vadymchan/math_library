@@ -229,7 +229,7 @@ class Vector {
   }
 
   [[nodiscard]] auto dot(const Vector& other) const -> T {
-    float                 result           = NAN;
+    T                     result           = NAN;
     constexpr std::size_t kVectorDimention = 1;
     auto mulFunc = InstructionSet<T>::template GetMulFunc<Option>();
     mulFunc(&result,
