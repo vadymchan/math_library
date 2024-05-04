@@ -344,6 +344,17 @@ class Matrix {
 
 #ifdef GAUSS_JORDAN_ELIMINATION_MATRIX_INVERSE
 
+  /**
+   * @brief Calculates the inverse of the matrix using Gauss-Jordan elimination.
+   *
+   * This method uses Gauss-Jordan elimination to find the inverse of the
+   * matrix. It augments the matrix with an identity matrix and performs row
+   * operations to transform the original matrix into an identity matrix, which
+   * results in the inverse matrix being formed in the augmented portion.
+   *
+   * @return The inverse of the matrix.
+   * @note The matrix must be square.
+   */
   [[nodiscard]] auto inverse() const -> Matrix {
     static_assert(Rows == Columns,
                   "Inverse is only defined for square matrices");
