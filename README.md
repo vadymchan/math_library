@@ -45,9 +45,31 @@ header-only math library for computer graphics. Uses SIMD set instructions
 
 1. Clone the repository
    `git clone git@github.com:vadymchan/math_library.git`
-2. Build project:
-   ` cmake .`
-   P.S. You can use cmake-gui for more comfortable building (and there you can choose options like build with third parties or not)
+
+2. Create a build directory (optional but recommended)
+   `mkdir build`
+   `cd build`
+
+3. Configure the project using CMake:
+   `cmake ..`
+
+   Alternatively, you can use the CMake GUI for a more user-friendly experience:
+
+   - Open the CMake GUI
+   - Set the source directory to the root of the cloned repository
+   - Set the build directory to the desired location (e.g., `math_library/build`)
+   - Click "Configure" and choose your preferred generator (e.g., Visual Studio, Ninja, Unix Makefiles)
+   - Optionally, you can modify the available CMake options:
+     - `MATH_LIBRARY_BUILD_TESTS`: Enable building tests and benchmarks (default: OFF)
+     - `MATH_LIBRARY_INCLUDE_G_TEST`: Include the Google Test library (default: ON if `MATH_LIBRARY_BUILD_TESTS` is ON)
+     - `MATH_LIBRARY_INCLUDE_SPDLOG`: Include the spdlog library (default: OFF)
+     - `MATH_LIBRARY_INCLUDE_G_BENCHMARK`: Include the Google Benchmark library (default: ON if `MATH_LIBRARY_BUILD_TESTS` is ON)
+   - Click "Configure" (optional, needed for setting startup project `math_library_exe`)
+   - Click "Generate" to generate the build files
+
+Note: If you choose to enable `MATH_LIBRARY_BUILD_TESTS`, the required third-party libraries (Google Test, spdlog, and Google Benchmark) will be automatically downloaded and configured using CMake's FetchContent module.
+
+By default, the math_library is built as a header-only library. However, if you have any .cpp files in the `src/lib` directory, it will be built as a static library instead.
 
 ---
 
