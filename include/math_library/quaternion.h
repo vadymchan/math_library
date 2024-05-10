@@ -5,7 +5,8 @@
 #ifndef MATH_LIBRARY_QUATERNION_H
 #define MATH_LIBRARY_QUATERNION_H
 
-
+#include "matrix.h"
+#include "vector.h"
 
 namespace math {
 template <typename T>
