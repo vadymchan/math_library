@@ -13,6 +13,21 @@ namespace math {
 template <typename T>
 class Quaternion {
   public:
+  Quaternion()
+      : m_data_(0, 0, 0, 1) {}
+
+  Quaternion(const T x, const T y, const T z, const T w)
+      : m_data_(x, y, z, w) {}
+
+  explicit Quaternion(const Vector3D<T>& v, const T w)
+      : m_data_(v.x(), v.y(), v.z(), w) {}
+
+  explicit Quaternion(const Vector4D<T>& v)
+      : m_data_(v) {}
+
+  Quaternion(const Quaternion& other)
+      : m_data_(other.m_data_) {}
+
 
   private:
 
