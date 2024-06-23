@@ -251,7 +251,7 @@ auto g_rotateRh(const Vector<T, 3, Option>& axis, T angle)
   auto normalizedAxis = axis;
   normalizedAxis.normalize();
 #else
-  auto normalizedAxis = axis.normalize();
+  auto normalizedAxis = axis.normalized();
 #endif
   const T& x = normalizedAxis.x();
   const T& y = normalizedAxis.y();
@@ -356,8 +356,8 @@ auto g_lookAtRh(const Vector3D<T, Option>& eye,
   auto r = worldUp.cross(f);
   r.normalize();
 #else
-  auto f = (target - eye).normalize();
-  auto r = worldUp.cross(f).normalize();
+  auto f = (target - eye).normalized();
+  auto r = worldUp.cross(f).normalized();
 #endif
   auto u = f.cross(r);
 
@@ -394,8 +394,8 @@ auto g_lookAtLh(const Vector3D<T, Option>& eye,
   auto r = worldUp.cross(f);
   r.normalize();
 #else
-  auto f = (target - eye).normalize();
-  auto r = worldUp.cross(f).normalize();
+  auto f = (target - eye).normalized();
+  auto r = worldUp.cross(f).normalized();
 #endif
   auto u = f.cross(r);
 
@@ -432,8 +432,8 @@ auto g_lookToRh(const Vector3D<T, Option>& eye,
   auto r = worldUp.cross(f);
   r.normalize();
 #else
-  auto f = direction.normalize();
-  auto r = worldUp.cross(f).normalize();
+  auto f = direction.normalized();
+  auto r = worldUp.cross(f).normalized();
 #endif
   auto u = f.cross(r);
 
@@ -470,8 +470,8 @@ auto g_lookToLh(const Vector3D<T, Option>& eye,
   auto r = worldUp.cross(f);
   r.normalize();
 #else
-  auto f = direction.normalize();
-  auto r = worldUp.cross(f).normalize();
+  auto f = direction.normalized();
+  auto r = worldUp.cross(f).normalized();
 #endif
   auto u = f.cross(r);
 
@@ -1539,7 +1539,7 @@ auto g_unitVector() -> const Vector<T, Size, Option> {
   vec.normalize();
   return vec;
 #else
-  return vec.normalize();
+  return vec.normalized();
 #endif  // MATH_LIBRARY_USE_NORMALIZE_IN_PLACE
 }
 

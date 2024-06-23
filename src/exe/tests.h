@@ -1148,7 +1148,7 @@ TEST(MatrixTest, NormalizeFloat) {
   vector.normalize();
   auto& normalizedVector = vector;
 #else
-  auto normalizedVector = vector.normalize();
+  auto normalizedVector = vector.normalized();
 #endif
 
   // The expected normalized vector is (2/3, 2/3, 1/3)
@@ -1166,7 +1166,7 @@ TEST(MatrixTest, NormalizeFailureFloat) {
   vector.normalize();
   auto& normalizedVector = vector;
 #else
-  auto normalizedVector = vector.normalize();
+  auto normalizedVector = vector.normalized();
 #endif
 
   vector *= 2;
@@ -2995,7 +2995,7 @@ TEST(MatrixTest, NormalizeUnsignedInt) {
   vector.normalize();
   auto& normalizedVector = vector;
 #else
-  auto normalizedVector = vector.normalize();
+  auto normalizedVector = vector.normalized();
 #endif
 
   // The expected normalized vector is (2/3, 2/3, 1/3)
@@ -3013,7 +3013,7 @@ TEST(MatrixTest, NormalizeFailureUnsignedInt) {
   vector.normalize();
   auto& normalizedVector = vector;
 #else
-  auto normalizedVector = vector.normalize();
+  auto normalizedVector = vector.normalized();
 #endif
 
   vector *= 2;
@@ -4311,7 +4311,7 @@ TEST(MatrixTest, NormalizeUint32T) {
   vector.normalize();
   auto& normalizedVector = vector;
 #else
-  auto normalizedVector = vector.normalize();
+  auto normalizedVector = vector.normalized();
 #endif
 
   // The expected normalized vector is (2/3, 2/3, 1/3)
@@ -4329,7 +4329,7 @@ TEST(MatrixTest, NormalizeFailureUint32T) {
   vector.normalize();
   auto& normalizedVector = vector;
 #else
-  auto normalizedVector = vector.normalize();
+  auto normalizedVector = vector.normalized();
 #endif
 
   vector *= 2;
