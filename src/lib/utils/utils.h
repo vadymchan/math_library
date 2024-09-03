@@ -5,6 +5,8 @@
 #ifndef MATH_LIBRARY_UTILS_H
 #define MATH_LIBRARY_UTILS_H
 
+#include <cmath>
+
 namespace math {
 
 constexpr float g_kPi               = 3.14159265358979323846f;
