@@ -30,9 +30,11 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
+      # Checkout the repository
+      - name: Checkout repository
         uses: actions/checkout@v4
 
+      # Setup Pages deployment
       - name: Setup Pages
         uses: actions/configure-pages@v4
 
@@ -42,22 +44,32 @@ jobs:
 
       # Install Doxygen
       - name: Install Doxygen
-        run: sudo apt install doxygen && doxygen --version
+        run: sudo apt-get update && sudo apt-get install -y doxygen graphviz
 
-      # Install Graphviz (for diagrams)
-      - name: Install Graphviz
-        run: sudo apt install graphviz
+      # Create folder for zipped docs (if needed)
+      - name: Create folder for zipped docs
+        run: mkdir -p zipped_docs
 
-      # Create documentation, explicitly pointing to the Doxyfile
+      # Generate documentation using Doxygen and the provided Doxyfile
       - name: Create documentation
         run: doxygen ./Doxyfile
 
-      # Upload artifact (generated HTML files)
-      - name: Upload artifact
-        uses: actions/upload-pages-artifact@v3
+      # Zip the generated documentation
+      - name: Zip the generated documentation
+        uses: montudor/action-zip@v1
         with:
-          path: "./docs/html/"
+          args: zip -qq -r zipped_docs/docs.zip ./docs
 
+      # Upload the zipped documentation as an artifact
+      - name: Upload the zipped documentation
+        uses: actions/upload-artifact@v2
+        with:
+          name: Doxygen docs
+          path: zipped_docs
+
+      # Deploy to GitHub Pages
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
+        with:
+          path: "./docs/html/"
