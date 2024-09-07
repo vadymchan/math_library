@@ -36,22 +36,26 @@ jobs:
       - name: Setup Pages
         uses: actions/configure-pages@v4
 
+      # Remove old documentation before generating new
+      - name: Clean old documentation
+        run: rm -rf ./docs/html/*
+
       # Install Doxygen
       - name: Install Doxygen
         run: sudo apt install doxygen && doxygen --version
 
+      # Install Graphviz (for diagrams)
       - name: Install Graphviz
         run: sudo apt install graphviz
 
-      # Create documentation
+      # Create documentation, explicitly pointing to the Doxyfile
       - name: Create documentation
-        run: doxygen
+        run: doxygen ./Doxyfile
 
-      # Upload artifact (adjusted path to match your Doxyfile)
+      # Upload artifact (generated HTML files)
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          # Path to the generated HTML documentation
           path: "./docs/html/"
 
       - name: Deploy to GitHub Pages
