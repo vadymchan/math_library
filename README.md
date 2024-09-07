@@ -54,19 +54,19 @@ header-only math library for computer graphics. Uses SIMD set instructions
 3. Configure the project using CMake:
    `cmake ..`
 
-   Alternatively, you can use the CMake GUI for a more user-friendly experience:
+Alternatively, you can use the CMake GUI for a more user-friendly experience:
 
-   - Open the CMake GUI
-   - Set the source directory to the root of the cloned repository
-   - Set the build directory to the desired location (e.g., `math_library/build`)
-   - Click "Configure" and choose your preferred generator (e.g., Visual Studio, Ninja, Unix Makefiles)
-   - Optionally, you can modify the available CMake options:
-     - `MATH_LIBRARY_BUILD_TESTS`: Enable building tests and benchmarks (default: OFF)
-     - `MATH_LIBRARY_INCLUDE_G_TEST`: Include the Google Test library (default: ON if `MATH_LIBRARY_BUILD_TESTS` is ON)
-     - `MATH_LIBRARY_INCLUDE_SPDLOG`: Include the spdlog library (default: OFF)
-     - `MATH_LIBRARY_INCLUDE_G_BENCHMARK`: Include the Google Benchmark library (default: ON if `MATH_LIBRARY_BUILD_TESTS` is ON)
-   - Click "Configure" (optional, needed for setting startup project `math_library_exe`)
-   - Click "Generate" to generate the build files
+- Open the CMake GUI
+- Set the source directory to the root of the cloned repository
+- Set the build directory to the desired location (e.g., `math_library/build`)
+- Click "Configure" and choose your preferred generator (e.g., Visual Studio, Ninja, Unix Makefiles)
+- Optionally, you can modify the available CMake options:
+  - `MATH_LIBRARY_BUILD_TESTS`: Enable building tests and benchmarks (default: OFF)
+  - `MATH_LIBRARY_INCLUDE_G_TEST`: Include the Google Test library (default: ON if `MATH_LIBRARY_BUILD_TESTS` is ON)
+  - `MATH_LIBRARY_INCLUDE_SPDLOG`: Include the spdlog library (default: OFF)
+  - `MATH_LIBRARY_INCLUDE_G_BENCHMARK`: Include the Google Benchmark library (default: ON if `MATH_LIBRARY_BUILD_TESTS` is ON)
+- Click "Configure" (optional, needed for setting startup project `math_library_exe`)
+- Click "Generate" to generate the build files
 
 Note: If you choose to enable `MATH_LIBRARY_BUILD_TESTS`, the required third-party libraries (Google Test, spdlog, and Google Benchmark) will be automatically downloaded and configured using CMake's FetchContent module.
 
