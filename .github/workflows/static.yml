@@ -30,11 +30,9 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
     steps:
-      # Checkout the repository
-      - name: Checkout repository
+      - name: Checkout
         uses: actions/checkout@v4
 
-      # Setup Pages deployment
       - name: Setup Pages
         uses: actions/configure-pages@v4
 
@@ -44,22 +42,22 @@ jobs:
 
       # Install Doxygen
       - name: Install Doxygen
-        run: sudo apt-get update && sudo apt-get install -y doxygen graphviz
+        run: sudo apt install doxygen && doxygen --version
 
-      # Generate documentation using Doxygen and the provided Doxyfile
+      # Install Graphviz (for diagrams)
+      - name: Install Graphviz
+        run: sudo apt install graphviz
+
+      # Create documentation, explicitly pointing to the Doxyfile
       - name: Create documentation
         run: doxygen ./Doxyfile
 
-      # Upload the generated documentation as an artifact (updated to v4)
+      # Upload artifact (generated HTML files)
       - name: Upload artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-pages-artifact@v3
         with:
-          name: doxygen-docs
           path: "./docs/html/"
 
-      # Deploy to GitHub Pages (no 'path' input, use correct artifact name)
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
-        with:
-          artifact_name: doxygen-docs
