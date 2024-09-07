@@ -1,0 +1,107 @@
+# Doxyfile 1.12.0
+
+# Basic project settings
+PROJECT_NAME           = math_library
+PROJECT_BRIEF          = "Header-only math library for computer graphics with SIMD instructions"
+
+# Path to source files
+INPUT                  = ./include ./src
+RECURSIVE              = YES
+
+# Output format
+GENERATE_HTML          = YES
+HTML_OUTPUT            = html    # Относительно OUTPUT_DIRECTORY (будет docs/html)
+GENERATE_LATEX         = NO
+GENERATE_MAN           = NO
+GENERATE_RTF           = NO
+GENERATE_XML           = NO
+
+# Output directory (вся документация будет в этой папке)
+OUTPUT_DIRECTORY       = ./docs
+
+# Code processing settings
+EXTRACT_ALL            = YES
+EXTRACT_PRIVATE        = NO
+EXTRACT_STATIC         = NO
+EXTRACT_LOCAL_CLASSES  = YES
+EXTRACT_ANON_NSPACES   = NO
+
+# Include all header files
+FILE_PATTERNS          = *.h   \
+                         *.hpp \
+                         *.cpp \
+                         *.inl
+
+# File processing settings
+RECURSIVE              = YES
+EXCLUDE_PATTERNS       = */exe/*         \
+                         */tests/*       \
+                         */benchmarks/*  \
+                         */third_party/*
+
+# Dependency graph generation
+HAVE_DOT               = YES
+CALL_GRAPH             = YES
+CALLER_GRAPH           = YES
+CLASS_DIAGRAMS         = YES
+INCLUDE_GRAPH          = YES
+INCLUDED_BY_GRAPH      = YES
+
+# Graph generation and diagrams
+DOTFILE_DIRS           = ./
+MAX_DOT_GRAPH_DEPTH    = 2
+DOT_CLEANUP            = YES
+
+# Warning and error output
+WARNINGS               = YES
+WARN_IF_UNDOCUMENTED   = YES
+WARN_IF_DOC_ERROR      = YES
+
+# Comment style
+JAVADOC_AUTOBRIEF      = YES
+MULTILINE_CPP_IS_BRIEF = NO
+
+# Support for C++11/20 syntax
+CLANG_ASSISTED_PARSING = YES
+CLANG_OPTIONS          = -std=c++20
+
+
+# Directories and dependencies
+INCLUDE_PATH           = ./include ./src/lib
+
+# Group generation (e.g., for classes and functions)
+ENABLE_PREPROCESSING   = YES
+MACRO_EXPANSION        = YES
+EXPAND_ONLY_PREDEF     = NO
+
+# Doxygen alias configuration
+ALIASES                += "todo=\todo"
+ALIASES                += "deprecated=\deprecated"
+
+# Sorting options
+SORT_MEMBER_DOCS       = YES
+SORT_BRIEF_DOCS        = YES
+
+# Options for maintaining cross-references
+GENERATE_TREEVIEW      = YES
+
+# Detail level
+SHOW_INCLUDE_FILES     = YES
+SHOW_USED_FILES        = YES
+
+# Markdown support
+MARKDOWN_SUPPORT       = YES
+AUTOLINK_SUPPORT       = YES
+INLINE_SOURCES         = NO
+
+# Table of contents generation
+GENERATE_TODOLIST      = YES
+GENERATE_DEPRECATEDLIST= YES
+
+# Styling and appearance for documentation
+HTML_HEADER            = 
+HTML_FOOTER            = 
+HTML_STYLESHEET        = 
+HTML_COLORSTYLE_HUE    = 200
+HTML_DYNAMIC_SECTIONS  = YES
+HTML_TIMESTAMP         = YES
