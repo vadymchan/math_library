@@ -10,13 +10,13 @@ RECURSIVE              = YES
 
 # Output format
 GENERATE_HTML          = YES
-HTML_OUTPUT            = html    # Относительно OUTPUT_DIRECTORY (будет docs/html)
+HTML_OUTPUT            = html 
 GENERATE_LATEX         = NO
 GENERATE_MAN           = NO
 GENERATE_RTF           = NO
 GENERATE_XML           = NO
 
-# Output directory (вся документация будет в этой папке)
+# Output directory 
 OUTPUT_DIRECTORY       = ./docs
 
 # Code processing settings
@@ -102,10 +102,10 @@ GENERATE_DEPRECATEDLIST = YES
 GENERATE_HTML          = YES
 HTML_OUTPUT            = html
 HTML_FILE_EXTENSION    = .html
-HTML_COLORSTYLE        = DARK
-HTML_COLORSTYLE_HUE    = 220
-HTML_COLORSTYLE_SAT    = 100
-HTML_COLORSTYLE_GAMMA  = 80
+HTML_HEADER            =
+HTML_FOOTER            =
+HTML_STYLESHEET        =
+HTML_COLORSTYLE        = AUTO_LIGHT
 HTML_TIMESTAMP         = YES
 SEARCHENGINE           = YES
 
