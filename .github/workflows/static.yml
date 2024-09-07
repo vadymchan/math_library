@@ -36,7 +36,7 @@ jobs:
         uses: actions/configure-pages@v4
 
       # Install dependencies for building Doxygen
-      - name: Install build dependencies
+      - name: Install dependencies
         run: sudo apt-get install -y cmake g++ make git graphviz
 
       # Clone Doxygen repository and build from source
@@ -58,12 +58,14 @@ jobs:
       - name: Create documentation
         run: doxygen ./Doxyfile
 
-      # Upload artifact (generated HTML files)
+      - name: Verify documentation files
+        run: ls -la ./docs/html/
+
       - name: Upload artifact
-        uses: actions/upload-pages-artifact@v1
+        uses: actions/upload-artifact@v4
         with:
           path: "./docs/html/"
-          artifact_name: "doxygen-docs"
+          name: "doxygen-docs"
 
       - name: Deploy to GitHub Pages
         id: deployment
