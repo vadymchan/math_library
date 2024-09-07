@@ -35,17 +35,21 @@ jobs:
       - name: Setup Pages
         uses: actions/configure-pages@v4
 
-      # Install the latest version of Doxygen
-      - name: Install the latest version of Doxygen
-        run: |
-          wget https://doxygen.nl/files/doxygen-latest.linux.bin.tar.gz
-          tar -xzf doxygen-latest.linux.bin.tar.gz
-          sudo mv doxygen-latest/bin/* /usr/local/bin/
-          doxygen --version
+      # Install dependencies for building Doxygen
+      - name: Install build dependencies
+        run: sudo apt-get install -y cmake g++ make git graphviz
 
-       # Install Graphviz (for diagrams)    
-      - name: Install Graphviz
-        run: sudo apt-get install -y graphviz
+      # Clone Doxygen repository and build from source
+      - name: Clone and build Doxygen from source
+        run: |
+          git clone https://github.com/doxygen/doxygen.git
+          cd doxygen
+          mkdir build
+          cd build
+          cmake ..
+          make -j$(nproc)
+          sudo make install
+          doxygen --version
 
       - name: Clean old documentation
         run: rm -rf ./docs/html/*
