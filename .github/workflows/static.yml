@@ -10,7 +10,6 @@ on:
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
 
-# Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
 permissions:
   contents: read
   pages: write
@@ -36,17 +35,20 @@ jobs:
       - name: Setup Pages
         uses: actions/configure-pages@v4
 
-      # Remove old documentation before generating new
+      # Install the latest version of Doxygen
+      - name: Install the latest version of Doxygen
+        run: |
+          wget https://doxygen.nl/files/doxygen-latest.linux.bin.tar.gz
+          tar -xzf doxygen-latest.linux.bin.tar.gz
+          sudo mv doxygen-latest/bin/* /usr/local/bin/
+          doxygen --version
+
+       # Install Graphviz (for diagrams)    
+      - name: Install Graphviz
+        run: sudo apt-get install -y graphviz
+
       - name: Clean old documentation
         run: rm -rf ./docs/html/*
-
-      # Install Doxygen
-      - name: Install Doxygen
-        run: sudo apt install doxygen && doxygen --version
-
-      # Install Graphviz (for diagrams)
-      - name: Install Graphviz
-        run: sudo apt install graphviz
 
       # Create documentation, explicitly pointing to the Doxyfile
       - name: Create documentation
@@ -54,10 +56,12 @@ jobs:
 
       # Upload artifact (generated HTML files)
       - name: Upload artifact
-        uses: actions/upload-pages-artifact@v3
+        uses: actions/upload-pages-artifact@v4
         with:
           path: "./docs/html/"
 
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
+        with:
+          artifact_name: doxygen-docs
