@@ -41,14 +41,19 @@ jobs:
         run: rm -rf ./docs/html/*
 
       # Install Doxygen
+      # Install latest version of Doxygen
       - name: Install latest Doxygen
         run: |
-          sudo apt-get update
-          sudo apt-get install -y software-properties-common
-          sudo add-apt-repository ppa:lyx-devel/release
-          sudo apt-get update
-          sudo apt-get install -y doxygen
+          # Get the latest version number dynamically from the Doxygen site
+          LATEST_VERSION=$(curl -s https://api.github.com/repos/doxygen/doxygen/releases/latest | grep '"tag_name"' | sed -E 's/.*"([^"]+)".*/\1/')
+          echo "Latest Doxygen version: $LATEST_VERSION"
+          
+          # Download and install the latest version
+          wget https://doxygen.nl/files/doxygen-${LATEST_VERSION#v}.linux.bin.tar.gz
+          tar -xzf doxygen-${LATEST_VERSION#v}.linux.bin.tar.gz
+          sudo cp doxygen-${LATEST_VERSION#v}/bin/doxygen /usr/local/bin/doxygen
           doxygen --version
+
 
       # Install Graphviz (for diagrams)
       - name: Install Graphviz
