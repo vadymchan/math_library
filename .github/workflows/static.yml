@@ -40,19 +40,25 @@ jobs:
       - name: Clean old documentation
         run: rm -rf ./docs/html/*
 
-      # Install Doxygen
       # Install latest version of Doxygen
       - name: Install latest Doxygen
         run: |
-          # Get the latest version number dynamically from the Doxygen site
-          LATEST_VERSION=$(curl -s https://api.github.com/repos/doxygen/doxygen/releases/latest | grep '"tag_name"' | sed -E 's/.*"([^"]+)".*/\1/')
+          # Get the latest release info from GitHub API
+          LATEST_RELEASE=$(curl -s https://api.github.com/repos/doxygen/doxygen/releases/latest)
+          
+          # Extract the tag name (version) and the download URL for the Linux binary
+          LATEST_VERSION=$(echo $LATEST_RELEASE | grep -Po '"tag_name": "\K.*?(?=")')
+          DOWNLOAD_URL=$(echo $LATEST_RELEASE | grep -Po '"browser_download_url": "\K.*doxygen.*linux.bin.tar.gz(?=")')
+          
           echo "Latest Doxygen version: $LATEST_VERSION"
+          echo "Download URL: $DOWNLOAD_URL"
           
           # Download and install the latest version
-          wget https://doxygen.nl/files/doxygen-${LATEST_VERSION#v}.linux.bin.tar.gz
-          tar -xzf doxygen-${LATEST_VERSION#v}.linux.bin.tar.gz
-          sudo cp doxygen-${LATEST_VERSION#v}/bin/doxygen /usr/local/bin/doxygen
+          wget $DOWNLOAD_URL
+          tar -xzf doxygen-*.linux.bin.tar.gz
+          sudo cp doxygen-*/bin/doxygen /usr/local/bin/doxygen
           doxygen --version
+
 
 
       # Install Graphviz (for diagrams)
