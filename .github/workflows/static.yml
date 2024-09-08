@@ -57,7 +57,6 @@ jobs:
           sudo cp doxygen-*/bin/doxygen /usr/local/bin/doxygen
           doxygen --version
 
-
       # Install Graphviz (for diagrams)
       - name: Install Graphviz
         run: sudo apt install graphviz
