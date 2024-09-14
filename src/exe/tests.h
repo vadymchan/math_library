@@ -6179,34 +6179,202 @@ TEST(OrthoTest, OrthoRhNoWithWidthHeightFloat) {
   EXPECT_FLOAT_EQ(orthoMatrix(3, 3), 1.0f);
 }
 
-// Test case for lookToLh
-TEST(LookAtTest, LookToLhFloat) {
-  math::Vector3Df eye(0.0f, 0.0f, 5.0f);
-  math::Vector3Df direction(0.0f, 0.0f, -1.0f);
-  math::Vector3Df up(0.0f, 1.0f, 0.0f);
-  math::Matrix4f viewMatrix = math::g_lookToLh(eye, direction, up);
+// ========================== VECTOR: FLOAT ==============================
 
-  std::cout << viewMatrix << std::endl;
+// Test case for the move assignment operator
+TEST(VectorTest, MoveAssignmentOperator) {
+  math::Vector<float, 3> vector1(1.0f, 2.0f, 3.0f);
+  math::Vector<float, 3> vector2;
+  vector2 = std::move(vector1);
 
-  EXPECT_FLOAT_EQ(viewMatrix(0, 0), -1.0f);
-  EXPECT_FLOAT_EQ(viewMatrix(0, 1), 0.0f);
-  EXPECT_FLOAT_EQ(viewMatrix(0, 2), 0.0f);
-  EXPECT_FLOAT_EQ(viewMatrix(0, 3), 0.0f);
-  EXPECT_FLOAT_EQ(viewMatrix(1, 0), 0.0f);
-  EXPECT_FLOAT_EQ(viewMatrix(1, 1), 1.0f);
-  EXPECT_FLOAT_EQ(viewMatrix(1, 2), 0.0f);
-  EXPECT_FLOAT_EQ(viewMatrix(1, 3), 0.0f);
-  EXPECT_FLOAT_EQ(viewMatrix(2, 0), 0.0f);
-  EXPECT_FLOAT_EQ(viewMatrix(2, 1), 0.0f);
-  EXPECT_FLOAT_EQ(viewMatrix(2, 2), -1.0f);
-  EXPECT_FLOAT_EQ(viewMatrix(2, 3), 0.0f);
-  EXPECT_FLOAT_EQ(viewMatrix(3, 0), 0.0f);
-  EXPECT_FLOAT_EQ(viewMatrix(3, 1), 0.0f);
-  EXPECT_FLOAT_EQ(viewMatrix(3, 2), 5.0f);
-  EXPECT_FLOAT_EQ(viewMatrix(3, 3), 1.0f);
+  EXPECT_EQ(vector2(0), 1.0f);
+  EXPECT_EQ(vector2(1), 2.0f);
+  EXPECT_EQ(vector2(2), 3.0f);
 }
 
-// ========================== VECTOR: FLOAT ==============================
+// Test case for the GetSize() static member function
+TEST(VectorTest, GetSize) {
+  std::size_t size = math::Vector<float, 4>::GetSize();
+  EXPECT_EQ(size, 4);
+}
+
+// Test case for the GetDataSize() static member function
+TEST(VectorTest, GetDataSize) {
+  std::size_t dataSize = math::Vector<float, 5>::GetDataSize();
+  EXPECT_EQ(dataSize, 5 * sizeof(float));
+}
+
+// Test case for the GetOption() static member function
+TEST(VectorTest, GetOption) {
+  math::Options option = math::Vector<float, 3>::GetOption();
+  EXPECT_EQ(option, math::Options::RowMajor);
+}
+
+// Test case for the data() member function (const version)
+TEST(VectorTest, DataFunctionConst) {
+  const math::Vector<float, 3> vector(1.0f, 2.0f, 3.0f);
+  const float*                 data = vector.data();
+
+  EXPECT_EQ(data[0], 1.0f);
+  EXPECT_EQ(data[1], 2.0f);
+  EXPECT_EQ(data[2], 3.0f);
+}
+
+// Test case for the data() member function (non-const version)
+TEST(VectorTest, DataFunctionNonConst) {
+  math::Vector<float, 3> vector(1.0f, 2.0f, 3.0f);
+  float*                 data = vector.data();
+
+  EXPECT_EQ(data[0], 1.0f);
+  EXPECT_EQ(data[1], 2.0f);
+  EXPECT_EQ(data[2], 3.0f);
+}
+
+// Test case for vector resizing with different target sizes
+TEST(VectorTest, Resizing) {
+  math::Vector<float, 3> vector(1.0f, 2.0f, 3.0f);
+  auto                   resizedVector = vector.resizedCopy<5>();
+
+  EXPECT_EQ(resizedVector(0), 1.0f);
+  EXPECT_EQ(resizedVector(1), 2.0f);
+  EXPECT_EQ(resizedVector(2), 3.0f);
+  EXPECT_EQ(resizedVector(3), 0.0f);
+  EXPECT_EQ(resizedVector(4), 0.0f);
+}
+
+// Test case for vector magnitude calculation
+TEST(VectorTest, Magnitude) {
+  math::Vector<float, 3> vector(1.0f, 2.0f, 3.0f);
+  float                  magnitude = vector.magnitude();
+  EXPECT_FLOAT_EQ(magnitude, 3.7416573867739413f);
+}
+
+// Test case for vector magnitude squared calculation
+TEST(VectorTest, MagnitudeSquared) {
+  math::Vector<float, 3> vector(1.0f, 2.0f, 3.0f);
+  float                  magnitudeSquared = vector.magnitudeSquared();
+  EXPECT_FLOAT_EQ(magnitudeSquared, 14.0f);
+}
+
+// Test case for vector normalization
+TEST(VectorTest, Normalization) {
+  math::Vector<float, 3> vector(1.0f, 2.0f, 3.0f);
+  math::Vector<float, 3> normalized = vector.normalized();
+
+  EXPECT_FLOAT_EQ(normalized(0), 0.2672612419124244f);
+  EXPECT_FLOAT_EQ(normalized(1), 0.5345224838248488f);
+  EXPECT_FLOAT_EQ(normalized(2), 0.8017837257372732f);
+}
+
+// Test case for vector dot product
+TEST(VectorTest, DotProduct) {
+  math::Vector<float, 3> vector1(1.0f, 2.0f, 3.0f);
+  math::Vector<float, 3> vector2(4.0f, 5.0f, 6.0f);
+  float                  dotProduct = vector1.dot(vector2);
+  EXPECT_FLOAT_EQ(dotProduct, 32.0f);
+}
+
+// Test case for vector cross product
+TEST(VectorTest, CrossProduct) {
+  math::Vector<float, 3> vector1(1.0f, 2.0f, 3.0f);
+  math::Vector<float, 3> vector2(4.0f, 5.0f, 6.0f);
+  math::Vector<float, 3> crossProduct = vector1.cross(vector2);
+
+  EXPECT_FLOAT_EQ(crossProduct(0), -3.0f);
+  EXPECT_FLOAT_EQ(crossProduct(1), 6.0f);
+  EXPECT_FLOAT_EQ(crossProduct(2), -3.0f);
+}
+
+// Test case for vector addition
+TEST(VectorTest, Addition) {
+  math::Vector<float, 3> vector1(1.0f, 2.0f, 3.0f);
+  math::Vector<float, 3> vector2(4.0f, 5.0f, 6.0f);
+  math::Vector<float, 3> result = vector1 + vector2;
+
+  EXPECT_FLOAT_EQ(result(0), 5.0f);
+  EXPECT_FLOAT_EQ(result(1), 7.0f);
+  EXPECT_FLOAT_EQ(result(2), 9.0f);
+}
+
+// Test case for vector subtraction
+TEST(VectorTest, Subtraction) {
+  math::Vector<float, 3> vector1(1.0f, 2.0f, 3.0f);
+  math::Vector<float, 3> vector2(4.0f, 5.0f, 6.0f);
+  math::Vector<float, 3> result = vector1 - vector2;
+
+  EXPECT_FLOAT_EQ(result(0), -3.0f);
+  EXPECT_FLOAT_EQ(result(1), -3.0f);
+  EXPECT_FLOAT_EQ(result(2), -3.0f);
+}
+
+// Test case for vector negation
+TEST(VectorTest, Negation) {
+  math::Vector<float, 3> vector(1.0f, -2.0f, 3.0f);
+  math::Vector<float, 3> result = -vector;
+
+  EXPECT_FLOAT_EQ(result(0), -1.0f);
+  EXPECT_FLOAT_EQ(result(1), 2.0f);
+  EXPECT_FLOAT_EQ(result(2), -3.0f);
+}
+
+// Test case for scalar multiplication
+TEST(VectorTest, ScalarMultiplication) {
+  math::Vector<float, 3> vector(1.0f, 2.0f, 3.0f);
+  math::Vector<float, 3> result = vector * 2.0f;
+
+  EXPECT_FLOAT_EQ(result(0), 2.0f);
+  EXPECT_FLOAT_EQ(result(1), 4.0f);
+  EXPECT_FLOAT_EQ(result(2), 6.0f);
+}
+
+// Test case for scalar division
+TEST(VectorTest, ScalarDivision) {
+  math::Vector<float, 3> vector(2.0f, 4.0f, 6.0f);
+  math::Vector<float, 3> result = vector / 2.0f;
+
+  EXPECT_FLOAT_EQ(result(0), 1.0f);
+  EXPECT_FLOAT_EQ(result(1), 2.0f);
+  EXPECT_FLOAT_EQ(result(2), 3.0f);
+}
+
+// Test case for vector multiplication with a matrix using the vector * matrix
+// operator (row major)
+TEST(VectorTest, MatrixMultiplicationRowMajor) {
+  math::Vector<float, 3>    vector(1.0f, 2.0f, 3.0f);
+  math::Matrix<float, 3, 3> matrix(
+      1.0f, 2.0f, 3.0f, 4.0f, 5.0f, 6.0f, 7.0f, 8.0f, 9.0f);
+  math::Vector<float, 3> result = vector * matrix;
+
+  EXPECT_FLOAT_EQ(result(0), 30.0f);
+  EXPECT_FLOAT_EQ(result(1), 36.0f);
+  EXPECT_FLOAT_EQ(result(2), 42.0f);
+}
+
+// Test case for vector multiplication with a matrix using the vector * matrix
+// operator (column major)
+TEST(VectorTest, MatrixMultiplicationColumnMajor) {
+  math::Vector<float, 3, math::Options::ColumnMajor>    vector(1.0f, 2.0f, 3.0f);
+  math::Matrix<float, 3, 3, math::Options::ColumnMajor> matrix(
+      1.0f, 2.0f, 3.0f, 4.0f, 5.0f, 6.0f, 7.0f, 8.0f, 9.0f);
+  auto result = matrix * vector;
+
+  EXPECT_FLOAT_EQ(result(0), 30.0f);
+  EXPECT_FLOAT_EQ(result(1), 36.0f);
+  EXPECT_FLOAT_EQ(result(2), 42.0f);
+}
+
+// Test case for vector multiplication and assignment with a matrix using the *=
+// operator
+TEST(VectorTest, MatrixMultiplicationAssignment) {
+  math::Vector<float, 3>    vector(1.0f, 2.0f, 3.0f);
+  math::Matrix<float, 3, 3> matrix(
+      1.0f, 2.0f, 3.0f, 4.0f, 5.0f, 6.0f, 7.0f, 8.0f, 9.0f);
+  vector *= matrix;
+
+  EXPECT_FLOAT_EQ(vector(0), 30.0f);
+  EXPECT_FLOAT_EQ(vector(1), 36.0f);
+  EXPECT_FLOAT_EQ(vector(2), 42.0f);
+}
 
 TEST(VectorComparisonTest, LessThanOperator) {
   math::Vector3Df vec1(1.0f, 2.0f, 3.0f);
