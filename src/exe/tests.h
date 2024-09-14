@@ -6722,6 +6722,238 @@ TEST(VectorComparisonTest, GreaterThanOrEqualToOperatorUint32LargeValues) {
   EXPECT_FALSE(vec2 >= vec1);
 }
 
+// ========================== QUATERNION: FLOAT =============================
+
+TEST(QuaternionTest, DefaultConstructor) {
+  math::Quaternionf q;
+  EXPECT_EQ(q.x(), 0.0f);
+  EXPECT_EQ(q.y(), 0.0f);
+  EXPECT_EQ(q.z(), 0.0f);
+  EXPECT_EQ(q.w(), 1.0f);
+}
+
+TEST(QuaternionTest, ParameterizedConstructor) {
+  math::Quaternionf q(1.0f, 2.0f, 3.0f, 4.0f);
+  EXPECT_EQ(q.x(), 1.0f);
+  EXPECT_EQ(q.y(), 2.0f);
+  EXPECT_EQ(q.z(), 3.0f);
+  EXPECT_EQ(q.w(), 4.0f);
+}
+
+TEST(QuaternionTest, CopyConstructor) {
+  math::Quaternionf q1(1.0f, 2.0f, 3.0f, 4.0f);
+  math::Quaternionf q2(q1);
+  EXPECT_EQ(q2.x(), 1.0f);
+  EXPECT_EQ(q2.y(), 2.0f);
+  EXPECT_EQ(q2.z(), 3.0f);
+  EXPECT_EQ(q2.w(), 4.0f);
+}
+
+TEST(QuaternionTest, Addition) {
+  math::Quaternionf q1(1.0f, 2.0f, 3.0f, 4.0f);
+  math::Quaternionf q2(5.0f, 6.0f, 7.0f, 8.0f);
+  math::Quaternionf result = q1 + q2;
+  EXPECT_EQ(result.x(), 6.0f);
+  EXPECT_EQ(result.y(), 8.0f);
+  EXPECT_EQ(result.z(), 10.0f);
+  EXPECT_EQ(result.w(), 12.0f);
+}
+
+TEST(QuaternionTest, Subtraction) {
+  math::Quaternionf q1(1.0f, 2.0f, 3.0f, 4.0f);
+  math::Quaternionf q2(5.0f, 6.0f, 7.0f, 8.0f);
+  math::Quaternionf result = q1 - q2;
+  EXPECT_EQ(result.x(), -4.0f);
+  EXPECT_EQ(result.y(), -4.0f);
+  EXPECT_EQ(result.z(), -4.0f);
+  EXPECT_EQ(result.w(), -4.0f);
+}
+
+TEST(QuaternionTest, Multiplication) {
+  math::Quaternionf q1(1.0f, 2.0f, 3.0f, 4.0f);
+  math::Quaternionf q2(5.0f, 6.0f, 7.0f, 8.0f);
+  math::Quaternionf result = q1 * q2;
+  EXPECT_EQ(result.x(), 24.0f);
+  EXPECT_EQ(result.y(), 48.0f);
+  EXPECT_EQ(result.z(), 48.0f);
+  EXPECT_EQ(result.w(), -6.0f);
+}
+
+TEST(QuaternionTest, Exponential) {
+  math::Quaternionf q(0.0f, math::g_kPi / 4.0f, 0.0f, 0.0f);
+  math::Quaternionf result = q.exp();
+
+  EXPECT_NEAR(result.x(), 0.0f, 1e-5f);
+  EXPECT_NEAR(result.y(), 0.707107f, 1e-5f);
+  EXPECT_NEAR(result.z(), 0.0f, 1e-5f);
+  EXPECT_NEAR(result.w(), 0.707107f, 1e-5f);
+}
+
+TEST(QuaternionTest, Logarithm) {
+  math::Quaternionf q(0.0f, 0.707107f, 0.0f, 0.707107f);
+  math::Quaternionf result = q.log();
+
+  EXPECT_NEAR(result.x(), 0.0f, 1e-5f);
+  EXPECT_NEAR(result.y(), math::g_kPi / 4.0f, 1e-5f);
+  EXPECT_NEAR(result.z(), 0.0f, 1e-5f);
+  EXPECT_NEAR(result.w(), 0.0f, 1e-5f);
+}
+
+TEST(QuaternionTest, ScalarMultiplication) {
+  math::Quaternionf q(1.0f, 2.0f, 3.0f, 4.0f);
+  math::Quaternionf result = q * 2.0f;
+  EXPECT_EQ(result.x(), 2.0f);
+  EXPECT_EQ(result.y(), 4.0f);
+  EXPECT_EQ(result.z(), 6.0f);
+  EXPECT_EQ(result.w(), 8.0f);
+}
+
+TEST(QuaternionTest, ScalarDivision) {
+  math::Quaternionf q(1.0f, 2.0f, 3.0f, 4.0f);
+  math::Quaternionf result = q / 2.0f;
+  EXPECT_EQ(result.x(), 0.5f);
+  EXPECT_EQ(result.y(), 1.0f);
+  EXPECT_EQ(result.z(), 1.5f);
+  EXPECT_EQ(result.w(), 2.0f);
+}
+
+TEST(QuaternionTest, Conjugate) {
+  math::Quaternionf q(1.0f, 2.0f, 3.0f, 4.0f);
+  math::Quaternionf result = q.conjugate();
+  EXPECT_EQ(result.x(), -1.0f);
+  EXPECT_EQ(result.y(), -2.0f);
+  EXPECT_EQ(result.z(), -3.0f);
+  EXPECT_EQ(result.w(), 4.0f);
+}
+
+TEST(QuaternionTest, Norm) {
+  math::Quaternionf q(1.0f, 2.0f, 3.0f, 4.0f);
+  float             norm = q.norm();
+  EXPECT_FLOAT_EQ(norm, 5.477226f);
+}
+
+TEST(QuaternionTest, Normalize) {
+  math::Quaternionf q(1.0f, 2.0f, 3.0f, 4.0f);
+#ifdef MATH_LIBRARY_USE_NORMALIZE_IN_PLACE
+  q.normalize();
+  EXPECT_NEAR(q.x(), 0.182574f, 1e-6f);
+  EXPECT_NEAR(q.y(), 0.365148f, 1e-6f);
+  EXPECT_NEAR(q.z(), 0.547723f, 1e-6f);
+  EXPECT_NEAR(q.w(), 0.730297f, 1e-6f);
+#else
+  math::Quaternionf result = q.normalized();
+  EXPECT_NEAR(result.x(), 0.182574f, 1e-6f);
+  EXPECT_NEAR(result.y(), 0.365148f, 1e-6f);
+  EXPECT_NEAR(result.z(), 0.547723f, 1e-6f);
+  EXPECT_NEAR(result.w(), 0.730297f, 1e-6f);
+#endif
+}
+
+TEST(QuaternionTest, FromRotationMatrix) {
+  math::Matrix3f    m(1.0f, 0.0f, 0.0f, 0.0f, 0.0f, -1.0f, 0.0f, 1.0f, 0.0f);
+  math::Quaternionf q = math::Quaternionf::fromRotationMatrix(m);
+  EXPECT_FLOAT_EQ(q.x(), 0.707107f);
+  EXPECT_FLOAT_EQ(q.y(), 0.0f);
+  EXPECT_FLOAT_EQ(q.z(), 0.0f);
+  EXPECT_FLOAT_EQ(q.w(), 0.707107f);
+}
+
+TEST(QuaternionTest, ToRotationMatrix) {
+  math::Quaternionf q(0.707107f, 0.0f, 0.0f, 0.707107f);
+  math::Matrix3f    m = q.toRotationMatrix();
+  EXPECT_FLOAT_EQ(m(0, 0), 1.0f);
+  EXPECT_FLOAT_EQ(m(0, 1), 0.0f);
+  EXPECT_FLOAT_EQ(m(0, 2), 0.0f);
+  EXPECT_FLOAT_EQ(m(1, 0), 0.0f);
+  EXPECT_NEAR(m(1, 1), 0.0f, 1e-6f);
+  EXPECT_NEAR(m(1, 2), -1.0f, 1e-6f);
+  EXPECT_FLOAT_EQ(m(2, 0), 0.0f);
+  EXPECT_NEAR(m(2, 1), 1.0f, 1e-6f);
+  EXPECT_NEAR(m(2, 2), 0.0f, 1e-6f);
+}
+
+TEST(QuaternionTest, Inverse) {
+  math::Quaternionf q(1.0f, 2.0f, 3.0f, 4.0f);
+
+  math::Quaternionf result = q.inverse();
+
+  EXPECT_NEAR(result.x(), -0.0333333f, 1e-6f);
+  EXPECT_NEAR(result.y(), -0.0666667f, 1e-6f);
+  EXPECT_NEAR(result.z(), -0.1f, 1e-6f);
+  EXPECT_NEAR(result.w(), 0.133333f, 1e-6f);
+}
+
+TEST(QuaternionTest, RotateVector) {
+  math::Vector3Df   v(1.0f, 0.0f, 0.0f);
+  math::Quaternionf q(0.707107f, 0.0f, 0.0f, 0.707107f);
+
+  math::Vector3Df result = q.rotateVector(v);
+
+  EXPECT_NEAR(result.x(), 1.0f, 1e-6f);
+  EXPECT_NEAR(result.y(), 0.0f, 1e-6f);
+  EXPECT_NEAR(result.z(), 0.0f, 1e-6f);
+}
+
+TEST(QuaternionTest, Slerp) {
+  math::Quaternionf q1(0.0f, 0.0f, 0.0f, 1.0f);
+  math::Quaternionf q2(0.0f, 0.0f, 1.0f, 0.0f);
+  math::Quaternionf result = math::Quaternionf::slerp(q1, q2, 0.5f);
+  EXPECT_NEAR(result.x(), 0.0f, 1e-6f);
+  EXPECT_NEAR(result.y(), 0.0f, 1e-6f);
+  EXPECT_NEAR(result.z(), 0.707107f, 1e-6f);
+  EXPECT_NEAR(result.w(), 0.707107f, 1e-6f);
+}
+
+TEST(QuaternionTest, Nlerp) {
+  math::Quaternionf q1(0.0f, 0.0f, 0.0f, 1.0f);
+  math::Quaternionf q2(0.0f, 0.0f, 1.0f, 0.0f);
+  math::Quaternionf result = math::Quaternionf::nlerp(q1, q2, 0.5f);
+  EXPECT_NEAR(result.x(), 0.0f, 1e-6f);
+  EXPECT_NEAR(result.y(), 0.0f, 1e-6f);
+  EXPECT_NEAR(result.z(), 0.707107f, 1e-6f);
+  EXPECT_NEAR(result.w(), 0.707107f, 1e-6f);
+}
+
+TEST(QuaternionTest, IsApprox) {
+  math::Quaternionf q1(1.0f, 2.0f, 3.0f, 4.0f);
+  math::Quaternionf q2(1.0f, 2.0f, 3.0f, 4.0f);
+  math::Quaternionf q3(1.1f, 2.1f, 3.1f, 4.1f);
+  EXPECT_TRUE(q1.isApprox(q2));
+  EXPECT_FALSE(q1.isApprox(q3));
+}
+
+TEST(QuaternionTest, Dot) {
+  math::Quaternionf q1(1.0f, 2.0f, 3.0f, 4.0f);
+  math::Quaternionf q2(5.0f, 6.0f, 7.0f, 8.0f);
+  float             result = q1.dot(q2);
+  EXPECT_FLOAT_EQ(result, 70.0f);
+}
+
+TEST(QuaternionTest, Angle) {
+  math::Quaternionf q1(0.0f, 0.0f, 0.0f, 1.0f);
+  math::Quaternionf q2(0.0f, 0.0f, 1.0f, 0.0f);
+  float             result = q1.angle(q2);
+  EXPECT_NEAR(result, 3.14159f, 1e-5f);
+}
+
+TEST(QuaternionTest, Exp) {
+  math::Quaternionf q(0.0f, 0.0f, 0.0f, 0.0f);
+  math::Quaternionf result = q.exp();
+  EXPECT_FLOAT_EQ(result.x(), 0.0f);
+  EXPECT_FLOAT_EQ(result.y(), 0.0f);
+  EXPECT_FLOAT_EQ(result.z(), 0.0f);
+  EXPECT_FLOAT_EQ(result.w(), 1.0f);
+}
+
+TEST(QuaternionTest, Log) {
+  math::Quaternionf q(0.0f, 0.0f, 0.0f, 1.0f);
+  math::Quaternionf result = q.log();
+  EXPECT_FLOAT_EQ(result.x(), 0.0f);
+  EXPECT_FLOAT_EQ(result.y(), 0.0f);
+  EXPECT_FLOAT_EQ(result.z(), 0.0f);
+  EXPECT_FLOAT_EQ(result.w(), 0.0f);
+}
+
 // ========================== DIMENSION: FLOAT ==============================
 
 TEST(DimensionComparisonTest, LessThanOperator) {
