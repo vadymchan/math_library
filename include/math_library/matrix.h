@@ -442,64 +442,95 @@ class Matrix {
 
 #ifdef LU_DECOMPOSITION_MATRIX_INVERSE
 
-
-  // TODO: check that works for Column major
+/**
+   * @brief Calculates the inverse of the matrix using Crout's algorithm for LU
+   * decomposition.
+   *
+   * This method uses Crout's algorithm to perform LU decomposition of the
+   * matrix and then uses forward and backward substitution to find the inverse
+   * of the matrix.
+   *
+   * @return The inverse of the matrix.
+   * @note The matrix must be square.
+   * @see Matrix Inversion using LU Decomposition by Tim Bright
+   *      https://www.gamedev.net/tutorials/programming/math-and-physics/matrix-inversion-using-lu-decomposition-r3637/
+   *
+   * @note The implementation is based on the article "Matrix Inversion using LU
+   * Decomposition" by Tim Bright, published on GameDev.net on April 25, 2014.
+   */
   [[nodiscard]] auto inverse() const -> Matrix {
     static_assert(Rows == Columns,
                   "Inverse is only defined for square matrices");
 
-    // Create a copy of the original matrix
     Matrix<T, Rows, Columns, Option> A = *this;
 
-    // Create an identity matrix of the same size
-    Matrix<T, Rows, Columns, Option> L
-        = Matrix<T, Rows, Columns, Option>::Identity();
-    Matrix<T, Rows, Columns, Option> U
-        = Matrix<T, Rows, Columns, Option>::Identity();
+    Matrix<T, Rows, Columns, Option> L(0);
+    Matrix<T, Rows, Columns, Option> U(0);
 
-    // Perform LU decomposition
+    // Initialize the first column of L
     for (std::size_t i = 0; i < Rows; ++i) {
-      // Calculate L elements
-      for (std::size_t j = 0; j < i; ++j) {
+      L(i, 0) = A(i, 0);
+    }
+
+    // Initialize the scaled first row of U
+    for (std::size_t j = 1; j < Columns; ++j) {
+      U(0, j) = A(0, j) / L(0, 0);
+    }
+
+    // Calculate L and U elements for each subsequent column
+    for (std::size_t j = 1; j < Columns - 1; ++j) {
+      // Calculate L elements in column j from row j to n
+      for (std::size_t i = j; i < Rows; ++i) {
         T sum = 0;
         for (std::size_t k = 0; k < j; ++k) {
           sum += L(i, k) * U(k, j);
         }
-        L(i, j) = (A(i, j) - sum) / U(j, j);
+        L(i, j) = A(i, j) - sum;
       }
 
-      // Calculate U elements
-      for (std::size_t j = i; j < Columns; ++j) {
+      // Calculate U elements in row j from column j+1 to n
+      for (std::size_t k = j + 1; k < Columns; ++k) {
         T sum = 0;
-        for (std::size_t k = 0; k < i; ++k) {
-          sum += L(i, k) * U(k, j);
+        for (std::size_t i = 0; i < j; ++i) {
+          sum += L(j, i) * U(i, k);
         }
-        U(i, j) = A(i, j) - sum;
+        U(j, k) = (A(j, k) - sum) / L(j, j);
       }
     }
 
+    // Calculate the final diagonal element of L
+    T sum = 0;
+    for (std::size_t k = 0; k < Columns - 1; ++k) {
+      sum += L(Rows - 1, k) * U(k, Columns - 1);
+    }
+    L(Rows - 1, Columns - 1) = A(Rows - 1, Columns - 1) - sum;
+
+    Matrix<T, Rows, Columns, Option> I
+        = Matrix<T, Rows, Columns, Option>::Identity();
+
     // Solve LY = I for Y using forward substitution
     Matrix<T, Rows, Columns, Option> Y;
-    for (std::size_t i = 0; i < Rows; ++i) {
-      for (std::size_t j = 0; j < Columns; ++j) {
+    for (std::size_t j = 0; j < Columns; ++j) {
+      Y(0, j) = I(0, j) / L(0, 0);
+      for (std::size_t i = 1; i < Rows; ++i) {
         T sum = 0;
         for (std::size_t k = 0; k < i; ++k) {
           sum += L(i, k) * Y(k, j);
         }
-        Y(i, j) = ((i == j ? 1 : 0) - sum) / L(i, i);
+        Y(i, j) = (I(i, j) - sum) / L(i, i);
       }
     }
 
     // Solve UX = Y for X using backward substitution
-    // TODO: to save memory can store in Y matrix (check if it works as expected)
-    Matrix<T, Rows, Columns, Option>& X = Y;
-    for (std::int32_t i = Rows - 1; i >= 0; --i) {
-      for (std::size_t j = 0; j < Columns; ++j) {
+    Matrix<T, Rows, Columns, Option> X;
+    for (std::size_t j = 0; j < Columns; ++j) {
+      X(Rows - 1, j) = Y(Rows - 1, j);
+      for (std::int32_t i = Rows - 2; i >= 0; --i) {
         T sum = 0;
         for (std::size_t k = i + 1; k < Columns; ++k) {
           sum += U(i, k) * X(k, j);
         }
-        X(i, j) = (Y(i, j) - sum) / U(i, i);
+        X(i, j) = Y(i, j) - sum;
       }
     }
 
