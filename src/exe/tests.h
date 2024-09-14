@@ -976,12 +976,30 @@ TEST(MatrixTest, InverseFloat) {
   matrix(1, 0) = 3;
   matrix(1, 1) = 4;
 
-  math::Matrix<float, 2, 2> inverseMatrix = matrix.inverse();
+  auto inverseMatrix = matrix.inverse();
 
   // The expected inverse matrix of [[1, 2], [3, 4]] is [[-2, 1], [1.5, -0.5]]
   EXPECT_FLOAT_EQ(inverseMatrix(0, 0), -2);
   EXPECT_FLOAT_EQ(inverseMatrix(0, 1), 1);
   EXPECT_FLOAT_EQ(inverseMatrix(1, 0), 1.5);
+  EXPECT_FLOAT_EQ(inverseMatrix(1, 1), -0.5);
+}
+
+// Method: inverse column major
+
+TEST(MatrixTest, InverseFloatColumnMajor) {
+  math::Matrix<float, 2, 2, math::Options::ColumnMajor> matrix;
+  matrix(0, 0) = 1;
+  matrix(1, 0) = 2;
+  matrix(0, 1) = 3;
+  matrix(1, 1) = 4;
+
+  auto inverseMatrix = matrix.inverse();
+
+  // The expected inverse matrix of [[1, 2], [3, 4]] is [[-2, 1.5], [1, -0.5]]
+  EXPECT_FLOAT_EQ(inverseMatrix(0, 0), -2);
+  EXPECT_FLOAT_EQ(inverseMatrix(1, 0), 1);
+  EXPECT_FLOAT_EQ(inverseMatrix(0, 1), 1.5);
   EXPECT_FLOAT_EQ(inverseMatrix(1, 1), -0.5);
 }
 
@@ -1021,9 +1039,9 @@ TEST(MatrixTest, InverseFailureFloat) {
 
   math::Matrix<float, 2, 2> inverseMatrix = matrix.inverse();
 
-  // The incorrect inverse matrix of [[1, 2], [3, 4]] is [[-2, 1], [2, -1]]
-  EXPECT_NE(inverseMatrix(0, 0), -2);
-  EXPECT_NE(inverseMatrix(0, 1), 1);
+  // The expected inverse matrix of [[1, 2], [3, 4]] is [[-2, 1], [1.5, -0.5]]
+  EXPECT_NE(inverseMatrix(0, 0), 3);
+  EXPECT_NE(inverseMatrix(0, 1), -1);
   EXPECT_NE(inverseMatrix(1, 0), 2);
   EXPECT_NE(inverseMatrix(1, 1), -1);
 }
