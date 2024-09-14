@@ -10,5 +10,6 @@
 #include "matrix.h"
 #include "point.h"
 #include "vector.h"
+#include "quaternion.h"
 
 #endif
