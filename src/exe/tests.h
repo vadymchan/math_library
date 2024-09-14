@@ -7010,6 +7010,214 @@ TEST(DimensionComparisonTest, GreaterThanOrEqualToOperator) {
   EXPECT_TRUE(vec3 >= vec1);
 }
 
+// ========================== QUATERNION: DOUBLE =============================
+
+TEST(QuaternionTest, DefaultConstructorDouble) {
+  math::Quaterniond q;
+  EXPECT_EQ(q.x(), 0.0);
+  EXPECT_EQ(q.y(), 0.0);
+  EXPECT_EQ(q.z(), 0.0);
+  EXPECT_EQ(q.w(), 1.0);
+}
+
+TEST(QuaternionTest, ParameterizedConstructorDouble) {
+  math::Quaterniond q(1.0, 2.0, 3.0, 4.0);
+  EXPECT_EQ(q.x(), 1.0);
+  EXPECT_EQ(q.y(), 2.0);
+  EXPECT_EQ(q.z(), 3.0);
+  EXPECT_EQ(q.w(), 4.0);
+}
+
+TEST(QuaternionTest, CopyConstructorDouble) {
+  math::Quaterniond q1(1.0, 2.0, 3.0, 4.0);
+  math::Quaterniond q2(q1);
+  EXPECT_EQ(q2.x(), 1.0);
+  EXPECT_EQ(q2.y(), 2.0);
+  EXPECT_EQ(q2.z(), 3.0);
+  EXPECT_EQ(q2.w(), 4.0);
+}
+
+TEST(QuaternionTest, AdditionDouble) {
+  math::Quaterniond q1(1.0, 2.0, 3.0, 4.0);
+  math::Quaterniond q2(5.0, 6.0, 7.0, 8.0);
+  math::Quaterniond result = q1 + q2;
+  EXPECT_EQ(result.x(), 6.0);
+  EXPECT_EQ(result.y(), 8.0);
+  EXPECT_EQ(result.z(), 10.0);
+  EXPECT_EQ(result.w(), 12.0);
+}
+
+TEST(QuaternionTest, SubtractionDouble) {
+  math::Quaterniond q1(1.0, 2.0, 3.0, 4.0);
+  math::Quaterniond q2(5.0, 6.0, 7.0, 8.0);
+  math::Quaterniond result = q1 - q2;
+  EXPECT_EQ(result.x(), -4.0);
+  EXPECT_EQ(result.y(), -4.0);
+  EXPECT_EQ(result.z(), -4.0);
+  EXPECT_EQ(result.w(), -4.0);
+}
+
+TEST(QuaternionTest, MultiplicationDouble) {
+  math::Quaterniond q1(1.0, 2.0, 3.0, 4.0);
+  math::Quaterniond q2(5.0, 6.0, 7.0, 8.0);
+  math::Quaterniond result = q1 * q2;
+  EXPECT_EQ(result.x(), 24.0);
+  EXPECT_EQ(result.y(), 48.0);
+  EXPECT_EQ(result.z(), 48.0);
+  EXPECT_EQ(result.w(), -6.0);
+}
+
+TEST(QuaternionTest, ScalarMultiplicationDouble) {
+  math::Quaterniond q(1.0, 2.0, 3.0, 4.0);
+  math::Quaterniond result = q * 2.0;
+  EXPECT_EQ(result.x(), 2.0);
+  EXPECT_EQ(result.y(), 4.0);
+  EXPECT_EQ(result.z(), 6.0);
+  EXPECT_EQ(result.w(), 8.0);
+}
+
+TEST(QuaternionTest, ScalarDivisionDouble) {
+  math::Quaterniond q(1.0, 2.0, 3.0, 4.0);
+  math::Quaterniond result = q / 2.0;
+  EXPECT_EQ(result.x(), 0.5);
+  EXPECT_EQ(result.y(), 1.0);
+  EXPECT_EQ(result.z(), 1.5);
+  EXPECT_EQ(result.w(), 2.0);
+}
+
+TEST(QuaternionTest, ConjugateDouble) {
+  math::Quaterniond q(1.0, 2.0, 3.0, 4.0);
+  math::Quaterniond result = q.conjugate();
+  EXPECT_EQ(result.x(), -1.0);
+  EXPECT_EQ(result.y(), -2.0);
+  EXPECT_EQ(result.z(), -3.0);
+  EXPECT_EQ(result.w(), 4.0);
+}
+
+TEST(QuaternionTest, NormDouble) {
+  math::Quaterniond q(1.0, 2.0, 3.0, 4.0);
+  double            norm = q.norm();
+  EXPECT_DOUBLE_EQ(norm, 5.477225575051661);
+}
+
+TEST(QuaternionTest, NormalizeDouble) {
+  math::Quaterniond q(1.0, 2.0, 3.0, 4.0);
+#ifdef MATH_LIBRARY_USE_NORMALIZE_IN_PLACE
+  q.normalize();
+  EXPECT_DOUBLE_EQ(q.x(), 0.18257418583505536);
+  EXPECT_DOUBLE_EQ(q.y(), 0.3651483716701107);
+  EXPECT_DOUBLE_EQ(q.z(), 0.5477225575051661);
+  EXPECT_DOUBLE_EQ(q.w(), 0.7302967433402214);
+#else
+  math::Quaterniond result = q.normalized();
+  EXPECT_DOUBLE_EQ(result.x(), 0.18257418583505536);
+  EXPECT_DOUBLE_EQ(result.y(), 0.3651483716701107);
+  EXPECT_DOUBLE_EQ(result.z(), 0.5477225575051661);
+  EXPECT_DOUBLE_EQ(result.w(), 0.7302967433402214);
+#endif
+}
+
+TEST(QuaternionTest, FromRotationMatrixDouble) {
+  math::Matrix3d    m(1.0, 0.0, 0.0, 0.0, 0.0, -1.0, 0.0, 1.0, 0.0);
+  math::Quaterniond q = math::Quaterniond::fromRotationMatrix(m);
+  EXPECT_DOUBLE_EQ(q.x(), 0.7071067811865476);
+  EXPECT_DOUBLE_EQ(q.y(), 0.0);
+  EXPECT_DOUBLE_EQ(q.z(), 0.0);
+  EXPECT_DOUBLE_EQ(q.w(), 0.7071067811865476);
+}
+
+TEST(QuaternionTest, ToRotationMatrixDouble) {
+  math::Quaterniond q(0.7071067811865476, 0.0, 0.0, 0.7071067811865476);
+  math::Matrix3d    m = q.toRotationMatrix();
+  EXPECT_DOUBLE_EQ(m(0, 0), 1.0);
+  EXPECT_DOUBLE_EQ(m(0, 1), 0.0);
+  EXPECT_DOUBLE_EQ(m(0, 2), 0.0);
+  EXPECT_DOUBLE_EQ(m(1, 0), 0.0);
+  EXPECT_NEAR(m(1, 1), 0.0, 1e-15);
+  EXPECT_DOUBLE_EQ(m(1, 2), -1.0);
+  EXPECT_DOUBLE_EQ(m(2, 0), 0.0);
+  EXPECT_DOUBLE_EQ(m(2, 1), 1.0);
+  EXPECT_NEAR(m(2, 2), 0.0, 1e-15);
+}
+
+TEST(QuaternionTest, InverseDouble) {
+  math::Quaterniond q(1.0, 2.0, 3.0, 4.0);
+  math::Quaterniond result = q.inverse();
+  EXPECT_DOUBLE_EQ(result.x(), -0.033333333333333333);
+  EXPECT_DOUBLE_EQ(result.y(), -0.06666666666666667);
+  EXPECT_DOUBLE_EQ(result.z(), -0.1);
+  EXPECT_DOUBLE_EQ(result.w(), 0.13333333333333333);
+}
+
+TEST(QuaternionTest, RotateVectorDouble) {
+  math::Quaterniond q(0.7071067811865476, 0.0, 0.0, 0.7071067811865476);
+  math::Vector3Dd   v(1.0, 0.0, 0.0);
+  math::Vector3Dd   result = q.rotateVector(v);
+  EXPECT_NEAR(result.x(), 1.0, 1e-15);
+  EXPECT_NEAR(result.y(), 0.0, 1e-15);
+  EXPECT_NEAR(result.z(), 0.0, 1e-15);
+}
+
+TEST(QuaternionTest, SlerpDouble) {
+  math::Quaterniond q1(0.0, 0.0, 0.0, 1.0);
+  math::Quaterniond q2(0.0, 0.0, 1.0, 0.0);
+  math::Quaterniond result = math::Quaterniond::slerp(q1, q2, 0.5);
+  EXPECT_NEAR(result.x(), 0.0, 1e-15);
+  EXPECT_NEAR(result.y(), 0.0, 1e-15);
+  EXPECT_NEAR(result.z(), 0.7071067811865476, 1e-15);
+  EXPECT_NEAR(result.w(), 0.7071067811865476, 1e-15);
+}
+
+TEST(QuaternionTest, NlerpDouble) {
+  math::Quaterniond q1(0.0, 0.0, 0.0, 1.0);
+  math::Quaterniond q2(0.0, 0.0, 1.0, 0.0);
+  math::Quaterniond result = math::Quaterniond::nlerp(q1, q2, 0.5);
+  EXPECT_NEAR(result.x(), 0.0, 1e-15);
+  EXPECT_NEAR(result.y(), 0.0, 1e-15);
+  EXPECT_NEAR(result.z(), 0.7071067811865476, 1e-15);
+  EXPECT_NEAR(result.w(), 0.7071067811865476, 1e-15);
+}
+
+TEST(QuaternionTest, IsApproxDouble) {
+  math::Quaterniond q1(1.0, 2.0, 3.0, 4.0);
+  math::Quaterniond q2(1.0, 2.0, 3.0, 4.0);
+  math::Quaterniond q3(1.1, 2.1, 3.1, 4.1);
+  EXPECT_TRUE(q1.isApprox(q2));
+  EXPECT_FALSE(q1.isApprox(q3));
+}
+
+TEST(QuaternionTest, DotDouble) {
+  math::Quaterniond q1(1.0, 2.0, 3.0, 4.0);
+  math::Quaterniond q2(5.0, 6.0, 7.0, 8.0);
+  double            result = q1.dot(q2);
+  EXPECT_DOUBLE_EQ(result, 70.0);
+}
+
+TEST(QuaternionTest, AngleDouble) {
+  math::Quaterniond q1(0.0, 0.0, 0.0, 1.0);
+  math::Quaterniond q2(0.0, 0.0, 1.0, 0.0);
+  double            result = q1.angle(q2);
+  EXPECT_NEAR(result, 3.141592653589793, 1e-15);
+}
+
+TEST(QuaternionTest, ExpDouble) {
+  math::Quaterniond q(0.0, 0.0, 0.0, 0.0);
+  math::Quaterniond result = q.exp();
+  EXPECT_DOUBLE_EQ(result.x(), 0.0);
+  EXPECT_DOUBLE_EQ(result.y(), 0.0);
+  EXPECT_DOUBLE_EQ(result.z(), 0.0);
+  EXPECT_DOUBLE_EQ(result.w(), 1.0);
+}
+
+TEST(QuaternionTest, LogDouble) {
+  math::Quaterniond q(0.0, 0.0, 0.0, 1.0);
+  math::Quaterniond result = q.log();
+  EXPECT_DOUBLE_EQ(result.x(), 0.0);
+  EXPECT_DOUBLE_EQ(result.y(), 0.0);
+  EXPECT_DOUBLE_EQ(result.z(), 0.0);
+  EXPECT_DOUBLE_EQ(result.w(), 0.0);
+}
+
 // ========================== DIMENSION: DOUBLE ==============================
 
 TEST(DimensionComparisonTest, LessThanOperatorDouble) {
