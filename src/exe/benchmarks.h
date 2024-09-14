@@ -2,8 +2,8 @@
  * @file benchmarks.h
  */
 
-#ifndef MATH_LIBRARY_BENCHMARK_H
-#define MATH_LIBRARY_BENCHMARK_H
+#ifndef MATH_LIBRARY_BENCHMARKS_H
+#define MATH_LIBRARY_BENCHMARKS_H
 
 #include <benchmark/benchmark.h>
 #include <math_library/all.h>
