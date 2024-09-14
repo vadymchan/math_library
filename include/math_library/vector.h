@@ -202,7 +202,9 @@ class Vector {
 
   auto magnitude() const -> T { return m_dataStorage_.magnitude(); }
 
-  auto magnitudeSquared() const -> T { return m_dataStorage_.magnitudeSquared(); }
+  auto magnitudeSquared() const -> T {
+    return m_dataStorage_.magnitudeSquared();
+  }
 
   /**
    * @brief Normalizes the vector (in-place).
@@ -407,7 +409,7 @@ class Vector {
    * the other vector, false otherwise.
    */
   auto operator>=(const Vector& other) const -> bool {
-    auto         cmpFunc = InstructionSet<T>::GetCmpFunc();
+    auto cmpFunc = InstructionSet<T>::GetCmpFunc();
     auto result  = cmpFunc(this->data(), other.data(), Size);
     return result == 1 || result == 0;
   }

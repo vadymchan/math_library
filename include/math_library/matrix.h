@@ -33,7 +33,7 @@ class Vector;
 template <typename T,
           std::size_t Rows,
           std::size_t Columns,
-          Options      Option = Options::RowMajor>
+          Options     Option = Options::RowMajor>
 class Matrix {
   public:
   static const bool s_kUseHeap = Rows * Columns > g_kStackAllocationLimit;
@@ -105,9 +105,8 @@ class Matrix {
     requires AllConvertibleTo<T, Args...>
           && ArgsSizeGreaterThanCount<1, Args...>
   Matrix(Args... args) {
-    static_assert(
-        sizeof...(Args) == static_cast<std::size_t>(Rows) * Columns,
-        "Incorrect number of arguments for Matrix initialization");
+    static_assert(sizeof...(Args) == static_cast<std::size_t>(Rows) * Columns,
+                  "Incorrect number of arguments for Matrix initialization");
     if constexpr (s_kUseHeap) {
       m_data_ = new T[static_cast<std::size_t>(Rows) * Columns];
     }
@@ -134,7 +133,7 @@ class Matrix {
   }
 
   static constexpr auto Identity() -> Matrix {
-    Matrix                 m(0);
+    Matrix                m(0);
     constexpr std::size_t kMin = std::min(Rows, Columns);
     for (std::size_t i = 0; i < kMin; ++i) {
       m(i, i) = 1;
@@ -571,7 +570,7 @@ class Matrix {
   [[nodiscard]] auto magnitude() const -> T
     requires OneDimensional<Rows, Columns>
   {
-    T                      sum              = 0;
+    T                     sum              = 0;
     constexpr std::size_t kVectorDimention = 1;
     constexpr std::size_t kMatrixSize      = Rows * Columns;
     auto mulFunc = InstructionSet<T>::template GetMulFunc<Option>();
@@ -637,7 +636,7 @@ class Matrix {
                       Matrix<T, OtherRows, OtherColumns>>
   [[nodiscard]] auto dot(const Matrix<T, OtherRows, OtherColumns>& other) const
       -> T {
-    T                      result           = NAN;
+    T                     result           = NAN;
     constexpr std::size_t kVectorDimention = 1;
     constexpr std::size_t kMatrixSize      = Rows * Columns;
     auto mulFunc = InstructionSet<T>::template GetMulFunc<Option>();
@@ -921,7 +920,7 @@ using MatrixNd = Matrix<double, Rows, Columns, Option>;
 // Matrix of ints
 template <std::size_t Rows,
           std::size_t Columns,
-          Options      Option = Options::RowMajor>
+          Options     Option = Options::RowMajor>
 using MatrixNi = Matrix<std::int32_t, Rows, Columns, Option>;
 
 // TODO: add Option template parameter to the alias below (may introduce the
