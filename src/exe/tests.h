@@ -9,7 +9,7 @@
 #include <math_library/all.h>
 
 // TEST(MatrixTest, ConstructorDestructorFloat)
-//  TEST(MatrixTest, CopyConstructorFloat)
+// TEST(MatrixTest, CopyConstructorFloat)
 // TEST(MatrixTest, MoveConstructorFloat)
 // TEST(MatrixTest, TransposeFloat)
 // TEST(MatrixTest, ReshapeFloat)
@@ -5565,7 +5565,7 @@ TEST(RotateRhTest, EulerAnglesFloat) {
 
   auto rotateMatrix = math::g_rotateRh<float>(angleX, angleY, angleZ);
 
-  //std::cout << rotateMatrix << std::endl;
+  // std::cout << rotateMatrix << std::endl;
 
   EXPECT_NEAR(rotateMatrix(0, 0), 0.65974f, 1e-6f);
   EXPECT_NEAR(rotateMatrix(0, 1), 0.75f, 1e-6f);
@@ -5595,7 +5595,7 @@ TEST(RotateRhTest, AxisAngleFloat) {
 
   auto rotateMatrix = math::g_rotateRh<float>(axis, angle);
 
-  //std::cout << rotateMatrix << std::endl;
+  // std::cout << rotateMatrix << std::endl;
 
   EXPECT_NEAR(rotateMatrix(0, 0), 0.642857f, 1e-6f);
   EXPECT_NEAR(rotateMatrix(0, 1), -0.622936f, 1e-6f);
