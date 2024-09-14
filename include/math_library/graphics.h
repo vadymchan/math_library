@@ -1,5 +1,27 @@
 /**
  * @file graphics.h
+ * @brief Header file for matrix transformations and projection functions in a
+ * 3D space.
+ *
+ * This file contains a variety of utility functions for generating and
+ * manipulating 4x4 transformation matrices for 3D graphics. The file includes
+ * functions to create translation, scaling, and rotation matrices, as well as
+ * view and projection matrices for both left-handed and right-handed coordinate
+ * systems. It also includes functions for transforming points and vectors, as
+ * well as some common vector utilities.
+ *
+ * Supported matrix operations include:
+ * - Translation matrices.
+ * - Scaling matrices.
+ * - Rotation matrices (around X, Y, and Z axes, and arbitrary axes).
+ * - View matrices (look-at, look-to).
+ * - Perspective projection matrices (both finite and infinite far plane).
+ * - Orthographic projection matrices.
+ * - Frustum projection matrices.
+ *
+ * The functions support both row-major and column-major matrix layouts through
+ * a template parameter.
+ *
  */
 
 #ifndef MATH_LIBRARY_GRAPHICS_H
@@ -19,6 +41,19 @@
 
 namespace math {
 
+/**
+ * @brief Creates a translation matrix.
+ *
+ * Generates a 4x4 translation matrix for translating objects in 3D space by the
+ * specified offsets along the x, y, and z axes.
+ *
+ * @tparam T The data type of the matrix elements (e.g., float, double).
+ * @tparam Option Specifies whether the matrix is row-major or column-major.
+ * @param dx Translation offset along the x-axis.
+ * @param dy Translation offset along the y-axis.
+ * @param dz Translation offset along the z-axis.
+ * @return A 4x4 translation matrix.
+ */
 template <typename T, Options Option = Options::RowMajor>
 auto g_translate(T dx, T dy, T dz) -> Matrix<T, 4, 4, Option> {
   Matrix<T, 4, 4, Option> translateMat{T()};
@@ -42,6 +77,18 @@ auto g_translate(T dx, T dy, T dz) -> Matrix<T, 4, 4, Option> {
   return translateMat;
 }
 
+/**
+ * @brief Creates a translation matrix.
+ *
+ * Generates a 4x4 translation matrix for translating objects in 3D space by the
+ * specified translation vector.
+ *
+ * @tparam T The data type of the matrix elements (e.g., float, double).
+ * @tparam Option Specifies whether the matrix is row-major or column-major.
+ * @param translation A vector specifying the translation offsets along the x,
+ * y, and z axes.
+ * @return A 4x4 translation matrix.
+ */
 template <typename T, Options Option = Options::RowMajor>
 auto g_translate(const Vector<T, 3, Option>& translation)
     -> Matrix<T, 4, 4, Option> {
@@ -49,6 +96,19 @@ auto g_translate(const Vector<T, 3, Option>& translation)
       translation.x(), translation.y(), translation.z());
 }
 
+/**
+ * @brief Adds a translation to an existing transformation matrix.
+ *
+ * Modifies the given 4x4 transformation matrix by adding a translation
+ * specified by the offsets along the x, y, and z axes.
+ *
+ * @tparam T The data type of the matrix elements.
+ * @tparam Option Specifies whether the matrix is row-major or column-major.
+ * @param matrix The transformation matrix to modify.
+ * @param dx Translation offset along the x-axis.
+ * @param dy Translation offset along the y-axis.
+ * @param dz Translation offset along the z-axis.
+ */
 template <typename T, Options Option>
 void g_addTranslate(Matrix<T, 4, 4, Option>& matrix, T dx, T dy, T dz) {
   if constexpr (Option == Options::RowMajor) {
@@ -62,12 +122,37 @@ void g_addTranslate(Matrix<T, 4, 4, Option>& matrix, T dx, T dy, T dz) {
   }
 }
 
+/**
+ * @brief Adds a translation to an existing transformation matrix.
+ *
+ * Modifies the given 4x4 transformation matrix by adding a translation
+ * specified by a translation vector.
+ *
+ * @tparam T The data type of the matrix elements.
+ * @tparam Option Specifies whether the matrix is row-major or column-major.
+ * @param matrix The transformation matrix to modify.
+ * @param translation A vector specifying the translation offsets along the x,
+ * y, and z axes.
+ */
 template <typename T, Options Option>
 void g_addTranslate(Matrix<T, 4, 4, Option>&    matrix,
                     const Vector<T, 3, Option>& translation) {
   g_addTranslate(matrix, translation.x(), translation.y(), translation.z());
 }
 
+/**
+ * @brief Sets the translation component of a transformation matrix.
+ *
+ * Updates the translation component of the given 4x4 transformation matrix to
+ * the specified offsets along the x, y, and z axes.
+ *
+ * @tparam T The data type of the matrix elements.
+ * @tparam Option Specifies whether the matrix is row-major or column-major.
+ * @param matrix The transformation matrix to modify.
+ * @param dx Translation offset along the x-axis.
+ * @param dy Translation offset along the y-axis.
+ * @param dz Translation offset along the z-axis.
+ */
 template <typename T, Options Option>
 void g_setTranslate(Matrix<T, 4, 4, Option>& matrix, T dx, T dy, T dz) {
   Vector<T, 4, Option> translation(dx, dy, dz, matrix(3, 3));
@@ -78,12 +163,37 @@ void g_setTranslate(Matrix<T, 4, 4, Option>& matrix, T dx, T dy, T dz) {
   }
 }
 
+/**
+ * @brief Sets the translation component of a transformation matrix.
+ *
+ * Updates the translation component of the given 4x4 transformation matrix to
+ * the specified translation vector.
+ *
+ * @tparam T The data type of the matrix elements.
+ * @tparam Option Specifies whether the matrix is row-major or column-major.
+ * @param matrix The transformation matrix to modify.
+ * @param translation A vector specifying the translation offsets along the x,
+ * y, and z axes.
+ */
 template <typename T, Options Option>
 void g_setTranslate(Matrix<T, 4, 4, Option>&    matrix,
                     const Vector<T, 3, Option>& translation) {
   g_setTranslate(matrix, translation.x(), translation.y(), translation.z());
 }
 
+/**
+ * @brief Creates a scaling matrix.
+ *
+ * Generates a 4x4 scaling matrix for scaling objects in 3D space by the
+ * specified factors along the x, y, and z axes.
+ *
+ * @tparam T The data type of the matrix elements.
+ * @tparam Option Specifies whether the matrix is row-major or column-major.
+ * @param sx Scaling factor along the x-axis.
+ * @param sy Scaling factor along the y-axis.
+ * @param sz Scaling factor along the z-axis.
+ * @return A 4x4 scaling matrix.
+ */
 template <typename T, Options Option = Options::RowMajor>
 auto g_scale(T sx, T sy, T sz) -> Matrix<T, 4, 4, Option> {
   // clang-format off
@@ -95,6 +205,18 @@ auto g_scale(T sx, T sy, T sz) -> Matrix<T, 4, 4, Option> {
   // clang-format on
 }
 
+/**
+ * @brief Creates a scaling matrix.
+ *
+ * Generates a 4x4 scaling matrix for scaling objects in 3D space by the
+ * specified scaling vector.
+ *
+ * @tparam T The data type of the matrix elements.
+ * @tparam Option Specifies whether the matrix is row-major or column-major.
+ * @param scale A vector specifying the scaling factors along the x, y, and z
+ * axes.
+ * @return A 4x4 scaling matrix.
+ */
 template <typename T, Options Option = Options::RowMajor>
 auto g_scale(const Vector<T, 3, Option>& scale) -> Matrix<T, 4, 4, Option> {
   return g_scale<T, Option>(scale.x(), scale.y(), scale.z());
@@ -102,6 +224,19 @@ auto g_scale(const Vector<T, 3, Option>& scale) -> Matrix<T, 4, 4, Option> {
 
 // BEGIN: rotation matrix creation functions
 // ----------------------------------------------------------------------------
+
+/**
+ * @brief Creates a rotation matrix around the X-axis in a right-handed
+ * coordinate system.
+ *
+ * Generates a 4x4 rotation matrix that rotates objects around the X-axis by the
+ * specified angle (in radians).
+ *
+ * @tparam T The data type of the matrix elements.
+ * @tparam Option Specifies whether the matrix is row-major or column-major.
+ * @param angle The rotation angle around the X-axis in radians.
+ * @return A 4x4 rotation matrix.
+ */
 template <typename T, Options Option = Options::RowMajor>
 auto g_rotateRhX(T angle) -> Matrix<T, 4, 4, Option> {
   const T kCosAngle = std::cos(angle);
@@ -127,6 +262,18 @@ auto g_rotateRhX(T angle) -> Matrix<T, 4, 4, Option> {
   return rotateMat;
 }
 
+/**
+ * @brief Creates a rotation matrix around the Y-axis in a right-handed
+ * coordinate system.
+ *
+ * Generates a 4x4 rotation matrix that rotates objects around the Y-axis by the
+ * specified angle (in radians).
+ *
+ * @tparam T The data type of the matrix elements.
+ * @tparam Option Specifies whether the matrix is row-major or column-major.
+ * @param angle The rotation angle around the Y-axis in radians.
+ * @return A 4x4 rotation matrix.
+ */
 template <typename T, Options Option = Options::RowMajor>
 auto g_rotateRhY(T angle) -> Matrix<T, 4, 4, Option> {
   const T kCosAngle = std::cos(angle);
@@ -152,6 +299,18 @@ auto g_rotateRhY(T angle) -> Matrix<T, 4, 4, Option> {
   return rotateMat;
 }
 
+/**
+ * @brief Creates a rotation matrix around the Z-axis in a right-handed
+ * coordinate system.
+ *
+ * Generates a 4x4 rotation matrix that rotates objects around the Z-axis by the
+ * specified angle (in radians).
+ *
+ * @tparam T The data type of the matrix elements.
+ * @tparam Option Specifies whether the matrix is row-major or column-major.
+ * @param angle The rotation angle around the Z-axis in radians.
+ * @return A 4x4 rotation matrix.
+ */
 template <typename T, Options Option = Options::RowMajor>
 auto g_rotateRhZ(T angle) -> Matrix<T, 4, 4, Option> {
   const T kCosAngle = std::cos(angle);
@@ -184,6 +343,8 @@ auto g_rotateRhZ(T angle) -> Matrix<T, 4, 4, Option> {
  * rotation around the X, Y, and Z axes. The rotation order applied is
  * Z (roll) -> X (pitch) -> Y (yaw)
  *
+ * @tparam T The data type of the matrix elements.
+ * @tparam Option Specifies whether the matrix is row-major or column-major.
  * @param angleX The rotation angle around the X-axis (roll) in radians.
  * @param angleY The rotation angle around the Y-axis (pitch) in radians.
  * @param angleZ The rotation angle around the Z-axis (yaw) in radians.
@@ -221,6 +382,18 @@ auto g_rotateRh(T angleX, T angleY, T angleZ) -> Matrix<T, 4, 4, Option> {
   return rotateMat;
 }
 
+/**
+ * @brief Creates a rotation matrix in the right-handed coordinate system.
+ *
+ * Generates a 4x4 rotation matrix that represents the combined rotation around
+ * the X, Y, and Z axes.
+ *
+ * @tparam T The data type of the matrix elements.
+ * @tparam Option Specifies whether the matrix is row-major or column-major.
+ * @param angles A vector containing rotation angles around the X, Y, and Z axes
+ * (in radians).
+ * @return A 4x4 rotation matrix in the right-handed coordinate system.
+ */
 template <typename T, Options Option = Options::RowMajor>
 auto g_rotateRh(const Vector<T, 3, Option>& angles) -> Matrix<T, 4, 4, Option> {
   return g_rotateRh<T, Option>(angles.x(), angles.y(), angles.z());
@@ -234,11 +407,16 @@ auto g_rotateRh(const Vector<T, 3, Option>& angles) -> Matrix<T, 4, 4, Option> {
  * an arbitrary axis and rotation angle. The axis does not need to be normalized
  * as the function will normalize it.
  *
+ * @tparam T The data type of the matrix elements.
+ * @tparam Option Specifies whether the matrix is row-major or column-major.
  * @param axis The 3D vector representing the axis of rotation.
  * @param angle The rotation angle around the axis, in radians.
  *
  * @note This function is designed for right-handed coordinate systems. It
  * automatically normalizes the axis of rotation.
+ *
+ * @return A 4x4 rotation matrix representing rotation around the specified
+ * axis.
  */
 template <typename T, Options Option = Options::RowMajor>
 auto g_rotateRh(const Vector<T, 3, Option>& axis, T angle)
@@ -279,16 +457,55 @@ auto g_rotateRh(const Vector<T, 3, Option>& axis, T angle)
   return rotateMat;
 }
 
+/**
+ * @brief Creates a rotation matrix around the X-axis in a left-handed
+ * coordinate system.
+ *
+ * Generates a 4x4 rotation matrix that rotates objects around the X-axis by the
+ * specified angle (in radians). This function adapts the right-handed rotation
+ * function by inverting the angle.
+ *
+ * @tparam T The data type of the matrix elements.
+ * @tparam Option Specifies whether the matrix is row-major or column-major.
+ * @param angle The rotation angle around the X-axis in radians.
+ * @return A 4x4 rotation matrix in a left-handed coordinate system.
+ */
 template <typename T, Options Option = Options::RowMajor>
 auto g_rotateLhX(T angle) -> Matrix<T, 4, 4, Option> {
   return g_rotateRhX<T, Option>(-angle);
 }
 
+/**
+ * @brief Creates a rotation matrix around the Y-axis in a left-handed
+ * coordinate system.
+ *
+ * Generates a 4x4 rotation matrix that rotates objects around the Y-axis by the
+ * specified angle (in radians). This function adapts the right-handed rotation
+ * function by inverting the angle.
+ *
+ * @tparam T The data type of the matrix elements.
+ * @tparam Option Specifies whether the matrix is row-major or column-major.
+ * @param angle The rotation angle around the Y-axis in radians.
+ * @return A 4x4 rotation matrix in a left-handed coordinate system.
+ */
 template <typename T, Options Option = Options::RowMajor>
 auto g_rotateLhY(T angle) -> Matrix<T, 4, 4, Option> {
   return g_rotateRhY<T, Option>(-angle);
 }
 
+/**
+ * @brief Creates a rotation matrix around the Z-axis in a left-handed
+ * coordinate system.
+ *
+ * Generates a 4x4 rotation matrix that rotates objects around the Z-axis by the
+ * specified angle (in radians). This function adapts the right-handed rotation
+ * function by inverting the angle.
+ *
+ * @tparam T The data type of the matrix elements.
+ * @tparam Option Specifies whether the matrix is row-major or column-major.
+ * @param angle The rotation angle around the Z-axis in radians.
+ * @return A 4x4 rotation matrix in a left-handed coordinate system.
+ */
 template <typename T, Options Option = Options::RowMajor>
 auto g_rotateLhZ(T angle) -> Matrix<T, 4, 4, Option> {
   return g_rotateRhZ<T, Option>(-angle);
@@ -303,6 +520,8 @@ auto g_rotateLhZ(T angle) -> Matrix<T, 4, 4, Option> {
  * Z (roll) -> X (pitch) -> Y (yaw) using the right-handed function but inverts
  * the angles for left-handed coordinate system adaptation.
  *
+ * @tparam T The data type of the matrix elements.
+ * @tparam Option Specifies whether the matrix is row-major or column-major.
  * @param angleX The rotation angle around the X-axis (pitch) in radians.
  * @param angleY The rotation angle around the Y-axis (yaw) in radians.
  * @param angleZ The rotation angle around the Z-axis (roll) in radians.
@@ -315,6 +534,18 @@ auto g_rotateLh(T angleX, T angleY, T angleZ) -> Matrix<T, 4, 4, Option> {
   return g_rotateRh<T, Option>(-angleX, -angleY, -angleZ);
 }
 
+/**
+ * @brief Creates a rotation matrix in the left-handed coordinate system.
+ *
+ * Generates a 4x4 rotation matrix that represents the combined rotation around
+ * the X, Y, and Z axes.
+ *
+ * @tparam T The data type of the matrix elements.
+ * @tparam Option Specifies whether the matrix is row-major or column-major.
+ * @param angles A vector containing rotation angles around the X, Y, and Z axes
+ * (in radians).
+ * @return A 4x4 rotation matrix in the left-handed coordinate system.
+ */
 template <typename T, Options Option = Options::RowMajor>
 auto g_rotateLh(const Vector<T, 3, Option>& angles) -> Matrix<T, 4, 4, Option> {
   return g_rotateLh<T, Option>(angles.x(), angles.y(), angles.z());
@@ -329,10 +560,15 @@ auto g_rotateLh(const Vector<T, 3, Option>& angles) -> Matrix<T, 4, 4, Option> {
  * adaptation to left-handed coordinate systems but maintains the axis
  * direction.
  *
+ * @tparam T The data type of the matrix elements.
+ * @tparam Option Specifies whether the matrix is row-major or column-major.
  * @param axis The 3D vector representing the axis of rotation.
  * @param angle The rotation angle around the axis, in radians.
  *
  * @note This function normalizes the axis of rotation automatically.
+ *
+ * @return A 4x4 rotation matrix representing rotation around the specified
+ * axis.
  */
 template <typename T, Options Option = Options::RowMajor>
 auto g_rotateLh(const Vector<T, 3, Option>& axis, T angle)
@@ -346,6 +582,21 @@ auto g_rotateLh(const Vector<T, 3, Option>& axis, T angle)
 // BEGIN: view matrix creation functions
 // ----------------------------------------------------------------------------
 
+/**
+ * @brief Creates a right-handed view matrix using an eye point, a target point,
+ * and an up vector.
+ *
+ * Generates a 4x4 view matrix that transforms world coordinates to view
+ * coordinates, using the specified eye position, target position, and up vector
+ * in a right-handed coordinate system.
+ *
+ * @tparam T The data type of the matrix elements.
+ * @tparam Option Specifies whether the matrix is row-major or column-major.
+ * @param eye The position of the camera (eye point) in world space.
+ * @param target The target point the camera is looking at in world space.
+ * @param worldUp The world's up vector.
+ * @return A 4x4 view matrix.
+ */
 template <typename T, Options Option = Options::RowMajor>
 auto g_lookAtRh(const Vector3D<T, Option>& eye,
                 const Vector3D<T, Option>& target,
@@ -384,6 +635,21 @@ auto g_lookAtRh(const Vector3D<T, Option>& eye,
   return viewMatrix;
 }
 
+/**
+ * @brief Creates a left-handed view matrix using an eye point, a target point,
+ * and an up vector.
+ *
+ * Generates a 4x4 view matrix that transforms world coordinates to view
+ * coordinates, using the specified eye position, target position, and up vector
+ * in a left-handed coordinate system.
+ *
+ * @tparam T The data type of the matrix elements.
+ * @tparam Option Specifies whether the matrix is row-major or column-major.
+ * @param eye The position of the camera (eye point) in world space.
+ * @param target The target point the camera is looking at in world space.
+ * @param worldUp The world's up vector.
+ * @return A 4x4 view matrix.
+ */
 template <typename T, Options Option = Options::RowMajor>
 auto g_lookAtLh(const Vector3D<T, Option>& eye,
                 const Vector3D<T, Option>& target,
@@ -422,6 +688,21 @@ auto g_lookAtLh(const Vector3D<T, Option>& eye,
   return viewMatrix;
 }
 
+/**
+ * @brief Creates a right-handed view matrix using an eye point, a view
+ * direction, and an up vector.
+ *
+ * Generates a 4x4 view matrix that transforms world coordinates to view
+ * coordinates, using the specified eye position, view direction, and up vector
+ * in a right-handed coordinate system.
+ *
+ * @tparam T The data type of the matrix elements.
+ * @tparam Option Specifies whether the matrix is row-major or column-major.
+ * @param eye The position of the camera (eye point) in world space.
+ * @param direction The viewing direction of the camera.
+ * @param worldUp The world's up vector.
+ * @return A 4x4 view matrix.
+ */
 template <typename T, Options Option = Options::RowMajor>
 auto g_lookToRh(const Vector3D<T, Option>& eye,
                 const Vector3D<T, Option>& direction,
@@ -460,6 +741,21 @@ auto g_lookToRh(const Vector3D<T, Option>& eye,
   return viewMatrix;
 }
 
+/**
+ * @brief Creates a left-handed view matrix using an eye point, a view
+ * direction, and an up vector.
+ *
+ * Generates a 4x4 view matrix that transforms world coordinates to view
+ * coordinates, using the specified eye position, view direction, and up vector
+ * in a left-handed coordinate system.
+ *
+ * @tparam T The data type of the matrix elements.
+ * @tparam Option Specifies whether the matrix is row-major or column-major.
+ * @param eye The position of the camera (eye point) in world space.
+ * @param direction The viewing direction of the camera.
+ * @param worldUp The world's up vector.
+ * @return A 4x4 view matrix.
+ */
 template <typename T, Options Option = Options::RowMajor>
 auto g_lookToLh(const Vector3D<T, Option>& eye,
                 const Vector3D<T, Option>& direction,
@@ -505,9 +801,21 @@ auto g_lookToLh(const Vector3D<T, Option>& eye,
 // ----------------------------------------------------------------------------
 
 /**
- * Generates a right-handed perspective projection matrix with a depth range of
- * negative one to one.
+ * @brief Generates a right-handed perspective projection matrix with a depth
+ * range of negative one to one.
+ *
+ * Creates a 4x4 perspective projection matrix using the specified field of
+ * view, aspect ratio, and near and far clipping planes.
+ *
  * @note RH-NO - Right-Handed, Negative One to One depth range.
+ *
+ * @tparam T The data type of the matrix elements.
+ * @tparam Option Specifies whether the matrix is row-major or column-major.
+ * @param fovY Field of view in the y direction, in radians.
+ * @param aspect Aspect ratio, defined as view space width divided by height.
+ * @param nearZ Near clipping plane distance.
+ * @param farZ Far clipping plane distance.
+ * @return A 4x4 perspective projection matrix.
  */
 template <typename T, Options Option = Options::RowMajor>
 auto g_perspectiveRhNo(T fovY, T aspect, T nearZ, T farZ)
@@ -551,9 +859,21 @@ auto g_perspectiveRhNo(T fovY, T aspect, T nearZ, T farZ)
 }
 
 /**
- * Generates a right-handed perspective projection matrix with a depth range of
- * zero to one.
+ * @brief Generates a right-handed perspective projection matrix with a depth
+ * range of zero to one.
+ *
+ * Creates a 4x4 perspective projection matrix using the specified field of
+ * view, aspect ratio, and near and far clipping planes.
+ *
  * @note RH-ZO - Right-Handed, Zero to One depth range.
+ *
+ * @tparam T The data type of the matrix elements.
+ * @tparam Option Specifies whether the matrix is row-major or column-major.
+ * @param fovY Field of view in the y direction, in radians.
+ * @param aspect Aspect ratio, defined as view space width divided by height.
+ * @param nearZ Near clipping plane distance.
+ * @param farZ Far clipping plane distance.
+ * @return A 4x4 perspective projection matrix.
  */
 template <typename T, Options Option = Options::RowMajor>
 auto g_perspectiveRhZo(T fovY, T aspect, T nearZ, T farZ)
@@ -596,9 +916,21 @@ auto g_perspectiveRhZo(T fovY, T aspect, T nearZ, T farZ)
 }
 
 /**
- * Generates a left-handed perspective projection matrix with a depth range of
- * negative one to one.
+ * @brief Generates a left-handed perspective projection matrix with a depth
+ * range of negative one to one.
+ *
+ * Creates a 4x4 perspective projection matrix using the specified field of
+ * view, aspect ratio, and near and far clipping planes.
+ *
  * @note LH-NO - Left-Handed, Negative One to One depth range.
+ *
+ * @tparam T The data type of the matrix elements.
+ * @tparam Option Specifies whether the matrix is row-major or column-major.
+ * @param fovY Field of view in the y direction, in radians.
+ * @param aspect Aspect ratio, defined as view space width divided by height.
+ * @param nearZ Near clipping plane distance.
+ * @param farZ Far clipping plane distance.
+ * @return A 4x4 perspective projection matrix.
  */
 template <typename T, Options Option = Options::RowMajor>
 auto g_perspectiveLhNo(T fovY, T aspect, T nearZ, T farZ)
@@ -641,9 +973,21 @@ auto g_perspectiveLhNo(T fovY, T aspect, T nearZ, T farZ)
 }
 
 /**
- * Generates a left-handed perspective projection matrix with a depth range of
- * zero to one.
+ * @brief Generates a left-handed perspective projection matrix with a depth
+ * range of zero to one.
+ *
+ * Creates a 4x4 perspective projection matrix using the specified field of
+ * view, aspect ratio, and near and far clipping planes.
+ *
  * @note LH-ZO - Left-Handed, Zero to One depth range.
+ *
+ * @tparam T The data type of the matrix elements.
+ * @tparam Option Specifies whether the matrix is row-major or column-major.
+ * @param fovY Field of view in the y direction, in radians.
+ * @param aspect Aspect ratio, defined as view space width divided by height.
+ * @param nearZ Near clipping plane distance.
+ * @param farZ Far clipping plane distance.
+ * @return A 4x4 perspective projection matrix.
  */
 template <typename T, Options Option = Options::RowMajor>
 auto g_perspectiveLhZo(T fovY, T aspect, T nearZ, T farZ)
@@ -686,9 +1030,22 @@ auto g_perspectiveLhZo(T fovY, T aspect, T nearZ, T farZ)
 }
 
 /**
- * Generates a right-handed perspective projection matrix based on field of
- * view, width, and height with a depth range of negative one to one.
+ * @brief Generates a right-handed perspective projection matrix based on field
+ * of view, width, and height with a depth range of negative one to one.
+ *
+ * Simplifies setting up the projection by directly specifying the viewport
+ * dimensions and the near and far clipping planes.
+ *
  * @note RH-NO - Right-Handed, Negative One to One depth range.
+ *
+ * @tparam T The data type of the matrix elements.
+ * @tparam Option Specifies whether the matrix is row-major or column-major.
+ * @param fovY Field of view in the y direction, in radians.
+ * @param width Width of the viewport.
+ * @param height Height of the viewport.
+ * @param zNear Near clipping plane distance.
+ * @param zFar Far clipping plane distance.
+ * @return A 4x4 perspective projection matrix.
  */
 template <typename T, Options Option = Options::RowMajor>
 auto g_perspectiveRhNo(T fovY, T width, T height, T zNear, T zFar)
@@ -699,9 +1056,22 @@ auto g_perspectiveRhNo(T fovY, T width, T height, T zNear, T zFar)
 }
 
 /**
- * Generates a right-handed perspective projection matrix based on field of
- * view, width, and height with a depth range of zero to one.
+ * @brief Generates a right-handed perspective projection matrix based on field
+ * of view, width, and height with a depth range of zero to one.
+ *
+ * Simplifies setting up the projection by directly specifying the viewport
+ * dimensions and the near and far clipping planes.
+ *
  * @note RH-ZO - Right-Handed, Zero to One depth range.
+ *
+ * @tparam T The data type of the matrix elements.
+ * @tparam Option Specifies whether the matrix is row-major or column-major.
+ * @param fovY Field of view in the y direction, in radians.
+ * @param width Width of the viewport.
+ * @param height Height of the viewport.
+ * @param zNear Near clipping plane distance.
+ * @param zFar Far clipping plane distance.
+ * @return A 4x4 perspective projection matrix.
  */
 template <typename T, Options Option = Options::RowMajor>
 auto g_perspectiveRhZo(T fovY, T width, T height, T zNear, T zFar)
@@ -712,9 +1082,22 @@ auto g_perspectiveRhZo(T fovY, T width, T height, T zNear, T zFar)
 }
 
 /**
- * Generates a left-handed perspective projection matrix based on field of view,
- * width, and height with a depth range of negative one to one.
+ * @brief Generates a left-handed perspective projection matrix based on field
+ * of view, width, and height with a depth range of negative one to one.
+ *
+ * Simplifies setting up the projection by directly specifying the viewport
+ * dimensions and the near and far clipping planes.
+ *
  * @note LH-NO - Left-Handed, Negative One to One depth range.
+ *
+ * @tparam T The data type of the matrix elements.
+ * @tparam Option Specifies whether the matrix is row-major or column-major.
+ * @param fovY Field of view in the y direction, in radians.
+ * @param width Width of the viewport.
+ * @param height Height of the viewport.
+ * @param zNear Near clipping plane distance.
+ * @param zFar Far clipping plane distance.
+ * @return A 4x4 perspective projection matrix.
  */
 template <typename T, Options Option = Options::RowMajor>
 auto g_perspectiveLhNo(T fovY, T width, T height, T zNear, T zFar)
@@ -725,9 +1108,22 @@ auto g_perspectiveLhNo(T fovY, T width, T height, T zNear, T zFar)
 }
 
 /**
- * Generates a left-handed perspective projection matrix based on field of view,
- * width, and height with a depth range of zero to one.
+ * @brief Generates a left-handed perspective projection matrix based on field
+ * of view, width, and height with a depth range of zero to one.
+ *
+ * Simplifies setting up the projection by directly specifying the viewport
+ * dimensions and the near and far clipping planes.
+ *
  * @note LH-ZO - Left-Handed, Zero to One depth range.
+ *
+ * @tparam T The data type of the matrix elements.
+ * @tparam Option Specifies whether the matrix is row-major or column-major.
+ * @param fovY Field of view in the y direction, in radians.
+ * @param width Width of the viewport.
+ * @param height Height of the viewport.
+ * @param zNear Near clipping plane distance.
+ * @param zFar Far clipping plane distance.
+ * @return A 4x4 perspective projection matrix.
  */
 template <typename T, Options Option = Options::RowMajor>
 auto g_perspectiveLhZo(T fovY, T width, T height, T zNear, T zFar)
@@ -738,9 +1134,21 @@ auto g_perspectiveLhZo(T fovY, T width, T height, T zNear, T zFar)
 }
 
 /**
- * Generates a right-handed perspective projection matrix optimized for
+ * @brief Generates a right-handed perspective projection matrix optimized for
  * rendering scenes with an infinite far plane.
+ *
+ * Creates a 4x4 perspective projection matrix using the specified field of
+ * view, aspect ratio, and near clipping plane.
+ *
  * @note RH-NO-Inf - Right-Handed, Negative One to One depth range, Infinite far
+ * plane.
+ *
+ * @tparam T The data type of the matrix elements.
+ * @tparam Option Specifies whether the matrix is row-major or column-major.
+ * @param fovY Field of view in the y direction, in radians.
+ * @param aspect Aspect ratio, defined as view space width divided by height.
+ * @param nearZ Near clipping plane distance.
+ * @return A 4x4 perspective projection matrix optimized for an infinite far
  * plane.
  */
 template <typename T, Options Option = Options::RowMajor>
@@ -790,9 +1198,24 @@ auto g_perspectiveRhNoInf(T fovY, T aspect, T nearZ)
 }
 
 /**
- * Generates a right-handed perspective projection matrix for scenes with an
- * infinite far plane, optimized for a zero to one depth range.
+ * @brief Generates a right-handed perspective projection matrix optimized for
+ * rendering scenes with an infinite far plane, using a depth range of zero to
+ * one.
+ *
+ * Creates a 4x4 perspective projection matrix using the specified field of
+ * view, aspect ratio, and near clipping plane. This matrix is optimized for
+ * scenarios where the far clipping plane is at infinity, which can improve
+ * depth precision and rendering of distant objects.
+ *
  * @note RH-ZO-Inf - Right-Handed, Zero to One depth range, Infinite far plane.
+ *
+ * @tparam T The data type of the matrix elements (e.g., float, double).
+ * @tparam Option Specifies whether the matrix is row-major or column-major.
+ * @param fovY Field of view in the y direction, in radians.
+ * @param aspect Aspect ratio, defined as view space width divided by height.
+ * @param nearZ Near clipping plane distance.
+ * @return A 4x4 perspective projection matrix optimized for an infinite far
+ * plane.
  */
 template <typename T, Options Option = Options::RowMajor>
 auto g_perspectiveRhZoInf(T fovY, T aspect, T nearZ)
@@ -841,9 +1264,24 @@ auto g_perspectiveRhZoInf(T fovY, T aspect, T nearZ)
 }
 
 /**
- * Generates a left-handed perspective projection matrix for rendering with an
- * infinite far plane, using a depth range of negative one to one.
+ * @brief Generates a left-handed perspective projection matrix optimized for
+ * rendering scenes with an infinite far plane, using a depth range of negative
+ * one to one.
+ *
+ * Creates a 4x4 perspective projection matrix using the specified field of
+ * view, aspect ratio, and near clipping plane. This matrix is designed for
+ * left-handed coordinate systems and is optimized for scenarios where the far
+ * clipping plane is at infinity.
+ *
  * @note LH-NO-Inf - Left-Handed, Negative One to One depth range, Infinite far
+ * plane.
+ *
+ * @tparam T The data type of the matrix elements (e.g., float, double).
+ * @tparam Option Specifies whether the matrix is row-major or column-major.
+ * @param fovY Field of view in the y direction, in radians.
+ * @param aspect Aspect ratio, defined as view space width divided by height.
+ * @param nearZ Near clipping plane distance.
+ * @return A 4x4 perspective projection matrix optimized for an infinite far
  * plane.
  */
 template <typename T, Options Option = Options::RowMajor>
@@ -893,9 +1331,23 @@ auto g_perspectiveLhNoInf(T fovY, T aspect, T nearZ)
 }
 
 /**
- * Produces a left-handed perspective projection matrix optimized for scenes
- * with an infinite far plane, and a depth range of zero to one.
+ * @brief Produces a left-handed perspective projection matrix optimized for
+ * scenes with an infinite far plane and a depth range of zero to one.
+ *
+ * This function creates a 4x4 perspective projection matrix using the specified
+ * field of view, aspect ratio, and near clipping plane. It is tailored for
+ * left-handed coordinate systems and assumes an infinite far plane, which is
+ * useful for rendering scenes where the far distance is effectively limitless.
+ *
  * @note LH-ZO-Inf - Left-Handed, Zero to One depth range, Infinite far plane.
+ *
+ * @tparam T The data type of the matrix elements (e.g., float, double).
+ * @tparam Option Specifies whether the matrix is row-major or column-major.
+ * @param fovY Field of view in the y direction, in radians.
+ * @param aspect Aspect ratio, defined as view space width divided by height.
+ * @param nearZ Near clipping plane distance.
+ * @return A 4x4 perspective projection matrix optimized for an infinite far
+ * plane.
  */
 template <typename T, Options Option = Options::RowMajor>
 auto g_perspectiveLhZoInf(T fovY, T aspect, T nearZ)
@@ -958,6 +1410,7 @@ auto g_perspectiveLhZoInf(T fovY, T aspect, T nearZ)
  * during rendering and for reconstructing 3D positions from screen coordinates
  * through inverted transformations.
  *
+ * @param vector The 4D vector to apply perspective division to.
  * @param tolerance The tolerance within which the w component is considered
  * effectively zero, preventing division in cases where it might lead to
  * numerical instability. This additional parameter is crucial for handling
@@ -967,6 +1420,8 @@ auto g_perspectiveLhZoInf(T fovY, T aspect, T nearZ)
  * the w component is significantly different from zero.
  *
  * @tparam T A floating-point type representing the vector's element type.
+ * @tparam Option Specifies whether the vector is row-major or column-major.
+ * @return The vector after perspective division.
  */
 template <typename T, Options Option = Options::RowMajor>
   requires std::floating_point<T>
@@ -984,9 +1439,25 @@ Vector<T, 4, Option> g_perspectiveDivide(const Vector<T, 4, Option>& vector,
 // ----------------------------------------------------------------------------
 
 /**
- * Generates a right-handed frustum projection matrix with a depth range of zero
- * to one.
+ * @brief Generates a right-handed frustum projection matrix with a depth range
+ * of zero to one.
+ *
+ * Creates a 4x4 perspective projection matrix that defines a frustum (a
+ * truncated pyramid) with the specified left, right, bottom, top, near, and far
+ * clipping planes. This is useful for creating asymmetric perspective
+ * projections, such as for stereo rendering or oblique projections.
+ *
  * @note RH-ZO - Right-Handed, Zero to One depth range.
+ *
+ * @tparam T The data type of the matrix elements.
+ * @tparam Option Specifies whether the matrix is row-major or column-major.
+ * @param left Coordinate of the left vertical clipping plane.
+ * @param right Coordinate of the right vertical clipping plane.
+ * @param bottom Coordinate of the bottom horizontal clipping plane.
+ * @param top Coordinate of the top horizontal clipping plane.
+ * @param nearVal Distance to the near depth clipping plane (must be positive).
+ * @param farVal Distance to the far depth clipping plane (must be positive).
+ * @return A 4x4 frustum projection matrix.
  */
 template <typename T, Options Option = Options::RowMajor>
 auto g_frustumRhZo(T left, T right, T bottom, T top, T nearVal, T farVal)
@@ -1031,9 +1502,28 @@ auto g_frustumRhZo(T left, T right, T bottom, T top, T nearVal, T farVal)
 }
 
 /**
- * Generates a right-handed frustum projection matrix with a depth range of
- * negative one to one.
+ * @brief Generates a right-handed frustum projection matrix with a depth range
+ * of negative one to one.
+ *
+ * Creates a 4x4 perspective projection matrix that defines a frustum (a
+ * truncated pyramid) using the specified left, right, bottom, top, near, and
+ * far clipping planes. This function is useful for creating asymmetric
+ * perspective projections, such as for stereo rendering or oblique projections,
+ * in a right-handed coordinate system with a depth range from -1 to 1.
+ *
  * @note RH-NO - Right-Handed, Negative One to One depth range.
+ *
+ * @tparam T The data type of the matrix elements (e.g., `float`, `double`).
+ * @tparam Option Specifies whether the matrix is row-major or column-major.
+ * @param left The coordinate for the left vertical clipping plane.
+ * @param right The coordinate for the right vertical clipping plane.
+ * @param bottom The coordinate for the bottom horizontal clipping plane.
+ * @param top The coordinate for the top horizontal clipping plane.
+ * @param nearVal The distance to the near depth clipping plane (must be
+ * positive).
+ * @param farVal The distance to the far depth clipping plane (must be
+ * positive).
+ * @return A 4x4 frustum projection matrix.
  */
 template <typename T, Options Option = Options::RowMajor>
 auto g_frustumRhNo(T left, T right, T bottom, T top, T nearVal, T farVal)
@@ -1078,9 +1568,28 @@ auto g_frustumRhNo(T left, T right, T bottom, T top, T nearVal, T farVal)
 }
 
 /**
- * Generates a left-handed frustum projection matrix with a depth range of zero
- * to one.
+ * @brief Generates a left-handed frustum projection matrix with a depth range
+ * of zero to one.
+ *
+ * Creates a 4x4 perspective projection matrix that defines a frustum (a
+ * truncated pyramid) using the specified left, right, bottom, top, near, and
+ * far clipping planes. This is useful for creating asymmetric perspective
+ * projections, such as for shadow mapping or oblique projections, in a
+ * left-handed coordinate system with a depth range from 0 to 1.
+ *
  * @note LH-ZO - Left-Handed, Zero to One depth range.
+ *
+ * @tparam T The data type of the matrix elements (e.g., `float`, `double`).
+ * @tparam Option Specifies whether the matrix is row-major or column-major.
+ * @param left The coordinate for the left vertical clipping plane.
+ * @param right The coordinate for the right vertical clipping plane.
+ * @param bottom The coordinate for the bottom horizontal clipping plane.
+ * @param top The coordinate for the top horizontal clipping plane.
+ * @param nearVal The distance to the near depth clipping plane (must be
+ * positive).
+ * @param farVal The distance to the far depth clipping plane (must be
+ * positive).
+ * @return A 4x4 frustum projection matrix.
  */
 template <typename T, Options Option = Options::RowMajor>
 auto g_frustumLhZo(T left, T right, T bottom, T top, T nearVal, T farVal)
@@ -1124,9 +1633,28 @@ auto g_frustumLhZo(T left, T right, T bottom, T top, T nearVal, T farVal)
 }
 
 /**
- * Generates a left-handed frustum projection matrix with a depth range of
- * negative one to one.
+ * @brief Generates a left-handed frustum projection matrix with a depth range
+ * of negative one to one.
+ *
+ * Creates a 4x4 perspective projection matrix that defines a frustum (a
+ * truncated pyramid) using the specified left, right, bottom, top, near, and
+ * far clipping planes. This function is useful for creating asymmetric
+ * perspective projections, such as for shadow mapping or oblique projections,
+ * in a left-handed coordinate system with a depth range from -1 to 1.
+ *
  * @note LH-NO - Left-Handed, Negative One to One depth range.
+ *
+ * @tparam T The data type of the matrix elements (e.g., `float`, `double`).
+ * @tparam Option Specifies whether the matrix is row-major or column-major.
+ * @param left The coordinate for the left vertical clipping plane.
+ * @param right The coordinate for the right vertical clipping plane.
+ * @param bottom The coordinate for the bottom horizontal clipping plane.
+ * @param top The coordinate for the top horizontal clipping plane.
+ * @param nearVal The distance to the near depth clipping plane (must be
+ * positive).
+ * @param farVal The distance to the far depth clipping plane (must be
+ * positive).
+ * @return A 4x4 frustum projection matrix.
  */
 template <typename T, Options Option = Options::RowMajor>
 auto g_frustumLhNo(T left, T right, T bottom, T top, T nearVal, T farVal)
@@ -1182,9 +1710,26 @@ auto g_frustumLhNo(T left, T right, T bottom, T top, T nearVal, T farVal)
 // near / far
 
 /**
- * Generates a left-handed orthographic projection matrix with a depth range of
- * zero to one.
+ * @brief Generates a left-handed orthographic projection matrix with a depth
+ * range of zero to one.
+ *
+ * Creates a 4x4 orthographic projection matrix using the specified left, right,
+ * bottom, top, near, and far clipping planes. This projection maintains
+ * parallel lines and is commonly used for UI rendering, CAD applications, and
+ * shadow maps in a left-handed coordinate system with a depth range from 0
+ * to 1.
+ *
  * @note LH-ZO - Left-Handed, Zero to One depth range.
+ *
+ * @tparam T The data type of the matrix elements (e.g., `float`, `double`).
+ * @tparam Option Specifies whether the matrix is row-major or column-major.
+ * @param left The coordinate for the left vertical clipping plane.
+ * @param right The coordinate for the right vertical clipping plane.
+ * @param bottom The coordinate for the bottom horizontal clipping plane.
+ * @param top The coordinate for the top horizontal clipping plane.
+ * @param nearZ The distance to the near depth clipping plane.
+ * @param farZ The distance to the far depth clipping plane.
+ * @return A 4x4 orthographic projection matrix.
  */
 template <typename T, Options Option = Options::RowMajor>
 auto g_orthoLhZo(T left, T right, T bottom, T top, T nearZ, T farZ)
@@ -1223,9 +1768,25 @@ auto g_orthoLhZo(T left, T right, T bottom, T top, T nearZ, T farZ)
 }
 
 /**
- * Generates a left-handed orthographic projection matrix with a depth range of
- * negative one to one.
+ * @brief Generates a left-handed orthographic projection matrix with a depth
+ * range of negative one to one.
+ *
+ * Creates a 4x4 orthographic projection matrix using the specified left, right,
+ * bottom, top, near, and far clipping planes. This projection maintains
+ * parallel lines and is suitable for UI rendering, CAD applications, and 2D
+ * games in a left-handed coordinate system with a depth range from -1 to 1.
+ *
  * @note LH-NO - Left-Handed, Negative One to One depth range.
+ *
+ * @tparam T The data type of the matrix elements (e.g., `float`, `double`).
+ * @tparam Option Specifies whether the matrix is row-major or column-major.
+ * @param left The coordinate for the left vertical clipping plane.
+ * @param right The coordinate for the right vertical clipping plane.
+ * @param bottom The coordinate for the bottom horizontal clipping plane.
+ * @param top The coordinate for the top horizontal clipping plane.
+ * @param nearZ The distance to the near depth clipping plane.
+ * @param farZ The distance to the far depth clipping plane.
+ * @return A 4x4 orthographic projection matrix.
  */
 template <typename T, Options Option = Options::RowMajor>
 auto g_orthoLhNo(T left, T right, T bottom, T top, T nearZ, T farZ)
@@ -1264,9 +1825,25 @@ auto g_orthoLhNo(T left, T right, T bottom, T top, T nearZ, T farZ)
 }
 
 /**
- * Generates a right-handed orthographic projection matrix with a depth range
- * of zero to one.
+ * @brief Generates a right-handed orthographic projection matrix with a depth
+ * range of zero to one.
+ *
+ * Creates a 4x4 orthographic projection matrix using the specified left, right,
+ * bottom, top, near, and far clipping planes. This projection is useful for
+ * rendering UI elements, 2D games, and CAD models in a right-handed coordinate
+ * system with a depth range from 0 to 1.
+ *
  * @note RH-ZO - Right-Handed, Zero to One depth range.
+ *
+ * @tparam T The data type of the matrix elements (e.g., `float`, `double`).
+ * @tparam Option Specifies whether the matrix is row-major or column-major.
+ * @param left The coordinate for the left vertical clipping plane.
+ * @param right The coordinate for the right vertical clipping plane.
+ * @param bottom The coordinate for the bottom horizontal clipping plane.
+ * @param top The coordinate for the top horizontal clipping plane.
+ * @param nearZ The distance to the near depth clipping plane.
+ * @param farZ The distance to the far depth clipping plane.
+ * @return A 4x4 orthographic projection matrix.
  */
 template <typename T, Options Option = Options::RowMajor>
 auto g_orthoRhZo(T left, T right, T bottom, T top, T nearZ, T farZ)
@@ -1305,9 +1882,26 @@ auto g_orthoRhZo(T left, T right, T bottom, T top, T nearZ, T farZ)
 }
 
 /**
- * Generates a right-handed orthographic projection matrix with a depth range
- * of negative one to one.
+ * @brief Generates a right-handed orthographic projection matrix with a depth
+ * range of negative one to one.
+ *
+ * Creates a 4x4 orthographic projection matrix using the specified left, right,
+ * bottom, top, near, and far clipping planes. This projection maintains
+ * parallel lines and is commonly used for rendering UI elements, 2D games, and
+ * CAD models in a right-handed coordinate system with a depth range from -1
+ * to 1.
+ *
  * @note RH-NO - Right-Handed, Negative One to One depth range.
+ *
+ * @tparam T The data type of the matrix elements (e.g., `float`, `double`).
+ * @tparam Option Specifies whether the matrix is row-major or column-major.
+ * @param left The coordinate for the left vertical clipping plane.
+ * @param right The coordinate for the right vertical clipping plane.
+ * @param bottom The coordinate for the bottom horizontal clipping plane.
+ * @param top The coordinate for the top horizontal clipping plane.
+ * @param nearZ The distance to the near depth clipping plane.
+ * @param farZ The distance to the far depth clipping plane.
+ * @return A 4x4 orthographic projection matrix.
  */
 template <typename T, Options Option = Options::RowMajor>
 auto g_orthoRhNo(T left, T right, T bottom, T top, T nearZ, T farZ)
@@ -1348,11 +1942,26 @@ auto g_orthoRhNo(T left, T right, T bottom, T top, T nearZ, T farZ)
 // TODO: remove code duplication from the functions below
 
 /**
- * Generates a left-handed orthographic projection matrix based on the given
- * width and height, with a depth range of zero to one. This simplifies setting
- * up the projection by directly specifying the viewport dimensions and the near
- * and far clipping planes.
+ * @brief Generates a left-handed orthographic projection matrix based on the
+ * given width and height, with a depth range of zero to one.
+ *
+ * This function simplifies the creation of an orthographic projection matrix by
+ * directly specifying the viewport dimensions (width and height) and the near
+ * and far clipping planes. It calculates the left, right, bottom, and top
+ * parameters internally and then calls the standard `g_orthoLhZo` function to
+ * generate the matrix. This projection is commonly used in 2D rendering and
+ * UI, particularly in graphics APIs that utilize a 0 to 1 depth range, such as
+ * DirectX.
+ *
  * @note LH-ZO - Left-Handed, Zero to One depth range.
+ *
+ * @tparam T The data type of the matrix elements (e.g., `float` or `double`).
+ * @tparam Option Specifies whether the matrix is row-major or column-major.
+ * @param width The width of the viewport.
+ * @param height The height of the viewport.
+ * @param zNear The distance to the near clipping plane.
+ * @param zFar The distance to the far clipping plane.
+ * @return A 4x4 left-handed orthographic projection matrix.
  */
 template <typename T, Options Option = Options::RowMajor>
 auto g_orthoLhZo(T width, T height, T zNear, T zFar)
@@ -1369,11 +1978,25 @@ auto g_orthoLhZo(T width, T height, T zNear, T zFar)
 }
 
 /**
- * Generates a left-handed orthographic projection matrix based on the given
- * width and height, with a depth range of negative one to one. This simplifies
- * setting up the projection by directly specifying the viewport dimensions and
- * the near and far clipping planes.
+ * @brief Generates a left-handed orthographic projection matrix based on the
+ * given width and height, with a depth range of negative one to one.
+ *
+ * This function simplifies the creation of an orthographic projection matrix by
+ * directly specifying the viewport dimensions (width and height) and the near
+ * and far clipping planes. It calculates the left, right, bottom, and top
+ * parameters internally and then calls the standard `g_orthoLhNo` function to
+ * generate the matrix. This is useful for setting up 2D rendering or UI
+ * elements in a 3D space.
+ *
  * @note LH-NO - Left-Handed, Negative One to One depth range.
+ *
+ * @tparam T The data type of the matrix elements (e.g., `float` or `double`).
+ * @tparam Option Specifies whether the matrix is row-major or column-major.
+ * @param width The width of the viewport.
+ * @param height The height of the viewport.
+ * @param zNear The distance to the near clipping plane.
+ * @param zFar The distance to the far clipping plane.
+ * @return A 4x4 left-handed orthographic projection matrix.
  */
 template <typename T, Options Option = Options::RowMajor>
 auto g_orthoLhNo(T width, T height, T zNear, T zFar)
@@ -1390,11 +2013,26 @@ auto g_orthoLhNo(T width, T height, T zNear, T zFar)
 }
 
 /**
- * Generates a right-handed orthographic projection matrix based on the given
- * width and height, with a depth range of zero to one. This simplifies setting
- * up the projection by directly specifying the viewport dimensions and the near
- * and far clipping planes.
+ * @brief Generates a right-handed orthographic projection matrix based on the
+ * given width and height, with a depth range of zero to one.
+ *
+ * This function simplifies the creation of an orthographic projection matrix by
+ * directly specifying the viewport dimensions (width and height) and the near
+ * and far clipping planes. It internally calculates the left, right, bottom,
+ * and top parameters and then calls the standard `g_orthoRhZo` function to
+ * generate the matrix. This is particularly useful for setting up orthographic
+ * projections in graphics APIs that use a depth range from 0 to 1, such as
+ * DirectX.
+ *
  * @note RH-ZO - Right-Handed, Zero to One depth range.
+ *
+ * @tparam T The data type of the matrix elements (e.g., `float` or `double`).
+ * @tparam Option Specifies whether the matrix is row-major or column-major.
+ * @param width The width of the viewport.
+ * @param height The height of the viewport.
+ * @param zNear The distance to the near clipping plane.
+ * @param zFar The distance to the far clipping plane.
+ * @return A 4x4 right-handed orthographic projection matrix.
  */
 template <typename T, Options Option = Options::RowMajor>
 auto g_orthoRhZo(T width, T height, T zNear, T zFar)
@@ -1411,11 +2049,24 @@ auto g_orthoRhZo(T width, T height, T zNear, T zFar)
 }
 
 /**
- * Generates a right-handed orthographic projection matrix based on the given
- * width and height, with a depth range of negative one to one. This simplifies
- * setting up the projection by directly specifying the viewport dimensions and
- * the near and far clipping planes.
+ * @brief Generates a right-handed orthographic projection matrix based on the
+ * given width and height, with a depth range of negative one to one.
+ *
+ * This function simplifies the setup of an orthographic projection by allowing
+ * you to specify the viewport dimensions directly. It calculates the necessary
+ * parameters internally and then calls the standard `g_orthoRhNo` function to
+ * create the projection matrix. This is useful for rendering 2D elements in a
+ * 3D space or for applications like CAD programs.
+ *
  * @note RH-NO - Right-Handed, Negative One to One depth range.
+ *
+ * @tparam T The data type of the matrix elements (e.g., `float` or `double`).
+ * @tparam Option Specifies whether the matrix is row-major or column-major.
+ * @param width The width of the viewport.
+ * @param height The height of the viewport.
+ * @param zNear The distance to the near clipping plane.
+ * @param zFar The distance to the far clipping plane.
+ * @return A 4x4 right-handed orthographic projection matrix.
  */
 template <typename T, Options Option = Options::RowMajor>
 auto g_orthoRhNo(T width, T height, T zNear, T zFar)
@@ -1438,13 +2089,25 @@ auto g_orthoRhNo(T width, T height, T zNear, T zFar)
  * @brief Transforms a 3D point using a specified transformation matrix and
  * applies perspective division.
  *
- * @param point The point to be transformed. When a Vector object is passed, it
- * is treated as a point with the homogeneous coordinate set to 1.
+ * This function multiplies a 3D point by a 4x4 transformation matrix. It first
+ * converts the 3D point into a 4D homogeneous coordinate by setting the
+ * w-component to 1. After the transformation, it performs a perspective
+ * division to convert back to 3D coordinates, which is essential when using
+ * perspective projection matrices.
  *
  * @note This function automatically applies perspective division for points
  * transformed with a perspective projection matrix. The default tolerance is
- * used for g_perspectiveDivide. Consider adding a parameter to adjust this if
+ * used for `g_perspectiveDivide`. Consider adding a parameter to adjust this if
  * needed.
+ *
+ * @tparam T The floating-point data type of the point and matrix elements
+ * (e.g., `float` or `double`).
+ * @tparam Option Specifies whether the point and matrix are row-major or
+ * column-major.
+ * @param point The 3D point to be transformed.
+ * @param matrix The 4x4 transformation matrix.
+ * @return The transformed 3D point after applying the transformation matrix and
+ * perspective division.
  */
 template <typename T, Options Option = Options::RowMajor>
   requires std::floating_point<T>
@@ -1459,6 +2122,22 @@ Point<T, 3, Option> g_transformPoint(const Point<T, 3, Option>&     point,
   return result.resizedCopy<3>();
 }
 
+/**
+ * @brief Transforms a 3D vector using a specified transformation matrix.
+ *
+ * This function multiplies a 3D vector by a 4x4 transformation matrix. It first
+ * converts the 3D vector into a 4D homogeneous coordinate by setting the
+ * w-component to 0. This ensures that the vector is only affected by the linear
+ * transformations (rotation and scaling) and not by translations in the matrix.
+ *
+ * @tparam T The data type of the vector and matrix elements (e.g., `float` or
+ * `double`).
+ * @tparam Option Specifies whether the vector and matrix are row-major or
+ * column-major.
+ * @param vector The 3D vector to be transformed.
+ * @param matrix The 4x4 transformation matrix.
+ * @return The transformed 3D vector after applying the transformation matrix.
+ */
 template <typename T, Options Option = Options::RowMajor>
 Vector<T, 3, Option> g_transformVector(const Vector<T, 3, Option>&    vector,
                                        const Matrix<T, 4, 4, Option>& matrix) {
@@ -1474,6 +2153,17 @@ Vector<T, 3, Option> g_transformVector(const Vector<T, 3, Option>&    vector,
 
 // TODO: make these constexpr
 
+/**
+ * @brief Returns a unit vector pointing upwards along the positive Y-axis.
+ *
+ * Generates a vector with all components zero except for the Y-component, which
+ * is set to one. This function requires the vector size to be at least 2.
+ *
+ * @tparam T The data type of the vector elements.
+ * @tparam Size The size of the vector (must be at least 2).
+ * @tparam Option Specifies whether the vector is row-major or column-major.
+ * @return A vector pointing upwards along the Y-axis.
+ */
 template <typename T, std::size_t Size, Options Option = Options::RowMajor>
   requires ValueAtLeast<Size, 2>
 auto g_upVector() -> const Vector<T, Size, Option> {
@@ -1482,6 +2172,18 @@ auto g_upVector() -> const Vector<T, Size, Option> {
   return vec;
 }
 
+/**
+ * @brief Returns a unit vector pointing downwards along the negative Y-axis.
+ *
+ * Generates a vector with all components zero except for the Y-component, which
+ * is set to negative one. This function requires the vector size to be at
+ * least 2.
+ *
+ * @tparam T The data type of the vector elements.
+ * @tparam Size The size of the vector (must be at least 2).
+ * @tparam Option Specifies whether the vector is row-major or column-major.
+ * @return A vector pointing downwards along the Y-axis.
+ */
 template <typename T, std::size_t Size, Options Option = Options::RowMajor>
   requires ValueAtLeast<Size, 2>
 auto g_downVector() -> const Vector<T, Size, Option> {
@@ -1490,6 +2192,18 @@ auto g_downVector() -> const Vector<T, Size, Option> {
   return vec;
 }
 
+
+/**
+ * @brief Returns a unit vector pointing to the right along the positive X-axis.
+ *
+ * Generates a vector with all components zero except for the X-component, which
+ * is set to one. This function requires the vector size to be at least 2.
+ *
+ * @tparam T The data type of the vector elements.
+ * @tparam Size The size of the vector (must be at least 2).
+ * @tparam Option Specifies whether the vector is row-major or column-major.
+ * @return A vector pointing to the right along the X-axis.
+ */
 template <typename T, std::size_t Size, Options Option = Options::RowMajor>
   requires ValueAtLeast<Size, 2>
 auto g_rightVector() -> const Vector<T, Size, Option> {
@@ -1498,6 +2212,18 @@ auto g_rightVector() -> const Vector<T, Size, Option> {
   return vec;
 }
 
+/**
+ * @brief Returns a unit vector pointing to the left along the negative X-axis.
+ *
+ * Generates a vector with all components zero except for the X-component, which
+ * is set to negative one. This function requires the vector size to be at
+ * least 2.
+ *
+ * @tparam T The data type of the vector elements.
+ * @tparam Size The size of the vector (must be at least 2).
+ * @tparam Option Specifies whether the vector is row-major or column-major.
+ * @return A vector pointing to the left along the X-axis.
+ */
 template <typename T, std::size_t Size, Options Option = Options::RowMajor>
   requires ValueAtLeast<Size, 2>
 auto g_leftVector() -> const Vector<T, Size, Option> {
@@ -1506,6 +2232,17 @@ auto g_leftVector() -> const Vector<T, Size, Option> {
   return vec;
 }
 
+/**
+ * @brief Returns a unit vector pointing forward along the positive Z-axis.
+ *
+ * Generates a vector with all components zero except for the Z-component, which
+ * is set to one. This function requires the vector size to be at least 3.
+ *
+ * @tparam T The data type of the vector elements.
+ * @tparam Size The size of the vector (must be at least 3).
+ * @tparam Option Specifies whether the vector is row-major or column-major.
+ * @return A vector pointing forward along the Z-axis.
+ */
 template <typename T, std::size_t Size, Options Option = Options::RowMajor>
   requires ValueAtLeast<Size, 3>
 auto g_forwardVector() -> const Vector<T, Size, Option> {
@@ -1514,6 +2251,18 @@ auto g_forwardVector() -> const Vector<T, Size, Option> {
   return vec;
 }
 
+/**
+ * @brief Returns a unit vector pointing backward along the negative Z-axis.
+ *
+ * Generates a vector with all components zero except for the Z-component, which
+ * is set to negative one. This function requires the vector size to be at
+ * least 3.
+ *
+ * @tparam T The data type of the vector elements.
+ * @tparam Size The size of the vector (must be at least 3).
+ * @tparam Option Specifies whether the vector is row-major or column-major.
+ * @return A vector pointing backward along the Z-axis.
+ */
 template <typename T, std::size_t Size, Options Option = Options::RowMajor>
   requires ValueAtLeast<Size, 3>
 auto g_backwardVector() -> const Vector<T, Size, Option> {
@@ -1522,16 +2271,47 @@ auto g_backwardVector() -> const Vector<T, Size, Option> {
   return vec;
 }
 
+/**
+ * @brief Returns a zero vector of the specified size.
+ *
+ * Generates a vector where all components are set to zero.
+ *
+ * @tparam T The data type of the vector elements.
+ * @tparam Size The size of the vector.
+ * @tparam Option Specifies whether the vector is row-major or column-major.
+ * @return A zero vector.
+ */
 template <typename T, std::size_t Size, Options Option = Options::RowMajor>
 auto g_zeroVector() -> const Vector<T, Size, Option> {
   return Vector<T, Size, Option>(0);
 }
 
+/**
+ * @brief Returns a vector with all components set to one.
+ *
+ * Generates a vector where all components are set to one.
+ *
+ * @tparam T The data type of the vector elements.
+ * @tparam Size The size of the vector.
+ * @tparam Option Specifies whether the vector is row-major or column-major.
+ * @return A vector with all components equal to one.
+ */
 template <typename T, std::size_t Size, Options Option = Options::RowMajor>
 auto g_oneVector() -> const Vector<T, Size, Option> {
   return Vector<T, Size, Option>(1);
 }
 
+/**
+ * @brief Returns a unit vector with all components equal, pointing diagonally.
+ *
+ * Generates a vector where all components are equal and the vector is
+ * normalized to have a magnitude of one.
+ *
+ * @tparam T The data type of the vector elements.
+ * @tparam Size The size of the vector.
+ * @tparam Option Specifies whether the vector is row-major or column-major.
+ * @return A unit vector with equal components.
+ */
 template <typename T, std::size_t Size, Options Option = Options::RowMajor>
 auto g_unitVector() -> const Vector<T, Size, Option> {
   Vector<T, Size, Option> vec(1);
