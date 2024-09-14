@@ -1638,6 +1638,274 @@ TEST(MatrixTest, GeneralizedSetBasis) {
   }
 }
 
+// Test case for the move assignment operator
+TEST(MatrixTest, MoveAssignmentOperator) {
+  math::Matrix<float, 2, 2> matrix1(1.0f, 2.0f, 3.0f, 4.0f);
+  math::Matrix<float, 2, 2> matrix2;
+  matrix2 = std::move(matrix1);
+
+  EXPECT_EQ(matrix2(0, 0), 1.0f);
+  EXPECT_EQ(matrix2(0, 1), 2.0f);
+  EXPECT_EQ(matrix2(1, 0), 3.0f);
+  EXPECT_EQ(matrix2(1, 1), 4.0f);
+}
+
+// Test case for the GetRows() static member function
+TEST(MatrixTest, GetRows) {
+  std::size_t rows = math::Matrix<float, 2, 3>::GetRows();
+  EXPECT_EQ(rows, 2);
+}
+
+// Test case for the GetColumns() static member function
+TEST(MatrixTest, GetColumns) {
+  std::size_t columns = math::Matrix<float, 2, 3>::GetColumns();
+  EXPECT_EQ(columns, 3);
+}
+
+// Test case for the GetDataSize() static member function
+TEST(MatrixTest, GetDataSize) {
+  std::size_t dataSize = math::Matrix<float, 2, 3>::GetDataSize();
+  EXPECT_EQ(dataSize, 6 * sizeof(float));
+}
+
+// Test case for the GetOption() static member function
+TEST(MatrixTest, GetOption) {
+  math::Options option = math::Matrix<float, 2, 3>::GetOption();
+  EXPECT_EQ(option, math::Options::RowMajor);
+}
+
+// Test case for the data() member function (const version)
+TEST(MatrixTest, DataFunctionConst) {
+  math::Matrix<float, 2, 2>        matrix(1.0f, 2.0f, 3.0f, 4.0f);
+  const math::Matrix<float, 2, 2>& constMatrix = matrix;
+
+  EXPECT_EQ(constMatrix.data()[0], 1.0f);
+  EXPECT_EQ(constMatrix.data()[1], 2.0f);
+  EXPECT_EQ(constMatrix.data()[2], 3.0f);
+  EXPECT_EQ(constMatrix.data()[3], 4.0f);
+}
+
+// Test case for the data() member function (non-const version)
+TEST(MatrixTest, DataFunctionNonConst) {
+  math::Matrix<float, 2, 2> matrix(1.0f, 2.0f, 3.0f, 4.0f);
+
+  EXPECT_EQ(matrix.data()[0], 1.0f);
+  EXPECT_EQ(matrix.data()[1], 2.0f);
+  EXPECT_EQ(matrix.data()[2], 3.0f);
+  EXPECT_EQ(matrix.data()[3], 4.0f);
+}
+
+// Test case for scalar multiplication
+TEST(MatrixTest, ScalarMultiplication) {
+  math::Matrix<float, 2, 2> matrix(1.0f, 2.0f, 3.0f, 4.0f);
+  math::Matrix<float, 2, 2> result = matrix * 2.0f;
+
+  EXPECT_EQ(result(0, 0), 2.0f);
+  EXPECT_EQ(result(0, 1), 4.0f);
+  EXPECT_EQ(result(1, 0), 6.0f);
+  EXPECT_EQ(result(1, 1), 8.0f);
+}
+
+// Test case for scalar division
+TEST(MatrixTest, ScalarDivision) {
+  math::Matrix<float, 2, 2> matrix(1.0f, 2.0f, 3.0f, 4.0f);
+  math::Matrix<float, 2, 2> result = matrix / 2.0f;
+
+  EXPECT_EQ(result(0, 0), 0.5f);
+  EXPECT_EQ(result(0, 1), 1.0f);
+  EXPECT_EQ(result(1, 0), 1.5f);
+  EXPECT_EQ(result(1, 1), 2.0f);
+}
+
+// Test case for matrix multiplication with non-square matrices of different
+// sizes
+TEST(MatrixTest, NonSquareMatrixMultiplication) {
+  math::Matrix<float, 2, 3> matrix1(1.0f, 2.0f, 3.0f, 4.0f, 5.0f, 6.0f);
+  math::Matrix<float, 3, 2> matrix2(7.0f, 8.0f, 9.0f, 10.0f, 11.0f, 12.0f);
+  math::Matrix<float, 2, 2> result = matrix1 * matrix2;
+
+  EXPECT_EQ(result(0, 0), 58.0f);
+  EXPECT_EQ(result(0, 1), 64.0f);
+  EXPECT_EQ(result(1, 0), 139.0f);
+  EXPECT_EQ(result(1, 1), 154.0f);
+}
+
+// Test case for matrix multiplication using the *= operator
+TEST(MatrixTest, MatrixMultiplicationAssignment) {
+  math::Matrix<float, 2, 2> matrix1(1.0f, 2.0f, 3.0f, 4.0f);
+  math::Matrix<float, 2, 2> matrix2(5.0f, 6.0f, 7.0f, 8.0f);
+  matrix1 *= matrix2;
+
+  EXPECT_EQ(matrix1(0, 0), 19.0f);
+  EXPECT_EQ(matrix1(0, 1), 22.0f);
+  EXPECT_EQ(matrix1(1, 0), 43.0f);
+  EXPECT_EQ(matrix1(1, 1), 50.0f);
+}
+
+//// Test case for matrix addition with matrices of different options (RowMajor
+//// and ColumnMajor)
+// TEST(MatrixTest, MatrixAdditionOptions) {
+//   math::Matrix<float, 2, 2, math::Options::RowMajor> matrixRow(
+//       1.0f, 2.0f, 3.0f, 4.0f);
+//   math::Matrix<float, 2, 2, math::Options::ColumnMajor> matrixCol(
+//       5.0f, 7.0f, 6.0f, 8.0f);
+//   math::Matrix<float, 2, 2, math::Options::RowMajor> result
+//       = matrixRow + matrixCol;
+//
+//   EXPECT_EQ(result(0, 0), 6.0f);
+//   EXPECT_EQ(result(0, 1), 8.0f);
+//   EXPECT_EQ(result(1, 0), 10.0f);
+//   EXPECT_EQ(result(1, 1), 12.0f);
+// }
+//
+//// Test case for matrix subtraction with matrices of different options
+///(RowMajor / and ColumnMajor)
+// TEST(MatrixTest, MatrixSubtractionOptions) {
+//   math::Matrix<float, 2, 2, math::Options::RowMajor> matrixRow(
+//       1.0f, 2.0f, 3.0f, 4.0f);
+//   math::Matrix<float, 2, 2, math::Options::ColumnMajor> matrixCol(
+//       5.0f, 7.0f, 6.0f, 8.0f);
+//   math::Matrix<float, 2, 2, math::Options::RowMajor> result
+//       = matrixRow - matrixCol;
+//
+//   EXPECT_EQ(result(0, 0), -4.0f);
+//   EXPECT_EQ(result(0, 1), -4.0f);
+//   EXPECT_EQ(result(1, 0), -4.0f);
+//   EXPECT_EQ(result(1, 1), -4.0f);
+// }
+
+// Test case for matrix negation
+TEST(MatrixTest, MatrixNegation) {
+  math::Matrix<float, 2, 2> matrix(1.0f, -2.0f, 3.0f, -4.0f);
+  math::Matrix<float, 2, 2> result = -matrix;
+
+  EXPECT_EQ(result(0, 0), -1.0f);
+  EXPECT_EQ(result(0, 1), 2.0f);
+  EXPECT_EQ(result(1, 0), -3.0f);
+  EXPECT_EQ(result(1, 1), 4.0f);
+}
+
+// Test case for matrix transposition
+TEST(MatrixTest, Transposition) {
+  math::Matrix<float, 2, 3> matrix(1.0f, 2.0f, 3.0f, 4.0f, 5.0f, 6.0f);
+  math::Matrix<float, 3, 2> transposedMatrix = matrix.transpose();
+
+  EXPECT_EQ(transposedMatrix(0, 0), 1.0f);
+  EXPECT_EQ(transposedMatrix(0, 1), 4.0f);
+  EXPECT_EQ(transposedMatrix(1, 0), 2.0f);
+  EXPECT_EQ(transposedMatrix(1, 1), 5.0f);
+  EXPECT_EQ(transposedMatrix(2, 0), 3.0f);
+  EXPECT_EQ(transposedMatrix(2, 1), 6.0f);
+}
+
+// Test case for matrix reshaping
+TEST(MatrixTest, Reshaping) {
+  math::Matrix<float, 2, 3> matrix(1.0f, 2.0f, 3.0f, 4.0f, 5.0f, 6.0f);
+  math::Matrix<float, 3, 2> reshapedMatrix = matrix.reshape<3, 2>();
+
+  EXPECT_EQ(reshapedMatrix(0, 0), 1.0f);
+  EXPECT_EQ(reshapedMatrix(0, 1), 2.0f);
+  EXPECT_EQ(reshapedMatrix(1, 0), 3.0f);
+  EXPECT_EQ(reshapedMatrix(1, 1), 4.0f);
+  EXPECT_EQ(reshapedMatrix(2, 0), 5.0f);
+  EXPECT_EQ(reshapedMatrix(2, 1), 6.0f);
+}
+
+// Test case for matrix determinant
+TEST(MatrixTest, Determinant) {
+  math::Matrix<float, 2, 2> matrix2x2(1.0f, 2.0f, 3.0f, 4.0f);
+  float                     determinant2x2 = matrix2x2.determinant();
+
+  EXPECT_FLOAT_EQ(determinant2x2, -2.0f);
+}
+
+// Test case for matrix inverse
+TEST(MatrixTest, Inverse) {
+  math::Matrix<float, 2, 2> matrix2x2(1.0f, 2.0f, 3.0f, 4.0f);
+  math::Matrix<float, 2, 2> inverse2x2 = matrix2x2.inverse();
+
+  EXPECT_FLOAT_EQ(inverse2x2(0, 0), -2.0f);
+  EXPECT_FLOAT_EQ(inverse2x2(0, 1), 1.0f);
+  EXPECT_FLOAT_EQ(inverse2x2(1, 0), 1.5f);
+  EXPECT_FLOAT_EQ(inverse2x2(1, 1), -0.5f);
+}
+
+// Test case for matrix rank calculation
+TEST(MatrixTest, MatrixRank) {
+  math::Matrix<float, 3, 3> matrixFullRank(
+      1.0f, 2.0f, 3.0f, 4.0f, 5.0f, 6.0f, 7.0f, 8.0f, 10.0f);
+  math::Matrix<float, 3, 3> matrixRank2(
+      1.0f, 2.0f, 3.0f, 4.0f, 5.0f, 6.0f, 7.0f, 8.0f, 9.0f);
+  math::Matrix<float, 3, 3> matrixRank1(
+      1.0f, 2.0f, 3.0f, 2.0f, 4.0f, 6.0f, 3.0f, 6.0f, 9.0f);
+
+  EXPECT_EQ(matrixFullRank.rank(), 3);
+  EXPECT_EQ(matrixRank2.rank(), 2);
+  EXPECT_EQ(matrixRank1.rank(), 1);
+}
+
+// Test case for matrix normalization
+TEST(MatrixTest, Normalization) {
+  math::Matrix<float, 3, 1> matrix(1.0f, 2.0f, 3.0f);
+  math::Matrix<float, 3, 1> normalized = matrix.normalized();
+  EXPECT_FLOAT_EQ(normalized(0, 0), 0.2672612419124244f);
+  EXPECT_FLOAT_EQ(normalized(1, 0), 0.5345224838248488f);
+  EXPECT_FLOAT_EQ(normalized(2, 0), 0.8017837257372732f);
+}
+
+// Test case for matrix magnitude calculation
+TEST(MatrixTest, Magnitude) {
+  math::Matrix<float, 3, 1> matrix(1.0f, 2.0f, 3.0f);
+  float                     magnitude = matrix.magnitude();
+  EXPECT_FLOAT_EQ(magnitude, 3.7416573867739413f);
+}
+
+// Test case for matrix trace calculation
+TEST(MatrixTest, MatrixTrace) {
+  math::Matrix<float, 2, 2> matrix2x2(1.0f, 2.0f, 3.0f, 4.0f);
+  float                     trace2x2 = matrix2x2.trace();
+  EXPECT_FLOAT_EQ(trace2x2, 5.0f);
+  math::Matrix<float, 3, 3> matrix3x3(
+      1.0f, 2.0f, 3.0f, 4.0f, 5.0f, 6.0f, 7.0f, 8.0f, 9.0f);
+  float trace3x3 = matrix3x3.trace();
+  EXPECT_FLOAT_EQ(trace3x3, 15.0f);
+}
+
+// Test case for dimension comparison operators (<, >, <=, >=) with different
+// dimension sizes and element types
+TEST(DimensionTest, ComparisonOperators) {
+  math::Dimension2Df dim1(1.0f, 2.0f);
+  math::Dimension2Df dim2(3.0f, 4.0f);
+  math::Dimension2Df dim3(1.0f, 2.0f);
+
+  EXPECT_TRUE(dim1 < dim2);
+  EXPECT_FALSE(dim2 < dim1);
+  EXPECT_TRUE(dim1 <= dim2);
+  EXPECT_FALSE(dim2 <= dim1);
+  EXPECT_TRUE(dim2 > dim1);
+  EXPECT_FALSE(dim1 > dim2);
+  EXPECT_TRUE(dim2 >= dim1);
+  EXPECT_FALSE(dim1 >= dim2);
+  EXPECT_TRUE(dim1 <= dim3);
+  EXPECT_TRUE(dim1 >= dim3);
+}
+
+// Test case for dimension resizing with different target sizes
+TEST(DimensionTest, Resizing) {
+  math::Dimension3Df dim(1.0f, 2.0f, 3.0f);
+  math::Dimension2Df resizedDim = dim.resizedCopy<2>();
+
+  EXPECT_FLOAT_EQ(resizedDim.width(), 1.0f);
+  EXPECT_FLOAT_EQ(resizedDim.height(), 2.0f);
+
+  math::Dimension4Df resizedDim2 = dim.resizedCopy<4>();
+
+  EXPECT_FLOAT_EQ(resizedDim2.width(), 1.0f);
+  EXPECT_FLOAT_EQ(resizedDim2.height(), 2.0f);
+  EXPECT_FLOAT_EQ(resizedDim2.depth(), 3.0f);
+  EXPECT_FLOAT_EQ(resizedDim2.coeff(3), 0.0f);
+}
+
 // ============================== DOUBLE ==================================
 
 // Matrix equality with very small numbers
