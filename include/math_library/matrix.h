@@ -596,7 +596,7 @@ class Matrix {
   }
 
   /**
-   * \brief Calculates the Frobenius norm (magnitude) of a matrix.
+   * \brief Calculates the Frobenius (Euclidean) norm (magnitude) of a matrix.
    */
   [[nodiscard]] auto magnitude() const -> T
     requires OneDimensional<Rows, Columns>
@@ -615,8 +615,8 @@ class Matrix {
   }
 
   /**
-   * \brief Calculates the squared Frobenius norm (squared magnitude) of a
-   * matrix.
+   * \brief Calculates the squared Frobenius (Euclidean) norm (squared
+   * magnitude) of a matrix.
    */
   [[nodiscard]] auto magnitudeSquared() const -> T
     requires OneDimensional<Rows, Columns>
@@ -635,7 +635,8 @@ class Matrix {
   }
 
   /**
-   * @brief Normalizes the matrix based on its Frobenius norm (in-place).
+   * @brief Normalizes the matrix based on its Frobenius (Euclidean) norm
+   * (in-place).
    *
    * @note This method modifies the matrix itself.
    */
@@ -648,7 +649,8 @@ class Matrix {
   }
 
   /**
-   * @brief Normalizes the matrix based on its Frobenius norm (non-in-place).
+   * @brief Normalizes the matrix based on its Frobenius (Euclidean) norm
+   * (non-in-place).
    *
    * @return A new normalized matrix.
    */
