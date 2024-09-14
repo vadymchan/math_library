@@ -4599,6 +4599,158 @@ TEST(MatrixTest, CrossProductUint32TRandom) {
 // TODO: add more non trivial view matrix constructions
 // ========================== GRAPHICS ==============================
 
+// Test case for g_translate function with different translation values
+TEST(GraphicsTest, Translate) {
+  math::Matrix4f matrix = math::g_translate(1.0f, 2.0f, 3.0f);
+
+  EXPECT_FLOAT_EQ(matrix(0, 0), 1.0f);
+  EXPECT_FLOAT_EQ(matrix(1, 1), 1.0f);
+  EXPECT_FLOAT_EQ(matrix(2, 2), 1.0f);
+  EXPECT_FLOAT_EQ(matrix(3, 0), 1.0f);
+  EXPECT_FLOAT_EQ(matrix(3, 1), 2.0f);
+  EXPECT_FLOAT_EQ(matrix(3, 2), 3.0f);
+  EXPECT_FLOAT_EQ(matrix(3, 3), 1.0f);
+}
+
+// Test case for g_scale function with different scaling values
+TEST(GraphicsTest, Scale) {
+  math::Matrix4f matrix = math::g_scale(2.0f, 3.0f, 4.0f);
+
+  EXPECT_FLOAT_EQ(matrix(0, 0), 2.0f);
+  EXPECT_FLOAT_EQ(matrix(1, 1), 3.0f);
+  EXPECT_FLOAT_EQ(matrix(2, 2), 4.0f);
+  EXPECT_FLOAT_EQ(matrix(3, 3), 1.0f);
+}
+
+// Test case for g_rotateRh function with different rotation values
+TEST(GraphicsTest, RotateRh) {
+  float angleX = math::g_kPi / 4.0f;
+  float angleY = math::g_kPi / 3.0f;
+  float angleZ = math::g_kPi / 2.0f;
+
+  math::Matrix4f matrix = math::g_rotateRh(angleX, angleY, angleZ);
+
+  EXPECT_NEAR(matrix(0, 0), 0.612372458f, 1e-5);
+  EXPECT_NEAR(matrix(0, 1), 0.707106769f, 1e-5);
+  EXPECT_NEAR(matrix(0, 2), 0.353553385f, 1e-5);
+  EXPECT_NEAR(matrix(1, 0), -0.5f, 1e-5);
+  EXPECT_NEAR(matrix(1, 1), 0.0f, 1e-5);
+  EXPECT_NEAR(matrix(1, 2), 0.866025448f, 1e-5);
+  EXPECT_NEAR(matrix(2, 0), 0.612372458f, 1e-5);
+  EXPECT_NEAR(matrix(2, 1), -0.707106769f, 1e-5);
+  EXPECT_NEAR(matrix(2, 2), 0.353553355f, 1e-5);
+}
+
+// Test case for g_lookAtRh function with different eye, target, and up vectors
+TEST(GraphicsTest, LookAtRh) {
+  math::Vector3Df eye(0.0f, 0.0f, 5.0f);
+  math::Vector3Df target(0.0f, 0.0f, 0.0f);
+  math::Vector3Df up(0.0f, 1.0f, 0.0f);
+
+  math::Matrix4f matrix = math::g_lookAtRh(eye, target, up);
+
+  EXPECT_FLOAT_EQ(matrix(0, 0), -1.0f);
+  EXPECT_FLOAT_EQ(matrix(1, 1), 1.0f);
+  EXPECT_FLOAT_EQ(matrix(2, 2), 1.0f);
+  EXPECT_FLOAT_EQ(matrix(3, 2), 5.0f);
+}
+
+// Test case for g_lookToRh function with different eye, direction, and up
+// vectors
+TEST(GraphicsTest, LookToRh) {
+  math::Vector3Df eye(0.0f, 0.0f, 5.0f);
+  math::Vector3Df direction(0.0f, 0.0f, -1.0f);
+  math::Vector3Df up(0.0f, 1.0f, 0.0f);
+
+  math::Matrix4f matrix = math::g_lookToRh(eye, direction, up);
+
+  EXPECT_FLOAT_EQ(matrix(0, 0), -1.0f);
+  EXPECT_FLOAT_EQ(matrix(1, 1), 1.0f);
+  EXPECT_FLOAT_EQ(matrix(2, 2), 1.0f);
+  EXPECT_FLOAT_EQ(matrix(3, 2), 5.0f);
+}
+
+// Test case for g_transformPoint function
+TEST(GraphicsTest, TransformPoint) {
+  math::Point3Df  point(1.0f, 2.0f, 3.0f);
+  math::Matrix4f matrix(1.0f,
+                        0.0f,
+                        0.0f,
+                        0.0f,
+                        0.0f,
+                        1.0f,
+                        0.0f,
+                        0.0f,
+                        0.0f,
+                        0.0f,
+                        1.0f,
+                        0.0f,
+                        4.0f,
+                        5.0f,
+                        6.0f,
+                        1.0f);
+
+  math::Point3Df result = math::g_transformPoint(point, matrix);
+
+  EXPECT_FLOAT_EQ(result(0), 5.0f);
+  EXPECT_FLOAT_EQ(result(1), 7.0f);
+  EXPECT_FLOAT_EQ(result(2), 9.0f);
+}
+
+// Test case for g_transformPoint function with perspective division
+TEST(GraphicsTest, TransformPointWithPerspectiveDivision) {
+  math::Point3Df  point(1.0f, 2.0f, 3.0f);
+  math::Matrix4f matrix(1.0f,
+                        0.0f,
+                        0.0f,
+                        0.0f,
+                        0.0f,
+                        1.0f,
+                        0.0f,
+                        0.0f,
+                        0.0f,
+                        0.0f,
+                        1.0f,
+                        1.0f,
+                        0.0f,
+                        0.0f,
+                        0.0f,
+                        1.0f);
+
+  math::Point3Df result = math::g_transformPoint(point, matrix);
+
+  EXPECT_FLOAT_EQ(result(0), 0.25f);
+  EXPECT_FLOAT_EQ(result(1), 0.5f);
+  EXPECT_FLOAT_EQ(result(2), 0.75f);
+}
+
+// Test case for g_transformVector function
+TEST(GraphicsTest, TransformVector) {
+  math::Vector3Df vector(1.0f, 2.0f, 3.0f);
+  math::Matrix4f matrix(2.0f,
+                        0.0f,
+                        0.0f,
+                        0.0f,
+                        0.0f,
+                        3.0f,
+                        0.0f,
+                        0.0f,
+                        0.0f,
+                        0.0f,
+                        4.0f,
+                        0.0f,
+                        0.0f,
+                        0.0f,
+                        0.0f,
+                        1.0f);
+
+  math::Vector3Df result = math::g_transformVector(vector, matrix);
+
+  EXPECT_FLOAT_EQ(result(0), 2.0f);
+  EXPECT_FLOAT_EQ(result(1), 6.0f);
+  EXPECT_FLOAT_EQ(result(2), 12.0f);
+}
+
 TEST(ViewMatrixTest, LookAtRhRowMajor) {
   math::Vector3D<float> eye{0.0f, 0.0f, 1.0f};
   math::Vector3D<float> target{0.0f, 0.0f, 0.0f};
@@ -4863,6 +5015,546 @@ TEST(ViewMatrixTest, LookToLhColumnMajor) {
   EXPECT_FLOAT_EQ(viewMatrix(3, 1), 0.0f);
   EXPECT_FLOAT_EQ(viewMatrix(3, 2), 0.0f);
   EXPECT_FLOAT_EQ(viewMatrix(3, 3), 1.0f);
+}
+
+// Test case for lookAtRh
+TEST(LookAtTest, LookAtRhFloat) {
+  math::Vector3Df eye(0.0f, 0.0f, 5.0f);
+  math::Vector3Df target(0.0f, 0.0f, 0.0f);
+  math::Vector3Df up(0.0f, 1.0f, 0.0f);
+  math::Matrix4f  viewMatrix = math::g_lookAtRh(eye, target, up);
+
+  EXPECT_FLOAT_EQ(viewMatrix(0, 0), -1.0f);
+  EXPECT_FLOAT_EQ(viewMatrix(0, 1), 0.0f);
+  EXPECT_FLOAT_EQ(viewMatrix(0, 2), 0.0f);
+  EXPECT_FLOAT_EQ(viewMatrix(0, 3), 0.0f);
+  EXPECT_FLOAT_EQ(viewMatrix(1, 0), 0.0f);
+  EXPECT_FLOAT_EQ(viewMatrix(1, 1), 1.0f);
+  EXPECT_FLOAT_EQ(viewMatrix(1, 2), 0.0f);
+  EXPECT_FLOAT_EQ(viewMatrix(1, 3), 0.0f);
+  EXPECT_FLOAT_EQ(viewMatrix(2, 0), 0.0f);
+  EXPECT_FLOAT_EQ(viewMatrix(2, 1), 0.0f);
+  EXPECT_FLOAT_EQ(viewMatrix(2, 2), 1.0f);
+  EXPECT_FLOAT_EQ(viewMatrix(2, 3), 0.0f);
+  EXPECT_FLOAT_EQ(viewMatrix(3, 0), 0.0f);
+  EXPECT_FLOAT_EQ(viewMatrix(3, 1), 0.0f);
+  EXPECT_FLOAT_EQ(viewMatrix(3, 2), 5.0f);
+  EXPECT_FLOAT_EQ(viewMatrix(3, 3), 1.0f);
+}
+
+// Test case for lookAtLh
+TEST(LookAtTest, LookAtLhFloat) {
+  math::Vector3Df eye(0.0f, 0.0f, 5.0f);
+  math::Vector3Df target(0.0f, 0.0f, 0.0f);
+  math::Vector3Df up(0.0f, 1.0f, 0.0f);
+  math::Matrix4f  viewMatrix = math::g_lookAtLh(eye, target, up);
+
+  EXPECT_FLOAT_EQ(viewMatrix(0, 0), -1.0f);
+  EXPECT_FLOAT_EQ(viewMatrix(0, 1), 0.0f);
+  EXPECT_FLOAT_EQ(viewMatrix(0, 2), 0.0f);
+  EXPECT_FLOAT_EQ(viewMatrix(0, 3), 0.0f);
+  EXPECT_FLOAT_EQ(viewMatrix(1, 0), 0.0f);
+  EXPECT_FLOAT_EQ(viewMatrix(1, 1), 1.0f);
+  EXPECT_FLOAT_EQ(viewMatrix(1, 2), 0.0f);
+  EXPECT_FLOAT_EQ(viewMatrix(1, 3), 0.0f);
+  EXPECT_FLOAT_EQ(viewMatrix(2, 0), 0.0f);
+  EXPECT_FLOAT_EQ(viewMatrix(2, 1), 0.0f);
+  EXPECT_FLOAT_EQ(viewMatrix(2, 2), -1.0f);
+  EXPECT_FLOAT_EQ(viewMatrix(2, 3), 0.0f);
+  EXPECT_FLOAT_EQ(viewMatrix(3, 0), 0.0f);
+  EXPECT_FLOAT_EQ(viewMatrix(3, 1), 0.0f);
+  EXPECT_FLOAT_EQ(viewMatrix(3, 2), 5.0f);
+  EXPECT_FLOAT_EQ(viewMatrix(3, 3), 1.0f);
+}
+
+// Test case for lookToRh
+TEST(LookAtTest, LookToRhFloat) {
+  math::Vector3Df eye(0.0f, 0.0f, 5.0f);
+  math::Vector3Df direction(0.0f, 0.0f, -1.0f);
+  math::Vector3Df up(0.0f, 1.0f, 0.0f);
+  math::Matrix4f  viewMatrix = math::g_lookToRh(eye, direction, up);
+
+  EXPECT_FLOAT_EQ(viewMatrix(0, 0), -1.0f);
+  EXPECT_FLOAT_EQ(viewMatrix(0, 1), 0.0f);
+  EXPECT_FLOAT_EQ(viewMatrix(0, 2), 0.0f);
+  EXPECT_FLOAT_EQ(viewMatrix(0, 3), 0.0f);
+  EXPECT_FLOAT_EQ(viewMatrix(1, 0), 0.0f);
+  EXPECT_FLOAT_EQ(viewMatrix(1, 1), 1.0f);
+  EXPECT_FLOAT_EQ(viewMatrix(1, 2), 0.0f);
+  EXPECT_FLOAT_EQ(viewMatrix(1, 3), 0.0f);
+  EXPECT_FLOAT_EQ(viewMatrix(2, 0), 0.0f);
+  EXPECT_FLOAT_EQ(viewMatrix(2, 1), 0.0f);
+  EXPECT_FLOAT_EQ(viewMatrix(2, 2), 1.0f);
+  EXPECT_FLOAT_EQ(viewMatrix(2, 3), 0.0f);
+  EXPECT_FLOAT_EQ(viewMatrix(3, 0), 0.0f);
+  EXPECT_FLOAT_EQ(viewMatrix(3, 1), 0.0f);
+  EXPECT_FLOAT_EQ(viewMatrix(3, 2), 5.0f);
+  EXPECT_FLOAT_EQ(viewMatrix(3, 3), 1.0f);
+}
+
+// Test case for lookToLh
+TEST(LookAtTest, LookToLhFloat) {
+  math::Vector3Df eye(0.0f, 0.0f, 5.0f);
+  math::Vector3Df direction(0.0f, 0.0f, -1.0f);
+  math::Vector3Df up(0.0f, 1.0f, 0.0f);
+  math::Matrix4f  viewMatrix = math::g_lookToLh(eye, direction, up);
+
+  EXPECT_FLOAT_EQ(viewMatrix(0, 0), -1.0f);
+  EXPECT_FLOAT_EQ(viewMatrix(0, 1), 0.0f);
+  EXPECT_FLOAT_EQ(viewMatrix(0, 2), 0.0f);
+  EXPECT_FLOAT_EQ(viewMatrix(0, 3), 0.0f);
+  EXPECT_FLOAT_EQ(viewMatrix(1, 0), 0.0f);
+  EXPECT_FLOAT_EQ(viewMatrix(1, 1), 1.0f);
+  EXPECT_FLOAT_EQ(viewMatrix(1, 2), 0.0f);
+  EXPECT_FLOAT_EQ(viewMatrix(1, 3), 0.0f);
+  EXPECT_FLOAT_EQ(viewMatrix(2, 0), 0.0f);
+  EXPECT_FLOAT_EQ(viewMatrix(2, 1), 0.0f);
+  EXPECT_FLOAT_EQ(viewMatrix(2, 2), -1.0f);
+  EXPECT_FLOAT_EQ(viewMatrix(2, 3), 0.0f);
+  EXPECT_FLOAT_EQ(viewMatrix(3, 0), 0.0f);
+  EXPECT_FLOAT_EQ(viewMatrix(3, 1), 0.0f);
+  EXPECT_FLOAT_EQ(viewMatrix(3, 2), 5.0f);
+  EXPECT_FLOAT_EQ(viewMatrix(3, 3), 1.0f);
+}
+
+// Test case for perspectiveRhNo
+TEST(PerspectiveTest, PerspectiveRhNoFloat) {
+  constexpr float fovY   = math::g_degreeToRadian(45.0f);
+  constexpr float aspect = 1.0f;
+  constexpr float nearZ  = 0.1f;
+  constexpr float farZ   = 100.0f;
+  math::Matrix4f  projMatrix
+      = math::g_perspectiveRhNo(fovY, aspect, nearZ, farZ);
+
+  EXPECT_NEAR(projMatrix(0, 0), 2.4142134f, 1e-6f);
+  EXPECT_NEAR(projMatrix(0, 1), 0.0f, 1e-6f);
+  EXPECT_NEAR(projMatrix(0, 2), 0.0f, 1e-6f);
+  EXPECT_NEAR(projMatrix(0, 3), 0.0f, 1e-6f);
+  EXPECT_NEAR(projMatrix(1, 0), 0.0f, 1e-6f);
+  EXPECT_NEAR(projMatrix(1, 1), 2.4142134f, 1e-6f);
+  EXPECT_NEAR(projMatrix(1, 2), 0.0f, 1e-6f);
+  EXPECT_NEAR(projMatrix(1, 3), 0.0f, 1e-6f);
+  EXPECT_NEAR(projMatrix(2, 0), 0.0f, 1e-6f);
+  EXPECT_NEAR(projMatrix(2, 1), 0.0f, 1e-6f);
+  EXPECT_NEAR(projMatrix(2, 2), -1.002002f, 1e-6f);
+  EXPECT_NEAR(projMatrix(2, 3), -1.0f, 1e-6f);
+  EXPECT_NEAR(projMatrix(3, 0), 0.0f, 1e-6f);
+  EXPECT_NEAR(projMatrix(3, 1), 0.0f, 1e-6f);
+  EXPECT_NEAR(projMatrix(3, 2), -0.2002002f, 1e-6f);
+  EXPECT_NEAR(projMatrix(3, 3), 0.0f, 1e-6f);
+}
+
+// Test case for perspectiveRhZo
+TEST(PerspectiveTest, PerspectiveRhZoFloat) {
+  float          fovY   = math::g_degreeToRadian(45.0f);
+  float          aspect = 1.0f;
+  float          nearZ  = 0.1f;
+  float          farZ   = 100.0f;
+  math::Matrix4f projMatrix
+      = math::g_perspectiveRhZo(fovY, aspect, nearZ, farZ);
+
+  EXPECT_FLOAT_EQ(projMatrix(0, 0), 2.4142134f);
+  EXPECT_FLOAT_EQ(projMatrix(0, 1), 0.0f);
+  EXPECT_FLOAT_EQ(projMatrix(0, 2), 0.0f);
+  EXPECT_FLOAT_EQ(projMatrix(0, 3), 0.0f);
+  EXPECT_FLOAT_EQ(projMatrix(1, 0), 0.0f);
+  EXPECT_FLOAT_EQ(projMatrix(1, 1), 2.4142134f);
+  EXPECT_FLOAT_EQ(projMatrix(1, 2), 0.0f);
+  EXPECT_FLOAT_EQ(projMatrix(1, 3), 0.0f);
+  EXPECT_FLOAT_EQ(projMatrix(2, 0), 0.0f);
+  EXPECT_FLOAT_EQ(projMatrix(2, 1), 0.0f);
+  EXPECT_FLOAT_EQ(projMatrix(2, 2), -1.001001f);
+  EXPECT_FLOAT_EQ(projMatrix(2, 3), -1.0f);
+  EXPECT_FLOAT_EQ(projMatrix(3, 0), 0.0f);
+  EXPECT_FLOAT_EQ(projMatrix(3, 1), 0.0f);
+  EXPECT_FLOAT_EQ(projMatrix(3, 2), -0.1001001f);
+  EXPECT_FLOAT_EQ(projMatrix(3, 3), 0.0f);
+}
+
+// Test case for perspectiveLhNo
+TEST(PerspectiveTest, PerspectiveLhNoFloat) {
+  float          fovY   = math::g_degreeToRadian(45.0f);
+  float          aspect = 1.0f;
+  float          nearZ  = 0.1f;
+  float          farZ   = 100.0f;
+  math::Matrix4f projMatrix
+      = math::g_perspectiveLhNo(fovY, aspect, nearZ, farZ);
+
+  EXPECT_FLOAT_EQ(projMatrix(0, 0), 2.4142134f);
+  EXPECT_FLOAT_EQ(projMatrix(0, 1), 0.0f);
+  EXPECT_FLOAT_EQ(projMatrix(0, 2), 0.0f);
+  EXPECT_FLOAT_EQ(projMatrix(0, 3), 0.0f);
+  EXPECT_FLOAT_EQ(projMatrix(1, 0), 0.0f);
+  EXPECT_FLOAT_EQ(projMatrix(1, 1), 2.4142134f);
+  EXPECT_FLOAT_EQ(projMatrix(1, 2), 0.0f);
+  EXPECT_FLOAT_EQ(projMatrix(1, 3), 0.0f);
+  EXPECT_FLOAT_EQ(projMatrix(2, 0), 0.0f);
+  EXPECT_FLOAT_EQ(projMatrix(2, 1), 0.0f);
+  EXPECT_FLOAT_EQ(projMatrix(2, 2), 1.002002f);
+  EXPECT_FLOAT_EQ(projMatrix(2, 3), 1.0f);
+  EXPECT_FLOAT_EQ(projMatrix(3, 0), 0.0f);
+  EXPECT_FLOAT_EQ(projMatrix(3, 1), 0.0f);
+  EXPECT_FLOAT_EQ(projMatrix(3, 2), -0.2002002f);
+  EXPECT_FLOAT_EQ(projMatrix(3, 3), 0.0f);
+}
+
+// Test case for perspectiveLhZo
+TEST(PerspectiveTest, PerspectiveLhZoFloat) {
+  float          fovY   = math::g_degreeToRadian(45.0f);
+  float          aspect = 1.0f;
+  float          nearZ  = 0.1f;
+  float          farZ   = 100.0f;
+  math::Matrix4f projMatrix
+      = math::g_perspectiveLhZo(fovY, aspect, nearZ, farZ);
+
+  EXPECT_FLOAT_EQ(projMatrix(0, 0), 2.4142134f);
+  EXPECT_FLOAT_EQ(projMatrix(0, 1), 0.0f);
+  EXPECT_FLOAT_EQ(projMatrix(0, 2), 0.0f);
+  EXPECT_FLOAT_EQ(projMatrix(0, 3), 0.0f);
+  EXPECT_FLOAT_EQ(projMatrix(1, 0), 0.0f);
+  EXPECT_FLOAT_EQ(projMatrix(1, 1), 2.4142134f);
+  EXPECT_FLOAT_EQ(projMatrix(1, 2), 0.0f);
+  EXPECT_FLOAT_EQ(projMatrix(1, 3), 0.0f);
+  EXPECT_FLOAT_EQ(projMatrix(2, 0), 0.0f);
+  EXPECT_FLOAT_EQ(projMatrix(2, 1), 0.0f);
+  EXPECT_FLOAT_EQ(projMatrix(2, 2), 1.001001f);
+  EXPECT_FLOAT_EQ(projMatrix(2, 3), 1.0f);
+  EXPECT_FLOAT_EQ(projMatrix(3, 0), 0.0f);
+  EXPECT_FLOAT_EQ(projMatrix(3, 1), 0.0f);
+  EXPECT_FLOAT_EQ(projMatrix(3, 2), -0.1001001f);
+  EXPECT_FLOAT_EQ(projMatrix(3, 3), 0.0f);
+}
+
+// Test case for perspectiveRhNoInf
+TEST(PerspectiveInfTest, PerspectiveRhNoInfFloat) {
+  float          fovY       = math::g_degreeToRadian(45.0f);
+  float          aspect     = 1.0f;
+  float          nearZ      = 0.1f;
+  math::Matrix4f projMatrix = math::g_perspectiveRhNoInf(fovY, aspect, nearZ);
+
+  EXPECT_FLOAT_EQ(projMatrix(0, 0), 2.4142134f);
+  EXPECT_FLOAT_EQ(projMatrix(0, 1), 0.0f);
+  EXPECT_FLOAT_EQ(projMatrix(0, 2), 0.0f);
+  EXPECT_FLOAT_EQ(projMatrix(0, 3), 0.0f);
+  EXPECT_FLOAT_EQ(projMatrix(1, 0), 0.0f);
+  EXPECT_FLOAT_EQ(projMatrix(1, 1), 2.4142134f);
+  EXPECT_FLOAT_EQ(projMatrix(1, 2), 0.0f);
+  EXPECT_FLOAT_EQ(projMatrix(1, 3), 0.0f);
+  EXPECT_FLOAT_EQ(projMatrix(2, 0), 0.0f);
+  EXPECT_FLOAT_EQ(projMatrix(2, 1), 0.0f);
+  EXPECT_FLOAT_EQ(projMatrix(2, 2), -1.0f);
+  EXPECT_FLOAT_EQ(projMatrix(2, 3), -1.0f);
+  EXPECT_FLOAT_EQ(projMatrix(3, 0), 0.0f);
+  EXPECT_FLOAT_EQ(projMatrix(3, 1), 0.0f);
+  EXPECT_FLOAT_EQ(projMatrix(3, 2), -0.2f);
+  EXPECT_FLOAT_EQ(projMatrix(3, 3), 0.0f);
+}
+
+// Test case for perspectiveRhZoInf
+TEST(PerspectiveInfTest, PerspectiveRhZoInfFloat) {
+  float          fovY       = math::g_degreeToRadian(45.0f);
+  float          aspect     = 1.0f;
+  float          nearZ      = 0.1f;
+  math::Matrix4f projMatrix = math::g_perspectiveRhZoInf(fovY, aspect, nearZ);
+
+  EXPECT_FLOAT_EQ(projMatrix(0, 0), 2.4142134f);
+  EXPECT_FLOAT_EQ(projMatrix(0, 1), 0.0f);
+  EXPECT_FLOAT_EQ(projMatrix(0, 2), 0.0f);
+  EXPECT_FLOAT_EQ(projMatrix(0, 3), 0.0f);
+  EXPECT_FLOAT_EQ(projMatrix(1, 0), 0.0f);
+  EXPECT_FLOAT_EQ(projMatrix(1, 1), 2.4142134f);
+  EXPECT_FLOAT_EQ(projMatrix(1, 2), 0.0f);
+  EXPECT_FLOAT_EQ(projMatrix(1, 3), 0.0f);
+  EXPECT_FLOAT_EQ(projMatrix(2, 0), 0.0f);
+  EXPECT_FLOAT_EQ(projMatrix(2, 1), 0.0f);
+  EXPECT_FLOAT_EQ(projMatrix(2, 2), -1.0f);
+  EXPECT_FLOAT_EQ(projMatrix(2, 3), -1.0f);
+  EXPECT_FLOAT_EQ(projMatrix(3, 0), 0.0f);
+  EXPECT_FLOAT_EQ(projMatrix(3, 1), 0.0f);
+  EXPECT_FLOAT_EQ(projMatrix(3, 2), -0.1f);
+  EXPECT_FLOAT_EQ(projMatrix(3, 3), 0.0f);
+}
+
+// Test case for perspectiveLhNoInf
+TEST(PerspectiveInfTest, PerspectiveLhNoInfFloat) {
+  float          fovY       = math::g_degreeToRadian(45.0f);
+  float          aspect     = 1.0f;
+  float          nearZ      = 0.1f;
+  math::Matrix4f projMatrix = math::g_perspectiveLhNoInf(fovY, aspect, nearZ);
+
+  EXPECT_FLOAT_EQ(projMatrix(0, 0), 2.4142134f);
+  EXPECT_FLOAT_EQ(projMatrix(0, 1), 0.0f);
+  EXPECT_FLOAT_EQ(projMatrix(0, 2), 0.0f);
+  EXPECT_FLOAT_EQ(projMatrix(0, 3), 0.0f);
+  EXPECT_FLOAT_EQ(projMatrix(1, 0), 0.0f);
+  EXPECT_FLOAT_EQ(projMatrix(1, 1), 2.4142134f);
+  EXPECT_FLOAT_EQ(projMatrix(1, 2), 0.0f);
+  EXPECT_FLOAT_EQ(projMatrix(1, 3), 0.0f);
+  EXPECT_FLOAT_EQ(projMatrix(2, 0), 0.0f);
+  EXPECT_FLOAT_EQ(projMatrix(2, 1), 0.0f);
+  EXPECT_FLOAT_EQ(projMatrix(2, 2), 1.0f);
+  EXPECT_FLOAT_EQ(projMatrix(2, 3), 1.0f);
+  EXPECT_FLOAT_EQ(projMatrix(3, 0), 0.0f);
+  EXPECT_FLOAT_EQ(projMatrix(3, 1), 0.0f);
+  EXPECT_FLOAT_EQ(projMatrix(3, 2), -0.2f);
+  EXPECT_FLOAT_EQ(projMatrix(3, 3), 0.0f);
+}
+
+// Test case for perspectiveLhZoInf
+TEST(PerspectiveInfTest, PerspectiveLhZoInfFloat) {
+  float          fovY       = math::g_degreeToRadian(45.0f);
+  float          aspect     = 1.0f;
+  float          nearZ      = 0.1f;
+  math::Matrix4f projMatrix = math::g_perspectiveLhZoInf(fovY, aspect, nearZ);
+
+  EXPECT_FLOAT_EQ(projMatrix(0, 0), 2.4142134f);
+  EXPECT_FLOAT_EQ(projMatrix(0, 1), 0.0f);
+  EXPECT_FLOAT_EQ(projMatrix(0, 2), 0.0f);
+  EXPECT_FLOAT_EQ(projMatrix(0, 3), 0.0f);
+  EXPECT_FLOAT_EQ(projMatrix(1, 0), 0.0f);
+  EXPECT_FLOAT_EQ(projMatrix(1, 1), 2.4142134f);
+  EXPECT_FLOAT_EQ(projMatrix(1, 2), 0.0f);
+  EXPECT_FLOAT_EQ(projMatrix(1, 3), 0.0f);
+  EXPECT_FLOAT_EQ(projMatrix(2, 0), 0.0f);
+  EXPECT_FLOAT_EQ(projMatrix(2, 1), 0.0f);
+  EXPECT_FLOAT_EQ(projMatrix(2, 2), 1.0f);
+  EXPECT_FLOAT_EQ(projMatrix(2, 3), 1.0f);
+  EXPECT_FLOAT_EQ(projMatrix(3, 0), 0.0f);
+  EXPECT_FLOAT_EQ(projMatrix(3, 1), 0.0f);
+  EXPECT_FLOAT_EQ(projMatrix(3, 2), -0.1f);
+  EXPECT_FLOAT_EQ(projMatrix(3, 3), 0.0f);
+}
+
+// Test case for frustumRhZo
+TEST(FrustumTest, FrustumRhZoFloat) {
+  float          left    = -1.0f;
+  float          right   = 1.0f;
+  float          bottom  = -1.0f;
+  float          top     = 1.0f;
+  float          nearVal = 1.0f;
+  float          farVal  = 10.0f;
+  math::Matrix4f frustumMatrix
+      = math::g_frustumRhZo(left, right, bottom, top, nearVal, farVal);
+
+  EXPECT_FLOAT_EQ(frustumMatrix(0, 0), 1.0f);
+  EXPECT_FLOAT_EQ(frustumMatrix(0, 1), 0.0f);
+  EXPECT_FLOAT_EQ(frustumMatrix(0, 2), 0.0f);
+  EXPECT_FLOAT_EQ(frustumMatrix(0, 3), 0.0f);
+  EXPECT_FLOAT_EQ(frustumMatrix(1, 0), 0.0f);
+  EXPECT_FLOAT_EQ(frustumMatrix(1, 1), 1.0f);
+  EXPECT_FLOAT_EQ(frustumMatrix(1, 2), 0.0f);
+  EXPECT_FLOAT_EQ(frustumMatrix(1, 3), 0.0f);
+  EXPECT_FLOAT_EQ(frustumMatrix(2, 0), 0.0f);
+  EXPECT_FLOAT_EQ(frustumMatrix(2, 1), 0.0f);
+  EXPECT_FLOAT_EQ(frustumMatrix(2, 2), -1.1111112f);
+  EXPECT_FLOAT_EQ(frustumMatrix(2, 3), -1.0f);
+  EXPECT_FLOAT_EQ(frustumMatrix(3, 0), 0.0f);
+  EXPECT_FLOAT_EQ(frustumMatrix(3, 1), 0.0f);
+  EXPECT_FLOAT_EQ(frustumMatrix(3, 2), -1.1111112f);
+  EXPECT_FLOAT_EQ(frustumMatrix(3, 3), 0.0f);
+}
+
+// Test case for frustumRhNo
+TEST(FrustumTest, FrustumRhNoFloat) {
+  float          left    = -1.0f;
+  float          right   = 1.0f;
+  float          bottom  = -1.0f;
+  float          top     = 1.0f;
+  float          nearVal = 1.0f;
+  float          farVal  = 10.0f;
+  math::Matrix4f frustumMatrix
+      = math::g_frustumRhNo(left, right, bottom, top, nearVal, farVal);
+
+  EXPECT_FLOAT_EQ(frustumMatrix(0, 0), 1.0f);
+  EXPECT_FLOAT_EQ(frustumMatrix(0, 1), 0.0f);
+  EXPECT_FLOAT_EQ(frustumMatrix(0, 2), 0.0f);
+  EXPECT_FLOAT_EQ(frustumMatrix(0, 3), 0.0f);
+  EXPECT_FLOAT_EQ(frustumMatrix(1, 0), 0.0f);
+  EXPECT_FLOAT_EQ(frustumMatrix(1, 1), 1.0f);
+  EXPECT_FLOAT_EQ(frustumMatrix(1, 2), 0.0f);
+  EXPECT_FLOAT_EQ(frustumMatrix(1, 3), 0.0f);
+  EXPECT_FLOAT_EQ(frustumMatrix(2, 0), 0.0f);
+  EXPECT_FLOAT_EQ(frustumMatrix(2, 1), 0.0f);
+  EXPECT_FLOAT_EQ(frustumMatrix(2, 2), -1.2222222f);
+  EXPECT_FLOAT_EQ(frustumMatrix(2, 3), -1.0f);
+  EXPECT_FLOAT_EQ(frustumMatrix(3, 0), 0.0f);
+  EXPECT_FLOAT_EQ(frustumMatrix(3, 1), 0.0f);
+  EXPECT_FLOAT_EQ(frustumMatrix(3, 2), -2.2222223f);
+  EXPECT_FLOAT_EQ(frustumMatrix(3, 3), 0.0f);
+}
+
+// Test case for frustumLhZo
+TEST(FrustumTest, FrustumLhZoFloat) {
+  float          left    = -1.0f;
+  float          right   = 1.0f;
+  float          bottom  = -1.0f;
+  float          top     = 1.0f;
+  float          nearVal = 1.0f;
+  float          farVal  = 10.0f;
+  math::Matrix4f frustumMatrix
+      = math::g_frustumLhZo(left, right, bottom, top, nearVal, farVal);
+
+  EXPECT_FLOAT_EQ(frustumMatrix(0, 0), 1.0f);
+  EXPECT_FLOAT_EQ(frustumMatrix(0, 1), 0.0f);
+  EXPECT_FLOAT_EQ(frustumMatrix(0, 2), 0.0f);
+  EXPECT_FLOAT_EQ(frustumMatrix(0, 3), 0.0f);
+  EXPECT_FLOAT_EQ(frustumMatrix(1, 0), 0.0f);
+  EXPECT_FLOAT_EQ(frustumMatrix(1, 1), 1.0f);
+  EXPECT_FLOAT_EQ(frustumMatrix(1, 2), 0.0f);
+  EXPECT_FLOAT_EQ(frustumMatrix(1, 3), 0.0f);
+  EXPECT_FLOAT_EQ(frustumMatrix(2, 0), 0.0f);
+  EXPECT_FLOAT_EQ(frustumMatrix(2, 1), 0.0f);
+  EXPECT_FLOAT_EQ(frustumMatrix(2, 2), 1.1111112f);
+  EXPECT_FLOAT_EQ(frustumMatrix(2, 3), 1.0f);
+  EXPECT_FLOAT_EQ(frustumMatrix(3, 0), 0.0f);
+  EXPECT_FLOAT_EQ(frustumMatrix(3, 1), 0.0f);
+  EXPECT_FLOAT_EQ(frustumMatrix(3, 2), -1.1111112f);
+  EXPECT_FLOAT_EQ(frustumMatrix(3, 3), 0.0f);
+}
+
+// Test case for frustumLhNo
+TEST(FrustumTest, FrustumLhNoFloat) {
+  float          left    = -1.0f;
+  float          right   = 1.0f;
+  float          bottom  = -1.0f;
+  float          top     = 1.0f;
+  float          nearVal = 1.0f;
+  float          farVal  = 10.0f;
+  math::Matrix4f frustumMatrix
+      = math::g_frustumLhNo(left, right, bottom, top, nearVal, farVal);
+
+  EXPECT_FLOAT_EQ(frustumMatrix(0, 0), 1.0f);
+  EXPECT_FLOAT_EQ(frustumMatrix(0, 1), 0.0f);
+  EXPECT_FLOAT_EQ(frustumMatrix(0, 2), 0.0f);
+  EXPECT_FLOAT_EQ(frustumMatrix(0, 3), 0.0f);
+  EXPECT_FLOAT_EQ(frustumMatrix(1, 0), 0.0f);
+  EXPECT_FLOAT_EQ(frustumMatrix(1, 1), 1.0f);
+  EXPECT_FLOAT_EQ(frustumMatrix(1, 2), 0.0f);
+  EXPECT_FLOAT_EQ(frustumMatrix(1, 3), 0.0f);
+  EXPECT_FLOAT_EQ(frustumMatrix(2, 0), 0.0f);
+  EXPECT_FLOAT_EQ(frustumMatrix(2, 1), 0.0f);
+  EXPECT_FLOAT_EQ(frustumMatrix(2, 2), 1.2222222f);
+  EXPECT_FLOAT_EQ(frustumMatrix(2, 3), 1.0f);
+  EXPECT_FLOAT_EQ(frustumMatrix(3, 0), 0.0f);
+  EXPECT_FLOAT_EQ(frustumMatrix(3, 1), 0.0f);
+  EXPECT_FLOAT_EQ(frustumMatrix(3, 2), -2.2222223f);
+  EXPECT_FLOAT_EQ(frustumMatrix(3, 3), 0.0f);
+}
+
+// Test case for orthoLhZo
+TEST(OrthoTest, OrthoLhZoFloat) {
+  float          left   = -1.0f;
+  float          right  = 1.0f;
+  float          bottom = -1.0f;
+  float          top    = 1.0f;
+  float          nearZ  = 1.0f;
+  float          farZ   = 10.0f;
+  math::Matrix4f orthoMatrix
+      = math::g_orthoLhZo(left, right, bottom, top, nearZ, farZ);
+
+  EXPECT_FLOAT_EQ(orthoMatrix(0, 0), 1.0f);
+  EXPECT_FLOAT_EQ(orthoMatrix(0, 1), 0.0f);
+  EXPECT_FLOAT_EQ(orthoMatrix(0, 2), 0.0f);
+  EXPECT_FLOAT_EQ(orthoMatrix(0, 3), 0.0f);
+  EXPECT_FLOAT_EQ(orthoMatrix(1, 0), 0.0f);
+  EXPECT_FLOAT_EQ(orthoMatrix(1, 1), 1.0f);
+  EXPECT_FLOAT_EQ(orthoMatrix(1, 2), 0.0f);
+  EXPECT_FLOAT_EQ(orthoMatrix(1, 3), 0.0f);
+  EXPECT_FLOAT_EQ(orthoMatrix(2, 0), 0.0f);
+  EXPECT_FLOAT_EQ(orthoMatrix(2, 1), 0.0f);
+  EXPECT_FLOAT_EQ(orthoMatrix(2, 2), 0.1111111f);
+  EXPECT_FLOAT_EQ(orthoMatrix(2, 3), 0.0f);
+  EXPECT_FLOAT_EQ(orthoMatrix(3, 0), 0.0f);
+  EXPECT_FLOAT_EQ(orthoMatrix(3, 1), 0.0f);
+  EXPECT_FLOAT_EQ(orthoMatrix(3, 2), -0.1111111f);
+  EXPECT_FLOAT_EQ(orthoMatrix(3, 3), 1.0f);
+}
+
+// Test case for orthoLhNo
+TEST(OrthoTest, OrthoLhNoFloat) {
+  float          left   = -1.0f;
+  float          right  = 1.0f;
+  float          bottom = -1.0f;
+  float          top    = 1.0f;
+  float          nearZ  = 1.0f;
+  float          farZ   = 10.0f;
+  math::Matrix4f orthoMatrix
+      = math::g_orthoLhNo(left, right, bottom, top, nearZ, farZ);
+
+  EXPECT_FLOAT_EQ(orthoMatrix(0, 0), 1.0f);
+  EXPECT_FLOAT_EQ(orthoMatrix(0, 1), 0.0f);
+  EXPECT_FLOAT_EQ(orthoMatrix(0, 2), 0.0f);
+  EXPECT_FLOAT_EQ(orthoMatrix(0, 3), 0.0f);
+  EXPECT_FLOAT_EQ(orthoMatrix(1, 0), 0.0f);
+  EXPECT_FLOAT_EQ(orthoMatrix(1, 1), 1.0f);
+  EXPECT_FLOAT_EQ(orthoMatrix(1, 2), 0.0f);
+  EXPECT_FLOAT_EQ(orthoMatrix(1, 3), 0.0f);
+  EXPECT_FLOAT_EQ(orthoMatrix(2, 0), 0.0f);
+  EXPECT_FLOAT_EQ(orthoMatrix(2, 1), 0.0f);
+  EXPECT_FLOAT_EQ(orthoMatrix(2, 2), 0.2222222f);
+  EXPECT_FLOAT_EQ(orthoMatrix(2, 3), 0.0f);
+  EXPECT_FLOAT_EQ(orthoMatrix(3, 0), 0.0f);
+  EXPECT_FLOAT_EQ(orthoMatrix(3, 1), 0.0f);
+  EXPECT_FLOAT_EQ(orthoMatrix(3, 2), -1.2222222f);
+  EXPECT_FLOAT_EQ(orthoMatrix(3, 3), 1.0f);
+}
+
+// Test case for orthoRhZo
+TEST(OrthoTest, OrthoRhZoFloat) {
+  float          left   = -1.0f;
+  float          right  = 1.0f;
+  float          bottom = -1.0f;
+  float          top    = 1.0f;
+  float          nearZ  = 1.0f;
+  float          farZ   = 10.0f;
+  math::Matrix4f orthoMatrix
+      = math::g_orthoRhZo(left, right, bottom, top, nearZ, farZ);
+
+  EXPECT_FLOAT_EQ(orthoMatrix(0, 0), 1.0f);
+  EXPECT_FLOAT_EQ(orthoMatrix(0, 1), 0.0f);
+  EXPECT_FLOAT_EQ(orthoMatrix(0, 2), 0.0f);
+  EXPECT_FLOAT_EQ(orthoMatrix(0, 3), 0.0f);
+  EXPECT_FLOAT_EQ(orthoMatrix(1, 0), 0.0f);
+  EXPECT_FLOAT_EQ(orthoMatrix(1, 1), 1.0f);
+  EXPECT_FLOAT_EQ(orthoMatrix(1, 2), 0.0f);
+  EXPECT_FLOAT_EQ(orthoMatrix(1, 3), 0.0f);
+  EXPECT_FLOAT_EQ(orthoMatrix(2, 0), 0.0f);
+  EXPECT_FLOAT_EQ(orthoMatrix(2, 1), 0.0f);
+  EXPECT_FLOAT_EQ(orthoMatrix(2, 2), -0.1111111f);
+  EXPECT_FLOAT_EQ(orthoMatrix(2, 3), 0.0f);
+  EXPECT_FLOAT_EQ(orthoMatrix(3, 0), 0.0f);
+  EXPECT_FLOAT_EQ(orthoMatrix(3, 1), 0.0f);
+  EXPECT_FLOAT_EQ(orthoMatrix(3, 2), -0.1111111f);
+  EXPECT_FLOAT_EQ(orthoMatrix(3, 3), 1.0f);
+}
+
+// Test case for orthoRhNo
+TEST(OrthoTest, OrthoRhNoFloat) {
+  float          left   = -1.0f;
+  float          right  = 1.0f;
+  float          bottom = -1.0f;
+  float          top    = 1.0f;
+  float          nearZ  = 1.0f;
+  float          farZ   = 10.0f;
+  math::Matrix4f orthoMatrix
+      = math::g_orthoRhNo(left, right, bottom, top, nearZ, farZ);
+
+  EXPECT_FLOAT_EQ(orthoMatrix(0, 0), 1.0f);
+  EXPECT_FLOAT_EQ(orthoMatrix(0, 1), 0.0f);
+  EXPECT_FLOAT_EQ(orthoMatrix(0, 2), 0.0f);
+  EXPECT_FLOAT_EQ(orthoMatrix(0, 3), 0.0f);
+  EXPECT_FLOAT_EQ(orthoMatrix(1, 0), 0.0f);
+  EXPECT_FLOAT_EQ(orthoMatrix(1, 1), 1.0f);
+  EXPECT_FLOAT_EQ(orthoMatrix(1, 2), 0.0f);
+  EXPECT_FLOAT_EQ(orthoMatrix(1, 3), 0.0f);
+  EXPECT_FLOAT_EQ(orthoMatrix(2, 0), 0.0f);
+  EXPECT_FLOAT_EQ(orthoMatrix(2, 1), 0.0f);
+  EXPECT_FLOAT_EQ(orthoMatrix(2, 2), -0.2222222f);
+  EXPECT_FLOAT_EQ(orthoMatrix(2, 3), 0.0f);
+  EXPECT_FLOAT_EQ(orthoMatrix(3, 0), 0.0f);
+  EXPECT_FLOAT_EQ(orthoMatrix(3, 1), 0.0f);
+  EXPECT_FLOAT_EQ(orthoMatrix(3, 2), -1.2222222f);
+  EXPECT_FLOAT_EQ(orthoMatrix(3, 3), 1.0f);
 }
 
 // Test case for g_rotateRh (Euler angles)
