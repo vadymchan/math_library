@@ -11,6 +11,7 @@
 #include <immintrin.h>
 
 #include <cassert>
+#include <cstddef>
 #include <cstdint>
 
 namespace math {

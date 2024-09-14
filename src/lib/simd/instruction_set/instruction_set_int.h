@@ -10,6 +10,9 @@
 
 #include <immintrin.h>
 
+#include <cstddef>
+#include <cstdint>
+
 namespace math {
 template <typename T>
 class InstructionSet;
@@ -118,8 +121,12 @@ class InstructionSet<std::int32_t> {
   }
 
   template <Options Option>
-  using MulFunc = void (*)(
-      std::int32_t*, const std::int32_t*, const std::int32_t*, const std::size_t, const std::size_t, const std::size_t);
+  using MulFunc = void (*)(std::int32_t*,
+                           const std::int32_t*,
+                           const std::int32_t*,
+                           const std::size_t,
+                           const std::size_t,
+                           const std::size_t);
 
   template <Options Option>
   static auto GetMulFunc() -> MulFunc<Option> {
@@ -180,7 +187,7 @@ class InstructionSet<std::int32_t> {
 #endif
   }
 
-   using CmpFunc
+  using CmpFunc
       = std::int32_t (*)(const std::int32_t*, const std::int32_t*, std::size_t);
 
   static auto GetCmpFunc() -> CmpFunc {
@@ -1132,8 +1139,8 @@ class InstructionSet<std::int32_t> {
   }
 
   static std::int32_t CmpFallback(const std::int32_t* a,
-                         const std::int32_t* b,
-                         std::size_t         size) {
+                                  const std::int32_t* b,
+                                  std::size_t         size) {
     for (std::size_t i = 0; i < size; ++i) {
       if (a[i] < b[i]) {
         return -1;

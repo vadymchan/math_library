@@ -10,6 +10,8 @@
 
 #include <immintrin.h>
 
+#include <cstddef>
+
 namespace math {
 
 template <typename T>
@@ -281,7 +283,7 @@ class InstructionSet<float> {
   }
 
   static void AddScalarAvx(float* a, float scalar, std::size_t size) {
-    __m256       ymm0      = _mm256_set1_ps(scalar);
+    __m256            ymm0      = _mm256_set1_ps(scalar);
     const std::size_t kAvxLimit = size - (size % s_kAvxSimdWidth);
     std::size_t       i         = 0;
 
@@ -310,7 +312,7 @@ class InstructionSet<float> {
   }
 
   static void AddScalarSse3(float* a, float scalar, std::size_t size) {
-    __m128       xmm0      = _mm_set1_ps(scalar);
+    __m128            xmm0      = _mm_set1_ps(scalar);
     const std::size_t kSseLimit = size - (size % s_kSseSimdWidth);
     std::size_t       i         = 0;
 
@@ -403,7 +405,7 @@ class InstructionSet<float> {
   }
 
   static void SubScalarAvx(float* a, float scalar, std::size_t size) {
-    __m256       ymm0      = _mm256_set1_ps(scalar);
+    __m256            ymm0      = _mm256_set1_ps(scalar);
     const std::size_t kAvxLimit = size - (size % s_kAvxSimdWidth);
     std::size_t       i         = 0;
 
@@ -432,7 +434,7 @@ class InstructionSet<float> {
   }
 
   static void SubScalarSse3(float* a, float scalar, std::size_t size) {
-    __m128       xmm0      = _mm_set1_ps(scalar);
+    __m128            xmm0      = _mm_set1_ps(scalar);
     const std::size_t kSseLimit = size - (size % s_kSseSimdWidth);
     std::size_t       i         = 0;
 
@@ -463,7 +465,7 @@ class InstructionSet<float> {
   static void NegAvx2(float* a, std::size_t size) { NegAvx(a, size); }
 
   static void NegAvx(float* a, std::size_t size) {
-    __m256       negZero   = _mm256_set1_ps(-0.0f);
+    __m256            negZero   = _mm256_set1_ps(-0.0f);
     const std::size_t kAvxLimit = size - (size % s_kAvxSimdWidth);
     std::size_t       i         = 0;
 
@@ -486,7 +488,7 @@ class InstructionSet<float> {
   static void NegSsse3(float* a, std::size_t size) { NegSse3(a, size); }
 
   static void NegSse3(float* a, std::size_t size) {
-    __m128       negZero   = _mm_set1_ps(-0.0f);
+    __m128            negZero   = _mm_set1_ps(-0.0f);
     const std::size_t kSseLimit = size - (size % s_kSseSimdWidth);
     std::size_t       i         = 0;
 
@@ -555,7 +557,7 @@ class InstructionSet<float> {
   // BEGIN: AVX multiplication array utility functions
 
   template <Options Option>
-  static inline auto LoadAAvx(const float* a,
+  static inline auto LoadAAvx(const float*      a,
                               const std::size_t kCurrentRowA,
                               const std::size_t kInnerIndex,
                               const std::size_t kRowsA,
@@ -577,7 +579,7 @@ class InstructionSet<float> {
   }
 
   template <Options Option>
-  static inline auto LoadBAvx(const float* b,
+  static inline auto LoadBAvx(const float*      b,
                               const std::size_t kInnerIndex,
                               const std::size_t kCurrentColB,
                               const std::size_t kColsB,
@@ -603,7 +605,7 @@ class InstructionSet<float> {
   // BEGIN: SSE multiplication array utility functions
 
   template <Options Option>
-  static inline auto LoadASse(const float* a,
+  static inline auto LoadASse(const float*      a,
                               const std::size_t kCurrentRowA,
                               const std::size_t kInnerIndex,
                               const std::size_t kRowsA,
@@ -621,7 +623,7 @@ class InstructionSet<float> {
   }
 
   template <Options Option>
-  static inline auto LoadBSse(const float* b,
+  static inline auto LoadBSse(const float*      b,
                               const std::size_t kInnerIndex,
                               const std::size_t kCurrentColB,
                               const std::size_t kColsB,
@@ -643,9 +645,9 @@ class InstructionSet<float> {
   // END: multiplication array utility functions
 
   template <Options Option>
-  static void MulAvx2(float*       result,
-                      const float* a,
-                      const float* b,
+  static void MulAvx2(float*            result,
+                      const float*      a,
+                      const float*      b,
                       const std::size_t kRowsA,
                       const std::size_t kColsB,
                       const std::size_t kColsARowsB) {
@@ -653,15 +655,15 @@ class InstructionSet<float> {
   }
 
   template <Options Option>
-  static void MulAvx(float*       result,
-                     const float* a,
-                     const float* b,
+  static void MulAvx(float*            result,
+                     const float*      a,
+                     const float*      b,
                      const std::size_t kRowsA,
                      const std::size_t kColsB,
                      const std::size_t kColsARowsB) {
     for (std::size_t currentRowA = 0; currentRowA < kRowsA; ++currentRowA) {
       for (std::size_t currentColB = 0; currentColB < kColsB; ++currentColB) {
-        __m256 sum        = _mm256_setzero_ps();
+        __m256      sum        = _mm256_setzero_ps();
         std::size_t innerIndex = 0;
         for (; innerIndex + s_kAvxSimdWidth - 1 < kColsARowsB;
              innerIndex += s_kAvxSimdWidth) {
@@ -691,9 +693,9 @@ class InstructionSet<float> {
   }
 
   template <Options Option>
-  static void MulSse42(float*       result,
-                       const float* a,
-                       const float* b,
+  static void MulSse42(float*            result,
+                       const float*      a,
+                       const float*      b,
                        const std::size_t kRowsA,
                        const std::size_t kColsB,
                        const std::size_t kColsARowsB) {
@@ -701,9 +703,9 @@ class InstructionSet<float> {
   }
 
   template <Options Option>
-  static void MulSse41(float*       result,
-                       const float* a,
-                       const float* b,
+  static void MulSse41(float*            result,
+                       const float*      a,
+                       const float*      b,
                        const std::size_t kRowsA,
                        const std::size_t kColsB,
                        const std::size_t kColsARowsB) {
@@ -711,9 +713,9 @@ class InstructionSet<float> {
   }
 
   template <Options Option>
-  static void MulSsse3(float*       result,
-                       const float* a,
-                       const float* b,
+  static void MulSsse3(float*            result,
+                       const float*      a,
+                       const float*      b,
                        const std::size_t kRowsA,
                        const std::size_t kColsB,
                        const std::size_t kColsARowsB) {
@@ -721,15 +723,15 @@ class InstructionSet<float> {
   }
 
   template <Options Option>
-  static void MulSse3(float*       result,
-                      const float* a,
-                      const float* b,
+  static void MulSse3(float*            result,
+                      const float*      a,
+                      const float*      b,
                       const std::size_t kRowsA,
                       const std::size_t kColsB,
                       const std::size_t kColsARowsB) {
     for (std::size_t currentRowA = 0; currentRowA < kRowsA; ++currentRowA) {
       for (std::size_t currentColB = 0; currentColB < kColsB; ++currentColB) {
-        __m128 sum        = _mm_setzero_ps();
+        __m128      sum        = _mm_setzero_ps();
         std::size_t innerIndex = 0;
         for (; innerIndex + s_kSseSimdWidth - 1 < kColsARowsB;
              innerIndex += s_kSseSimdWidth) {
@@ -758,9 +760,9 @@ class InstructionSet<float> {
   }
 
   template <Options Option>
-  static void MulFallback(float*       result,
-                          const float* a,
-                          const float* b,
+  static void MulFallback(float*            result,
+                          const float*      a,
+                          const float*      b,
                           const std::size_t kRowsA,
                           const std::size_t kColsB,
                           const std::size_t kColsARowsB) {
@@ -787,7 +789,7 @@ class InstructionSet<float> {
   }
 
   static void MulScalarAvx(float* a, float scalar, std::size_t size) {
-    __m256       ymm0      = _mm256_set1_ps(scalar);
+    __m256            ymm0      = _mm256_set1_ps(scalar);
     const std::size_t kAvxLimit = size - (size % s_kAvxSimdWidth);
     std::size_t       i         = 0;
 
@@ -816,7 +818,7 @@ class InstructionSet<float> {
   }
 
   static void MulScalarSse3(float* a, float scalar, std::size_t size) {
-    __m128       xmm0      = _mm_set1_ps(scalar);
+    __m128            xmm0      = _mm_set1_ps(scalar);
     const std::size_t kSseLimit = size - (size % s_kSseSimdWidth);
     std::size_t       i         = 0;
 
@@ -849,7 +851,7 @@ class InstructionSet<float> {
   }
 
   static void DivScalarAvx(float* a, float scalar, std::size_t size) {
-    __m256       ymm0      = _mm256_set1_ps(scalar);
+    __m256            ymm0      = _mm256_set1_ps(scalar);
     const std::size_t kAvxLimit = size - (size % s_kAvxSimdWidth);
     std::size_t       i         = 0;
 
@@ -878,7 +880,7 @@ class InstructionSet<float> {
   }
 
   static void DivScalarSse3(float* a, float scalar, std::size_t size) {
-    __m128       xmm0      = _mm_set1_ps(scalar);
+    __m128            xmm0      = _mm_set1_ps(scalar);
     const std::size_t kSseLimit = size - (size % s_kSseSimdWidth);
     std::size_t       i         = 0;
 
