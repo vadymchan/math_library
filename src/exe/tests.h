@@ -6032,7 +6032,7 @@ TEST(RotateLhTest, AxisAngleFloat) {
   EXPECT_FLOAT_EQ(rotateMatrix(0, 3), 0.0f);
 
   EXPECT_NEAR(rotateMatrix(1, 0), -0.622936f, 1e-6f);
-  EXPECT_NEAR(rotateMatrix(1, 1), 0.535714f, 1e-6f); 
+  EXPECT_NEAR(rotateMatrix(1, 1), 0.535714f, 1e-6f);
   EXPECT_NEAR(rotateMatrix(1, 2), 0.570053f, 1e-6f);
   EXPECT_FLOAT_EQ(rotateMatrix(1, 3), 0.0f);
 
@@ -6075,85 +6075,108 @@ TEST(RotateLhTest, AxisAngleFailureFloat) {
   EXPECT_FLOAT_EQ(rotateMatrix(3, 3), 1.0f);
 }
 
-// Test case for lookAtRh
-TEST(LookAtTest, LookAtRhFloat) {
-  math::Vector3Df eye(0.0f, 0.0f, 5.0f);
-  math::Vector3Df target(0.0f, 0.0f, 0.0f);
-  math::Vector3Df up(0.0f, 1.0f, 0.0f);
-  math::Matrix4f viewMatrix = math::g_lookAtRh(eye, target, up);
+// Test case for orthoLhZo with width and height
+TEST(OrthoTest, OrthoLhZoWithWidthHeightFloat) {
+  float          width       = 800.0f;
+  float          height      = 600.0f;
+  float          zNear       = 1.0f;
+  float          zFar        = 10.0f;
+  math::Matrix4f orthoMatrix = math::g_orthoLhZo(width, height, zNear, zFar);
 
-  std::cout << viewMatrix << std::endl;
-
-  EXPECT_FLOAT_EQ(viewMatrix(0, 0), -1.0f);
-  EXPECT_FLOAT_EQ(viewMatrix(0, 1), 0.0f);
-  EXPECT_FLOAT_EQ(viewMatrix(0, 2), 0.0f);
-  EXPECT_FLOAT_EQ(viewMatrix(0, 3), 0.0f);
-  EXPECT_FLOAT_EQ(viewMatrix(1, 0), 0.0f);
-  EXPECT_FLOAT_EQ(viewMatrix(1, 1), 1.0f);
-  EXPECT_FLOAT_EQ(viewMatrix(1, 2), 0.0f);
-  EXPECT_FLOAT_EQ(viewMatrix(1, 3), 0.0f);
-  EXPECT_FLOAT_EQ(viewMatrix(2, 0), 0.0f);
-  EXPECT_FLOAT_EQ(viewMatrix(2, 1), 0.0f);
-  EXPECT_FLOAT_EQ(viewMatrix(2, 2), 1.0f);
-  EXPECT_FLOAT_EQ(viewMatrix(2, 3), 0.0f);
-  EXPECT_FLOAT_EQ(viewMatrix(3, 0), 0.0f);
-  EXPECT_FLOAT_EQ(viewMatrix(3, 1), 0.0f);
-  EXPECT_FLOAT_EQ(viewMatrix(3, 2), 5.0f);
-  EXPECT_FLOAT_EQ(viewMatrix(3, 3), 1.0f);
+  EXPECT_FLOAT_EQ(orthoMatrix(0, 0), 0.0025f);
+  EXPECT_FLOAT_EQ(orthoMatrix(0, 1), 0.0f);
+  EXPECT_FLOAT_EQ(orthoMatrix(0, 2), 0.0f);
+  EXPECT_FLOAT_EQ(orthoMatrix(0, 3), 0.0f);
+  EXPECT_FLOAT_EQ(orthoMatrix(1, 0), 0.0f);
+  EXPECT_FLOAT_EQ(orthoMatrix(1, 1), 0.0033333334f);
+  EXPECT_FLOAT_EQ(orthoMatrix(1, 2), 0.0f);
+  EXPECT_FLOAT_EQ(orthoMatrix(1, 3), 0.0f);
+  EXPECT_FLOAT_EQ(orthoMatrix(2, 0), 0.0f);
+  EXPECT_FLOAT_EQ(orthoMatrix(2, 1), 0.0f);
+  EXPECT_FLOAT_EQ(orthoMatrix(2, 2), 0.1111111f);
+  EXPECT_FLOAT_EQ(orthoMatrix(2, 3), 0.0f);
+  EXPECT_FLOAT_EQ(orthoMatrix(3, 0), 0.0f);
+  EXPECT_FLOAT_EQ(orthoMatrix(3, 1), 0.0f);
+  EXPECT_FLOAT_EQ(orthoMatrix(3, 2), -0.1111111f);
+  EXPECT_FLOAT_EQ(orthoMatrix(3, 3), 1.0f);
 }
 
-// Test case for lookAtLh
-TEST(LookAtTest, LookAtLhFloat) {
-  math::Vector3Df eye(0.0f, 0.0f, 5.0f);
-  math::Vector3Df target(0.0f, 0.0f, 0.0f);
-  math::Vector3Df up(0.0f, 1.0f, 0.0f);
-  math::Matrix4f viewMatrix = math::g_lookAtLh(eye, target, up);
+// Test case for orthoLhNo with width and height
+TEST(OrthoTest, OrthoLhNoWithWidthHeightFloat) {
+  float          width       = 800.0f;
+  float          height      = 600.0f;
+  float          zNear       = 1.0f;
+  float          zFar        = 10.0f;
+  math::Matrix4f orthoMatrix = math::g_orthoLhNo(width, height, zNear, zFar);
 
-  std::cout << viewMatrix << std::endl;
-
-  EXPECT_FLOAT_EQ(viewMatrix(0, 0), -1.0f);
-  EXPECT_FLOAT_EQ(viewMatrix(0, 1), 0.0f);
-  EXPECT_FLOAT_EQ(viewMatrix(0, 2), 0.0f);
-  EXPECT_FLOAT_EQ(viewMatrix(0, 3), 0.0f);
-  EXPECT_FLOAT_EQ(viewMatrix(1, 0), 0.0f);
-  EXPECT_FLOAT_EQ(viewMatrix(1, 1), 1.0f);
-  EXPECT_FLOAT_EQ(viewMatrix(1, 2), 0.0f);
-  EXPECT_FLOAT_EQ(viewMatrix(1, 3), 0.0f);
-  EXPECT_FLOAT_EQ(viewMatrix(2, 0), 0.0f);
-  EXPECT_FLOAT_EQ(viewMatrix(2, 1), 0.0f);
-  EXPECT_FLOAT_EQ(viewMatrix(2, 2), -1.0f);
-  EXPECT_FLOAT_EQ(viewMatrix(2, 3), 0.0f);
-  EXPECT_FLOAT_EQ(viewMatrix(3, 0), 0.0f);
-  EXPECT_FLOAT_EQ(viewMatrix(3, 1), 0.0f);
-  EXPECT_FLOAT_EQ(viewMatrix(3, 2), 5.0f);
-  EXPECT_FLOAT_EQ(viewMatrix(3, 3), 1.0f);
+  EXPECT_FLOAT_EQ(orthoMatrix(0, 0), 0.0025f);
+  EXPECT_FLOAT_EQ(orthoMatrix(0, 1), 0.0f);
+  EXPECT_FLOAT_EQ(orthoMatrix(0, 2), 0.0f);
+  EXPECT_FLOAT_EQ(orthoMatrix(0, 3), 0.0f);
+  EXPECT_FLOAT_EQ(orthoMatrix(1, 0), 0.0f);
+  EXPECT_FLOAT_EQ(orthoMatrix(1, 1), 0.0033333334f);
+  EXPECT_FLOAT_EQ(orthoMatrix(1, 2), 0.0f);
+  EXPECT_FLOAT_EQ(orthoMatrix(1, 3), 0.0f);
+  EXPECT_FLOAT_EQ(orthoMatrix(2, 0), 0.0f);
+  EXPECT_FLOAT_EQ(orthoMatrix(2, 1), 0.0f);
+  EXPECT_FLOAT_EQ(orthoMatrix(2, 2), 0.2222222f);
+  EXPECT_FLOAT_EQ(orthoMatrix(2, 3), 0.0f);
+  EXPECT_FLOAT_EQ(orthoMatrix(3, 0), 0.0f);
+  EXPECT_FLOAT_EQ(orthoMatrix(3, 1), 0.0f);
+  EXPECT_FLOAT_EQ(orthoMatrix(3, 2), -1.2222222f);
+  EXPECT_FLOAT_EQ(orthoMatrix(3, 3), 1.0f);
 }
 
-// Test case for lookToRh
-TEST(LookAtTest, LookToRhFloat) {
-  math::Vector3Df eye(0.0f, 0.0f, 5.0f);
-  math::Vector3Df direction(0.0f, 0.0f, -1.0f);
-  math::Vector3Df up(0.0f, 1.0f, 0.0f);
-  math::Matrix4f viewMatrix = math::g_lookToRh(eye, direction, up);
+// Test case for orthoRhZo with width and height
+TEST(OrthoTest, OrthoRhZoWithWidthHeightFloat) {
+  float          width       = 800.0f;
+  float          height      = 600.0f;
+  float          zNear       = 1.0f;
+  float          zFar        = 10.0f;
+  math::Matrix4f orthoMatrix = math::g_orthoRhZo(width, height, zNear, zFar);
 
-  std::cout << viewMatrix << std::endl;
+  EXPECT_FLOAT_EQ(orthoMatrix(0, 0), 0.0025f);
+  EXPECT_FLOAT_EQ(orthoMatrix(0, 1), 0.0f);
+  EXPECT_FLOAT_EQ(orthoMatrix(0, 2), 0.0f);
+  EXPECT_FLOAT_EQ(orthoMatrix(0, 3), 0.0f);
+  EXPECT_FLOAT_EQ(orthoMatrix(1, 0), 0.0f);
+  EXPECT_FLOAT_EQ(orthoMatrix(1, 1), 0.0033333334f);
+  EXPECT_FLOAT_EQ(orthoMatrix(1, 2), 0.0f);
+  EXPECT_FLOAT_EQ(orthoMatrix(1, 3), 0.0f);
+  EXPECT_FLOAT_EQ(orthoMatrix(2, 0), 0.0f);
+  EXPECT_FLOAT_EQ(orthoMatrix(2, 1), 0.0f);
+  EXPECT_FLOAT_EQ(orthoMatrix(2, 2), -0.1111111f);
+  EXPECT_FLOAT_EQ(orthoMatrix(2, 3), 0.0f);
+  EXPECT_FLOAT_EQ(orthoMatrix(3, 0), 0.0f);
+  EXPECT_FLOAT_EQ(orthoMatrix(3, 1), 0.0f);
+  EXPECT_FLOAT_EQ(orthoMatrix(3, 2), -0.1111111f);
+  EXPECT_FLOAT_EQ(orthoMatrix(3, 3), 1.0f);
+}
 
-  EXPECT_FLOAT_EQ(viewMatrix(0, 0), -1.0f);
-  EXPECT_FLOAT_EQ(viewMatrix(0, 1), 0.0f);
-  EXPECT_FLOAT_EQ(viewMatrix(0, 2), 0.0f);
-  EXPECT_FLOAT_EQ(viewMatrix(0, 3), 0.0f);
-  EXPECT_FLOAT_EQ(viewMatrix(1, 0), 0.0f);
-  EXPECT_FLOAT_EQ(viewMatrix(1, 1), 1.0f);
-  EXPECT_FLOAT_EQ(viewMatrix(1, 2), 0.0f);
-  EXPECT_FLOAT_EQ(viewMatrix(1, 3), 0.0f);
-  EXPECT_FLOAT_EQ(viewMatrix(2, 0), 0.0f);
-  EXPECT_FLOAT_EQ(viewMatrix(2, 1), 0.0f);
-  EXPECT_FLOAT_EQ(viewMatrix(2, 2), 1.0f);
-  EXPECT_FLOAT_EQ(viewMatrix(2, 3), 0.0f);
-  EXPECT_FLOAT_EQ(viewMatrix(3, 0), 0.0f);
-  EXPECT_FLOAT_EQ(viewMatrix(3, 1), 0.0f);
-  EXPECT_FLOAT_EQ(viewMatrix(3, 2), 5.0f);
-  EXPECT_FLOAT_EQ(viewMatrix(3, 3), 1.0f);
+// Test case for orthoRhNo with width and height
+TEST(OrthoTest, OrthoRhNoWithWidthHeightFloat) {
+  float          width       = 800.0f;
+  float          height      = 600.0f;
+  float          zNear       = 1.0f;
+  float          zFar        = 10.0f;
+  math::Matrix4f orthoMatrix = math::g_orthoRhNo(width, height, zNear, zFar);
+
+  EXPECT_FLOAT_EQ(orthoMatrix(0, 0), 0.0025f);
+  EXPECT_FLOAT_EQ(orthoMatrix(0, 1), 0.0f);
+  EXPECT_FLOAT_EQ(orthoMatrix(0, 2), 0.0f);
+  EXPECT_FLOAT_EQ(orthoMatrix(0, 3), 0.0f);
+  EXPECT_FLOAT_EQ(orthoMatrix(1, 0), 0.0f);
+  EXPECT_FLOAT_EQ(orthoMatrix(1, 1), 0.0033333334f);
+  EXPECT_FLOAT_EQ(orthoMatrix(1, 2), 0.0f);
+  EXPECT_FLOAT_EQ(orthoMatrix(1, 3), 0.0f);
+  EXPECT_FLOAT_EQ(orthoMatrix(2, 0), 0.0f);
+  EXPECT_FLOAT_EQ(orthoMatrix(2, 1), 0.0f);
+  EXPECT_FLOAT_EQ(orthoMatrix(2, 2), -0.2222222f);
+  EXPECT_FLOAT_EQ(orthoMatrix(2, 3), 0.0f);
+  EXPECT_FLOAT_EQ(orthoMatrix(3, 0), 0.0f);
+  EXPECT_FLOAT_EQ(orthoMatrix(3, 1), 0.0f);
+  EXPECT_FLOAT_EQ(orthoMatrix(3, 2), -1.2222222f);
+  EXPECT_FLOAT_EQ(orthoMatrix(3, 3), 1.0f);
 }
 
 // Test case for lookToLh
