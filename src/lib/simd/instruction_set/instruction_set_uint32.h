@@ -1,9 +1,9 @@
 /**
- * @file instruction_set_uint32_t.h
+ * @file instruction_set_uint32.h
  */
 
-#ifndef MATH_LIBRARY_INSTRUCTION_SET_UINT32_T_H
-#define MATH_LIBRARY_INSTRUCTION_SET_UINT32_T_H
+#ifndef MATH_LIBRARY_INSTRUCTION_SET_UINT32_H
+#define MATH_LIBRARY_INSTRUCTION_SET_UINT32_H
 
 #include "../../options/options.h"
 #include "../precompiled/simd_defines.h"
@@ -1158,4 +1158,4 @@ class InstructionSet<std::uint32_t> {
 
 }  // namespace math
 
-#endif  // MATH_LIBRARY_INSTRUCTION_SET_UINT32_T_H
+#endif  // MATH_LIBRARY_INSTRUCTION_SET_UINT32_H
