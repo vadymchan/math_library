@@ -16,7 +16,7 @@
 #include "graphics.h"
 #include "matrix.h"
 #include "point.h"
-#include "vector.h"
 #include "quaternion.h"
+#include "vector.h"
 
 #endif
