@@ -624,7 +624,7 @@ class InstructionSet {
 
 #include "instruction_set_double.h"
 #include "instruction_set_float.h"
-#include "instruction_set_int.h"
-#include "instruction_set_uint32_t.h"
+#include "instruction_set_int32.h"
+#include "instruction_set_uint32.h"
 
 #endif

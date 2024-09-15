@@ -1,9 +1,9 @@
 /**
- * @file instruction_set_int.h
+ * @file instruction_set_int32.h
  */
 
-#ifndef MATH_LIBRARY_INSTRUCTION_SET_INT_H
-#define MATH_LIBRARY_INSTRUCTION_SET_INT_H
+#ifndef MATH_LIBRARY_INSTRUCTION_SET_INT32_H
+#define MATH_LIBRARY_INSTRUCTION_SET_INT32_H
 
 #include "../../options/options.h"
 #include "../precompiled/simd_defines.h"
