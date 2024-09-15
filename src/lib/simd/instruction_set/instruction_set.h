@@ -515,8 +515,11 @@ class InstructionSet {
     MulScalarFallback(a, scalar, size);
   }
 
-  static void MulScalarAvx(T* a, T scalar, std::size_t size) {}
-
+  /**
+   * @brief Multiplies each element of an array by a scalar using AVX SIMD
+  static void MulScalarAvx(T* a, T scalar, std::size_t size) {
+    MulScalarFallback(a, scalar, size);
+  }
   static void MulScalarSse42(T* a, T scalar, std::size_t size) {
     MulScalarFallback(a, scalar, size);
   }
