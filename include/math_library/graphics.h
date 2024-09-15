@@ -2087,7 +2087,7 @@ Point<T, 3, Option> g_transformPoint(const Point<T, 3, Option>&     point,
   result                     *= matrix;
   // applied when perspective projection matrix is used
   result = g_perspectiveDivide(result);
-  return result.resizedCopy<3>();
+  return result.template resizedCopy<3>();
 }
 
 /**
@@ -2111,7 +2111,7 @@ Vector<T, 3, Option> g_transformVector(const Vector<T, 3, Option>&    vector,
                                        const Matrix<T, 4, 4, Option>& matrix) {
   auto result  = Vector<T, 4, Option>(vector, 0);
   result      *= matrix;
-  return result.resizedCopy<3>();
+  return result.template resizedCopy<3>();
 }
 
 // BEGIN: global util vector objects

@@ -329,7 +329,7 @@ class Dimension {
   template <std::size_t TargetSize>
   auto resizedCopy() const -> Dimension<T, TargetSize, Option> {
     return Dimension<T, TargetSize, Option>(
-        m_dataStorage_.resizedCopy<TargetSize>());
+        m_dataStorage_.template resizedCopy<TargetSize>());
   }
 
   /**
