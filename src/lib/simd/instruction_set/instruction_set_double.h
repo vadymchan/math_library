@@ -10,6 +10,8 @@
 
 #include <immintrin.h>
 
+#include <cstddef>
+
 namespace math {
 
 template <typename T>

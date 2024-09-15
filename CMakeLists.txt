@@ -4,7 +4,8 @@ project(math_library)
 
 #-------- lib ----------------------------------------
 
-option(MATH_LIBRARY_USE_NORMALIZE_IN_PLACE "Use in-place normalization" ON)
+# TODO: deprecated - remove
+# option(MATH_LIBRARY_USE_NORMALIZE_IN_PLACE "Use in-place normalization" ON)
 
 file(GLOB_RECURSE LIB_SOURCES "src/lib/*.cpp")
 file(GLOB_RECURSE PUBLIC_HEADERS "include/math_library/*.h")
@@ -16,9 +17,10 @@ if(LIB_SOURCES)
     add_library(math_library STATIC ${PUBLIC_HEADERS} ${PRIVATE_HEADERS} ${LIB_SOURCES})
     target_include_directories(math_library PUBLIC include)
     target_include_directories(math_library PRIVATE src/lib)
-    if(MATH_LIBRARY_USE_NORMALIZE_IN_PLACE)
-        target_compile_definitions(math_library PUBLIC MATH_LIBRARY_USE_NORMALIZE_IN_PLACE)
-    endif()
+    # TODO: deprecated - remove 
+    # if(MATH_LIBRARY_USE_NORMALIZE_IN_PLACE)
+    #     target_compile_definitions(math_library PUBLIC MATH_LIBRARY_USE_NORMALIZE_IN_PLACE)
+    # endif()
 
     source_group(TREE "${CMAKE_CURRENT_SOURCE_DIR}/include/math_library" PREFIX "include" FILES ${PUBLIC_HEADERS})
     source_group(TREE "${CMAKE_CURRENT_SOURCE_DIR}/src/lib" PREFIX "src" FILES ${LIB_SOURCES} ${PRIVATE_HEADERS})
@@ -27,9 +29,10 @@ else()
     message(STATUS "Build math library as header only library")
     add_library(math_library INTERFACE ${PUBLIC_HEADERS} ${PRIVATE_HEADERS})
     target_include_directories(math_library INTERFACE include)
-    if(MATH_LIBRARY_USE_NORMALIZE_IN_PLACE)
-        target_compile_definitions(math_library INTERFACE MATH_LIBRARY_USE_NORMALIZE_IN_PLACE)
-    endif()
+    # TODO: deprecated - remove
+    # if(MATH_LIBRARY_USE_NORMALIZE_IN_PLACE)
+    #     target_compile_definitions(math_library INTERFACE MATH_LIBRARY_USE_NORMALIZE_IN_PLACE)
+    # endif()
 
     source_group(TREE "${CMAKE_CURRENT_SOURCE_DIR}/include/math_library" PREFIX "include" FILES ${PUBLIC_HEADERS})
     source_group(TREE "${CMAKE_CURRENT_SOURCE_DIR}/src/lib" PREFIX "src" FILES ${PRIVATE_HEADERS})

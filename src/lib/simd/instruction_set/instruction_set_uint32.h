@@ -1,23 +1,28 @@
 /**
- * @file instruction_set_int.h
+ * @file instruction_set_uint32.h
  */
 
-#ifndef MATH_LIBRARY_INSTRUCTION_SET_INT_H
-#define MATH_LIBRARY_INSTRUCTION_SET_INT_H
+#ifndef MATH_LIBRARY_INSTRUCTION_SET_UINT32_H
+#define MATH_LIBRARY_INSTRUCTION_SET_UINT32_H
 
 #include "../../options/options.h"
 #include "../precompiled/simd_defines.h"
 
 #include <immintrin.h>
 
+#include <cassert>
+#include <cstddef>
+#include <cstdint>
+
 namespace math {
+
 template <typename T>
 class InstructionSet;
 
 template <>
-class InstructionSet<std::int32_t> {
+class InstructionSet<std::uint32_t> {
   public:
-  using AddFunc = void (*)(std::int32_t*, const std::int32_t*, std::size_t);
+  using AddFunc = void (*)(std::uint32_t*, const std::uint32_t*, std::size_t);
 
   static auto GetAddFunc() -> AddFunc {
 #ifdef SUPPORTS_AVX2
@@ -37,7 +42,7 @@ class InstructionSet<std::int32_t> {
 #endif
   }
 
-  using AddScalarFunc = void (*)(std::int32_t*, std::int32_t, std::size_t);
+  using AddScalarFunc = void (*)(std::uint32_t*, std::uint32_t, std::size_t);
 
   static auto GetAddScalarFunc() -> AddScalarFunc {
 #ifdef SUPPORTS_AVX2
@@ -57,7 +62,7 @@ class InstructionSet<std::int32_t> {
 #endif
   }
 
-  using SubFunc = void (*)(std::int32_t*, const std::int32_t*, std::size_t);
+  using SubFunc = void (*)(std::uint32_t*, const std::uint32_t*, std::size_t);
 
   static auto GetSubFunc() -> SubFunc {
 #ifdef SUPPORTS_AVX2
@@ -77,7 +82,7 @@ class InstructionSet<std::int32_t> {
 #endif
   }
 
-  using SubScalarFunc = void (*)(std::int32_t*, std::int32_t, std::size_t);
+  using SubScalarFunc = void (*)(std::uint32_t*, std::uint32_t, std::size_t);
 
   static auto GetSubScalarFunc() -> SubScalarFunc {
 #ifdef SUPPORTS_AVX2
@@ -97,7 +102,7 @@ class InstructionSet<std::int32_t> {
 #endif
   }
 
-  using NegFunc = void (*)(std::int32_t*, std::size_t);
+  using NegFunc = void (*)(std::uint32_t*, std::size_t);
 
   static auto GetNegFunc() -> NegFunc {
 #ifdef SUPPORTS_AVX2
@@ -118,8 +123,12 @@ class InstructionSet<std::int32_t> {
   }
 
   template <Options Option>
-  using MulFunc = void (*)(
-      std::int32_t*, const std::int32_t*, const std::int32_t*, const std::size_t, const std::size_t, const std::size_t);
+  using MulFunc = void (*)(std::uint32_t*,
+                           const std::uint32_t*,
+                           const std::uint32_t*,
+                           const std::size_t,
+                           const std::size_t,
+                           const std::size_t);
 
   template <Options Option>
   static auto GetMulFunc() -> MulFunc<Option> {
@@ -140,7 +149,7 @@ class InstructionSet<std::int32_t> {
 #endif
   }
 
-  using MulScalarFunc = void (*)(std::int32_t*, std::int32_t, std::size_t);
+  using MulScalarFunc = void (*)(std::uint32_t*, std::uint32_t, std::size_t);
 
   static auto GetMulScalarFunc() -> MulScalarFunc {
 #ifdef SUPPORTS_AVX2
@@ -160,7 +169,7 @@ class InstructionSet<std::int32_t> {
 #endif
   }
 
-  using DivScalarFunc = void (*)(std::int32_t*, std::int32_t, std::size_t);
+  using DivScalarFunc = void (*)(std::uint32_t*, std::uint32_t, std::size_t);
 
   static auto GetDivScalarFunc() -> DivScalarFunc {
 #ifdef SUPPORTS_AVX2
@@ -180,8 +189,8 @@ class InstructionSet<std::int32_t> {
 #endif
   }
 
-   using CmpFunc
-      = std::int32_t (*)(const std::int32_t*, const std::int32_t*, std::size_t);
+  using CmpFunc
+      = int (*)(const std::uint32_t*, const std::uint32_t*, std::size_t);
 
   static auto GetCmpFunc() -> CmpFunc {
 #ifdef SUPPORTS_AVX2
@@ -203,20 +212,22 @@ class InstructionSet<std::int32_t> {
 
   private:
   static constexpr std::size_t s_kAvxSimdWidth
-      = sizeof(__m256i) / sizeof(std::int32_t);  // 8
+      = sizeof(__m256i) / sizeof(std::uint32_t);  // 8
   static constexpr std::size_t s_kSseSimdWidth
-      = sizeof(__m128i) / sizeof(std::int32_t);  // 4
+      = sizeof(__m128i) / sizeof(std::uint32_t);  // 4
 
   // BEGIN: add two arrays
   //----------------------------------------------------------------------------
 
-  static void AddAvx2(std::int32_t*       a,
-                      const std::int32_t* b,
-                      std::size_t         size) {
+  static void AddAvx2(std::uint32_t*       a,
+                      const std::uint32_t* b,
+                      std::size_t          size) {
     AddAvx(a, b, size);
   }
 
-  static void AddAvx(std::int32_t* a, const std::int32_t* b, std::size_t size) {
+  static void AddAvx(std::uint32_t*       a,
+                     const std::uint32_t* b,
+                     std::size_t          size) {
     const std::size_t kAvxLimit = size - (size % s_kAvxSimdWidth);
     std::size_t       i         = 0;
 
@@ -225,6 +236,7 @@ class InstructionSet<std::int32_t> {
           = _mm256_loadu_si256(reinterpret_cast<const __m256i*>(a + i));
       __m256i ymm2
           = _mm256_loadu_si256(reinterpret_cast<const __m256i*>(b + i));
+      // Note: _mm256_add_epi32 works for both signed and unsigned
       ymm1 = _mm256_add_epi32(ymm1, ymm2);
       _mm256_storeu_si256(reinterpret_cast<__m256i*>(a + i), ymm1);
     }
@@ -235,34 +247,35 @@ class InstructionSet<std::int32_t> {
     }
   }
 
-  static void AddSse42(std::int32_t*       a,
-                       const std::int32_t* b,
-                       std::size_t         size) {
+  static void AddSse42(std::uint32_t*       a,
+                       const std::uint32_t* b,
+                       std::size_t          size) {
     AddSse3(a, b, size);
   }
 
-  static void AddSse41(std::int32_t*       a,
-                       const std::int32_t* b,
-                       std::size_t         size) {
+  static void AddSse41(std::uint32_t*       a,
+                       const std::uint32_t* b,
+                       std::size_t          size) {
     AddSse3(a, b, size);
   }
 
-  static void AddSsse3(std::int32_t*       a,
-                       const std::int32_t* b,
-                       std::size_t         size) {
+  static void AddSsse3(std::uint32_t*       a,
+                       const std::uint32_t* b,
+                       std::size_t          size) {
     AddSse3(a, b, size);
   }
 
-  static void AddSse3(std::int32_t*       a,
-                      const std::int32_t* b,
-                      std::size_t         size) {
+  static void AddSse3(std::uint32_t*       a,
+                      const std::uint32_t* b,
+                      std::size_t          size) {
     const std::size_t kSseLimit = size - (size % s_kSseSimdWidth);
     std::size_t       i         = 0;
 
     for (; i < kSseLimit; i += s_kSseSimdWidth) {
       __m128i xmm1 = _mm_loadu_si128(reinterpret_cast<const __m128i*>(a + i));
       __m128i xmm2 = _mm_loadu_si128(reinterpret_cast<const __m128i*>(b + i));
-      xmm1         = _mm_add_epi32(xmm1, xmm2);
+      // Note: _mm_add_epi32 works for both signed and unsigned
+      xmm1 = _mm_add_epi32(xmm1, xmm2);
       _mm_storeu_si128(reinterpret_cast<__m128i*>(a + i), xmm1);
     }
 
@@ -272,9 +285,9 @@ class InstructionSet<std::int32_t> {
     }
   }
 
-  static void AddFallback(std::int32_t*       a,
-                          const std::int32_t* b,
-                          std::size_t         size) {
+  static void AddFallback(std::uint32_t*       a,
+                          const std::uint32_t* b,
+                          std::size_t          size) {
     for (std::size_t i = 0; i < size; ++i) {
       a[i] += b[i];
     }
@@ -286,15 +299,15 @@ class InstructionSet<std::int32_t> {
   // BEGIN: add scalar
   //----------------------------------------------------------------------------
 
-  static void AddScalarAvx2(std::int32_t* a,
-                            std::int32_t  scalar,
-                            std::size_t   size) {
+  static void AddScalarAvx2(std::uint32_t* a,
+                            std::uint32_t  scalar,
+                            std::size_t    size) {
     AddScalarAvx(a, scalar, size);
   }
 
-  static void AddScalarAvx(std::int32_t* a,
-                           std::int32_t  scalar,
-                           std::size_t   size) {
+  static void AddScalarAvx(std::uint32_t* a,
+                           std::uint32_t  scalar,
+                           std::size_t    size) {
     __m256i           ymm0      = _mm256_set1_epi32(scalar);
     const std::size_t kAvxLimit = size - (size % s_kAvxSimdWidth);
     std::size_t       i         = 0;
@@ -312,28 +325,29 @@ class InstructionSet<std::int32_t> {
     }
   }
 
-  static void AddScalarSse42(std::int32_t* a,
-                             std::int32_t  scalar,
-                             std::size_t   size) {
+  static void AddScalarSse42(std::uint32_t* a,
+                             std::uint32_t  scalar,
+                             std::size_t    size) {
     AddScalarSse3(a, scalar, size);
   }
 
-  static void AddScalarSse41(std::int32_t* a,
-                             std::int32_t  scalar,
-                             std::size_t   size) {
+  static void AddScalarSse41(std::uint32_t* a,
+                             std::uint32_t  scalar,
+                             std::size_t    size) {
     AddScalarSse3(a, scalar, size);
   }
 
-  static void AddScalarSsse3(std::int32_t* a,
-                             std::int32_t  scalar,
-                             std::size_t   size) {
+  static void AddScalarSsse3(std::uint32_t* a,
+                             std::uint32_t  scalar,
+                             std::size_t    size) {
     AddScalarSse3(a, scalar, size);
   }
 
-  static void AddScalarSse3(std::int32_t* a,
-                            std::int32_t  scalar,
-                            std::size_t   size) {
-    __m128i           xmm0      = _mm_set1_epi32(scalar);
+  static void AddScalarSse3(std::uint32_t* a,
+                            std::uint32_t  scalar,
+                            std::size_t    size) {
+    __m128i xmm0 = _mm_set1_epi32(
+        scalar);  // Same intrinsic can be used for std::uint32_t
     const std::size_t kSseLimit = size - (size % s_kSseSimdWidth);
     std::size_t       i         = 0;
 
@@ -349,10 +363,9 @@ class InstructionSet<std::int32_t> {
     }
   }
 
-  static void AddScalarFallback(std::int32_t* a,
-                                std::int32_t  scalar,
-                                std::size_t   size) {
-    // no SIMD
+  static void AddScalarFallback(std::uint32_t* a,
+                                std::uint32_t  scalar,
+                                std::size_t    size) {
     for (std::size_t i = 0; i < size; ++i) {
       a[i] += scalar;
     }
@@ -363,14 +376,15 @@ class InstructionSet<std::int32_t> {
 
   // BEGIN: subtract two arrays
   //----------------------------------------------------------------------------
-
-  static void SubAvx2(std::int32_t*       a,
-                      const std::int32_t* b,
-                      std::size_t         size) {
+  static void SubAvx2(std::uint32_t*       a,
+                      const std::uint32_t* b,
+                      std::size_t          size) {
     SubAvx(a, b, size);
   }
 
-  static void SubAvx(std::int32_t* a, const std::int32_t* b, std::size_t size) {
+  static void SubAvx(std::uint32_t*       a,
+                     const std::uint32_t* b,
+                     std::size_t          size) {
     const std::size_t kAvxLimit = size - (size % s_kAvxSimdWidth);
     std::size_t       i         = 0;
 
@@ -383,33 +397,33 @@ class InstructionSet<std::int32_t> {
       _mm256_storeu_si256(reinterpret_cast<__m256i*>(a + i), ymm1);
     }
 
-    // Handling remaining elements
+    // Handle any remainder
     for (; i < size; ++i) {
       a[i] -= b[i];
     }
   }
 
-  static void SubSse42(std::int32_t*       a,
-                       const std::int32_t* b,
-                       std::size_t         size) {
+  static void SubSse42(std::uint32_t*       a,
+                       const std::uint32_t* b,
+                       std::size_t          size) {
     SubSse3(a, b, size);
   }
 
-  static void SubSse41(std::int32_t*       a,
-                       const std::int32_t* b,
-                       std::size_t         size) {
+  static void SubSse41(std::uint32_t*       a,
+                       const std::uint32_t* b,
+                       std::size_t          size) {
     SubSse3(a, b, size);
   }
 
-  static void SubSsse3(std::int32_t*       a,
-                       const std::int32_t* b,
-                       std::size_t         size) {
+  static void SubSsse3(std::uint32_t*       a,
+                       const std::uint32_t* b,
+                       std::size_t          size) {
     SubSse3(a, b, size);
   }
 
-  static void SubSse3(std::int32_t*       a,
-                      const std::int32_t* b,
-                      std::size_t         size) {
+  static void SubSse3(std::uint32_t*       a,
+                      const std::uint32_t* b,
+                      std::size_t          size) {
     const std::size_t kSseLimit = size - (size % s_kSseSimdWidth);
     std::size_t       i         = 0;
 
@@ -426,9 +440,9 @@ class InstructionSet<std::int32_t> {
     }
   }
 
-  static void SubFallback(std::int32_t*       a,
-                          const std::int32_t* b,
-                          std::size_t         size) {
+  static void SubFallback(std::uint32_t*       a,
+                          const std::uint32_t* b,
+                          std::size_t          size) {
     for (std::size_t i = 0; i < size; ++i) {
       a[i] -= b[i];
     }
@@ -440,15 +454,15 @@ class InstructionSet<std::int32_t> {
   // BEGIN: subtract scalar
   //----------------------------------------------------------------------------
 
-  static void SubScalarAvx2(std::int32_t* a,
-                            std::int32_t  scalar,
-                            std::size_t   size) {
+  static void SubScalarAvx2(std::uint32_t* a,
+                            std::uint32_t  scalar,
+                            std::size_t    size) {
     SubScalarAvx(a, scalar, size);
   }
 
-  static void SubScalarAvx(std::int32_t* a,
-                           std::int32_t  scalar,
-                           std::size_t   size) {
+  static void SubScalarAvx(std::uint32_t* a,
+                           std::uint32_t  scalar,
+                           std::size_t    size) {
     __m256i           ymm0      = _mm256_set1_epi32(scalar);
     const std::size_t kAvxLimit = size - (size % s_kAvxSimdWidth);
     std::size_t       i         = 0;
@@ -466,27 +480,27 @@ class InstructionSet<std::int32_t> {
     }
   }
 
-  static void SubScalarSse42(std::int32_t* a,
-                             std::int32_t  scalar,
-                             std::size_t   size) {
+  static void SubScalarSse42(std::uint32_t* a,
+                             std::uint32_t  scalar,
+                             std::size_t    size) {
     SubScalarSse3(a, scalar, size);
   }
 
-  static void SubScalarSse41(std::int32_t* a,
-                             std::int32_t  scalar,
-                             std::size_t   size) {
+  static void SubScalarSse41(std::uint32_t* a,
+                             std::uint32_t  scalar,
+                             std::size_t    size) {
     SubScalarSse3(a, scalar, size);
   }
 
-  static void SubScalarSsse3(std::int32_t* a,
-                             std::int32_t  scalar,
-                             std::size_t   size) {
+  static void SubScalarSsse3(std::uint32_t* a,
+                             std::uint32_t  scalar,
+                             std::size_t    size) {
     SubScalarSse3(a, scalar, size);
   }
 
-  static void SubScalarSse3(std::int32_t* a,
-                            std::int32_t  scalar,
-                            std::size_t   size) {
+  static void SubScalarSse3(std::uint32_t* a,
+                            std::uint32_t  scalar,
+                            std::size_t    size) {
     __m128i           xmm0      = _mm_set1_epi32(scalar);
     const std::size_t kSseLimit = size - (size % s_kSseSimdWidth);
     std::size_t       i         = 0;
@@ -503,9 +517,9 @@ class InstructionSet<std::int32_t> {
     }
   }
 
-  static void SubScalarFallback(std::int32_t* a,
-                                std::int32_t  scalar,
-                                std::size_t   size) {
+  static void SubScalarFallback(std::uint32_t* a,
+                                std::uint32_t  scalar,
+                                std::size_t    size) {
     for (std::size_t i = 0; i < size; ++i) {
       a[i] -= scalar;
     }
@@ -514,63 +528,42 @@ class InstructionSet<std::int32_t> {
   // END: subtract scalar
   //----------------------------------------------------------------------------
 
-  // BEGIN: negation array
+  // BEGIN: negation array fallback
   //----------------------------------------------------------------------------
 
-  static void NegAvx2(std::int32_t* a, std::size_t size) { NegAvx(a, size); }
-
-  static void NegAvx(std::int32_t* a, std::size_t size) {
-    const std::size_t kAvxLimit = size - (size % s_kAvxSimdWidth);
-    std::size_t       i         = 0;
-
-    for (; i < kAvxLimit; i += s_kAvxSimdWidth) {
-      __m256i ymm1
-          = _mm256_loadu_si256(reinterpret_cast<const __m256i*>(a + i));
-      ymm1 = _mm256_sub_epi32(_mm256_setzero_si256(), ymm1);  // Negate
-      _mm256_storeu_si256(reinterpret_cast<__m256i*>(a + i), ymm1);
-    }
-
-    // Handle any remaining elements without SIMD
-    for (; i < size; ++i) {
-      a[i] = -a[i];
-    }
+  static void NegAvx2(std::uint32_t* a, std::size_t size) {
+    NegFallback(a, size);
   }
 
-  static void NegSse42(std::int32_t* a, std::size_t size) { NegSse3(a, size); }
-
-  static void NegSse41(std::int32_t* a, std::size_t size) { NegSse3(a, size); }
-
-  static void NegSsse3(std::int32_t* a, std::size_t size) { NegSse3(a, size); }
-
-  static void NegSse3(std::int32_t* a, std::size_t size) {
-    const std::size_t kSseLimit = size - (size % s_kSseSimdWidth);
-    std::size_t       i         = 0;
-
-    for (; i < kSseLimit; i += s_kSseSimdWidth) {
-      __m128i xmm1 = _mm_loadu_si128(reinterpret_cast<const __m128i*>(a + i));
-      xmm1         = _mm_sub_epi32(_mm_setzero_si128(), xmm1);  // Negate
-      _mm_storeu_si128(reinterpret_cast<__m128i*>(a + i), xmm1);
-    }
-
-    // Handle any remaining elements without SIMD
-    for (; i < size; ++i) {
-      a[i] = -a[i];
-    }
+  static void NegAvx(std::uint32_t* a, std::size_t size) {
+    NegFallback(a, size);
   }
 
-  static void NegFallback(std::int32_t* a, std::size_t size) {
-    for (std::size_t i = 0; i < size; ++i) {
-      a[i] = -a[i];
-    }
+  static void NegSse42(std::uint32_t* a, std::size_t size) {
+    NegFallback(a, size);
   }
 
-  // END: negation array
+  static void NegSse41(std::uint32_t* a, std::size_t size) {
+    NegFallback(a, size);
+  }
+
+  static void NegSsse3(std::uint32_t* a, std::size_t size) {
+    NegFallback(a, size);
+  }
+
+  static void NegSse3(std::uint32_t* a, std::size_t size) {
+    NegFallback(a, size);
+  }
+
+  static void NegFallback(std::uint32_t* a, std::size_t size) {
+    assert(false && "Negation for std::uint32_t is not supported.");
+  }
+
+  // END: negation array fallback
   //----------------------------------------------------------------------------
 
   // BEGIN: multiplication array
   //----------------------------------------------------------------------------
-
-  // BEGIN: multiplication array utility functions
 
   template <Options Option>
   static inline auto IndexA(const std::size_t kCurrentRowA,
@@ -613,11 +606,11 @@ class InstructionSet<std::int32_t> {
   // BEGIN: AVX multiplication array utility functions
 
   template <Options Option>
-  static inline auto LoadAAvx(const std::int32_t* a,
-                              const std::size_t   kCurrentRowA,
-                              const std::size_t   kInnerIndex,
-                              const std::size_t   kRowsA,
-                              const std::size_t   kColsARowsB) -> __m256i {
+  static inline auto LoadAAvx(const std::uint32_t* a,
+                              const std::size_t    kCurrentRowA,
+                              const std::size_t    kInnerIndex,
+                              const std::size_t    kRowsA,
+                              const std::size_t    kColsARowsB) -> __m256i {
     if constexpr (Option == Options::RowMajor) {
       return _mm256_loadu_si256(reinterpret_cast<const __m256i*>(
           &a[IndexA<Option>(kCurrentRowA, kInnerIndex, kRowsA, kColsARowsB)]));
@@ -635,11 +628,11 @@ class InstructionSet<std::int32_t> {
   }
 
   template <Options Option>
-  static inline auto LoadBAvx(const std::int32_t* b,
-                              const std::size_t   kInnerIndex,
-                              const std::size_t   kCurrentColB,
-                              const std::size_t   kColsB,
-                              const std::size_t   kColsARowsB) -> __m256i {
+  static inline auto LoadBAvx(const std::uint32_t* b,
+                              const std::size_t    kInnerIndex,
+                              const std::size_t    kCurrentColB,
+                              const std::size_t    kColsB,
+                              const std::size_t    kColsARowsB) -> __m256i {
     if constexpr (Option == Options::RowMajor) {
       return _mm256_set_epi32(
           b[IndexB<Option>(kInnerIndex + 7, kCurrentColB, kColsB, kColsARowsB)],
@@ -661,11 +654,11 @@ class InstructionSet<std::int32_t> {
   // BEGIN: SSE multiplication array utility functions
 
   template <Options Option>
-  static inline auto LoadASse(const std::int32_t* a,
-                              const std::size_t   kCurrentRowA,
-                              const std::size_t   kInnerIndex,
-                              const std::size_t   kRowsA,
-                              const std::size_t   kColsARowsB) -> __m128i {
+  static inline auto LoadASse(const std::uint32_t* a,
+                              const std::size_t    kCurrentRowA,
+                              const std::size_t    kInnerIndex,
+                              const std::size_t    kRowsA,
+                              const std::size_t    kColsARowsB) -> __m128i {
     if constexpr (Option == Options::RowMajor) {
       return _mm_loadu_si128(reinterpret_cast<const __m128i*>(
           &a[IndexA<Option>(kCurrentRowA, kInnerIndex, kRowsA, kColsARowsB)]));
@@ -679,11 +672,11 @@ class InstructionSet<std::int32_t> {
   }
 
   template <Options Option>
-  static inline auto LoadBSse(const std::int32_t* b,
-                              const std::size_t   kInnerIndex,
-                              const std::size_t   kCurrentColB,
-                              const std::size_t   kColsB,
-                              const std::size_t   kColsARowsB) -> __m128 {
+  static inline auto LoadBSse(const std::uint32_t* b,
+                              const std::size_t    kInnerIndex,
+                              const std::size_t    kCurrentColB,
+                              const std::size_t    kColsB,
+                              const std::size_t    kColsARowsB) -> __m128 {
     if constexpr (Option == Options::ColumnMajor) {
       return _mm_loadu_si128(reinterpret_cast<const __m128i*>(
           &b[IndexB<Option>(kInnerIndex, kCurrentColB, kColsB, kColsARowsB)]));
@@ -701,12 +694,12 @@ class InstructionSet<std::int32_t> {
 #endif
 
   template <Options Option>
-  static void MulAvx2(std::int32_t*       result,
-                      const std::int32_t* a,
-                      const std::int32_t* b,
-                      const std::size_t   kRowsA,
-                      const std::size_t   kColsB,
-                      const std::size_t   kColsARowsB) {
+  static void MulAvx2(std::uint32_t*       result,
+                      const std::uint32_t* a,
+                      const std::uint32_t* b,
+                      const std::size_t    kRowsA,
+                      const std::size_t    kColsB,
+                      const std::size_t    kColsARowsB) {
     for (std::size_t currentRowA = 0; currentRowA < kRowsA; ++currentRowA) {
       for (std::size_t currentColB = 0; currentColB < kColsB; ++currentColB) {
         __m256i     sum        = _mm256_setzero_si256();
@@ -722,10 +715,10 @@ class InstructionSet<std::int32_t> {
 
           sum = _mm256_add_epi32(sum, _mm256_mullo_epi32(aVec, bVec));
         }
-        std::int32_t tmp[s_kAvxSimdWidth];
+        std::uint32_t tmp[s_kAvxSimdWidth];
         _mm256_storeu_si256(reinterpret_cast<__m256i*>(tmp), sum);
-        std::int32_t finalSum = 0;
-        for (std::int32_t i : tmp) {
+        std::uint32_t finalSum = 0;
+        for (std::uint32_t i : tmp) {
           finalSum += i;
         }
         for (; innerIndex < kColsARowsB; ++innerIndex) {
@@ -741,34 +734,35 @@ class InstructionSet<std::int32_t> {
   }
 
   template <Options Option>
-  static void MulAvx(std::int32_t*       result,
-                     const std::int32_t* a,
-                     const std::int32_t* b,
-                     const std::size_t   kRowsA,
-                     const std::size_t   kColsB,
-                     const std::size_t   kColsARowsB) {
+  static void MulAvx(std::uint32_t*       result,
+                     const std::uint32_t* a,
+                     const std::uint32_t* b,
+                     std::size_t          kRowsA,
+                     std::size_t          kColsB,
+                     std::size_t          kColsARowsB) {
     // downgrade to SSE 4.2 since AVX does not support direct multiplication of
     // 32-bit integers
     MulSse42<Option>(result, a, b, kRowsA, kColsB, kColsARowsB);
   }
 
   template <Options Option>
-  static void MulSse42(std::int32_t*       result,
-                       const std::int32_t* a,
-                       const std::int32_t* b,
-                       const std::size_t   kRowsA,
-                       const std::size_t   kColsB,
-                       const std::size_t   kColsARowsB) {
+  static void MulSse42(std::uint32_t*       result,
+                       const std::uint32_t* a,
+                       const std::uint32_t* b,
+                       std::size_t          kRowsA,
+                       std::size_t          kColsB,
+                       std::size_t          kColsARowsB) {
     MulSse41<Option>(result, a, b, kRowsA, kColsB, kColsARowsB);
   }
 
+  // MulSse41 - SSE4.1 implementation
   template <Options Option>
-  static void MulSse41(std::int32_t*       result,
-                       const std::int32_t* a,
-                       const std::int32_t* b,
-                       const std::size_t   kRowsA,
-                       const std::size_t   kColsB,
-                       const std::size_t   kColsARowsB) {
+  static void MulSse41(std::uint32_t*       result,
+                       const std::uint32_t* a,
+                       const std::uint32_t* b,
+                       std::size_t          kRowsA,
+                       std::size_t          kColsB,
+                       std::size_t          kColsARowsB) {
     for (std::size_t currentRowA = 0; currentRowA < kRowsA; ++currentRowA) {
       for (std::size_t currentColB = 0; currentColB < kColsB; ++currentColB) {
         __m128i     sum        = _mm_setzero_si128();
@@ -784,10 +778,10 @@ class InstructionSet<std::int32_t> {
 
           sum = _mm_add_epi32(sum, _mm_mullo_epi32(a_vec, b_vec));
         }
-        std::int32_t tmp[s_kSseSimdWidth];
+        std::uint32_t tmp[s_kSseSimdWidth];
         _mm_storeu_si128(reinterpret_cast<__m128i*>(tmp), sum);
-        std::int32_t finalSum = 0;
-        for (std::int32_t i : tmp) {
+        std::uint32_t finalSum = 0;
+        for (std::uint32_t i : tmp) {
           finalSum += i;
         }
         for (; innerIndex < kColsARowsB; ++innerIndex) {
@@ -803,44 +797,44 @@ class InstructionSet<std::int32_t> {
   }
 
   template <Options Option>
-  static void MulSsse3(std::int32_t*       result,
-                       const std::int32_t* a,
-                       const std::int32_t* b,
-                       const std::size_t   kRowsA,
-                       const std::size_t   kColsB,
-                       const std::size_t   kColsARowsB) {
+  static void MulSsse3(std::uint32_t*       result,
+                       const std::uint32_t* a,
+                       const std::uint32_t* b,
+                       const std::size_t    kRowsA,
+                       const std::size_t    kColsB,
+                       const std::size_t    kColsARowsB) {
     // SSSE3 does not include instructions for multiplying a vector of 32-bit
     // integers by a scalar.
     MulFallback<Option>(result, a, b, kRowsA, kColsB, kColsARowsB);
   }
 
   template <Options Option>
-  static void MulSse3(std::int32_t*       result,
-                      const std::int32_t* a,
-                      const std::int32_t* b,
-                      const std::size_t   kRowsA,
-                      const std::size_t   kColsB,
-                      const std::size_t   kColsARowsB) {
+  static void MulSse3(std::uint32_t*       result,
+                      const std::uint32_t* a,
+                      const std::uint32_t* b,
+                      const std::size_t    kRowsA,
+                      const std::size_t    kColsB,
+                      const std::size_t    kColsARowsB) {
     // SSE3 does not include instructions for multiplying a vector of 32-bit
     // integers by a scalar.
     MulFallback<Option>(result, a, b, kRowsA, kColsB, kColsARowsB);
   }
 
   template <Options Option>
-  static void MulFallback(std::int32_t*       result,
-                          const std::int32_t* a,
-                          const std::int32_t* b,
-                          const std::size_t   kRowsA,
-                          const std::size_t   kColsB,
-                          const std::size_t   kColsARowsB) {
+  static void MulFallback(std::uint32_t*       result,
+                          const std::uint32_t* a,
+                          const std::uint32_t* b,
+                          const std::size_t    kRowsA,
+                          const std::size_t    kColsB,
+                          const std::size_t    kColsARowsB) {
     for (std::size_t i = 0; i < kRowsA; ++i) {
       for (std::size_t j = 0; j < kColsB; ++j) {
-        std::int32_t sum = 0;
+        std::uint32_t sum = 0;
         for (std::size_t k = 0; k < kColsARowsB; ++k) {
-          sum += a[indexA<Option>(i, k, kRowsA, kColsARowsB)]
-               * b[indexB<Option>(k, j, kColsB, kColsARowsB)];
+          sum += a[IndexA<Option>(i, k, kRowsA, kColsARowsB)]
+               * b[IndexB<Option>(k, j, kColsB, kColsARowsB)];
         }
-        result[indexResult<Option>(i, j, kRowsA, kColsB)] = sum;
+        result[IndexResult<Option>(i, j, kRowsA, kColsB)] = sum;
       }
     }
   }
@@ -851,9 +845,9 @@ class InstructionSet<std::int32_t> {
   // BEGIN: multiplication scalar
   //----------------------------------------------------------------------------
 
-  static void MulScalarAvx2(std::int32_t* a,
-                            std::int32_t  scalar,
-                            std::size_t   size) {
+  static void MulScalarAvx2(std::uint32_t* a,
+                            std::uint32_t  scalar,
+                            std::size_t    size) {
     __m256i           ymm0       = _mm256_set1_epi32(scalar);
     const std::size_t kAvx2Limit = size - (size % s_kAvxSimdWidth);
     std::size_t       i          = 0;
@@ -870,23 +864,23 @@ class InstructionSet<std::int32_t> {
     }
   }
 
-  static void MulScalarAvx(std::int32_t* a,
-                           std::int32_t  scalar,
-                           std::size_t   size) {
+  static void MulScalarAvx(std::uint32_t* a,
+                           std::uint32_t  scalar,
+                           std::size_t    size) {
     MulScalarSse42(a, scalar, size);  // downgrade to SSE 4.2 since AVX does
                                       // not support direct multiplication of
                                       // 32-bit integers
   }
 
-  static void MulScalarSse42(std::int32_t* a,
-                             std::int32_t  scalar,
-                             std::size_t   size) {
+  static void MulScalarSse42(std::uint32_t* a,
+                             std::uint32_t  scalar,
+                             std::size_t    size) {
     MulScalarSse41(a, scalar, size);
   }
 
-  static void MulScalarSse41(std::int32_t* a,
-                             std::int32_t  scalar,
-                             std::size_t   size) {
+  static void MulScalarSse41(std::uint32_t* a,
+                             std::uint32_t  scalar,
+                             std::size_t    size) {
     __m128i           xmm0      = _mm_set1_epi32(scalar);
     const std::size_t kSseLimit = size - (size % s_kSseSimdWidth);
     std::size_t       i         = 0;
@@ -903,25 +897,25 @@ class InstructionSet<std::int32_t> {
     }
   }
 
-  static void MulScalarSsse3(std::int32_t* a,
-                             std::int32_t  scalar,
-                             std::size_t   size) {
+  static void MulScalarSsse3(std::uint32_t* a,
+                             std::uint32_t  scalar,
+                             std::size_t    size) {
     // SSSE3 does not include instructions for multiplying a vector of 32-bit
     // integers by a scalar.
     MulScalarFallback(a, scalar, size);
   }
 
-  static void MulScalarSse3(std::int32_t* a,
-                            std::int32_t  scalar,
-                            std::size_t   size) {
+  static void MulScalarSse3(std::uint32_t* a,
+                            std::uint32_t  scalar,
+                            std::size_t    size) {
     // SSE3 does not include instructions for multiplying a vector of 32-bit
     // integers by a scalar.
     MulScalarFallback(a, scalar, size);
   }
 
-  static void MulScalarFallback(std::int32_t* a,
-                                std::int32_t  scalar,
-                                std::size_t   size) {
+  static void MulScalarFallback(std::uint32_t* a,
+                                std::uint32_t  scalar,
+                                std::size_t    size) {
     for (std::size_t i = 0; i < size; ++i) {
       a[i] *= scalar;
     }
@@ -933,9 +927,9 @@ class InstructionSet<std::int32_t> {
   // BEGIN: division scalar
   //----------------------------------------------------------------------------
 
-  static void DivScalarAvx2(std::int32_t* a,
-                            std::int32_t  scalar,
-                            std::size_t   size) {
+  static void DivScalarAvx2(std::uint32_t* a,
+                            std::uint32_t  scalar,
+                            std::size_t    size) {
 #ifdef SUPPORTS_SVML
     DivScalarAvx(a, scalar, size);
 #else
@@ -943,9 +937,9 @@ class InstructionSet<std::int32_t> {
 #endif
   }
 
-  static void DivScalarAvx(std::int32_t* a,
-                           std::int32_t  scalar,
-                           std::size_t   size) {
+  static void DivScalarAvx(std::uint32_t* a,
+                           std::uint32_t  scalar,
+                           std::size_t    size) {
 #ifdef SUPPORTS_SVML
     const std::size_t kAvxLimit = size - (size % s_kAvxSimdWidth);
     __m256i           ymm0      = _mm256_set1_epi32(scalar);
@@ -966,9 +960,9 @@ class InstructionSet<std::int32_t> {
 #endif
   }
 
-  static void DivScalarSse42(std::int32_t* a,
-                             std::int32_t  scalar,
-                             std::size_t   size) {
+  static void DivScalarSse42(std::uint32_t* a,
+                             std::uint32_t  scalar,
+                             std::size_t    size) {
 #ifdef SUPPORTS_SVML
     DivScalarSse3(a, scalar, size);
 #else
@@ -976,9 +970,9 @@ class InstructionSet<std::int32_t> {
 #endif
   }
 
-  static void DivScalarSse41(std::int32_t* a,
-                             std::int32_t  scalar,
-                             std::size_t   size) {
+  static void DivScalarSse41(std::uint32_t* a,
+                             std::uint32_t  scalar,
+                             std::size_t    size) {
 #ifdef SUPPORTS_SVML
     DivScalarSse3(a, scalar, size);
 #else
@@ -986,9 +980,9 @@ class InstructionSet<std::int32_t> {
 #endif
   }
 
-  static void DivScalarSsse3(std::int32_t* a,
-                             std::int32_t  scalar,
-                             std::size_t   size) {
+  static void DivScalarSsse3(std::uint32_t* a,
+                             std::uint32_t  scalar,
+                             std::size_t    size) {
 #ifdef SUPPORTS_SVML
     DivScalarSse3(a, scalar, size);
 #else
@@ -996,9 +990,9 @@ class InstructionSet<std::int32_t> {
 #endif
   }
 
-  static void DivScalarSse3(std::int32_t* a,
-                            std::int32_t  scalar,
-                            std::size_t   size) {
+  static void DivScalarSse3(std::uint32_t* a,
+                            std::uint32_t  scalar,
+                            std::size_t    size) {
 #ifdef SUPPORTS_SVML
     const std::size_t kSseLimit = size - (size % s_kSseSimdWidth);
     __m128i           xmm0      = _mm_set1_epi32(scalar);
@@ -1019,9 +1013,9 @@ class InstructionSet<std::int32_t> {
 #endif
   }
 
-  static void DivScalarFallback(std::int32_t* a,
-                                std::int32_t  scalar,
-                                std::size_t   size) {
+  static void DivScalarFallback(std::uint32_t* a,
+                                std::uint32_t  scalar,
+                                std::size_t    size) {
     for (std::size_t i = 0; i < size; ++i) {
       a[i] /= scalar;
     }
@@ -1033,31 +1027,38 @@ class InstructionSet<std::int32_t> {
   // BEGIN: comparison array
   //----------------------------------------------------------------------------
 
-  static std::int32_t CmpAvx2(const std::int32_t* a,
-                              const std::int32_t* b,
-                              std::size_t         size) {
+  static int CmpAvx2(const std::uint32_t* a,
+                     const std::uint32_t* b,
+                     std::size_t          size) {
     return CmpAvx(a, b, size);
   }
 
-  static std::int32_t CmpAvx(const std::int32_t* a,
-                             const std::int32_t* b,
-                             std::size_t         size) {
+  static int CmpAvx(const std::uint32_t* a,
+                    const std::uint32_t* b,
+                    std::size_t          size) {
     const std::size_t kAvxLimit = size - (size % s_kAvxSimdWidth);
     std::size_t       i         = 0;
 
     for (; i < kAvxLimit; i += s_kAvxSimdWidth) {
-      __m256i      aVec      = _mm256_loadu_si256((__m256i*)(a + i));
-      __m256i      bVec      = _mm256_loadu_si256((__m256i*)(b + i));
-      __m256i      cmpResult = _mm256_cmpgt_epi32(bVec, aVec);
-      std::int32_t mask = _mm256_movemask_ps(_mm256_castsi256_ps(cmpResult));
+      __m256i aVec = _mm256_loadu_si256((__m256i*)(a + i));
+      __m256i bVec = _mm256_loadu_si256((__m256i*)(b + i));
+
+      __m256i signBit  = _mm256_set1_epi32(0x80'00'00'00);
+      __m256i aVecSign = _mm256_xor_si256(aVec, signBit);
+      __m256i bVecSign = _mm256_xor_si256(bVec, signBit);
+
+      __m256i cmpResult = _mm256_cmpgt_epi32(bVecSign, aVecSign);
+      int     mask      = _mm256_movemask_ps(_mm256_castsi256_ps(cmpResult));
       if (mask != 0) {
         return -1;
       }
-      cmpResult = _mm256_cmpgt_epi32(aVec, bVec);
+
+      cmpResult = _mm256_cmpgt_epi32(aVecSign, bVecSign);
       mask      = _mm256_movemask_ps(_mm256_castsi256_ps(cmpResult));
       if (mask != 0) {
         return 1;
       }
+
       cmpResult = _mm256_cmpeq_epi32(aVec, bVec);
       mask      = _mm256_movemask_ps(_mm256_castsi256_ps(cmpResult));
       if (mask == 0xFF) {
@@ -1076,43 +1077,50 @@ class InstructionSet<std::int32_t> {
     return 0;
   }
 
-  static std::int32_t CmpSse42(const std::int32_t* a,
-                               const std::int32_t* b,
-                               std::size_t         size) {
+  static int CmpSse42(const std::uint32_t* a,
+                      const std::uint32_t* b,
+                      std::size_t          size) {
     return CmpSse3(a, b, size);
   }
 
-  static std::int32_t CmpSse41(const std::int32_t* a,
-                               const std::int32_t* b,
-                               std::size_t         size) {
+  static int CmpSse41(const std::uint32_t* a,
+                      const std::uint32_t* b,
+                      std::size_t          size) {
     return CmpSse3(a, b, size);
   }
 
-  static std::int32_t CmpSsse3(const std::int32_t* a,
-                               const std::int32_t* b,
-                               std::size_t         size) {
+  static int CmpSsse3(const std::uint32_t* a,
+                      const std::uint32_t* b,
+                      std::size_t          size) {
     return CmpSse3(a, b, size);
   }
 
-  static std::int32_t CmpSse3(const std::int32_t* a,
-                              const std::int32_t* b,
-                              std::size_t         size) {
+  static int CmpSse3(const std::uint32_t* a,
+                     const std::uint32_t* b,
+                     std::size_t          size) {
     const std::size_t kSseLimit = size - (size % s_kSseSimdWidth);
     std::size_t       i         = 0;
 
     for (; i < kSseLimit; i += s_kSseSimdWidth) {
-      __m128i      aVec      = _mm_loadu_si128((__m128i*)(a + i));
-      __m128i      bVec      = _mm_loadu_si128((__m128i*)(b + i));
-      __m128i      cmpResult = _mm_cmplt_epi32(aVec, bVec);
-      std::int32_t mask      = _mm_movemask_ps(_mm_castsi128_ps(cmpResult));
+      __m128i aVec = _mm_loadu_si128((__m128i*)(a + i));
+      __m128i bVec = _mm_loadu_si128((__m128i*)(b + i));
+
+      __m128i signBit  = _mm_set1_epi32(0x80'00'00'00);
+      __m128i aVecSign = _mm_xor_si128(aVec, signBit);
+      __m128i bVecSign = _mm_xor_si128(bVec, signBit);
+
+      __m128i cmpResult = _mm_cmpgt_epi32(bVecSign, aVecSign);
+      int     mask      = _mm_movemask_ps(_mm_castsi128_ps(cmpResult));
       if (mask != 0) {
         return -1;
       }
-      cmpResult = _mm_cmpgt_epi32(aVec, bVec);
+
+      cmpResult = _mm_cmpgt_epi32(aVecSign, bVecSign);
       mask      = _mm_movemask_ps(_mm_castsi128_ps(cmpResult));
       if (mask != 0) {
         return 1;
       }
+
       cmpResult = _mm_cmpeq_epi32(aVec, bVec);
       mask      = _mm_movemask_ps(_mm_castsi128_ps(cmpResult));
       if (mask == 0xF) {
@@ -1131,9 +1139,9 @@ class InstructionSet<std::int32_t> {
     return 0;
   }
 
-  static std::int32_t CmpFallback(const std::int32_t* a,
-                         const std::int32_t* b,
-                         std::size_t         size) {
+  static int CmpFallback(const std::uint32_t* a,
+                         const std::uint32_t* b,
+                         std::size_t          size) {
     for (std::size_t i = 0; i < size; ++i) {
       if (a[i] < b[i]) {
         return -1;
@@ -1150,4 +1158,4 @@ class InstructionSet<std::int32_t> {
 
 }  // namespace math
 
-#endif
+#endif  // MATH_LIBRARY_INSTRUCTION_SET_UINT32_H
