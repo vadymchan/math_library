@@ -704,7 +704,7 @@ class Vector {
    * multiplication.
    * @note This function only works for row-major vectors, and the size of the
    * vector must equal the number of rows in the matrix.
-   */   
+   */
   template <std::size_t Rows, std::size_t Columns>
     requires ValueEqualTo<Rows, Size> && (Option == Options::RowMajor)
   auto operator*(const Matrix<T, Rows, Columns, Option>& matrix) const
@@ -1090,7 +1090,6 @@ auto operator*(const Matrix<T, Rows, Columns, Option>& matrix,
   return Vector<T, Rows, Option>(matrix * vector.m_dataStorage_);
 }
 
-
 /**
  * @brief Performs scalar multiplication on a vector, where the scalar value is
  * the left-hand operand.
@@ -1122,9 +1121,10 @@ auto operator*(const ScalarType& scalar, const Vector<T, Size, Option>& vector)
 
 /**
  * @brief Alias for a vector of floats.
- * 
- * This defines a vector of floating point numbers with the specified size and layout.
- * 
+ *
+ * This defines a vector of floating point numbers with the specified size and
+ * layout.
+ *
  * @tparam Size The number of elements in the vector.
  * @tparam Option The layout option (RowMajor or ColumnMajor).
  */
@@ -1133,9 +1133,10 @@ using VectorNf = Vector<float, Size, Option>;
 
 /**
  * @brief Alias for a vector of doubles.
- * 
- * This defines a vector of double-precision floating point numbers with the specified size and layout.
- * 
+ *
+ * This defines a vector of double-precision floating point numbers with the
+ * specified size and layout.
+ *
  * @tparam Size The number of elements in the vector.
  * @tparam Option The layout option (RowMajor or ColumnMajor).
  */
@@ -1144,9 +1145,10 @@ using VectorNd = Vector<double, Size, Option>;
 
 /**
  * @brief Alias for a vector of integers.
- * 
- * This defines a vector of 32-bit signed integers with the specified size and layout.
- * 
+ *
+ * This defines a vector of 32-bit signed integers with the specified size and
+ * layout.
+ *
  * @tparam Size The number of elements in the vector.
  * @tparam Option The layout option (RowMajor or ColumnMajor).
  */
@@ -1155,9 +1157,10 @@ using VectorNi = Vector<std::int32_t, Size, Option>;
 
 /**
  * @brief Alias for a vector of unsigned integers.
- * 
- * This defines a vector of 32-bit unsigned integers with the specified size and layout.
- * 
+ *
+ * This defines a vector of 32-bit unsigned integers with the specified size and
+ * layout.
+ *
  * @tparam Size The number of elements in the vector.
  * @tparam Option The layout option (RowMajor or ColumnMajor).
  */
@@ -1166,9 +1169,10 @@ using VectorNui = Vector<std::uint32_t, Size, Option>;
 
 /**
  * @brief Alias for a 2D vector.
- * 
- * This defines a 2D vector (vector with 2 elements) of the specified type and layout.
- * 
+ *
+ * This defines a 2D vector (vector with 2 elements) of the specified type and
+ * layout.
+ *
  * @tparam T The type of elements in the vector.
  * @tparam Option The layout option (RowMajor or ColumnMajor).
  */
@@ -1177,9 +1181,10 @@ using Vector2D = Vector<T, 2, Option>;
 
 /**
  * @brief Alias for a 3D vector.
- * 
- * This defines a 3D vector (vector with 3 elements) of the specified type and layout.
- * 
+ *
+ * This defines a 3D vector (vector with 3 elements) of the specified type and
+ * layout.
+ *
  * @tparam T The type of elements in the vector.
  * @tparam Option The layout option (RowMajor or ColumnMajor).
  */
@@ -1188,9 +1193,10 @@ using Vector3D = Vector<T, 3, Option>;
 
 /**
  * @brief Alias for a 4D vector.
- * 
- * This defines a 4D vector (vector with 4 elements) of the specified type and layout.
- * 
+ *
+ * This defines a 4D vector (vector with 4 elements) of the specified type and
+ * layout.
+ *
  * @tparam T The type of elements in the vector.
  * @tparam Option The layout option (RowMajor or ColumnMajor).
  */
