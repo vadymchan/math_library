@@ -595,14 +595,14 @@ class Quaternion {
   template <Options Option = Options::RowMajor>
   static auto fromRotationMatrix(const Matrix<T, 3, 3, Option>& m)
       -> Quaternion {
-    const T trace = m.trace();
+    auto trace = m.trace();
 
     constexpr T kHalfInverseScaleFactor  = T(0.5);
     constexpr T kIdentityMatrixIncrement = T(1);
 
     if (trace > 0) {
-      const T scaleFactor = kHalfInverseScaleFactor
-                          / std::sqrt(trace + kIdentityMatrixIncrement);
+      auto scaleFactor = kHalfInverseScaleFactor
+                       / std::sqrt(trace + kIdentityMatrixIncrement);
       return fromRotationMatrixPositiveTrace(m, scaleFactor);
     } else {
       return fromRotationMatrixNegativeTrace(m);
@@ -690,14 +690,14 @@ class Quaternion {
    */
   static auto slerp(const Quaternion& q1, const Quaternion& q2, const T t)
       -> Quaternion {
-    const T dot   = q1.m_data_.dot(q2.m_data_);
-    const T angle = std::acos(dot);
+    auto dot   = q1.m_data_.dot(q2.m_data_);
+    auto angle = std::acos(dot);
     if (std::abs(angle) < std::numeric_limits<T>::epsilon()) {
       return q1;
     }
-    const T sinAngle = std::sin(angle);
-    const T t1       = std::sin((1 - t) * angle) / sinAngle;
-    const T t2       = std::sin(t * angle) / sinAngle;
+    auto sinAngle = std::sin(angle);
+    auto t1       = std::sin((1 - t) * angle) / sinAngle;
+    auto t2       = std::sin(t * angle) / sinAngle;
     return Quaternion(t1 * q1.m_data_ + t2 * q2.m_data_);
   }
 
@@ -823,11 +823,11 @@ class Quaternion {
     }
 
     const Vector3D<T> vec   = m_data_.template resizedCopy<3>();
-    const T           angle = vec.magnitude();
-    const T           sina  = std::sin(angle);
-    const T           cosa  = std::cos(angle);
+    auto              angle = vec.magnitude();
+    auto              sinA  = std::sin(angle);
+    auto              cosA  = std::cos(angle);
     const Vector3D<T> axis  = vec.normalized();
-    return Quaternion(axis * sina, cosa);
+    return Quaternion(axis * sinA, cosA);
   }
 
   /**
@@ -840,13 +840,13 @@ class Quaternion {
    * @return The natural logarithm of the quaternion.
    */
   [[nodiscard]] auto log() const -> Quaternion {
-    const T           angle = std::acos(m_data_.w());
-    const T           sina  = std::sin(angle);
+    auto              angle = std::acos(m_data_.w());
+    auto              sinA  = std::sin(angle);
     const Vector3D<T> vec   = m_data_.template resizedCopy<3>();
-    if (std::abs(sina) < std::numeric_limits<T>::epsilon()) {
+    if (std::abs(sinA) < std::numeric_limits<T>::epsilon()) {
       return Quaternion(vec, 0);
     }
-    const T factor = angle / sina;
+    auto factor = angle / sinA;
     return Quaternion(vec * factor, 0);
   }
 
@@ -1080,14 +1080,16 @@ class Quaternion {
 /**
  * @brief Typedef for a quaternion with float components.
  *
- * This type is used when working with quaternions that use `float` as the scalar type.
+ * This type is used when working with quaternions that use `float` as the
+ * scalar type.
  */
 using Quaternionf = Quaternion<float>;
 
 /**
  * @brief Typedef for a quaternion with double components.
  *
- * This type is used when working with quaternions that use `double` as the scalar type.
+ * This type is used when working with quaternions that use `double` as the
+ * scalar type.
  */
 using Quaterniond = Quaternion<double>;
 
