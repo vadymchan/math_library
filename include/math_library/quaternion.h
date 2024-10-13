@@ -510,6 +510,43 @@ class Quaternion {
       // clang-format on
     }
   }
+
+  /**
+   * @brief Converts the quaternion to Euler angles (pitch, yaw, roll).
+   *
+   * This method computes the Euler angles (pitch, yaw, and roll) and returns
+   * them as a 3D vector. The angles are computed in radians, where:
+   * - Pitch represents the rotation around the X-axis.
+   * - Yaw represents the rotation around the Y-axis.
+   * - Roll represents the rotation around the Z-axis.
+   *
+   * @return A 3D vector where:
+   * - X-component is the pitch (rotation around the X-axis).
+   * - Y-component is the yaw (rotation around the Y-axis).
+   * - Z-component is the roll (rotation around the Z-axis).
+   */
+  [[nodiscard]] auto toEulerAngles() const -> Vector3D<T> {
+    T pitch, yaw, roll;
+    toEulerAngles(pitch, yaw, roll);
+    return Vector3D<T>(pitch, yaw, roll);
+  }
+
+  /**
+   * @brief Converts the quaternion to Euler angles (pitch, yaw, roll).
+   *
+   * This method computes the Euler angles and returns them via reference
+   * parameters.
+   *
+   * @param pitch Reference to store the pitch angle (rotation around X-axis).
+   * @param yaw Reference to store the yaw angle (rotation around Y-axis).
+   * @param roll Reference to store the roll angle (rotation around Z-axis).
+   */
+  void toEulerAngles(T& pitch, T& yaw, T& roll) const {
+    pitch = getPitch();
+    yaw   = getYaw();
+    roll  = getRoll();
+  }
+
   /**
    * @brief Converts the quaternion to an axis-angle representation.
    *
@@ -571,6 +608,47 @@ class Quaternion {
       return fromRotationMatrixNegativeTrace(m);
     }
   }
+
+  // TODO: add doxygen comments
+  static auto fromEulerAngles(const T pitch, const T yaw, const T roll)
+      -> Quaternion {
+    auto halfPitch = pitch / T(2);
+    auto halfYaw   = yaw / T(2);
+    auto halfRoll  = roll / T(2);
+
+    auto c1 = std::cos(halfPitch);
+    auto s1 = std::sin(halfPitch);
+
+    auto c2 = std::cos(halfYaw);
+    auto s2 = std::sin(halfYaw);
+
+    auto c3 = std::cos(halfRoll);
+    auto s3 = std::sin(halfRoll);
+
+    Quaternion qPitch(s1, 0, 0, c1);
+    Quaternion qYaw(0, s2, 0, c2);
+    Quaternion qRoll(0, 0, s3, c3);
+
+    // currently using this approach (unoptimized) for clarity
+    Quaternion result;
+    result = qRoll * qPitch * qYaw;  // ZXY
+    // result = qRoll * qYaw * qPitch;  // ZYX
+    // result = qPitch * qYaw * qRoll;  // XYZ
+    // result = qPitch * qRoll * qYaw;  // XZY
+    // result = qYaw * qPitch * qRoll;  // YXZ
+    // result = qYaw * qRoll * qPitch;  // YZX
+
+    return result;
+
+    // optimized version (order is roll, yaw, pitch)
+    // auto q0 = c1 * c2 * c3 + s1 * s2 * s3;
+    // auto q1 = s1 * c2 * c3 - c1 * s2 * s3;
+    // auto q2 = c1 * s2 * c3 + s1 * c2 * s3;
+    // auto q3 = c1 * c2 * s3 - s1 * s2 * c3;
+
+    // return Quaternion(q1, q2, q3, q0);
+  }
+
   /**
    * @brief Creates a quaternion from an axis-angle representation.
    *
