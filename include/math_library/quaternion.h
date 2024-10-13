@@ -407,19 +407,19 @@ class Quaternion {
 
     if constexpr (Option == Options::RowMajor) {
       // clang-format off
-        return Matrix<T, 3, 3, Option>(
-            1 - 2*y*y - 2*z*z, 2*x*y - 2*z*w,     2*x*z + 2*y*w,
-            2*x*y + 2*z*w,     1 - 2*x*x - 2*z*z, 2*y*z - 2*x*w,
-            2*x*z - 2*y*w,     2*y*z + 2*x*w,     1 - 2*x*x - 2*y*y
-        );
+      return Matrix<T, 3, 3, Option>(
+          1 - 2*y*y - 2*z*z, 2*x*y + 2*z*w,     2*x*z - 2*y*w,
+          2*x*y - 2*z*w,     1 - 2*x*x - 2*z*z, 2*y*z + 2*x*w,
+          2*x*z + 2*y*w,     2*y*z - 2*x*w,     1 - 2*x*x - 2*y*y
+      );
       // clang-format on
     } else if constexpr (Option == Options::ColumnMajor) {
       // clang-format off
-        return Matrix<T, 3, 3, Option>(
-            1 - 2*y*y - 2*z*z, 2*x*y + 2*z*w,     2*x*z - 2*y*w,
-            2*x*y - 2*z*w,     1 - 2*x*x - 2*z*z, 2*y*z + 2*x*w,
-            2*x*z + 2*y*w,     2*y*z - 2*x*w,     1 - 2*x*x - 2*y*y
-        );
+      return Matrix<T, 3, 3, Option>(
+          1 - 2*y*y - 2*z*z, 2*x*y - 2*z*w,     2*x*z + 2*y*w,
+          2*x*y + 2*z*w,     1 - 2*x*x - 2*z*z, 2*y*z - 2*x*w,
+          2*x*z - 2*y*w,     2*y*z + 2*x*w,     1 - 2*x*x - 2*y*y
+      );
       // clang-format on
     }
   }
