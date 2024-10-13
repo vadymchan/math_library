@@ -510,6 +510,40 @@ class Quaternion {
       // clang-format on
     }
   }
+  /**
+   * @brief Converts the quaternion to an axis-angle representation.
+   *
+   * Extracts the rotation axis and rotation angle from the quaternion.
+   * The axis is returned as a normalized vector, and the angle is in radians.
+   * For the identity quaternion (no rotation), the angle will be zero and the
+   * axis will be (1, 0, 0).
+   *
+   * @param axis Output parameter to receive the rotation axis (normalized
+   * vector).
+   * @param angle Output parameter to receive the rotation angle in radians.
+   */
+  void toAxisAngle(Vector3D<T>& axis, T& angle) const {
+    auto q = this->normalized();
+
+    auto q0 = q.w();
+    auto q1 = q.x();
+    auto q2 = q.y();
+    auto q3 = q.z();
+
+    angle = T(2) * std::acos(q0);
+
+    // sin(angle/2) is derived using the identity
+    // sin^2(angle/2) + cos^2(angle/2) = 1,
+    // therefore sin(angle/2) = sqrt(1 - cos^2(angle/2))
+    auto sinHalfAngle = std::sqrt(T(1) - q0 * q0);
+
+    if (sinHalfAngle < std::numeric_limits<T>::epsilon()) {
+      // Angle is zero, so any axis will do
+      axis = Vector3D<T>(T(1), T(0), T(0));
+    } else {
+      axis = Vector3D<T>(q1, q2, q3) / sinHalfAngle;
+    }
+  }
 
   /**
    * @brief Creates a quaternion from a rotation matrix.
@@ -536,6 +570,31 @@ class Quaternion {
     } else {
       return fromRotationMatrixNegativeTrace(m);
     }
+  }
+  /**
+   * @brief Creates a quaternion from an axis-angle representation.
+   *
+   * Constructs a quaternion representing a rotation around a given axis by a
+   * given angle. The axis should be a normalized vector.
+   *
+   * @param axis The axis of rotation (should be a normalized vector).
+   * @param angle The rotation angle in radians.
+   * @return The quaternion representing the rotation.
+   */
+  static auto fromAxisAngle(const Vector3D<T>& axis, const T angle)
+      -> Quaternion {
+    auto halfAngle    = angle / T(2);
+    auto sinHalfAngle = std::sin(halfAngle);
+    auto cosHalfAngle = std::cos(halfAngle);
+
+    Vector3D<T> normalizedAxis = axis.normalized();
+
+    auto q0 = cosHalfAngle;
+    auto q1 = normalizedAxis.x() * sinHalfAngle;
+    auto q2 = normalizedAxis.y() * sinHalfAngle;
+    auto q3 = normalizedAxis.z() * sinHalfAngle;
+
+    return Quaternion(q1, q2, q3, q0);
   }
 
   /**
