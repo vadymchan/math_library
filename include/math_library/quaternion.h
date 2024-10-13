@@ -124,6 +124,93 @@ class Quaternion {
   [[nodiscard]] auto w() const -> const T& { return m_data_.w(); }
 
   /**
+   * @brief Computes the pitch (rotation around the X-axis) from the normalized
+   * quaternion.
+   *
+   * This method calculates the pitch angle, handling singularities where
+   * necessary.
+   *
+   * @return The pitch angle in radians.
+   */
+  [[nodiscard]] auto getPitch() const -> T {
+    auto q = this->normalized();
+
+    auto w = q.w();
+    auto x = q.x();
+    auto y = q.y();
+    auto z = q.z();
+
+    T sinr_cosp = T(2) * (x * y + w * z);
+    T cosr_cosp = w * w - x * x - y * y + z * z;
+
+    constexpr T epsilon = std::numeric_limits<T>::epsilon();
+
+    if (std::abs(sinr_cosp) < epsilon && std::abs(cosr_cosp) < epsilon) {
+      // Handle singularity
+      return T(2) * std::atan2(x, w);
+    } else {
+      return std::atan2(sinr_cosp, cosr_cosp);
+    }
+  }
+
+  /**
+   * @brief Computes the yaw (rotation around the Y-axis) from the normalized
+   * quaternion.
+   *
+   * This method calculates the yaw angle, handling singularities where
+   * necessary.
+   *
+   * @return The yaw angle in radians.
+   */
+  [[nodiscard]] auto getYaw() const -> T {
+    auto q = this->normalized();
+
+    auto w = q.w();
+    auto x = q.x();
+    auto y = q.y();
+    auto z = q.z();
+
+    T sinp = T(2) * (w * y - x * z);
+
+    if (std::abs(sinp) >= T(1)) {
+      // Singularity: use 90 degrees if out of range
+      return std::copysign(T(g_kPi) / T(2), sinp);
+    } else {
+      return std::asin(sinp);
+    }
+  }
+
+  /**
+   * @brief Computes the roll (rotation around the Z-axis) from the normalized
+   * quaternion.
+   *
+   * This method calculates the roll angle, handling singularities where
+   * necessary.
+   *
+   * @return The roll angle in radians.
+   */
+  [[nodiscard]] auto getRoll() const -> T {
+    auto q = this->normalized();
+
+    auto w = q.w();
+    auto x = q.x();
+    auto y = q.y();
+    auto z = q.z();
+
+    T siny_cosp = T(2) * (x * y + w * z);
+    T cosy_cosp = w * w + x * x - y * y - z * z;
+
+    constexpr T epsilon = std::numeric_limits<T>::epsilon();
+
+    if (std::abs(siny_cosp) < epsilon && std::abs(cosy_cosp) < epsilon) {
+      // Handle singularity
+      return T(0);
+    } else {
+      return std::atan2(siny_cosp, cosy_cosp);
+    }
+  }
+
+  /**
    * @brief Sets the x-component of the quaternion.
    *
    * This method allows you to modify the x-component of the quaternion.
