@@ -641,7 +641,7 @@ class Vector {
    * @return A reference to this vector after the subtraction.
    */
   auto operator-=(const Vector& other) -> Vector& {
-    m_dataStorage_ -= other;
+    m_dataStorage_ -= other.m_dataStorage_;
     return *this;
   }
 
