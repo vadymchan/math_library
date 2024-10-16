@@ -18,6 +18,33 @@
 
 namespace math {
 
+// TODO: dirty solution. Consider moving somewhere
+enum class Axis {
+  X = 0,
+  Y = 1,
+  Z = 2
+};
+
+enum class Frame {
+  Static   = 0,
+  Rotating = 1
+};
+
+enum class EulerRotationOrder {
+  XYZ,
+  XYX,
+  XZY,
+  XZX,
+  YZX,
+  YZY,
+  YXZ,
+  YXY,
+  ZXY,
+  ZXZ,
+  ZYX,
+  ZYZ
+};
+
 /**
  * @brief A class representing a quaternion.
  *
@@ -122,93 +149,6 @@ class Quaternion {
    * @return A const reference to the w-component.
    */
   [[nodiscard]] auto w() const -> const T& { return m_data_.w(); }
-
-  /**
-   * @brief Computes the pitch (rotation around the X-axis) from the normalized
-   * quaternion.
-   *
-   * This method calculates the pitch angle, handling singularities where
-   * necessary.
-   *
-   * @return The pitch angle in radians.
-   */
-  [[nodiscard]] auto getPitch() const -> T {
-    auto q = this->normalized();
-
-    auto w = q.w();
-    auto x = q.x();
-    auto y = q.y();
-    auto z = q.z();
-
-    T sinr_cosp = T(2) * (x * y + w * z);
-    T cosr_cosp = w * w - x * x - y * y + z * z;
-
-    constexpr T epsilon = std::numeric_limits<T>::epsilon();
-
-    if (std::abs(sinr_cosp) < epsilon && std::abs(cosr_cosp) < epsilon) {
-      // Handle singularity
-      return T(2) * std::atan2(x, w);
-    } else {
-      return std::atan2(sinr_cosp, cosr_cosp);
-    }
-  }
-
-  /**
-   * @brief Computes the yaw (rotation around the Y-axis) from the normalized
-   * quaternion.
-   *
-   * This method calculates the yaw angle, handling singularities where
-   * necessary.
-   *
-   * @return The yaw angle in radians.
-   */
-  [[nodiscard]] auto getYaw() const -> T {
-    auto q = this->normalized();
-
-    auto w = q.w();
-    auto x = q.x();
-    auto y = q.y();
-    auto z = q.z();
-
-    T sinp = T(2) * (w * y - x * z);
-
-    if (std::abs(sinp) >= T(1)) {
-      // Singularity: use 90 degrees if out of range
-      return std::copysign(T(g_kPi) / T(2), sinp);
-    } else {
-      return std::asin(sinp);
-    }
-  }
-
-  /**
-   * @brief Computes the roll (rotation around the Z-axis) from the normalized
-   * quaternion.
-   *
-   * This method calculates the roll angle, handling singularities where
-   * necessary.
-   *
-   * @return The roll angle in radians.
-   */
-  [[nodiscard]] auto getRoll() const -> T {
-    auto q = this->normalized();
-
-    auto w = q.w();
-    auto x = q.x();
-    auto y = q.y();
-    auto z = q.z();
-
-    T siny_cosp = T(2) * (x * y + w * z);
-    T cosy_cosp = w * w + x * x - y * y - z * z;
-
-    constexpr T epsilon = std::numeric_limits<T>::epsilon();
-
-    if (std::abs(siny_cosp) < epsilon && std::abs(cosy_cosp) < epsilon) {
-      // Handle singularity
-      return T(0);
-    } else {
-      return std::atan2(siny_cosp, cosy_cosp);
-    }
-  }
 
   /**
    * @brief Sets the x-component of the quaternion.
@@ -516,40 +456,91 @@ class Quaternion {
     }
   }
 
-  /**
-   * @brief Converts the quaternion to Euler angles (pitch, yaw, roll).
-   *
-   * This method computes the Euler angles (pitch, yaw, and roll) and returns
-   * them as a 3D vector. The angles are computed in radians, where:
-   * - Pitch represents the rotation around the X-axis.
-   * - Yaw represents the rotation around the Y-axis.
-   * - Roll represents the rotation around the Z-axis.
-   *
-   * @return A 3D vector where:
-   * - X-component is the pitch (rotation around the X-axis).
-   * - Y-component is the yaw (rotation around the Y-axis).
-   * - Z-component is the roll (rotation around the Z-axis).
-   */
-  [[nodiscard]] auto toEulerAngles() const -> Vector3D<T> {
-    T pitch, yaw, roll;
-    toEulerAngles(pitch, yaw, roll);
-    return Vector3D<T>(pitch, yaw, roll);
-  }
+  // TODO: add toEulerAngles method that takes vector of angles
 
-  /**
-   * @brief Converts the quaternion to Euler angles (pitch, yaw, roll).
-   *
-   * This method computes the Euler angles and returns them via reference
-   * parameters.
-   *
-   * @param pitch Reference to store the pitch angle (rotation around X-axis).
-   * @param yaw Reference to store the yaw angle (rotation around Y-axis).
-   * @param roll Reference to store the roll angle (rotation around Z-axis).
-   */
-  void toEulerAngles(T& pitch, T& yaw, T& roll) const {
-    pitch = getPitch();
-    yaw   = getYaw();
-    roll  = getRoll();
+  // TODO: add doxygen comment
+  template <typename T1 = T>
+  void toEulerAngles(T1&                angle1,
+                     T1&                angle2,
+                     T1&                angle3,
+                     EulerRotationOrder order,
+                     Frame              frame = Frame::Static) {
+    Axis firstAxis, secondAxis, thirdAxis;
+    bool isParityOdd, isRepeated;
+    getEulerOrderParameters(
+        order, firstAxis, secondAxis, thirdAxis, isParityOdd, isRepeated);
+
+    auto i = static_cast<std::size_t>(firstAxis);
+    auto j = static_cast<std::size_t>(secondAxis);
+    auto k = static_cast<std::size_t>(thirdAxis);
+
+    auto norm  = squaredNorm();
+    auto scale = (norm > T1(0)) ? (T1(2) / norm) : T1(0);
+
+    // Precompute products for the rotation matrix
+    auto scaleX = x() * scale;
+    auto scaleY = y() * scale;
+    auto scaleZ = z() * scale;
+
+    auto wx = w() * scaleX;
+    auto wy = w() * scaleY;
+    auto wz = w() * scaleZ;
+
+    auto xx = x() * scaleX;
+    auto xy = x() * scaleY;
+    auto xz = x() * scaleZ;
+
+    auto yy = y() * scaleY;
+    auto yz = y() * scaleZ;
+    auto zz = z() * scaleZ;
+
+    // Convert quaternion to rotation matrix
+    // clang-format off
+    Matrix<T1, 3, 3> R;
+    R << T1(1) - (yy + zz), xy - wz          , xz + wy          ,
+         xy + wz          , T1(1) - (xx + zz), yz - wx          ,
+         xz - wy          , yz + wx          , T1(1) - (xx + yy);
+    
+
+    const auto kSingularityThreshold = T1(1e-6);
+
+    // Extract Euler angles from the rotation matrix
+    if (isRepeated) {
+      auto sy = std::sqrt(R(i, j) * R(i, j) + R(i, k) * R(i, k));
+      if (sy > kSingularityThreshold) {
+        angle1 = std::atan2(R(i, j),  R(i, k));
+        angle2 = std::atan2(sy     ,  R(i, i));
+        angle3 = std::atan2(R(j, i), -R(k, i));
+      } else {
+        angle1 = std::atan2(-R(j, k), R(j, j));
+        angle2 = std::atan2( sy     , R(i, i));
+        angle3 = T1(0);
+      }
+    } else {
+      auto cy = std::sqrt(R(i, i) * R(i, i) + R(j, i) * R(j, i));
+      if (cy > kSingularityThreshold) {
+        angle1 = std::atan2( R(k, j), R(k, k));
+        angle2 = std::atan2(-R(k, i), cy     );
+        angle3 = std::atan2( R(j, i), R(i, i));
+      } else {
+        angle1 = std::atan2(-R(j, k), R(j, j));
+        angle2 = std::atan2(-R(k, i), cy     );
+        angle3 = T1(0);
+      }
+    }
+    // clang-format on
+
+    // Handle parity
+    if (isParityOdd) {
+      angle1 = -angle1;
+      angle2 = -angle2;
+      angle3 = -angle3;
+    }
+
+    // Swap angles if frame is rotating
+    if (frame == Frame::Rotating) {
+      std::swap(angle1, angle3);
+    }
   }
 
   /**
@@ -615,43 +606,69 @@ class Quaternion {
   }
 
   // TODO: add doxygen comments
-  static auto fromEulerAngles(const T pitch, const T yaw, const T roll)
-      -> Quaternion {
-    auto halfPitch = pitch / T(2);
-    auto halfYaw   = yaw / T(2);
-    auto halfRoll  = roll / T(2);
+  static auto fromEulerAngles(T                  angle1,
+                              T                  angle2,
+                              T                  angle3,
+                              EulerRotationOrder order,
+                              Frame frame = Frame::Static) -> Quaternion {
+    Axis firstAxis, secondAxis, thirdAxis;
+    bool isParityOdd, isRepeated;
+    getEulerOrderParameters(
+        order, firstAxis, secondAxis, thirdAxis, isParityOdd, isRepeated);
 
-    auto c1 = std::cos(halfPitch);
-    auto s1 = std::sin(halfPitch);
+    auto i = static_cast<std::size_t>(firstAxis);
+    auto j = static_cast<std::size_t>(secondAxis);
+    auto k = static_cast<std::size_t>(thirdAxis);
 
-    auto c2 = std::cos(halfYaw);
-    auto s2 = std::sin(halfYaw);
+    if (frame == Frame::Rotating) {
+      std::swap(angle1, angle3);
+    }
+    if (isParityOdd) {
+      angle2 = -angle2;
+    }
 
-    auto c3 = std::cos(halfRoll);
-    auto s3 = std::sin(halfRoll);
+    T halfA1 = angleFirst * T(0.5);
+    T halfA2 = angleSecond * T(0.5);
+    T halfA3 = angleThird * T(0.5);
 
-    Quaternion qPitch(s1, 0, 0, c1);
-    Quaternion qYaw(0, s2, 0, c2);
-    Quaternion qRoll(0, 0, s3, c3);
+    T cosA1 = std::cos(halfA1);
+    T cosA2 = std::cos(halfA2);
+    T cosA3 = std::cos(halfA3);
 
-    // currently using this approach (unoptimized) for clarity
-    Quaternion result;
-    result = qRoll * qPitch * qYaw;  // ZXY
-    // result = qRoll * qYaw * qPitch;  // ZYX
-    // result = qPitch * qYaw * qRoll;  // XYZ
-    // result = qPitch * qRoll * qYaw;  // XZY
-    // result = qYaw * qPitch * qRoll;  // YXZ
-    // result = qYaw * qRoll * qPitch;  // YZX
+    T sinA1 = std::sin(halfA1);
+    T sinA2 = std::sin(halfA2);
+    T sinA3 = std::sin(halfA3);
 
-    return result;
+    T cosA1_cosA3 = cosA1 * cosA3;
+    T cosA1_sinA3 = cosA1 * sinA3;
+    T sinA1_cosA3 = sinA1 * cosA3;
+    T sinA1_sinA3 = sinA1 * sinA3;
 
-    // optimized version (order is roll, yaw, pitch)
-    // auto q0 = c1 * c2 * c3 + s1 * s2 * s3;
-    // auto q1 = s1 * c2 * c3 - c1 * s2 * s3;
-    // auto q2 = c1 * s2 * c3 + s1 * c2 * s3;
-    // auto q3 = c1 * c2 * s3 - s1 * s2 * c3;
+    T qx, qy, qz, qw;
 
-    // return Quaternion(q1, q2, q3, q0);
+    if (hasRepetition) {
+      qx = cosA2 * (cosA1_sinA3 + sinA1_cosA3);
+      qy = sinA2 * (cosA1_cosA3 + sinA1_sinA3);
+      qz = sinA2 * (cosA1_sinA3 - sinA1_cosA3);
+      qw = cosA2 * (cosA1_cosA3 - sinA1_sinA3);
+    } else {
+      qx = cosA2 * sinA1_cosA3 - sinA2 * cosA1_sinA3;
+      qy = cosA2 * sinA1_sinA3 + sinA2 * cosA1_cosA3;
+      qz = cosA2 * cosA1_sinA3 - sinA2 * sinA1_cosA3;
+      qw = cosA2 * cosA1_cosA3 + sinA2 * sinA1_sinA3;
+    }
+
+    if (isParityOdd) {
+      qy = -qy;
+    }
+
+    std::array<T, 3> qComponents;
+    qComponents[i] = qx;
+    qComponents[j] = qy;
+    qComponents[k] = qz;
+
+    return Quaternion<T>(qComponents[0], qComponents[1], qComponents[2], qw)
+        .normalized();
   }
 
   /**
@@ -947,6 +964,96 @@ class Quaternion {
 #endif  // FEATURE_QUATERNION_INITIALIZER
 
   private:
+  // TODO: add doxygen comment
+  static void getEulerOrderParameters(EulerRotationOrder order,
+                                      Axis&              firstAxis,
+                                      Axis&              secondAxis,
+                                      Axis&              thirdAxis,
+                                      bool&              isParityOdd,
+                                      bool&              hasRepetition) {
+    switch (order) {
+      case EulerRotationOrder::XYZ:
+        firstAxis     = Axis::X;
+        isParityOdd   = false;
+        hasRepetition = false;
+        break;
+      case EulerRotationOrder::XYX:
+        firstAxis     = Axis::X;
+        isParityOdd   = false;
+        hasRepetition = true;
+        break;
+      case EulerRotationOrder::XZY:
+        firstAxis     = Axis::X;
+        isParityOdd   = true;
+        hasRepetition = false;
+        break;
+      case EulerRotationOrder::XZX:
+        firstAxis     = Axis::X;
+        isParityOdd   = true;
+        hasRepetition = true;
+        break;
+      case EulerRotationOrder::YZX:
+        firstAxis     = Axis::Y;
+        isParityOdd   = false;
+        hasRepetition = false;
+        break;
+      case EulerRotationOrder::YZY:
+        firstAxis     = Axis::Y;
+        isParityOdd   = false;
+        hasRepetition = true;
+        break;
+      case EulerRotationOrder::YXZ:
+        firstAxis     = Axis::Y;
+        isParityOdd   = true;
+        hasRepetition = false;
+        break;
+      case EulerRotationOrder::YXY:
+        firstAxis     = Axis::Y;
+        isParityOdd   = true;
+        hasRepetition = true;
+        break;
+      case EulerRotationOrder::ZXY:
+        firstAxis     = Axis::Z;
+        isParityOdd   = false;
+        hasRepetition = false;
+        break;
+      case EulerRotationOrder::ZXZ:
+        firstAxis     = Axis::Z;
+        isParityOdd   = false;
+        hasRepetition = true;
+        break;
+      case EulerRotationOrder::ZYX:
+        firstAxis     = Axis::Z;
+        isParityOdd   = true;
+        hasRepetition = false;
+        break;
+      case EulerRotationOrder::ZYZ:
+        firstAxis     = Axis::Z;
+        isParityOdd   = true;
+        hasRepetition = true;
+        break;
+      default:
+        assert(false && "Invalid Euler rotation order");
+        break;
+    }
+
+    int32_t firstAxisIndex = static_cast<int32_t>(firstAxis);
+    int32_t secondAxisIndex;
+    int32_t thirdAxisIndex;
+
+    // Determine the second and third axes based on parity
+    if (!isParityOdd) {
+      secondAxisIndex = (firstAxisIndex + 1) % 3;
+      thirdAxisIndex  = (firstAxisIndex + 2) % 3;
+    } else {
+      secondAxisIndex = (firstAxisIndex + 2) % 3;
+      thirdAxisIndex  = (firstAxisIndex + 1) % 3;
+    }
+
+    secondAxis = static_cast<Axis>(secondAxisIndex);
+    thirdAxis  = static_cast<Axis>(thirdAxisIndex);
+  }
+
   /**
    * @brief Constructs a quaternion from a rotation matrix when the trace is
    * positive.
