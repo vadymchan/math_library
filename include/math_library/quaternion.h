@@ -428,6 +428,11 @@ class Quaternion {
    */
   [[nodiscard]] auto norm() const -> T { return m_data_.magnitude(); }
 
+  // TODO: add doxygen comment
+  [[nodiscard]] auto squaredNorm() const -> T {
+    return m_data_.magnitudeSquared();
+  }
+
   /**
    * @brief Normalizes the quaternion (in-place).
    *
