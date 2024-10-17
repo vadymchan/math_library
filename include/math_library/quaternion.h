@@ -459,10 +459,12 @@ class Quaternion {
   // TODO: add toEulerAngles method that takes vector of angles
 
   // TODO: add doxygen comment
-  template <typename T1 = T>
-  void toEulerAngles(T1&                angle1,
-                     T1&                angle2,
-                     T1&                angle3,
+  // This additional template parameter allows for different types to be passed
+  // (e.g., double format when T is float).
+  template <typename U = T>
+  void toEulerAngles(U&                 angle1,
+                     U&                 angle2,
+                     U&                 angle3,
                      EulerRotationOrder order,
                      Frame              frame = Frame::Static) {
     Axis firstAxis, secondAxis, thirdAxis;
@@ -475,7 +477,7 @@ class Quaternion {
     auto k = static_cast<std::size_t>(thirdAxis);
 
     auto norm  = squaredNorm();
-    auto scale = (norm > T1(0)) ? (T1(2) / norm) : T1(0);
+    auto scale = (norm > U(0)) ? (U(2) / norm) : U(0);
 
     // Precompute products for the rotation matrix
     auto scaleX = x() * scale;
@@ -496,13 +498,12 @@ class Quaternion {
 
     // Convert quaternion to rotation matrix
     // clang-format off
-    Matrix<T1, 3, 3> R;
-    R << T1(1) - (yy + zz), xy - wz          , xz + wy          ,
-         xy + wz          , T1(1) - (xx + zz), yz - wx          ,
-         xz - wy          , yz + wx          , T1(1) - (xx + yy);
-    
+    Matrix<U, 3, 3> R;
+    R << U(1) - (yy + zz) , xy - wz          , xz + wy          ,
+         xy + wz          , U(1) - (xx + zz) , yz - wx          ,
+         xz - wy          , yz + wx          , U(1) - (xx + yy) ;
 
-    const auto kSingularityThreshold = T1(1e-6);
+    const auto kSingularityThreshold = U(1e-6);
 
     // Extract Euler angles from the rotation matrix
     if (isRepeated) {
@@ -514,7 +515,7 @@ class Quaternion {
       } else {
         angle1 = std::atan2(-R(j, k), R(j, j));
         angle2 = std::atan2( sy     , R(i, i));
-        angle3 = T1(0);
+        angle3 = U(0);
       }
     } else {
       auto cy = std::sqrt(R(i, i) * R(i, i) + R(j, i) * R(j, i));
@@ -525,7 +526,7 @@ class Quaternion {
       } else {
         angle1 = std::atan2(-R(j, k), R(j, j));
         angle2 = std::atan2(-R(k, i), cy     );
-        angle3 = T1(0);
+        angle3 = U(0);
       }
     }
     // clang-format on
