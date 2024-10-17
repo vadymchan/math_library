@@ -628,9 +628,9 @@ class Quaternion {
       angle2 = -angle2;
     }
 
-    T halfA1 = angleFirst * T(0.5);
-    T halfA2 = angleSecond * T(0.5);
-    T halfA3 = angleThird * T(0.5);
+    T halfA1 = angle1 * T(0.5);
+    T halfA2 = angle2 * T(0.5);
+    T halfA3 = angle3 * T(0.5);
 
     T cosA1 = std::cos(halfA1);
     T cosA2 = std::cos(halfA2);
@@ -647,7 +647,7 @@ class Quaternion {
 
     T qx, qy, qz, qw;
 
-    if (hasRepetition) {
+    if (isRepeated) {
       qx = cosA2 * (cosA1_sinA3 + sinA1_cosA3);
       qy = sinA2 * (cosA1_cosA3 + sinA1_sinA3);
       qz = sinA2 * (cosA1_sinA3 - sinA1_cosA3);
