@@ -699,6 +699,57 @@ class Quaternion {
   }
 
   /**
+   * @brief Creates a quaternion representing the rotation from one vector
+   *        direction to another (shortest arc).
+   *
+   *
+   * @tparam T    Scalar type of the quaternion and vectors.
+   * @param from  Starting direction.
+   * @param to    Target   direction.
+   * @return Quaternion rotating *from* into *to*.
+   */
+  template <typename T>
+  static auto fromVectors(const Vector3D<T>& from, const Vector3D<T>& to)
+      -> Quaternion {
+    constexpr T kEps          = std::numeric_limits<T>::epsilon();
+    constexpr T kCosAlmostOne = T(0.999999);  // around 0.002 degree threshold
+
+    assert(from.magnitudeSquared() > kEps && to.magnitudeSquared() > kEps
+           && "Quaternion::fromVectors: zero-length input");
+    Vector3D<T> f = from.normalized();
+    Vector3D<T> t = to.normalized();
+
+    const T cosTheta = f.dot(t);
+
+    // If the angle is very small, return the identity quaternion
+    if (cosTheta > kCosAlmostOne) {
+      return Quaternion(T(0), T(0), T(0), T(1));  
+    }
+
+    // If the angle is very close to 180 degrees, find an orthogonal axis
+    if (cosTheta < -kCosAlmostOne) {
+      // Find an arbitrary axis orthogonal to f
+      Vector3D<T> axis;
+      if (std::abs(f.x()) < std::abs(f.y())
+          && std::abs(f.x()) < std::abs(f.z())) {
+        axis = Vector3D<T>(T(1), T(0), T(0));
+      } else if (std::abs(f.y()) < std::abs(f.z())) {
+        axis = Vector3D<T>(T(0), T(1), T(0));
+      } else {
+        axis = Vector3D<T>(T(0), T(0), T(1));
+      }
+
+      axis = axis.cross(f).normalized();
+      return fromAxisAngle(axis, T(g_kPi));  
+    }
+
+    // General case
+    Vector3D<T> v = f.cross(t);
+    Quaternion  q(v.x(), v.y(), v.z(), T(1) + cosTheta);
+    return q.normalized();
+  }
+
+  /**
    * @brief Performs spherical linear interpolation (Slerp) between two
    * quaternions.
    *
