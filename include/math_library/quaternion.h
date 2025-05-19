@@ -606,7 +606,22 @@ class Quaternion {
     }
   }
 
-  // TODO: add doxygen comments
+  /**
+   * @brief Creates a quaternion from three Euler angles.
+   *
+   * Constructs a normalized quaternion representing the rotation defined by
+   * the three Euler angles, applied in the specified order and frame.
+   *
+   * @tparam T The underlying scalar type (e.g., float or double).
+   * @param angle1 The first rotation angle (in radians).
+   * @param angle2 The second rotation angle (in radians).
+   * @param angle3 The third rotation angle (in radians).
+   * @param order  The order in which the rotations are applied (an @ref
+   * EulerRotationOrder value).
+   * @param frame  The rotation frame: Static (extrinsic) or Rotating
+   * (intrinsic). Default is Static.
+   * @return A quaternion corresponding to the composed Euler rotation.
+   */
   static auto fromEulerAngles(T                  angle1,
                               T                  angle2,
                               T                  angle3,
