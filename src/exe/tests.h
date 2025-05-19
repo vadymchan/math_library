@@ -2,6 +2,8 @@
  * @file tests.h
  */
 
+// TODO: add tests for
+
 #ifndef MATH_LIBRARY_TESTS_H
 #define MATH_LIBRARY_TESTS_H
 
@@ -6862,13 +6864,13 @@ TEST(QuaternionTest, ToRotationMatrix) {
   math::Quaternionf q(0.707107f, 0.0f, 0.0f, 0.707107f);
   math::Matrix3f<>  m = q.toRotationMatrix();
   EXPECT_FLOAT_EQ(m(0, 0), 1.0f);
-  EXPECT_FLOAT_EQ(m(0, 1), 0.0f);
-  EXPECT_FLOAT_EQ(m(0, 2), 0.0f);
   EXPECT_FLOAT_EQ(m(1, 0), 0.0f);
-  EXPECT_NEAR(m(1, 1), 0.0f, 1e-6f);
-  EXPECT_NEAR(m(1, 2), -1.0f, 1e-6f);
   EXPECT_FLOAT_EQ(m(2, 0), 0.0f);
-  EXPECT_NEAR(m(2, 1), 1.0f, 1e-6f);
+  EXPECT_FLOAT_EQ(m(0, 1), 0.0f);
+  EXPECT_NEAR(m(1, 1), 0.0f, 1e-6f);
+  EXPECT_NEAR(m(2, 1), -1.0f, 1e-6f);
+  EXPECT_FLOAT_EQ(m(0, 2), 0.0f);
+  EXPECT_NEAR(m(1, 2), 1.0f, 1e-6f);
   EXPECT_NEAR(m(2, 2), 0.0f, 1e-6f);
 }
 
@@ -6952,6 +6954,68 @@ TEST(QuaternionTest, Log) {
   EXPECT_FLOAT_EQ(result.y(), 0.0f);
   EXPECT_FLOAT_EQ(result.z(), 0.0f);
   EXPECT_FLOAT_EQ(result.w(), 0.0f);
+}
+
+TEST(QuaternionTest, FromVectorsIdentity) {
+  math::Vector3Df from(1.0f, 0.0f, 0.0f);
+  math::Vector3Df to(1.0f, 0.0f, 0.0f);
+
+  math::Quaternionf q = math::Quaternionf::fromVectors(from, to);
+
+  EXPECT_NEAR(q.x(), 0.0f, 1e-6f);
+  EXPECT_NEAR(q.y(), 0.0f, 1e-6f);
+  EXPECT_NEAR(q.z(), 0.0f, 1e-6f);
+  EXPECT_NEAR(q.w(), 1.0f, 1e-6f);
+  EXPECT_NEAR(q.norm(), 1.0f, 1e-6f);
+
+  math::Vector3Df rotated = q.rotateVector(from);
+  EXPECT_NEAR(rotated.x(), to.x(), 1e-6f);
+  EXPECT_NEAR(rotated.y(), to.y(), 1e-6f);
+  EXPECT_NEAR(rotated.z(), to.z(), 1e-6f);
+}
+
+TEST(QuaternionTest, FromVectorsOpposite) {
+  math::Vector3Df from(1.0f, 0.0f, 0.0f);
+  math::Vector3Df to(-1.0f, 0.0f, 0.0f);
+
+  math::Quaternionf q = math::Quaternionf::fromVectors(from, to);
+
+  EXPECT_NEAR(q.norm(), 1.0f, 1e-6f);
+
+  math::Vector3Df rotated = q.rotateVector(from);
+  EXPECT_NEAR(rotated.x(), to.x(), 1e-5f);
+  EXPECT_NEAR(rotated.y(), to.y(), 1e-5f);
+  EXPECT_NEAR(rotated.z(), to.z(), 1e-5f);
+}
+
+TEST(QuaternionTest, FromVectorsOrthogonal) {
+  math::Vector3Df from(1.0f, 0.0f, 0.0f);
+  math::Vector3Df to(0.0f, 1.0f, 0.0f);
+
+  math::Quaternionf q = math::Quaternionf::fromVectors(from, to);
+  EXPECT_NEAR(q.norm(), 1.0f, 1e-6f);
+
+  math::Vector3Df rotated = q.rotateVector(from);
+  EXPECT_NEAR(rotated.x(), to.x(), 1e-5f);
+  EXPECT_NEAR(rotated.y(), to.y(), 1e-5f);
+  EXPECT_NEAR(rotated.z(), to.z(), 1e-5f);
+}
+
+TEST(QuaternionTest, FromVectorsNonNormalized) {
+  math::Vector3Df from(2.0f, 0.0f, 0.0f);
+  math::Vector3Df to(0.0f, -3.0f, 0.0f);
+
+  math::Quaternionf q = math::Quaternionf::fromVectors(from, to);
+
+  EXPECT_NEAR(q.norm(), 1.0f, 1e-6f);
+
+  // сравниваем направления
+  math::Vector3Df rotatedDir = q.rotateVector(from).normalized();
+  math::Vector3Df toDir      = to.normalized();
+
+  EXPECT_NEAR(rotatedDir.x(), toDir.x(), 1e-5f);
+  EXPECT_NEAR(rotatedDir.y(), toDir.y(), 1e-5f);
+  EXPECT_NEAR(rotatedDir.z(), toDir.z(), 1e-5f);
 }
 
 // ========================== DIMENSION: FLOAT ==============================
@@ -7130,13 +7194,13 @@ TEST(QuaternionTest, ToRotationMatrixDouble) {
   math::Quaterniond q(0.7071067811865476, 0.0, 0.0, 0.7071067811865476);
   math::Matrix3d<>  m = q.toRotationMatrix();
   EXPECT_DOUBLE_EQ(m(0, 0), 1.0);
-  EXPECT_DOUBLE_EQ(m(0, 1), 0.0);
-  EXPECT_DOUBLE_EQ(m(0, 2), 0.0);
   EXPECT_DOUBLE_EQ(m(1, 0), 0.0);
-  EXPECT_NEAR(m(1, 1), 0.0, 1e-15);
-  EXPECT_DOUBLE_EQ(m(1, 2), -1.0);
   EXPECT_DOUBLE_EQ(m(2, 0), 0.0);
-  EXPECT_DOUBLE_EQ(m(2, 1), 1.0);
+  EXPECT_DOUBLE_EQ(m(0, 1), 0.0);
+  EXPECT_NEAR(m(1, 1), 0.0, 1e-15);
+  EXPECT_DOUBLE_EQ(m(2, 1), -1.0);
+  EXPECT_DOUBLE_EQ(m(0, 2), 0.0);
+  EXPECT_DOUBLE_EQ(m(1, 2), 1.0);
   EXPECT_NEAR(m(2, 2), 0.0, 1e-15);
 }
 
@@ -7216,6 +7280,144 @@ TEST(QuaternionTest, LogDouble) {
   EXPECT_DOUBLE_EQ(result.y(), 0.0);
   EXPECT_DOUBLE_EQ(result.z(), 0.0);
   EXPECT_DOUBLE_EQ(result.w(), 0.0);
+}
+
+TEST(QuaternionTest, FromAxisAngle) {
+  math::Vector3Dd axis(1.0, 0.0, 0.0);
+  double          angle = math::g_kPi / 2;
+
+  math::Quaterniond q = math::Quaterniond::fromAxisAngle(axis, angle);
+
+  EXPECT_NEAR(q.norm(), 1.0, 1e-6);
+
+  math::Vector3Dd v(0.0, 1.0, 0.0);
+  math::Vector3Dd rotated_v = q.rotateVector(v);
+
+  EXPECT_NEAR(rotated_v.x(), 0.0, 1e-6);
+  EXPECT_NEAR(rotated_v.y(), 0.0, 1e-6);
+  EXPECT_NEAR(rotated_v.z(), 1.0, 1e-6);
+}
+
+TEST(QuaternionTest, ToAxisAngle) {
+  math::Vector3Dd axis(0.0, 1.0, 0.0);
+  double          angle = math::g_kPi;
+
+  math::Quaterniond q = math::Quaterniond::fromAxisAngle(axis, angle);
+
+  math::Vector3Dd extractedAxis;
+  double          extractedAngle;
+  q.toAxisAngle(extractedAxis, extractedAngle);
+
+  EXPECT_NEAR(extractedAxis.x(), axis.x(), 1e-6);
+  EXPECT_NEAR(extractedAxis.y(), axis.y(), 1e-6);
+  EXPECT_NEAR(extractedAxis.z(), axis.z(), 1e-6);
+  EXPECT_NEAR(extractedAngle, angle, 1e-6);
+}
+
+TEST(QuaternionTest, AxisAngleIdentity) {
+  math::Vector3Dd axis(1.0, 0.0, 0.0);
+  double          angle = 0.0;
+
+  math::Quaterniond q = math::Quaterniond::fromAxisAngle(axis, angle);
+
+  math::Vector3Dd extractedAxis;
+  double          extractedAngle;
+  q.toAxisAngle(extractedAxis, extractedAngle);
+
+  EXPECT_NEAR(extractedAxis.x(), 1.0, 1e-6);
+  EXPECT_NEAR(extractedAxis.y(), 0.0, 1e-6);
+  EXPECT_NEAR(extractedAxis.z(), 0.0, 1e-6);
+  EXPECT_NEAR(extractedAngle, 0.0, 1e-6);
+}
+
+TEST(QuaternionTest, FromAxisAngleZeroAngle) {
+  math::Vector3Dd axis(1.0, 0.0, 0.0);
+  double          angle = 0.0;
+
+  math::Quaterniond q = math::Quaterniond::fromAxisAngle(axis, angle);
+
+  EXPECT_NEAR(q.x(), 0.0, 1e-6);
+  EXPECT_NEAR(q.y(), 0.0, 1e-6);
+  EXPECT_NEAR(q.z(), 0.0, 1e-6);
+  EXPECT_NEAR(q.w(), 1.0, 1e-6);
+}
+
+TEST(QuaternionTest, FromAxisAngleNonNormalizedAxis) {
+  math::Vector3Dd axis(2.0, 0.0, 0.0);
+  double          angle = math::g_kPi / 2;
+
+  math::Quaterniond q = math::Quaterniond::fromAxisAngle(axis, angle);
+
+  EXPECT_NEAR(q.x(), std::sin(angle / 2), 1e-6);
+  EXPECT_NEAR(q.y(), 0.0, 1e-6);
+  EXPECT_NEAR(q.z(), 0.0, 1e-6);
+  EXPECT_NEAR(q.w(), std::cos(angle / 2), 1e-6);
+}
+
+TEST(QuaternionTest, ToAxisAngleIdentityQuaternion) {
+  math::Quaterniond q(0.0, 0.0, 0.0, 1.0);
+
+  math::Vector3Dd axis;
+  double          angle;
+  q.toAxisAngle(axis, angle);
+
+  EXPECT_NEAR(angle, 0.0, 1e-6);
+  EXPECT_NEAR(axis.x(), 1.0, 1e-6);
+  EXPECT_NEAR(axis.y(), 0.0, 1e-6);
+  EXPECT_NEAR(axis.z(), 0.0, 1e-6);
+}
+
+TEST(QuaternionTest, FromVectorsIdentityDouble) {
+  math::Vector3Dd from(1.0, 0.0, 0.0);
+  math::Vector3Dd to(1.0, 0.0, 0.0);
+
+  math::Quaterniond q = math::Quaterniond::fromVectors(from, to);
+
+  EXPECT_NEAR(q.x(), 0.0, 1e-15);
+  EXPECT_NEAR(q.y(), 0.0, 1e-15);
+  EXPECT_NEAR(q.z(), 0.0, 1e-15);
+  EXPECT_NEAR(q.w(), 1.0, 1e-15);
+  EXPECT_NEAR(q.norm(), 1.0, 1e-15);
+
+  math::Vector3Dd rotated = q.rotateVector(from);
+  EXPECT_NEAR(rotated.x(), to.x(), 1e-15);
+  EXPECT_NEAR(rotated.y(), to.y(), 1e-15);
+  EXPECT_NEAR(rotated.z(), to.z(), 1e-15);
+}
+
+TEST(QuaternionTest, FromVectorsOppositeDouble) {
+  math::Vector3Dd from(0.0, 1.0, 0.0);
+  math::Vector3Dd to(0.0, -1.0, 0.0);
+
+  math::Quaterniond q = math::Quaterniond::fromVectors(from, to);
+  EXPECT_NEAR(q.norm(), 1.0, 1e-15);
+
+  math::Vector3Dd rotated = q.rotateVector(from);
+
+  double dot = rotated.normalized().dot(to);
+  EXPECT_NEAR(dot, 1.0, 1e-8);
+
+  EXPECT_NEAR((rotated - to).magnitude(), 0.0, 1e-7);
+
+  const double kTol = 1e-7;
+  EXPECT_NEAR(rotated.x(), to.x(), kTol);
+  EXPECT_NEAR(rotated.y(), to.y(), kTol);
+  EXPECT_NEAR(rotated.z(), to.z(), kTol);
+}
+
+TEST(QuaternionTest, FromVectorsArbitraryDouble) {
+  math::Vector3Dd from(1.0, 1.0, 0.0);
+  math::Vector3Dd to(0.0, 0.0, -2.0);
+
+  math::Quaterniond q = math::Quaterniond::fromVectors(from, to);
+  EXPECT_NEAR(q.norm(), 1.0, 1e-15);
+
+  math::Vector3Dd rotatedDir = q.rotateVector(from).normalized();
+  math::Vector3Dd toDir      = to.normalized();
+
+  EXPECT_NEAR(rotatedDir.x(), toDir.x(), 1e-14);
+  EXPECT_NEAR(rotatedDir.y(), toDir.y(), 1e-14);
+  EXPECT_NEAR(rotatedDir.z(), toDir.z(), 1e-14);
 }
 
 // ========================== DIMENSION: DOUBLE ==============================
