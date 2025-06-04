@@ -594,9 +594,9 @@ auto g_rotateLh(const Vector<T, 3, Option>& axis, T angle)
  * @return A 4x4 view matrix.
  */
 template <typename T, Options Option = Options::RowMajor>
-auto g_lookAtRh(const Vector3D<T, Option>& eye,
-                const Vector3D<T, Option>& target,
-                const Vector3D<T, Option>& worldUp) -> Matrix<T, 4, 4, Option> {
+auto g_lookAtRh(const Vector3<T, Option>& eye,
+                const Vector3<T, Option>& target,
+                const Vector3<T, Option>& worldUp) -> Matrix<T, 4, 4, Option> {
   auto f = (target - eye).normalized();
   auto r = worldUp.cross(f).normalized();
   auto u = f.cross(r);
@@ -640,9 +640,9 @@ auto g_lookAtRh(const Vector3D<T, Option>& eye,
  * @return A 4x4 view matrix.
  */
 template <typename T, Options Option = Options::RowMajor>
-auto g_lookAtLh(const Vector3D<T, Option>& eye,
-                const Vector3D<T, Option>& target,
-                const Vector3D<T, Option>& worldUp) -> Matrix<T, 4, 4, Option> {
+auto g_lookAtLh(const Vector3<T, Option>& eye,
+                const Vector3<T, Option>& target,
+                const Vector3<T, Option>& worldUp) -> Matrix<T, 4, 4, Option> {
   auto f = (target - eye).normalized();
   auto r = worldUp.cross(f).normalized();
   auto u = f.cross(r);
@@ -686,9 +686,9 @@ auto g_lookAtLh(const Vector3D<T, Option>& eye,
  * @return A 4x4 view matrix.
  */
 template <typename T, Options Option = Options::RowMajor>
-auto g_lookToRh(const Vector3D<T, Option>& eye,
-                const Vector3D<T, Option>& direction,
-                const Vector3D<T, Option>& worldUp) -> Matrix<T, 4, 4, Option> {
+auto g_lookToRh(const Vector3<T, Option>& eye,
+                const Vector3<T, Option>& direction,
+                const Vector3<T, Option>& worldUp) -> Matrix<T, 4, 4, Option> {
   auto f = direction.normalized();
   auto r = worldUp.cross(f).normalized();
   auto u = f.cross(r);
@@ -732,9 +732,9 @@ auto g_lookToRh(const Vector3D<T, Option>& eye,
  * @return A 4x4 view matrix.
  */
 template <typename T, Options Option = Options::RowMajor>
-auto g_lookToLh(const Vector3D<T, Option>& eye,
-                const Vector3D<T, Option>& direction,
-                const Vector3D<T, Option>& worldUp) -> Matrix<T, 4, 4, Option> {
+auto g_lookToLh(const Vector3<T, Option>& eye,
+                const Vector3<T, Option>& direction,
+                const Vector3<T, Option>& worldUp) -> Matrix<T, 4, 4, Option> {
   auto f = direction.normalized();
   auto r = worldUp.cross(f).normalized();
   auto u = f.cross(r);
@@ -1402,9 +1402,8 @@ Vector<T, 4, Option> g_perspectiveDivide(const Vector<T, 4, Option>& vector,
   return vector;
 }
 
-// BEGIN: frustrum (perspective projection matrix that off center) creation
-// functions
-// ----------------------------------------------------------------------------
+// BEGIN: frustrum (perspective projection matrix that off center) creation functions
+// ----------------------------------------------------------------------------------
 
 /**
  * @brief Generates a right-handed frustum projection matrix with a depth range
@@ -1667,9 +1666,8 @@ auto g_frustumLhNo(T left, T right, T bottom, T top, T nearVal, T farVal)
   return frustum;
 }
 
-// END: frustrum (perspective projection matrix that off center) creation
-// functions
-// ----------------------------------------------------------------------------
+// END: frustrum (perspective projection matrix that off center) creation functions
+// --------------------------------------------------------------------------------
 
 // BEGIN: orthographic projection creation matrix
 // ----------------------------------------------------------------------------
@@ -2287,6 +2285,281 @@ auto g_unitVector() -> const Vector<T, Size, Option> {
 }
 
 // END: global util vector objects
+// ----------------------------------------------------------------------------
+
+// BEGIN: intersections functionality (currently in this file)
+// ----------------------------------------------------------------------------
+
+/**
+ * @brief Represents a ray in 3D space for intersection calculations
+ *
+ * A ray is defined by an origin point and a normalized direction vector.
+ *
+ * @tparam T The data type of the ray components
+ * @tparam Option The memory layout option
+ */
+template <typename T, Options Option = Options::RowMajor>
+class Ray {
+  public:
+  Ray() = default;
+
+  /**
+   * @brief Constructs a ray from origin and direction
+   *
+   * @param origin The starting point of the ray
+   * @param direction The direction vector (will be normalized)
+   */
+  Ray(const Point3<T, Option>& origin, const Vector3<T, Option>& direction)
+      : m_origin(origin)
+      , m_direction(direction.normalized()) {}
+
+  [[nodiscard]] auto origin() const -> const Point3<T, Option>& {
+    return m_origin;
+  }
+
+  [[nodiscard]] auto direction() const -> const Vector3<T, Option>& {
+    return m_direction;
+  }
+
+  /**
+   * @brief Calculates a point along the ray at distance t
+   *
+   * @param t The distance along the ray
+   * @return The point at origin + t * direction
+   */
+  [[nodiscard]] auto pointAt(T t) const -> Point3<T, Option> {
+    return m_origin + m_direction * t;
+  }
+
+  private:
+  Point3<T, Option>  m_origin;
+  Vector3<T, Option> m_direction;
+};
+
+// Type aliases
+template <Options Option = Options::RowMajor>
+using Rayf = Ray<float, Option>;
+
+template <Options Option = Options::RowMajor>
+using Rayd = Ray<double, Option>;
+
+/**
+ * @brief Simple intersection result structure
+ *
+ * Contains information about ray-primitive intersection
+ */
+template <typename T>
+struct IntersectionResult {
+  bool       hit      = false;
+  T          distance = 0;
+  Point3<T> point;
+
+  explicit operator bool() const { return hit; }
+};
+
+/**
+ * @brief Tests ray-AABB (Axis-Aligned Bounding Box) intersection
+ *
+ * Uses the slab method for efficient AABB intersection testing.
+ * This is typically used as a broad-phase collision detection.
+ *
+ * @param ray The ray to test
+ * @param min Minimum corner of the box
+ * @param max Maximum corner of the box
+ * @return Intersection result with hit information
+ */
+template <typename T, Options Option = Options::RowMajor>
+auto g_rayAABBintersect(const Ray<T, Option>&     ray,
+                        const Point3<T, Option>& min,
+                        const Point3<T, Option>& max)
+    -> IntersectionResult<T> {
+  IntersectionResult<T> result;
+
+  T tmin = 0;
+  T tmax = std::numeric_limits<T>::max();
+
+  for (int i = 0; i < 3; ++i) {
+    if (g_abs(ray.direction()(i)) < std::numeric_limits<T>::epsilon()) {
+      // Ray parallel to slab
+      if (ray.origin()(i) < min(i) || ray.origin()(i) > max(i)) {
+        return result;
+      }
+    } else {
+      T invD = T(1) / ray.direction()(i);
+      T t0   = (min(i) - ray.origin()(i)) * invD;
+      T t1   = (max(i) - ray.origin()(i)) * invD;
+
+      if (invD < 0) {
+        std::swap(t0, t1);
+      }
+
+      tmin = std::max(tmin, t0);
+      tmax = std::min(tmax, t1);
+
+      if (tmax <= tmin) {
+        return result;
+      }
+    }
+  }
+
+  result.hit      = true;
+  result.distance = tmin;
+  result.point    = ray.pointAt(tmin);
+  return result;
+}
+
+/**
+ * @brief Tests ray-triangle intersection using Moller-Trumbore algorithm
+ *
+ * This is used for precise mesh intersection testing.
+ * Typically used as narrow-phase collision detection after AABB test.
+ *
+ * @param ray The ray to test
+ * @param v0 First vertex of triangle
+ * @param v1 Second vertex of triangle
+ * @param v2 Third vertex of triangle
+ * @return Intersection result with hit information
+ */
+template <typename T, Options Option = Options::RowMajor>
+auto g_rayTriangleintersect(const Ray<T, Option>&     ray,
+                            const Point3<T, Option>& v0,
+                            const Point3<T, Option>& v1,
+                            const Point3<T, Option>& v2)
+    -> IntersectionResult<T> {
+  IntersectionResult<T> result;
+
+  constexpr T kEpsilon = std::numeric_limits<T>::epsilon();
+
+  Vector3<T, Option> edge1 = v1 - v0;
+  Vector3<T, Option> edge2 = v2 - v0;
+  Vector3<T, Option> h     = ray.direction().cross(edge2);
+  T                   a     = edge1.dot(h);
+
+  if (a > -kEpsilon && a < kEpsilon) {
+    return result;  // Ray is parallel to triangle
+  }
+
+  T                   f = T(1) / a;
+  Vector3<T, Option> s = ray.origin() - v0;
+  T                   u = f * s.dot(h);
+
+  if (u < 0 || u > 1) {
+    return result;
+  }
+
+  Vector3<T, Option> q = s.cross(edge1);
+  T                   v = f * ray.direction().dot(q);
+
+  if (v < 0 || u + v > 1) {
+    return result;
+  }
+
+  T t = f * edge2.dot(q);
+
+  if (t > kEpsilon) {
+    result.hit      = true;
+    result.distance = t;
+    result.point    = ray.pointAt(t);
+    return result;
+  }
+
+  return result;
+}
+
+/**
+ * @brief Tests ray-sphere intersection
+ *
+ * Useful for bounding sphere tests or spherical objects.
+ *
+ * @param ray The ray to test
+ * @param center Sphere center
+ * @param radius Sphere radius
+ * @return Intersection result with hit information
+ */
+template <typename T, Options Option = Options::RowMajor>
+auto g_raySphereintersect(const Ray<T, Option>&     ray,
+                          const Point3<T, Option>& center,
+                          T radius) -> IntersectionResult<T> {
+  IntersectionResult<T> result;
+
+  Vector3<T, Option> oc = ray.origin() - center;
+  T                   a  = ray.direction().dot(ray.direction());
+  T                   b  = T(2) * oc.dot(ray.direction());
+  T                   c  = oc.dot(oc) - radius * radius;
+
+  T discriminant = b * b - T(4) * a * c;
+
+  if (discriminant < 0) {
+    return result;
+  }
+
+  T sqrtDiscriminant = std::sqrt(discriminant);
+  T t1               = (-b - sqrtDiscriminant) / (T(2) * a);
+  T t2               = (-b + sqrtDiscriminant) / (T(2) * a);
+
+  // Take the closest positive intersection
+  T t = (t1 > 0) ? t1 : ((t2 > 0) ? t2 : T(-1));
+
+  if (t > 0) {
+    result.hit      = true;
+    result.distance = t;
+    result.point    = ray.pointAt(t);
+  }
+
+  return result;
+}
+
+/**
+ * @brief Creates a ray from screen coordinates
+ *
+ * Converts screen/mouse coordinates to a ray in world space.
+ * Essential for mouse picking functionality.
+ *
+ * @param x Screen x coordinate (0 to width)
+ * @param y Screen y coordinate (0 to height)
+ * @param width Screen width
+ * @param height Screen height
+ * @param viewMatrix View matrix
+ * @param projectionMatrix Projection matrix
+ * @return Ray in world space
+ */
+template <typename T, Options Option = Options::RowMajor>
+auto g_screenToRay(T                              x,
+                   T                              y,
+                   T                              width,
+                   T                              height,
+                   const Matrix<T, 4, 4, Option>& viewMatrix,
+                   const Matrix<T, 4, 4, Option>& projectionMatrix)
+    -> Ray<T, Option> {
+  // Convert to normalized device coordinates (-1 to 1)
+  T ndcX = (T(2) * x) / width - T(1);
+  T ndcY = T(1) - (T(2) * y) / height;  // Flip Y
+
+  // Create points in clip space
+  Vector4<T, Option> nearPoint(ndcX, ndcY, T(-1), T(1));
+  Vector4<T, Option> farPoint(ndcX, ndcY, T(1), T(1));
+
+  // Transform to world space
+  auto invProjView = (projectionMatrix * viewMatrix).inverse();
+
+  Vector4<T, Option> worldNear  = nearPoint;
+  worldNear                     *= invProjView;
+  worldNear                      = g_perspectiveDivide(worldNear);
+
+  Vector4<T, Option> worldFar  = farPoint;
+  worldFar                     *= invProjView;
+  worldFar                      = g_perspectiveDivide(worldFar);
+
+  // Create ray
+  Point3<T, Option>  origin    = worldNear.template resizedCopy<3>();
+  Vector3<T, Option> direction = (worldFar.template resizedCopy<3>()
+                                   - worldNear.template resizedCopy<3>())
+                                      .normalized();
+
+  return Ray<T, Option>(origin, direction);
+}
+
+// END: intersections functionality
 // ----------------------------------------------------------------------------
 
 }  // namespace math

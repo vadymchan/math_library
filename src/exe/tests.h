@@ -1466,7 +1466,7 @@ TEST(MatrixTest, CrossProductFloatRandom) {
 
 // Method: get row
 TEST(MatrixTest, GetRow) {
-  math::MatrixNf<3, 3> matrix;
+  math::MatrixXf<3, 3> matrix;
   // Initialize matrix for the test
   matrix << 1.0f, 2.0f, 3.0f, 
             4.0f, 5.0f, 6.0f, 
@@ -1482,7 +1482,7 @@ TEST(MatrixTest, GetRow) {
 
 // Method: get row from column-major matrix
 TEST(MatrixTest, GetRowColumnMajor) {
-  math::MatrixNf<3, 3, math::Options::ColumnMajor> matrix;
+  math::MatrixXf<3, 3, math::Options::ColumnMajor> matrix;
   matrix << 1.0f, 4.0f, 7.0f, 
             2.0f, 5.0f, 8.0f, 
             3.0f, 6.0f, 9.0f;
@@ -1497,7 +1497,7 @@ TEST(MatrixTest, GetRowColumnMajor) {
 
 // Method: get column
 TEST(MatrixTest, GetColumn) {
-  math::MatrixNf<3, 3, math::Options::ColumnMajor> matrix;
+  math::MatrixXf<3, 3, math::Options::ColumnMajor> matrix;
   matrix << 1.0f, 4.0f, 7.0f, 
             2.0f, 5.0f, 8.0f, 
             3.0f, 6.0f, 9.0f;
@@ -1512,7 +1512,7 @@ TEST(MatrixTest, GetColumn) {
 
 // Method: get column from row-major matrix
 TEST(MatrixTest, GetColumnRowMajor) {
-  math::MatrixNf<3, 3> matrix;
+  math::MatrixXf<3, 3> matrix;
   matrix << 1.0f, 2.0f, 3.0f, 
             4.0f, 5.0f, 6.0f, 
             7.0f, 8.0f, 9.0f;
@@ -1529,7 +1529,7 @@ TEST(MatrixTest, GetColumnRowMajor) {
 
 // Method: set row
 TEST(MatrixTest, SetRow) {
-  math::MatrixNf<3, 3>                            matrix;
+  math::MatrixXf<3, 3>                            matrix;
   math::Vector<float, 3, math::Options::RowMajor> rowVector(1.0f, 2.0f, 3.0f);
   matrix.setRow<1>(rowVector);  // Set the second row
 
@@ -1541,7 +1541,7 @@ TEST(MatrixTest, SetRow) {
 
 // Method: set row in column-major matrix
 TEST(MatrixTest, SetRowColumnMajor) {
-  math::MatrixNf<3, 3, math::Options::ColumnMajor>   matrix;
+  math::MatrixXf<3, 3, math::Options::ColumnMajor>   matrix;
   math::Vector<float, 3, math::Options::ColumnMajor> rowVector(
       1.0f, 2.0f, 3.0f);
   matrix.setRow<1>(rowVector);  // Set the second row
@@ -1554,7 +1554,7 @@ TEST(MatrixTest, SetRowColumnMajor) {
 
 // Method: set column
 TEST(MatrixTest, SetColumn) {
-  math::MatrixNf<3, 3, math::Options::ColumnMajor>   matrix;
+  math::MatrixXf<3, 3, math::Options::ColumnMajor>   matrix;
   math::Vector<float, 3, math::Options::ColumnMajor> columnVector(
       4.0f, 5.0f, 6.0f);
   matrix.setColumn<2>(columnVector);  // Set the third column
@@ -1567,7 +1567,7 @@ TEST(MatrixTest, SetColumn) {
 
 // Method: set column in row-major matrix
 TEST(MatrixTest, SetColumnRowMajor) {
-  math::MatrixNf<3, 3, math::Options::RowMajor>   matrix;
+  math::MatrixXf<3, 3, math::Options::RowMajor>   matrix;
   math::Vector<float, 3, math::Options::RowMajor> columnVector(
       4.0f, 5.0f, 6.0f);
   matrix.setColumn<2>(columnVector);  // Set the third column
@@ -1581,7 +1581,7 @@ TEST(MatrixTest, SetColumnRowMajor) {
 // Method: set basis X
 
 TEST(MatrixTest, SetBasisX) {
-  math::MatrixNf<3, 3>                            matrix;
+  math::MatrixXf<3, 3>                            matrix;
   math::Vector<float, 3, math::Options::RowMajor> xBasis(1.0f, 0.0f, 0.0f);
   matrix.setBasisX(xBasis);
 
@@ -1594,7 +1594,7 @@ TEST(MatrixTest, SetBasisX) {
 // Method: set basis Y
 
 TEST(MatrixTest, SetBasisY) {
-  math::MatrixNf<3, 3>                            matrix;
+  math::MatrixXf<3, 3>                            matrix;
   math::Vector<float, 3, math::Options::RowMajor> yBasis(0.0f, 1.0f, 0.0f);
   matrix.setBasisY(yBasis);
 
@@ -1607,7 +1607,7 @@ TEST(MatrixTest, SetBasisY) {
 // Method: set basis Z
 
 TEST(MatrixTest, SetBasisZ) {
-  math::MatrixNf<3, 3>                            matrix;
+  math::MatrixXf<3, 3>                            matrix;
   math::Vector<float, 3, math::Options::RowMajor> zBasis(0.0f, 0.0f, 1.0f);
   matrix.setBasisZ(zBasis);
 
@@ -1620,7 +1620,7 @@ TEST(MatrixTest, SetBasisZ) {
 // Method: set basis general
 
 TEST(MatrixTest, GeneralizedSetBasis) {
-  math::MatrixNf<3, 3>                            matrix;
+  math::MatrixXf<3, 3>                            matrix;
   math::Vector<float, 3, math::Options::RowMajor> basisVector(1.0f, 2.0f, 3.0f);
 
   // Test setting each basis individually
@@ -1894,13 +1894,13 @@ TEST(DimensionTest, ComparisonOperators) {
 
 // Test case for dimension resizing with different target sizes
 TEST(DimensionTest, Resizing) {
-  math::Dimension3Df dim(1.0f, 2.0f, 3.0f);
+  math::Dimension3f dim(1.0f, 2.0f, 3.0f);
   math::Dimension2Df resizedDim = dim.resizedCopy<2>();
 
   EXPECT_FLOAT_EQ(resizedDim.width(), 1.0f);
   EXPECT_FLOAT_EQ(resizedDim.height(), 2.0f);
 
-  math::Dimension4Df resizedDim2 = dim.resizedCopy<4>();
+  math::Dimension4f resizedDim2 = dim.resizedCopy<4>();
 
   EXPECT_FLOAT_EQ(resizedDim2.width(), 1.0f);
   EXPECT_FLOAT_EQ(resizedDim2.height(), 2.0f);
@@ -4931,9 +4931,9 @@ TEST(GraphicsTest, RotateRh) {
 
 // Test case for g_lookAtRh function with different eye, target, and up vectors
 TEST(GraphicsTest, LookAtRh) {
-  math::Vector3Df eye(0.0f, 0.0f, 5.0f);
-  math::Vector3Df target(0.0f, 0.0f, 0.0f);
-  math::Vector3Df up(0.0f, 1.0f, 0.0f);
+  math::Vector3f eye(0.0f, 0.0f, 5.0f);
+  math::Vector3f target(0.0f, 0.0f, 0.0f);
+  math::Vector3f up(0.0f, 1.0f, 0.0f);
 
   math::Matrix4f<> matrix = math::g_lookAtRh(eye, target, up);
 
@@ -4946,9 +4946,9 @@ TEST(GraphicsTest, LookAtRh) {
 // Test case for g_lookToRh function with different eye, direction, and up
 // vectors
 TEST(GraphicsTest, LookToRh) {
-  math::Vector3Df eye(0.0f, 0.0f, 5.0f);
-  math::Vector3Df direction(0.0f, 0.0f, -1.0f);
-  math::Vector3Df up(0.0f, 1.0f, 0.0f);
+  math::Vector3f eye(0.0f, 0.0f, 5.0f);
+  math::Vector3f direction(0.0f, 0.0f, -1.0f);
+  math::Vector3f up(0.0f, 1.0f, 0.0f);
 
   math::Matrix4f<> matrix = math::g_lookToRh(eye, direction, up);
 
@@ -4960,7 +4960,7 @@ TEST(GraphicsTest, LookToRh) {
 
 // Test case for g_transformPoint function
 TEST(GraphicsTest, TransformPoint) {
-  math::Point3Df   point(1.0f, 2.0f, 3.0f);
+  math::Point3f   point(1.0f, 2.0f, 3.0f);
   math::Matrix4f<> matrix(1.0f,
                           0.0f,
                           0.0f,
@@ -4978,7 +4978,7 @@ TEST(GraphicsTest, TransformPoint) {
                           6.0f,
                           1.0f);
 
-  math::Point3Df result = math::g_transformPoint(point, matrix);
+  math::Point3f result = math::g_transformPoint(point, matrix);
 
   EXPECT_FLOAT_EQ(result(0), 5.0f);
   EXPECT_FLOAT_EQ(result(1), 7.0f);
@@ -4987,7 +4987,7 @@ TEST(GraphicsTest, TransformPoint) {
 
 // Test case for g_transformPoint function with perspective division
 TEST(GraphicsTest, TransformPointWithPerspectiveDivision) {
-  math::Point3Df   point(1.0f, 2.0f, 3.0f);
+  math::Point3f   point(1.0f, 2.0f, 3.0f);
   math::Matrix4f<> matrix(1.0f,
                           0.0f,
                           0.0f,
@@ -5005,7 +5005,7 @@ TEST(GraphicsTest, TransformPointWithPerspectiveDivision) {
                           0.0f,
                           1.0f);
 
-  math::Point3Df result = math::g_transformPoint(point, matrix);
+  math::Point3f result = math::g_transformPoint(point, matrix);
 
   EXPECT_FLOAT_EQ(result(0), 0.25f);
   EXPECT_FLOAT_EQ(result(1), 0.5f);
@@ -5014,7 +5014,7 @@ TEST(GraphicsTest, TransformPointWithPerspectiveDivision) {
 
 // Test case for g_transformVector function
 TEST(GraphicsTest, TransformVector) {
-  math::Vector3Df  vector(1.0f, 2.0f, 3.0f);
+  math::Vector3f  vector(1.0f, 2.0f, 3.0f);
   math::Matrix4f<> matrix(2.0f,
                           0.0f,
                           0.0f,
@@ -5032,7 +5032,7 @@ TEST(GraphicsTest, TransformVector) {
                           0.0f,
                           1.0f);
 
-  math::Vector3Df result = math::g_transformVector(vector, matrix);
+  math::Vector3f result = math::g_transformVector(vector, matrix);
 
   EXPECT_FLOAT_EQ(result(0), 2.0f);
   EXPECT_FLOAT_EQ(result(1), 6.0f);
@@ -5040,9 +5040,9 @@ TEST(GraphicsTest, TransformVector) {
 }
 
 TEST(ViewMatrixTest, LookAtRhRowMajor) {
-  math::Vector3D<float> eye{0.0f, 0.0f, 1.0f};
-  math::Vector3D<float> target{0.0f, 0.0f, 0.0f};
-  math::Vector3D<float> up{0.0f, 1.0f, 0.0f};
+  math::Vector3<float> eye{0.0f, 0.0f, 1.0f};
+  math::Vector3<float> target{0.0f, 0.0f, 0.0f};
+  math::Vector3<float> up{0.0f, 1.0f, 0.0f};
   auto                  viewMatrix = g_lookAtRh(eye, target, up);
 
   // Check the right vector
@@ -5073,9 +5073,9 @@ TEST(ViewMatrixTest, LookAtRhRowMajor) {
 }
 
 TEST(ViewMatrixTest, LookAtRhColumnMajor) {
-  math::Vector3D<float, math::Options::ColumnMajor> eye{0.0f, 0.0f, 1.0f};
-  math::Vector3D<float, math::Options::ColumnMajor> target{0.0f, 0.0f, 0.0f};
-  math::Vector3D<float, math::Options::ColumnMajor> up{0.0f, 1.0f, 0.0f};
+  math::Vector3<float, math::Options::ColumnMajor> eye{0.0f, 0.0f, 1.0f};
+  math::Vector3<float, math::Options::ColumnMajor> target{0.0f, 0.0f, 0.0f};
+  math::Vector3<float, math::Options::ColumnMajor> up{0.0f, 1.0f, 0.0f};
   auto viewMatrix = g_lookAtRh(eye, target, up);
 
   // Check the right vector
@@ -5106,9 +5106,9 @@ TEST(ViewMatrixTest, LookAtRhColumnMajor) {
 }
 
 TEST(ViewMatrixTest, LookToRhRowMajor) {
-  math::Vector3D<float> eye{0.0f, 0.0f, 1.0f};
-  math::Vector3D<float> direction{0.0f, 0.0f, -1.0f};
-  math::Vector3D<float> up{0.0f, 1.0f, 0.0f};
+  math::Vector3<float> eye{0.0f, 0.0f, 1.0f};
+  math::Vector3<float> direction{0.0f, 0.0f, -1.0f};
+  math::Vector3<float> up{0.0f, 1.0f, 0.0f};
   auto                  viewMatrix = g_lookToRh(eye, direction, up);
 
   // Check the right vector
@@ -5139,10 +5139,10 @@ TEST(ViewMatrixTest, LookToRhRowMajor) {
 }
 
 TEST(ViewMatrixTest, LookToRhColumnMajor) {
-  math::Vector3D<float, math::Options::ColumnMajor> eye{0.0f, 0.0f, 1.0f};
-  math::Vector3D<float, math::Options::ColumnMajor> direction{
+  math::Vector3<float, math::Options::ColumnMajor> eye{0.0f, 0.0f, 1.0f};
+  math::Vector3<float, math::Options::ColumnMajor> direction{
     0.0f, 0.0f, -1.0f};
-  math::Vector3D<float, math::Options::ColumnMajor> up{0.0f, 1.0f, 0.0f};
+  math::Vector3<float, math::Options::ColumnMajor> up{0.0f, 1.0f, 0.0f};
   auto viewMatrix = g_lookToRh(eye, direction, up);
 
   // Check the right vector
@@ -5173,9 +5173,9 @@ TEST(ViewMatrixTest, LookToRhColumnMajor) {
 }
 
 TEST(ViewMatrixTest, LookAtLhRowMajor) {
-  math::Vector3D<float> eye{0.0f, 0.0f, 1.0f};
-  math::Vector3D<float> target{0.0f, 0.0f, 0.0f};
-  math::Vector3D<float> up{0.0f, 1.0f, 0.0f};
+  math::Vector3<float> eye{0.0f, 0.0f, 1.0f};
+  math::Vector3<float> target{0.0f, 0.0f, 0.0f};
+  math::Vector3<float> up{0.0f, 1.0f, 0.0f};
   auto                  viewMatrix = g_lookAtLh(eye, target, up);
 
   // Check the right vector
@@ -5206,9 +5206,9 @@ TEST(ViewMatrixTest, LookAtLhRowMajor) {
 }
 
 TEST(ViewMatrixTest, LookAtLhColumnMajor) {
-  math::Vector3D<float, math::Options::ColumnMajor> eye{0.0f, 0.0f, 1.0f};
-  math::Vector3D<float, math::Options::ColumnMajor> target{0.0f, 0.0f, 0.0f};
-  math::Vector3D<float, math::Options::ColumnMajor> up{0.0f, 1.0f, 0.0f};
+  math::Vector3<float, math::Options::ColumnMajor> eye{0.0f, 0.0f, 1.0f};
+  math::Vector3<float, math::Options::ColumnMajor> target{0.0f, 0.0f, 0.0f};
+  math::Vector3<float, math::Options::ColumnMajor> up{0.0f, 1.0f, 0.0f};
   auto viewMatrix = g_lookAtLh(eye, target, up);
 
   // Check the right vector
@@ -5239,9 +5239,9 @@ TEST(ViewMatrixTest, LookAtLhColumnMajor) {
 }
 
 TEST(ViewMatrixTest, LookToLhRowMajor) {
-  math::Vector3D<float> eye{0.0f, 0.0f, 1.0f};
-  math::Vector3D<float> direction{0.0f, 0.0f, -1.0f};
-  math::Vector3D<float> up{0.0f, 1.0f, 0.0f};
+  math::Vector3<float> eye{0.0f, 0.0f, 1.0f};
+  math::Vector3<float> direction{0.0f, 0.0f, -1.0f};
+  math::Vector3<float> up{0.0f, 1.0f, 0.0f};
   auto                  viewMatrix = g_lookToLh(eye, direction, up);
 
   // Check the right vector
@@ -5272,10 +5272,10 @@ TEST(ViewMatrixTest, LookToLhRowMajor) {
 }
 
 TEST(ViewMatrixTest, LookToLhColumnMajor) {
-  math::Vector3D<float, math::Options::ColumnMajor> eye{0.0f, 0.0f, 1.0f};
-  math::Vector3D<float, math::Options::ColumnMajor> direction{
+  math::Vector3<float, math::Options::ColumnMajor> eye{0.0f, 0.0f, 1.0f};
+  math::Vector3<float, math::Options::ColumnMajor> direction{
     0.0f, 0.0f, -1.0f};
-  math::Vector3D<float, math::Options::ColumnMajor> up{0.0f, 1.0f, 0.0f};
+  math::Vector3<float, math::Options::ColumnMajor> up{0.0f, 1.0f, 0.0f};
   auto viewMatrix = g_lookToLh(eye, direction, up);
 
   // Check the right vector
@@ -5307,9 +5307,9 @@ TEST(ViewMatrixTest, LookToLhColumnMajor) {
 
 // Test case for lookAtRh
 TEST(LookAtTest, LookAtRhFloat) {
-  math::Vector3Df  eye(0.0f, 0.0f, 5.0f);
-  math::Vector3Df  target(0.0f, 0.0f, 0.0f);
-  math::Vector3Df  up(0.0f, 1.0f, 0.0f);
+  math::Vector3f  eye(0.0f, 0.0f, 5.0f);
+  math::Vector3f  target(0.0f, 0.0f, 0.0f);
+  math::Vector3f  up(0.0f, 1.0f, 0.0f);
   math::Matrix4f<> viewMatrix = math::g_lookAtRh(eye, target, up);
 
   EXPECT_FLOAT_EQ(viewMatrix(0, 0), -1.0f);
@@ -5332,9 +5332,9 @@ TEST(LookAtTest, LookAtRhFloat) {
 
 // Test case for lookAtLh
 TEST(LookAtTest, LookAtLhFloat) {
-  math::Vector3Df  eye(0.0f, 0.0f, 5.0f);
-  math::Vector3Df  target(0.0f, 0.0f, 0.0f);
-  math::Vector3Df  up(0.0f, 1.0f, 0.0f);
+  math::Vector3f  eye(0.0f, 0.0f, 5.0f);
+  math::Vector3f  target(0.0f, 0.0f, 0.0f);
+  math::Vector3f  up(0.0f, 1.0f, 0.0f);
   math::Matrix4f<> viewMatrix = math::g_lookAtLh(eye, target, up);
 
   EXPECT_FLOAT_EQ(viewMatrix(0, 0), -1.0f);
@@ -5357,9 +5357,9 @@ TEST(LookAtTest, LookAtLhFloat) {
 
 // Test case for lookToRh
 TEST(LookAtTest, LookToRhFloat) {
-  math::Vector3Df  eye(0.0f, 0.0f, 5.0f);
-  math::Vector3Df  direction(0.0f, 0.0f, -1.0f);
-  math::Vector3Df  up(0.0f, 1.0f, 0.0f);
+  math::Vector3f  eye(0.0f, 0.0f, 5.0f);
+  math::Vector3f  direction(0.0f, 0.0f, -1.0f);
+  math::Vector3f  up(0.0f, 1.0f, 0.0f);
   math::Matrix4f<> viewMatrix = math::g_lookToRh(eye, direction, up);
 
   EXPECT_FLOAT_EQ(viewMatrix(0, 0), -1.0f);
@@ -5382,9 +5382,9 @@ TEST(LookAtTest, LookToRhFloat) {
 
 // Test case for lookToLh
 TEST(LookAtTest, LookToLhFloat) {
-  math::Vector3Df  eye(0.0f, 0.0f, 5.0f);
-  math::Vector3Df  direction(0.0f, 0.0f, -1.0f);
-  math::Vector3Df  up(0.0f, 1.0f, 0.0f);
+  math::Vector3f  eye(0.0f, 0.0f, 5.0f);
+  math::Vector3f  direction(0.0f, 0.0f, -1.0f);
+  math::Vector3f  up(0.0f, 1.0f, 0.0f);
   math::Matrix4f<> viewMatrix = math::g_lookToLh(eye, direction, up);
 
   EXPECT_FLOAT_EQ(viewMatrix(0, 0), -1.0f);
@@ -6181,6 +6181,132 @@ TEST(OrthoTest, OrthoRhNoWithWidthHeightFloat) {
   EXPECT_FLOAT_EQ(orthoMatrix(3, 3), 1.0f);
 }
 
+// intersection
+
+// --------- Ray–AABB ----------------------------------------------------
+
+TEST(IntersectionsTest, RayAABB_Hit) {
+  math::Rayf<>  ray({-1.0f, 0.5f, 0.5f}, {1.0f, 0.0f, 0.0f});
+  math::Point3f min(0.0f, 0.0f, 0.0f);
+  math::Point3f max(1.0f, 1.0f, 1.0f);
+
+  auto result = math::g_rayAABBintersect(ray, min, max);
+
+  ASSERT_TRUE(result);
+  EXPECT_FLOAT_EQ(result.distance, 1.0f);
+  EXPECT_FLOAT_EQ(result.point(0), 0.0f);
+  EXPECT_FLOAT_EQ(result.point(1), 0.5f);
+  EXPECT_FLOAT_EQ(result.point(2), 0.5f);
+}
+
+TEST(IntersectionsTest, RayAABB_Miss) {
+  math::Rayf<>  ray({-1.0f, 2.0f, 2.0f}, {1.0f, 0.0f, 0.0f});
+  math::Point3f min(0.0f, 0.0f, 0.0f);
+  math::Point3f max(1.0f, 1.0f, 1.0f);
+
+  auto result = math::g_rayAABBintersect(ray, min, max);
+
+  EXPECT_FALSE(result);
+}
+
+TEST(IntersectionsTest, RayAABB_InsideBox) {
+  math::Rayf<>  ray({0.5f, 0.5f, 0.5f}, {1.0f, 0.0f, 0.0f});
+  math::Point3f min(0.0f, 0.0f, 0.0f);
+  math::Point3f max(1.0f, 1.0f, 1.0f);
+
+  auto result = math::g_rayAABBintersect(ray, min, max);
+
+  ASSERT_TRUE(result);
+  EXPECT_FLOAT_EQ(result.distance, 0.0f);  
+  EXPECT_FLOAT_EQ(result.point(0), 0.5f);
+}
+
+// --------- Ray–Triangle ------------------------------------------------
+
+TEST(IntersectionsTest, RayTriangle_Hit) {
+  math::Point3f v0(0.0f, 0.0f, 0.0f);
+  math::Point3f v1(1.0f, 0.0f, 0.0f);
+  math::Point3f v2(0.0f, 1.0f, 0.0f);
+
+  math::Rayf<> ray({0.25f, 0.25f, -1.0f}, {0.0f, 0.0f, 1.0f});
+
+  auto result = math::g_rayTriangleintersect(ray, v0, v1, v2);
+
+  ASSERT_TRUE(result);
+  EXPECT_FLOAT_EQ(result.distance, 1.0f);
+  EXPECT_NEAR(result.point(0), 0.25f, 1e-6f);
+  EXPECT_NEAR(result.point(1), 0.25f, 1e-6f);
+  EXPECT_NEAR(result.point(2), 0.0f, 1e-6f);
+}
+
+TEST(IntersectionsTest, RayTriangle_Miss) {
+  math::Point3f v0(0.0f, 0.0f, 0.0f);
+  math::Point3f v1(1.0f, 0.0f, 0.0f);
+  math::Point3f v2(0.0f, 1.0f, 0.0f);
+
+  math::Rayf<> ray({1.0f, 1.0f, -1.0f}, {0.0f, 0.0f, 1.0f});
+
+  auto result = math::g_rayTriangleintersect(ray, v0, v1, v2);
+
+  EXPECT_FALSE(result);
+}
+
+// --------- Ray–Sphere --------------------------------------------------
+
+TEST(IntersectionsTest, RaySphere_HitOutside) {
+  math::Rayf<>  ray({0.0f, 0.0f, -3.0f}, {0.0f, 0.0f, 1.0f});
+  math::Point3f center(0.0f, 0.0f, 0.0f);
+  float         radius = 1.0f;
+
+  auto result = math::g_raySphereintersect(ray, center, radius);
+
+  ASSERT_TRUE(result);
+  EXPECT_FLOAT_EQ(result.distance, 2.0f);
+  EXPECT_FLOAT_EQ(result.point(2), -1.0f);
+}
+
+TEST(IntersectionsTest, RaySphere_HitInside) {
+  math::Rayf<>  ray({0.0f, 0.0f, 0.0f}, {1.0f, 0.0f, 0.0f});
+  math::Point3f center(0.0f, 0.0f, 0.0f);
+  float         radius = 1.0f;
+
+  auto result = math::g_raySphereintersect(ray, center, radius);
+
+  ASSERT_TRUE(result);
+  EXPECT_FLOAT_EQ(result.distance, 1.0f);
+  EXPECT_FLOAT_EQ(result.point(0), 1.0f);
+}
+
+TEST(IntersectionsTest, RaySphere_Miss) {
+  math::Rayf<>  ray({0.0f, 0.0f, -3.0f}, {1.0f, 0.0f, 0.0f});
+  math::Point3f center(0.0f, 0.0f, 0.0f);
+
+  auto result = math::g_raySphereintersect(ray, center, 1.0f);
+
+  EXPECT_FALSE(result);
+}
+
+// --------- Screen -> Ray ------------------------------------------------
+
+TEST(IntersectionsTest, ScreenToRay_IdentityMatrices) {
+  const float width = 2.0f, height = 2.0f;
+  float       x = 1.0f, y = 1.0f;  
+
+  math::Matrix4f<> view = math::Matrix4f<>::Identity();
+  math::Matrix4f<> proj = math::Matrix4f<>::Identity();
+
+  auto ray = math::g_screenToRay(x, y, width, height, view, proj);
+
+  // we should get (0,0,-1) -> (0,0,1)
+  EXPECT_FLOAT_EQ(ray.origin()(0), 0.0f);
+  EXPECT_FLOAT_EQ(ray.origin()(1), 0.0f);
+  EXPECT_FLOAT_EQ(ray.origin()(2), -1.0f);
+
+  EXPECT_FLOAT_EQ(ray.direction()(0), 0.0f);
+  EXPECT_FLOAT_EQ(ray.direction()(1), 0.0f);
+  EXPECT_FLOAT_EQ(ray.direction()(2), 1.0f);
+}
+
 // ========================== VECTOR: FLOAT ==============================
 
 // Test case for the move assignment operator
@@ -6379,41 +6505,41 @@ TEST(VectorTest, MatrixMultiplicationAssignment) {
 }
 
 TEST(VectorComparisonTest, LessThanOperator) {
-  math::Vector3Df vec1(1.0f, 2.0f, 3.0f);
-  math::Vector3Df vec2(4.0f, 5.0f, 6.0f);
+  math::Vector3f vec1(1.0f, 2.0f, 3.0f);
+  math::Vector3f vec2(4.0f, 5.0f, 6.0f);
 
   EXPECT_TRUE(vec1 < vec2);
   EXPECT_FALSE(vec2 < vec1);
 }
 
 TEST(VectorComparisonTest, LessThanOperatorEqual) {
-  math::Vector3Df vec1(1.0f, 2.0f, 3.0f);
-  math::Vector3Df vec2(1.0f, 2.0f, 3.0f);
+  math::Vector3f vec1(1.0f, 2.0f, 3.0f);
+  math::Vector3f vec2(1.0f, 2.0f, 3.0f);
 
   EXPECT_FALSE(vec1 < vec2);
   EXPECT_FALSE(vec2 < vec1);
 }
 
 TEST(VectorComparisonTest, GreaterThanOperator) {
-  math::Vector3Df vec1(4.0f, 5.0f, 6.0f);
-  math::Vector3Df vec2(1.0f, 2.0f, 3.0f);
+  math::Vector3f vec1(4.0f, 5.0f, 6.0f);
+  math::Vector3f vec2(1.0f, 2.0f, 3.0f);
 
   EXPECT_TRUE(vec1 > vec2);
   EXPECT_FALSE(vec2 > vec1);
 }
 
 TEST(VectorComparisonTest, GreaterThanOperatorEqual) {
-  math::Vector3Df vec1(1.0f, 2.0f, 3.0f);
-  math::Vector3Df vec2(1.0f, 2.0f, 3.0f);
+  math::Vector3f vec1(1.0f, 2.0f, 3.0f);
+  math::Vector3f vec2(1.0f, 2.0f, 3.0f);
 
   EXPECT_FALSE(vec1 > vec2);
   EXPECT_FALSE(vec2 > vec1);
 }
 
 TEST(VectorComparisonTest, LessThanOrEqualToOperator) {
-  math::Vector3Df vec1(1.0f, 2.0f, 3.0f);
-  math::Vector3Df vec2(4.0f, 5.0f, 6.0f);
-  math::Vector3Df vec3(1.0f, 2.0f, 3.0f);
+  math::Vector3f vec1(1.0f, 2.0f, 3.0f);
+  math::Vector3f vec2(4.0f, 5.0f, 6.0f);
+  math::Vector3f vec3(1.0f, 2.0f, 3.0f);
 
   EXPECT_TRUE(vec1 <= vec2);
   EXPECT_FALSE(vec2 <= vec1);
@@ -6422,9 +6548,9 @@ TEST(VectorComparisonTest, LessThanOrEqualToOperator) {
 }
 
 TEST(VectorComparisonTest, GreaterThanOrEqualToOperator) {
-  math::Vector3Df vec1(4.0f, 5.0f, 6.0f);
-  math::Vector3Df vec2(1.0f, 2.0f, 3.0f);
-  math::Vector3Df vec3(4.0f, 5.0f, 6.0f);
+  math::Vector3f vec1(4.0f, 5.0f, 6.0f);
+  math::Vector3f vec2(1.0f, 2.0f, 3.0f);
+  math::Vector3f vec3(4.0f, 5.0f, 6.0f);
 
   EXPECT_TRUE(vec1 >= vec2);
   EXPECT_FALSE(vec2 >= vec1);
@@ -6435,41 +6561,41 @@ TEST(VectorComparisonTest, GreaterThanOrEqualToOperator) {
 // ========================== VECTOR: DOUBLE ==============================
 
 TEST(VectorComparisonTest, LessThanOperatorDouble) {
-  math::Vector3D<double> vec1(1.0, 2.0, 3.0);
-  math::Vector3D<double> vec2(4.0, 5.0, 6.0);
+  math::Vector3<double> vec1(1.0, 2.0, 3.0);
+  math::Vector3<double> vec2(4.0, 5.0, 6.0);
 
   EXPECT_TRUE(vec1 < vec2);
   EXPECT_FALSE(vec2 < vec1);
 }
 
 TEST(VectorComparisonTest, LessThanOperatorEqualDouble) {
-  math::Vector3D<double> vec1(1.0, 2.0, 3.0);
-  math::Vector3D<double> vec2(1.0, 2.0, 3.0);
+  math::Vector3<double> vec1(1.0, 2.0, 3.0);
+  math::Vector3<double> vec2(1.0, 2.0, 3.0);
 
   EXPECT_FALSE(vec1 < vec2);
   EXPECT_FALSE(vec2 < vec1);
 }
 
 TEST(VectorComparisonTest, GreaterThanOperatorDouble) {
-  math::Vector3D<double> vec1(4.0, 5.0, 6.0);
-  math::Vector3D<double> vec2(1.0, 2.0, 3.0);
+  math::Vector3<double> vec1(4.0, 5.0, 6.0);
+  math::Vector3<double> vec2(1.0, 2.0, 3.0);
 
   EXPECT_TRUE(vec1 > vec2);
   EXPECT_FALSE(vec2 > vec1);
 }
 
 TEST(VectorComparisonTest, GreaterThanOperatorEqualDouble) {
-  math::Vector3D<double> vec1(1.0, 2.0, 3.0);
-  math::Vector3D<double> vec2(1.0, 2.0, 3.0);
+  math::Vector3<double> vec1(1.0, 2.0, 3.0);
+  math::Vector3<double> vec2(1.0, 2.0, 3.0);
 
   EXPECT_FALSE(vec1 > vec2);
   EXPECT_FALSE(vec2 > vec1);
 }
 
 TEST(VectorComparisonTest, LessThanOrEqualToOperatorDouble) {
-  math::Vector3D<double> vec1(1.0, 2.0, 3.0);
-  math::Vector3D<double> vec2(4.0, 5.0, 6.0);
-  math::Vector3D<double> vec3(1.0, 2.0, 3.0);
+  math::Vector3<double> vec1(1.0, 2.0, 3.0);
+  math::Vector3<double> vec2(4.0, 5.0, 6.0);
+  math::Vector3<double> vec3(1.0, 2.0, 3.0);
 
   EXPECT_TRUE(vec1 <= vec2);
   EXPECT_FALSE(vec2 <= vec1);
@@ -6478,9 +6604,9 @@ TEST(VectorComparisonTest, LessThanOrEqualToOperatorDouble) {
 }
 
 TEST(VectorComparisonTest, GreaterThanOrEqualToOperatorDouble) {
-  math::Vector3D<double> vec1(4.0, 5.0, 6.0);
-  math::Vector3D<double> vec2(1.0, 2.0, 3.0);
-  math::Vector3D<double> vec3(4.0, 5.0, 6.0);
+  math::Vector3<double> vec1(4.0, 5.0, 6.0);
+  math::Vector3<double> vec2(1.0, 2.0, 3.0);
+  math::Vector3<double> vec3(4.0, 5.0, 6.0);
 
   EXPECT_TRUE(vec1 >= vec2);
   EXPECT_FALSE(vec2 >= vec1);
@@ -6491,41 +6617,41 @@ TEST(VectorComparisonTest, GreaterThanOrEqualToOperatorDouble) {
 // ========================== VECTOR: INT ==============================
 
 TEST(VectorComparisonTest, LessThanOperatorInt) {
-  math::Vector3Di vec1(1, 2, 3);
-  math::Vector3Di vec2(4, 5, 6);
+  math::Vector3i vec1(1, 2, 3);
+  math::Vector3i vec2(4, 5, 6);
 
   EXPECT_TRUE(vec1 < vec2);
   EXPECT_FALSE(vec2 < vec1);
 }
 
 TEST(VectorComparisonTest, LessThanOperatorEqualInt) {
-  math::Vector3Di vec1(1, 2, 3);
-  math::Vector3Di vec2(1, 2, 3);
+  math::Vector3i vec1(1, 2, 3);
+  math::Vector3i vec2(1, 2, 3);
 
   EXPECT_FALSE(vec1 < vec2);
   EXPECT_FALSE(vec2 < vec1);
 }
 
 TEST(VectorComparisonTest, GreaterThanOperatorInt) {
-  math::Vector3Di vec1(4, 5, 6);
-  math::Vector3Di vec2(1, 2, 3);
+  math::Vector3i vec1(4, 5, 6);
+  math::Vector3i vec2(1, 2, 3);
 
   EXPECT_TRUE(vec1 > vec2);
   EXPECT_FALSE(vec2 > vec1);
 }
 
 TEST(VectorComparisonTest, GreaterThanOperatorEqualInt) {
-  math::Vector3Di vec1(1, 2, 3);
-  math::Vector3Di vec2(1, 2, 3);
+  math::Vector3i vec1(1, 2, 3);
+  math::Vector3i vec2(1, 2, 3);
 
   EXPECT_FALSE(vec1 > vec2);
   EXPECT_FALSE(vec2 > vec1);
 }
 
 TEST(VectorComparisonTest, LessThanOrEqualToOperatorInt) {
-  math::Vector3Di vec1(1, 2, 3);
-  math::Vector3Di vec2(4, 5, 6);
-  math::Vector3Di vec3(1, 2, 3);
+  math::Vector3i vec1(1, 2, 3);
+  math::Vector3i vec2(4, 5, 6);
+  math::Vector3i vec3(1, 2, 3);
 
   EXPECT_TRUE(vec1 <= vec2);
   EXPECT_FALSE(vec2 <= vec1);
@@ -6534,9 +6660,9 @@ TEST(VectorComparisonTest, LessThanOrEqualToOperatorInt) {
 }
 
 TEST(VectorComparisonTest, GreaterThanOrEqualToOperatorInt) {
-  math::Vector3Di vec1(4, 5, 6);
-  math::Vector3Di vec2(1, 2, 3);
-  math::Vector3Di vec3(4, 5, 6);
+  math::Vector3i vec1(4, 5, 6);
+  math::Vector3i vec2(1, 2, 3);
+  math::Vector3i vec3(4, 5, 6);
 
   EXPECT_TRUE(vec1 >= vec2);
   EXPECT_FALSE(vec2 >= vec1);
@@ -6547,41 +6673,41 @@ TEST(VectorComparisonTest, GreaterThanOrEqualToOperatorInt) {
 // ========================= VECTOR: UNSIGNED INT =============================
 
 TEST(VectorComparisonTest, LessThanOperatorUnsignedInt) {
-  math::Vector3D<unsigned int> vec1(1, 2, 3);
-  math::Vector3D<unsigned int> vec2(4, 5, 6);
+  math::Vector3<unsigned int> vec1(1, 2, 3);
+  math::Vector3<unsigned int> vec2(4, 5, 6);
 
   EXPECT_TRUE(vec1 < vec2);
   EXPECT_FALSE(vec2 < vec1);
 }
 
 TEST(VectorComparisonTest, LessThanOperatorEqualUnsignedInt) {
-  math::Vector3D<unsigned int> vec1(1, 2, 3);
-  math::Vector3D<unsigned int> vec2(1, 2, 3);
+  math::Vector3<unsigned int> vec1(1, 2, 3);
+  math::Vector3<unsigned int> vec2(1, 2, 3);
 
   EXPECT_FALSE(vec1 < vec2);
   EXPECT_FALSE(vec2 < vec1);
 }
 
 TEST(VectorComparisonTest, GreaterThanOperatorUnsignedInt) {
-  math::Vector3D<unsigned int> vec1(4, 5, 6);
-  math::Vector3D<unsigned int> vec2(1, 2, 3);
+  math::Vector3<unsigned int> vec1(4, 5, 6);
+  math::Vector3<unsigned int> vec2(1, 2, 3);
 
   EXPECT_TRUE(vec1 > vec2);
   EXPECT_FALSE(vec2 > vec1);
 }
 
 TEST(VectorComparisonTest, GreaterThanOperatorEqualUnsignedInt) {
-  math::Vector3D<unsigned int> vec1(1, 2, 3);
-  math::Vector3D<unsigned int> vec2(1, 2, 3);
+  math::Vector3<unsigned int> vec1(1, 2, 3);
+  math::Vector3<unsigned int> vec2(1, 2, 3);
 
   EXPECT_FALSE(vec1 > vec2);
   EXPECT_FALSE(vec2 > vec1);
 }
 
 TEST(VectorComparisonTest, LessThanOrEqualToOperatorUnsignedInt) {
-  math::Vector3D<unsigned int> vec1(1, 2, 3);
-  math::Vector3D<unsigned int> vec2(4, 5, 6);
-  math::Vector3D<unsigned int> vec3(1, 2, 3);
+  math::Vector3<unsigned int> vec1(1, 2, 3);
+  math::Vector3<unsigned int> vec2(4, 5, 6);
+  math::Vector3<unsigned int> vec3(1, 2, 3);
 
   EXPECT_TRUE(vec1 <= vec2);
   EXPECT_FALSE(vec2 <= vec1);
@@ -6590,9 +6716,9 @@ TEST(VectorComparisonTest, LessThanOrEqualToOperatorUnsignedInt) {
 }
 
 TEST(VectorComparisonTest, GreaterThanOrEqualToOperatorUnsignedInt) {
-  math::Vector3D<unsigned int> vec1(4, 5, 6);
-  math::Vector3D<unsigned int> vec2(1, 2, 3);
-  math::Vector3D<unsigned int> vec3(4, 5, 6);
+  math::Vector3<unsigned int> vec1(4, 5, 6);
+  math::Vector3<unsigned int> vec2(1, 2, 3);
+  math::Vector3<unsigned int> vec3(4, 5, 6);
 
   EXPECT_TRUE(vec1 >= vec2);
   EXPECT_FALSE(vec2 >= vec1);
@@ -6601,36 +6727,36 @@ TEST(VectorComparisonTest, GreaterThanOrEqualToOperatorUnsignedInt) {
 }
 
 TEST(VectorComparisonTest, LessThanOperatorUnsignedIntLargeValues) {
-  math::Vector3D<unsigned int> vec1(
+  math::Vector3<unsigned int> vec1(
       0xFF'FF'FF'FF, 0xFF'FF'FF'FF, 0xFF'FF'FF'FF);
-  math::Vector3D<unsigned int> vec2(0, 0, 0);
+  math::Vector3<unsigned int> vec2(0, 0, 0);
 
   EXPECT_FALSE(vec1 < vec2);
   EXPECT_TRUE(vec2 < vec1);
 }
 
 TEST(VectorComparisonTest, GreaterThanOperatorUnsignedIntLargeValues) {
-  math::Vector3D<unsigned int> vec1(
+  math::Vector3<unsigned int> vec1(
       0xFF'FF'FF'FF, 0xFF'FF'FF'FF, 0xFF'FF'FF'FF);
-  math::Vector3D<unsigned int> vec2(0, 0, 0);
+  math::Vector3<unsigned int> vec2(0, 0, 0);
 
   EXPECT_TRUE(vec1 > vec2);
   EXPECT_FALSE(vec2 > vec1);
 }
 
 TEST(VectorComparisonTest, LessThanOrEqualToOperatorUnsignedIntLargeValues) {
-  math::Vector3D<unsigned int> vec1(
+  math::Vector3<unsigned int> vec1(
       0xFF'FF'FF'FF, 0xFF'FF'FF'FF, 0xFF'FF'FF'FF);
-  math::Vector3D<unsigned int> vec2(0, 0, 0);
+  math::Vector3<unsigned int> vec2(0, 0, 0);
 
   EXPECT_FALSE(vec1 <= vec2);
   EXPECT_TRUE(vec2 <= vec1);
 }
 
 TEST(VectorComparisonTest, GreaterThanOrEqualToOperatorUnsignedIntLargeValues) {
-  math::Vector3D<unsigned int> vec1(
+  math::Vector3<unsigned int> vec1(
       0xFF'FF'FF'FF, 0xFF'FF'FF'FF, 0xFF'FF'FF'FF);
-  math::Vector3D<unsigned int> vec2(0, 0, 0);
+  math::Vector3<unsigned int> vec2(0, 0, 0);
 
   EXPECT_FALSE(vec2 >= vec1);
   EXPECT_TRUE(vec1 >= vec2);
@@ -6886,10 +7012,10 @@ TEST(QuaternionTest, Inverse) {
 }
 
 TEST(QuaternionTest, RotateVector) {
-  math::Vector3Df   v(1.0f, 0.0f, 0.0f);
+  math::Vector3f   v(1.0f, 0.0f, 0.0f);
   math::Quaternionf q(0.707107f, 0.0f, 0.0f, 0.707107f);
 
-  math::Vector3Df result = q.rotateVector(v);
+  math::Vector3f result = q.rotateVector(v);
 
   EXPECT_NEAR(result.x(), 1.0f, 1e-6f);
   EXPECT_NEAR(result.y(), 0.0f, 1e-6f);
@@ -6957,8 +7083,8 @@ TEST(QuaternionTest, Log) {
 }
 
 TEST(QuaternionTest, FromVectorsIdentity) {
-  math::Vector3Df from(1.0f, 0.0f, 0.0f);
-  math::Vector3Df to(1.0f, 0.0f, 0.0f);
+  math::Vector3f from(1.0f, 0.0f, 0.0f);
+  math::Vector3f to(1.0f, 0.0f, 0.0f);
 
   math::Quaternionf q = math::Quaternionf::fromVectors(from, to);
 
@@ -6968,50 +7094,50 @@ TEST(QuaternionTest, FromVectorsIdentity) {
   EXPECT_NEAR(q.w(), 1.0f, 1e-6f);
   EXPECT_NEAR(q.norm(), 1.0f, 1e-6f);
 
-  math::Vector3Df rotated = q.rotateVector(from);
+  math::Vector3f rotated = q.rotateVector(from);
   EXPECT_NEAR(rotated.x(), to.x(), 1e-6f);
   EXPECT_NEAR(rotated.y(), to.y(), 1e-6f);
   EXPECT_NEAR(rotated.z(), to.z(), 1e-6f);
 }
 
 TEST(QuaternionTest, FromVectorsOpposite) {
-  math::Vector3Df from(1.0f, 0.0f, 0.0f);
-  math::Vector3Df to(-1.0f, 0.0f, 0.0f);
+  math::Vector3f from(1.0f, 0.0f, 0.0f);
+  math::Vector3f to(-1.0f, 0.0f, 0.0f);
 
   math::Quaternionf q = math::Quaternionf::fromVectors(from, to);
 
   EXPECT_NEAR(q.norm(), 1.0f, 1e-6f);
 
-  math::Vector3Df rotated = q.rotateVector(from);
+  math::Vector3f rotated = q.rotateVector(from);
   EXPECT_NEAR(rotated.x(), to.x(), 1e-5f);
   EXPECT_NEAR(rotated.y(), to.y(), 1e-5f);
   EXPECT_NEAR(rotated.z(), to.z(), 1e-5f);
 }
 
 TEST(QuaternionTest, FromVectorsOrthogonal) {
-  math::Vector3Df from(1.0f, 0.0f, 0.0f);
-  math::Vector3Df to(0.0f, 1.0f, 0.0f);
+  math::Vector3f from(1.0f, 0.0f, 0.0f);
+  math::Vector3f to(0.0f, 1.0f, 0.0f);
 
   math::Quaternionf q = math::Quaternionf::fromVectors(from, to);
   EXPECT_NEAR(q.norm(), 1.0f, 1e-6f);
 
-  math::Vector3Df rotated = q.rotateVector(from);
+  math::Vector3f rotated = q.rotateVector(from);
   EXPECT_NEAR(rotated.x(), to.x(), 1e-5f);
   EXPECT_NEAR(rotated.y(), to.y(), 1e-5f);
   EXPECT_NEAR(rotated.z(), to.z(), 1e-5f);
 }
 
 TEST(QuaternionTest, FromVectorsNonNormalized) {
-  math::Vector3Df from(2.0f, 0.0f, 0.0f);
-  math::Vector3Df to(0.0f, -3.0f, 0.0f);
+  math::Vector3f from(2.0f, 0.0f, 0.0f);
+  math::Vector3f to(0.0f, -3.0f, 0.0f);
 
   math::Quaternionf q = math::Quaternionf::fromVectors(from, to);
 
   EXPECT_NEAR(q.norm(), 1.0f, 1e-6f);
 
   // ñðàâíèâàåì íàïðàâëåíèÿ
-  math::Vector3Df rotatedDir = q.rotateVector(from).normalized();
-  math::Vector3Df toDir      = to.normalized();
+  math::Vector3f rotatedDir = q.rotateVector(from).normalized();
+  math::Vector3f toDir      = to.normalized();
 
   EXPECT_NEAR(rotatedDir.x(), toDir.x(), 1e-5f);
   EXPECT_NEAR(rotatedDir.y(), toDir.y(), 1e-5f);
@@ -7021,41 +7147,41 @@ TEST(QuaternionTest, FromVectorsNonNormalized) {
 // ========================== DIMENSION: FLOAT ==============================
 
 TEST(DimensionComparisonTest, LessThanOperator) {
-  math::Dimension3Df vec1(1.0f, 2.0f, 3.0f);
-  math::Dimension3Df vec2(4.0f, 5.0f, 6.0f);
+  math::Dimension3f vec1(1.0f, 2.0f, 3.0f);
+  math::Dimension3f vec2(4.0f, 5.0f, 6.0f);
 
   EXPECT_TRUE(vec1 < vec2);
   EXPECT_FALSE(vec2 < vec1);
 }
 
 TEST(DimensionComparisonTest, LessThanOperatorEqual) {
-  math::Dimension3Df vec1(1.0f, 2.0f, 3.0f);
-  math::Dimension3Df vec2(1.0f, 2.0f, 3.0f);
+  math::Dimension3f vec1(1.0f, 2.0f, 3.0f);
+  math::Dimension3f vec2(1.0f, 2.0f, 3.0f);
 
   EXPECT_FALSE(vec1 < vec2);
   EXPECT_FALSE(vec2 < vec1);
 }
 
 TEST(DimensionComparisonTest, GreaterThanOperator) {
-  math::Dimension3Df vec1(4.0f, 5.0f, 6.0f);
-  math::Dimension3Df vec2(1.0f, 2.0f, 3.0f);
+  math::Dimension3f vec1(4.0f, 5.0f, 6.0f);
+  math::Dimension3f vec2(1.0f, 2.0f, 3.0f);
 
   EXPECT_TRUE(vec1 > vec2);
   EXPECT_FALSE(vec2 > vec1);
 }
 
 TEST(DimensionComparisonTest, GreaterThanOperatorEqual) {
-  math::Dimension3Df vec1(1.0f, 2.0f, 3.0f);
-  math::Dimension3Df vec2(1.0f, 2.0f, 3.0f);
+  math::Dimension3f vec1(1.0f, 2.0f, 3.0f);
+  math::Dimension3f vec2(1.0f, 2.0f, 3.0f);
 
   EXPECT_FALSE(vec1 > vec2);
   EXPECT_FALSE(vec2 > vec1);
 }
 
 TEST(DimensionComparisonTest, LessThanOrEqualToOperator) {
-  math::Dimension3Df vec1(1.0f, 2.0f, 3.0f);
-  math::Dimension3Df vec2(4.0f, 5.0f, 6.0f);
-  math::Dimension3Df vec3(1.0f, 2.0f, 3.0f);
+  math::Dimension3f vec1(1.0f, 2.0f, 3.0f);
+  math::Dimension3f vec2(4.0f, 5.0f, 6.0f);
+  math::Dimension3f vec3(1.0f, 2.0f, 3.0f);
 
   EXPECT_TRUE(vec1 <= vec2);
   EXPECT_FALSE(vec2 <= vec1);
@@ -7064,9 +7190,9 @@ TEST(DimensionComparisonTest, LessThanOrEqualToOperator) {
 }
 
 TEST(DimensionComparisonTest, GreaterThanOrEqualToOperator) {
-  math::Dimension3Df vec1(4.0f, 5.0f, 6.0f);
-  math::Dimension3Df vec2(1.0f, 2.0f, 3.0f);
-  math::Dimension3Df vec3(4.0f, 5.0f, 6.0f);
+  math::Dimension3f vec1(4.0f, 5.0f, 6.0f);
+  math::Dimension3f vec2(1.0f, 2.0f, 3.0f);
+  math::Dimension3f vec3(4.0f, 5.0f, 6.0f);
 
   EXPECT_TRUE(vec1 >= vec2);
   EXPECT_FALSE(vec2 >= vec1);
@@ -7215,8 +7341,8 @@ TEST(QuaternionTest, InverseDouble) {
 
 TEST(QuaternionTest, RotateVectorDouble) {
   math::Quaterniond q(0.7071067811865476, 0.0, 0.0, 0.7071067811865476);
-  math::Vector3Dd   v(1.0, 0.0, 0.0);
-  math::Vector3Dd   result = q.rotateVector(v);
+  math::Vector3d   v(1.0, 0.0, 0.0);
+  math::Vector3d   result = q.rotateVector(v);
   EXPECT_NEAR(result.x(), 1.0, 1e-15);
   EXPECT_NEAR(result.y(), 0.0, 1e-15);
   EXPECT_NEAR(result.z(), 0.0, 1e-15);
@@ -7283,15 +7409,15 @@ TEST(QuaternionTest, LogDouble) {
 }
 
 TEST(QuaternionTest, FromAxisAngle) {
-  math::Vector3Dd axis(1.0, 0.0, 0.0);
+  math::Vector3d axis(1.0, 0.0, 0.0);
   double          angle = math::g_kPi / 2;
 
   math::Quaterniond q = math::Quaterniond::fromAxisAngle(axis, angle);
 
   EXPECT_NEAR(q.norm(), 1.0, 1e-6);
 
-  math::Vector3Dd v(0.0, 1.0, 0.0);
-  math::Vector3Dd rotated_v = q.rotateVector(v);
+  math::Vector3d v(0.0, 1.0, 0.0);
+  math::Vector3d rotated_v = q.rotateVector(v);
 
   EXPECT_NEAR(rotated_v.x(), 0.0, 1e-6);
   EXPECT_NEAR(rotated_v.y(), 0.0, 1e-6);
@@ -7299,12 +7425,12 @@ TEST(QuaternionTest, FromAxisAngle) {
 }
 
 TEST(QuaternionTest, ToAxisAngle) {
-  math::Vector3Dd axis(0.0, 1.0, 0.0);
+  math::Vector3d axis(0.0, 1.0, 0.0);
   double          angle = math::g_kPi;
 
   math::Quaterniond q = math::Quaterniond::fromAxisAngle(axis, angle);
 
-  math::Vector3Dd extractedAxis;
+  math::Vector3d extractedAxis;
   double          extractedAngle;
   q.toAxisAngle(extractedAxis, extractedAngle);
 
@@ -7315,12 +7441,12 @@ TEST(QuaternionTest, ToAxisAngle) {
 }
 
 TEST(QuaternionTest, AxisAngleIdentity) {
-  math::Vector3Dd axis(1.0, 0.0, 0.0);
+  math::Vector3d axis(1.0, 0.0, 0.0);
   double          angle = 0.0;
 
   math::Quaterniond q = math::Quaterniond::fromAxisAngle(axis, angle);
 
-  math::Vector3Dd extractedAxis;
+  math::Vector3d extractedAxis;
   double          extractedAngle;
   q.toAxisAngle(extractedAxis, extractedAngle);
 
@@ -7331,7 +7457,7 @@ TEST(QuaternionTest, AxisAngleIdentity) {
 }
 
 TEST(QuaternionTest, FromAxisAngleZeroAngle) {
-  math::Vector3Dd axis(1.0, 0.0, 0.0);
+  math::Vector3d axis(1.0, 0.0, 0.0);
   double          angle = 0.0;
 
   math::Quaterniond q = math::Quaterniond::fromAxisAngle(axis, angle);
@@ -7343,7 +7469,7 @@ TEST(QuaternionTest, FromAxisAngleZeroAngle) {
 }
 
 TEST(QuaternionTest, FromAxisAngleNonNormalizedAxis) {
-  math::Vector3Dd axis(2.0, 0.0, 0.0);
+  math::Vector3d axis(2.0, 0.0, 0.0);
   double          angle = math::g_kPi / 2;
 
   math::Quaterniond q = math::Quaterniond::fromAxisAngle(axis, angle);
@@ -7357,7 +7483,7 @@ TEST(QuaternionTest, FromAxisAngleNonNormalizedAxis) {
 TEST(QuaternionTest, ToAxisAngleIdentityQuaternion) {
   math::Quaterniond q(0.0, 0.0, 0.0, 1.0);
 
-  math::Vector3Dd axis;
+  math::Vector3d axis;
   double          angle;
   q.toAxisAngle(axis, angle);
 
@@ -7368,8 +7494,8 @@ TEST(QuaternionTest, ToAxisAngleIdentityQuaternion) {
 }
 
 TEST(QuaternionTest, FromVectorsIdentityDouble) {
-  math::Vector3Dd from(1.0, 0.0, 0.0);
-  math::Vector3Dd to(1.0, 0.0, 0.0);
+  math::Vector3d from(1.0, 0.0, 0.0);
+  math::Vector3d to(1.0, 0.0, 0.0);
 
   math::Quaterniond q = math::Quaterniond::fromVectors(from, to);
 
@@ -7379,20 +7505,20 @@ TEST(QuaternionTest, FromVectorsIdentityDouble) {
   EXPECT_NEAR(q.w(), 1.0, 1e-15);
   EXPECT_NEAR(q.norm(), 1.0, 1e-15);
 
-  math::Vector3Dd rotated = q.rotateVector(from);
+  math::Vector3d rotated = q.rotateVector(from);
   EXPECT_NEAR(rotated.x(), to.x(), 1e-15);
   EXPECT_NEAR(rotated.y(), to.y(), 1e-15);
   EXPECT_NEAR(rotated.z(), to.z(), 1e-15);
 }
 
 TEST(QuaternionTest, FromVectorsOppositeDouble) {
-  math::Vector3Dd from(0.0, 1.0, 0.0);
-  math::Vector3Dd to(0.0, -1.0, 0.0);
+  math::Vector3d from(0.0, 1.0, 0.0);
+  math::Vector3d to(0.0, -1.0, 0.0);
 
   math::Quaterniond q = math::Quaterniond::fromVectors(from, to);
   EXPECT_NEAR(q.norm(), 1.0, 1e-15);
 
-  math::Vector3Dd rotated = q.rotateVector(from);
+  math::Vector3d rotated = q.rotateVector(from);
 
   double dot = rotated.normalized().dot(to);
   EXPECT_NEAR(dot, 1.0, 1e-8);
@@ -7406,14 +7532,14 @@ TEST(QuaternionTest, FromVectorsOppositeDouble) {
 }
 
 TEST(QuaternionTest, FromVectorsArbitraryDouble) {
-  math::Vector3Dd from(1.0, 1.0, 0.0);
-  math::Vector3Dd to(0.0, 0.0, -2.0);
+  math::Vector3d from(1.0, 1.0, 0.0);
+  math::Vector3d to(0.0, 0.0, -2.0);
 
   math::Quaterniond q = math::Quaterniond::fromVectors(from, to);
   EXPECT_NEAR(q.norm(), 1.0, 1e-15);
 
-  math::Vector3Dd rotatedDir = q.rotateVector(from).normalized();
-  math::Vector3Dd toDir      = to.normalized();
+  math::Vector3d rotatedDir = q.rotateVector(from).normalized();
+  math::Vector3d toDir      = to.normalized();
 
   EXPECT_NEAR(rotatedDir.x(), toDir.x(), 1e-14);
   EXPECT_NEAR(rotatedDir.y(), toDir.y(), 1e-14);
@@ -7423,41 +7549,41 @@ TEST(QuaternionTest, FromVectorsArbitraryDouble) {
 // ========================== DIMENSION: DOUBLE ==============================
 
 TEST(DimensionComparisonTest, LessThanOperatorDouble) {
-  math::Dimension3D<double> vec1(1.0, 2.0, 3.0);
-  math::Dimension3D<double> vec2(4.0, 5.0, 6.0);
+  math::Dimension3<double> vec1(1.0, 2.0, 3.0);
+  math::Dimension3<double> vec2(4.0, 5.0, 6.0);
 
   EXPECT_TRUE(vec1 < vec2);
   EXPECT_FALSE(vec2 < vec1);
 }
 
 TEST(DimensionComparisonTest, LessThanOperatorEqualDouble) {
-  math::Dimension3D<double> vec1(1.0, 2.0, 3.0);
-  math::Dimension3D<double> vec2(1.0, 2.0, 3.0);
+  math::Dimension3<double> vec1(1.0, 2.0, 3.0);
+  math::Dimension3<double> vec2(1.0, 2.0, 3.0);
 
   EXPECT_FALSE(vec1 < vec2);
   EXPECT_FALSE(vec2 < vec1);
 }
 
 TEST(DimensionComparisonTest, GreaterThanOperatorDouble) {
-  math::Dimension3D<double> vec1(4.0, 5.0, 6.0);
-  math::Dimension3D<double> vec2(1.0, 2.0, 3.0);
+  math::Dimension3<double> vec1(4.0, 5.0, 6.0);
+  math::Dimension3<double> vec2(1.0, 2.0, 3.0);
 
   EXPECT_TRUE(vec1 > vec2);
   EXPECT_FALSE(vec2 > vec1);
 }
 
 TEST(DimensionComparisonTest, GreaterThanOperatorEqualDouble) {
-  math::Dimension3D<double> vec1(1.0, 2.0, 3.0);
-  math::Dimension3D<double> vec2(1.0, 2.0, 3.0);
+  math::Dimension3<double> vec1(1.0, 2.0, 3.0);
+  math::Dimension3<double> vec2(1.0, 2.0, 3.0);
 
   EXPECT_FALSE(vec1 > vec2);
   EXPECT_FALSE(vec2 > vec1);
 }
 
 TEST(DimensionComparisonTest, LessThanOrEqualToOperatorDouble) {
-  math::Dimension3D<double> vec1(1.0, 2.0, 3.0);
-  math::Dimension3D<double> vec2(4.0, 5.0, 6.0);
-  math::Dimension3D<double> vec3(1.0, 2.0, 3.0);
+  math::Dimension3<double> vec1(1.0, 2.0, 3.0);
+  math::Dimension3<double> vec2(4.0, 5.0, 6.0);
+  math::Dimension3<double> vec3(1.0, 2.0, 3.0);
 
   EXPECT_TRUE(vec1 <= vec2);
   EXPECT_FALSE(vec2 <= vec1);
@@ -7466,9 +7592,9 @@ TEST(DimensionComparisonTest, LessThanOrEqualToOperatorDouble) {
 }
 
 TEST(DimensionComparisonTest, GreaterThanOrEqualToOperatorDouble) {
-  math::Dimension3D<double> vec1(4.0, 5.0, 6.0);
-  math::Dimension3D<double> vec2(1.0, 2.0, 3.0);
-  math::Dimension3D<double> vec3(4.0, 5.0, 6.0);
+  math::Dimension3<double> vec1(4.0, 5.0, 6.0);
+  math::Dimension3<double> vec2(1.0, 2.0, 3.0);
+  math::Dimension3<double> vec3(4.0, 5.0, 6.0);
 
   EXPECT_TRUE(vec1 >= vec2);
   EXPECT_FALSE(vec2 >= vec1);
@@ -7479,41 +7605,41 @@ TEST(DimensionComparisonTest, GreaterThanOrEqualToOperatorDouble) {
 // ========================== DIMENSION: INT ==============================
 
 TEST(DimensionComparisonTest, LessThanOperatorInt) {
-  math::Dimension3Di vec1(1, 2, 3);
-  math::Dimension3Di vec2(4, 5, 6);
+  math::Dimension3i vec1(1, 2, 3);
+  math::Dimension3i vec2(4, 5, 6);
 
   EXPECT_TRUE(vec1 < vec2);
   EXPECT_FALSE(vec2 < vec1);
 }
 
 TEST(DimensionComparisonTest, LessThanOperatorEqualInt) {
-  math::Dimension3Di vec1(1, 2, 3);
-  math::Dimension3Di vec2(1, 2, 3);
+  math::Dimension3i vec1(1, 2, 3);
+  math::Dimension3i vec2(1, 2, 3);
 
   EXPECT_FALSE(vec1 < vec2);
   EXPECT_FALSE(vec2 < vec1);
 }
 
 TEST(DimensionComparisonTest, GreaterThanOperatorInt) {
-  math::Dimension3Di vec1(4, 5, 6);
-  math::Dimension3Di vec2(1, 2, 3);
+  math::Dimension3i vec1(4, 5, 6);
+  math::Dimension3i vec2(1, 2, 3);
 
   EXPECT_TRUE(vec1 > vec2);
   EXPECT_FALSE(vec2 > vec1);
 }
 
 TEST(DimensionComparisonTest, GreaterThanOperatorEqualInt) {
-  math::Dimension3Di vec1(1, 2, 3);
-  math::Dimension3Di vec2(1, 2, 3);
+  math::Dimension3i vec1(1, 2, 3);
+  math::Dimension3i vec2(1, 2, 3);
 
   EXPECT_FALSE(vec1 > vec2);
   EXPECT_FALSE(vec2 > vec1);
 }
 
 TEST(DimensionComparisonTest, LessThanOrEqualToOperatorInt) {
-  math::Dimension3Di vec1(1, 2, 3);
-  math::Dimension3Di vec2(4, 5, 6);
-  math::Dimension3Di vec3(1, 2, 3);
+  math::Dimension3i vec1(1, 2, 3);
+  math::Dimension3i vec2(4, 5, 6);
+  math::Dimension3i vec3(1, 2, 3);
 
   EXPECT_TRUE(vec1 <= vec2);
   EXPECT_FALSE(vec2 <= vec1);
@@ -7522,9 +7648,9 @@ TEST(DimensionComparisonTest, LessThanOrEqualToOperatorInt) {
 }
 
 TEST(DimensionComparisonTest, GreaterThanOrEqualToOperatorInt) {
-  math::Dimension3Di vec1(4, 5, 6);
-  math::Dimension3Di vec2(1, 2, 3);
-  math::Dimension3Di vec3(4, 5, 6);
+  math::Dimension3i vec1(4, 5, 6);
+  math::Dimension3i vec2(1, 2, 3);
+  math::Dimension3i vec3(4, 5, 6);
 
   EXPECT_TRUE(vec1 >= vec2);
   EXPECT_FALSE(vec2 >= vec1);
@@ -7535,41 +7661,41 @@ TEST(DimensionComparisonTest, GreaterThanOrEqualToOperatorInt) {
 // ======================= DIMENSION: UNSIGNED INT ===========================
 
 TEST(DimensionComparisonTest, LessThanOperatorUnsignedInt) {
-  math::Dimension3D<unsigned int> vec1(1, 2, 3);
-  math::Dimension3D<unsigned int> vec2(4, 5, 6);
+  math::Dimension3<unsigned int> vec1(1, 2, 3);
+  math::Dimension3<unsigned int> vec2(4, 5, 6);
 
   EXPECT_TRUE(vec1 < vec2);
   EXPECT_FALSE(vec2 < vec1);
 }
 
 TEST(DimensionComparisonTest, LessThanOperatorEqualUnsignedInt) {
-  math::Dimension3D<unsigned int> vec1(1, 2, 3);
-  math::Dimension3D<unsigned int> vec2(1, 2, 3);
+  math::Dimension3<unsigned int> vec1(1, 2, 3);
+  math::Dimension3<unsigned int> vec2(1, 2, 3);
 
   EXPECT_FALSE(vec1 < vec2);
   EXPECT_FALSE(vec2 < vec1);
 }
 
 TEST(DimensionComparisonTest, GreaterThanOperatorUnsignedInt) {
-  math::Dimension3D<unsigned int> vec1(4, 5, 6);
-  math::Dimension3D<unsigned int> vec2(1, 2, 3);
+  math::Dimension3<unsigned int> vec1(4, 5, 6);
+  math::Dimension3<unsigned int> vec2(1, 2, 3);
 
   EXPECT_TRUE(vec1 > vec2);
   EXPECT_FALSE(vec2 > vec1);
 }
 
 TEST(DimensionComparisonTest, GreaterThanOperatorEqualUnsignedInt) {
-  math::Dimension3D<unsigned int> vec1(1, 2, 3);
-  math::Dimension3D<unsigned int> vec2(1, 2, 3);
+  math::Dimension3<unsigned int> vec1(1, 2, 3);
+  math::Dimension3<unsigned int> vec2(1, 2, 3);
 
   EXPECT_FALSE(vec1 > vec2);
   EXPECT_FALSE(vec2 > vec1);
 }
 
 TEST(DimensionComparisonTest, LessThanOrEqualToOperatorUnsignedInt) {
-  math::Dimension3D<unsigned int> vec1(1, 2, 3);
-  math::Dimension3D<unsigned int> vec2(4, 5, 6);
-  math::Dimension3D<unsigned int> vec3(1, 2, 3);
+  math::Dimension3<unsigned int> vec1(1, 2, 3);
+  math::Dimension3<unsigned int> vec2(4, 5, 6);
+  math::Dimension3<unsigned int> vec3(1, 2, 3);
 
   EXPECT_TRUE(vec1 <= vec2);
   EXPECT_FALSE(vec2 <= vec1);
@@ -7578,9 +7704,9 @@ TEST(DimensionComparisonTest, LessThanOrEqualToOperatorUnsignedInt) {
 }
 
 TEST(DimensionComparisonTest, GreaterThanOrEqualToOperatorUnsignedInt) {
-  math::Dimension3D<unsigned int> vec1(4, 5, 6);
-  math::Dimension3D<unsigned int> vec2(1, 2, 3);
-  math::Dimension3D<unsigned int> vec3(4, 5, 6);
+  math::Dimension3<unsigned int> vec1(4, 5, 6);
+  math::Dimension3<unsigned int> vec2(1, 2, 3);
+  math::Dimension3<unsigned int> vec3(4, 5, 6);
 
   EXPECT_TRUE(vec1 >= vec2);
   EXPECT_FALSE(vec2 >= vec1);
@@ -7589,27 +7715,27 @@ TEST(DimensionComparisonTest, GreaterThanOrEqualToOperatorUnsignedInt) {
 }
 
 TEST(DimensionComparisonTest, LessThanOperatorUnsignedIntLargeValues) {
-  math::Dimension3D<unsigned int> vec1(
+  math::Dimension3<unsigned int> vec1(
       0xFF'FF'FF'FF, 0xFF'FF'FF'FF, 0xFF'FF'FF'FF);
-  math::Dimension3D<unsigned int> vec2(0, 0, 0);
+  math::Dimension3<unsigned int> vec2(0, 0, 0);
 
   EXPECT_FALSE(vec1 < vec2);
   EXPECT_TRUE(vec2 < vec1);
 }
 
 TEST(DimensionComparisonTest, GreaterThanOperatorUnsignedIntLargeValues) {
-  math::Dimension3D<unsigned int> vec1(
+  math::Dimension3<unsigned int> vec1(
       0xFF'FF'FF'FF, 0xFF'FF'FF'FF, 0xFF'FF'FF'FF);
-  math::Dimension3D<unsigned int> vec2(0, 0, 0);
+  math::Dimension3<unsigned int> vec2(0, 0, 0);
 
   EXPECT_TRUE(vec1 > vec2);
   EXPECT_FALSE(vec2 > vec1);
 }
 
 TEST(DimensionComparisonTest, LessThanOrEqualToOperatorUnsignedIntLargeValues) {
-  math::Dimension3D<unsigned int> vec1(
+  math::Dimension3<unsigned int> vec1(
       0xFF'FF'FF'FF, 0xFF'FF'FF'FF, 0xFF'FF'FF'FF);
-  math::Dimension3D<unsigned int> vec2(0, 0, 0);
+  math::Dimension3<unsigned int> vec2(0, 0, 0);
 
   EXPECT_FALSE(vec1 <= vec2);
   EXPECT_TRUE(vec2 <= vec1);
@@ -7617,9 +7743,9 @@ TEST(DimensionComparisonTest, LessThanOrEqualToOperatorUnsignedIntLargeValues) {
 
 TEST(DimensionComparisonTest,
      GreaterThanOrEqualToOperatorUnsignedIntLargeValues) {
-  math::Dimension3D<unsigned int> vec1(
+  math::Dimension3<unsigned int> vec1(
       0xFF'FF'FF'FF, 0xFF'FF'FF'FF, 0xFF'FF'FF'FF);
-  math::Dimension3D<unsigned int> vec2(0, 0, 0);
+  math::Dimension3<unsigned int> vec2(0, 0, 0);
 
   EXPECT_FALSE(vec2 >= vec1);
   EXPECT_TRUE(vec1 >= vec2);
