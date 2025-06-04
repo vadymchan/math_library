@@ -1129,7 +1129,7 @@ auto operator*(const ScalarType& scalar, const Vector<T, Size, Option>& vector)
  * @tparam Option The layout option (RowMajor or ColumnMajor).
  */
 template <std::size_t Size, Options Option = Options::RowMajor>
-using VectorNf = Vector<float, Size, Option>;
+using VectorXf = Vector<float, Size, Option>;
 
 /**
  * @brief Alias for a vector of doubles.
@@ -1141,7 +1141,7 @@ using VectorNf = Vector<float, Size, Option>;
  * @tparam Option The layout option (RowMajor or ColumnMajor).
  */
 template <std::size_t Size, Options Option = Options::RowMajor>
-using VectorNd = Vector<double, Size, Option>;
+using VectorXd = Vector<double, Size, Option>;
 
 /**
  * @brief Alias for a vector of integers.
@@ -1153,7 +1153,7 @@ using VectorNd = Vector<double, Size, Option>;
  * @tparam Option The layout option (RowMajor or ColumnMajor).
  */
 template <std::size_t Size, Options Option = Options::RowMajor>
-using VectorNi = Vector<std::int32_t, Size, Option>;
+using VectorXi = Vector<std::int32_t, Size, Option>;
 
 /**
  * @brief Alias for a vector of unsigned integers.
@@ -1165,7 +1165,7 @@ using VectorNi = Vector<std::int32_t, Size, Option>;
  * @tparam Option The layout option (RowMajor or ColumnMajor).
  */
 template <std::size_t Size, Options Option = Options::RowMajor>
-using VectorNui = Vector<std::uint32_t, Size, Option>;
+using VectorXui = Vector<std::uint32_t, Size, Option>;
 
 /**
  * @brief Alias for a 2D vector.
@@ -1177,7 +1177,7 @@ using VectorNui = Vector<std::uint32_t, Size, Option>;
  * @tparam Option The layout option (RowMajor or ColumnMajor).
  */
 template <typename T, Options Option = Options::RowMajor>
-using Vector2D = Vector<T, 2, Option>;
+using Vector2 = Vector<T, 2, Option>;
 
 /**
  * @brief Alias for a 3D vector.
@@ -1189,7 +1189,7 @@ using Vector2D = Vector<T, 2, Option>;
  * @tparam Option The layout option (RowMajor or ColumnMajor).
  */
 template <typename T, Options Option = Options::RowMajor>
-using Vector3D = Vector<T, 3, Option>;
+using Vector3 = Vector<T, 3, Option>;
 
 /**
  * @brief Alias for a 4D vector.
@@ -1201,67 +1201,67 @@ using Vector3D = Vector<T, 3, Option>;
  * @tparam Option The layout option (RowMajor or ColumnMajor).
  */
 template <typename T, Options Option = Options::RowMajor>
-using Vector4D = Vector<T, 4, Option>;
+using Vector4 = Vector<T, 4, Option>;
 
 /**
  * @brief Alias for a 2D vector of floats.
  */
-using Vector2Df = Vector2D<float>;
+using Vector2f = Vector2<float>;
 
 /**
  * @brief Alias for a 3D vector of floats.
  */
-using Vector3Df = Vector3D<float>;
+using Vector3f = Vector3<float>;
 
 /**
  * @brief Alias for a 4D vector of floats.
  */
-using Vector4Df = Vector4D<float>;
+using Vector4f = Vector4<float>;
 
 /**
  * @brief Alias for a 2D vector of doubles.
  */
-using Vector2Dd = Vector2D<double>;
+using Vector2d = Vector2<double>;
 
 /**
  * @brief Alias for a 3D vector of doubles.
  */
-using Vector3Dd = Vector3D<double>;
+using Vector3d = Vector3<double>;
 
 /**
  * @brief Alias for a 4D vector of doubles.
  */
-using Vector4Dd = Vector4D<double>;
+using Vector4d = Vector4<double>;
 
 /**
  * @brief Alias for a 2D vector of 32-bit signed integers.
  */
-using Vector2Di = Vector2D<std::int32_t>;
+using Vector2i = Vector2<std::int32_t>;
 
 /**
  * @brief Alias for a 3D vector of 32-bit signed integers.
  */
-using Vector3Di = Vector3D<std::int32_t>;
+using Vector3i = Vector3<std::int32_t>;
 
 /**
  * @brief Alias for a 4D vector of 32-bit signed integers.
  */
-using Vector4Di = Vector4D<std::int32_t>;
+using Vector4i = Vector4<std::int32_t>;
 
 /**
  * @brief Alias for a 2D vector of 32-bit unsigned integers.
  */
-using Vector2Dui = Vector2D<std::uint32_t>;
+using Vector2ui = Vector2<std::uint32_t>;
 
 /**
  * @brief Alias for a 3D vector of 32-bit unsigned integers.
  */
-using Vector3Dui = Vector3D<std::uint32_t>;
+using Vector3ui = Vector3<std::uint32_t>;
 
 /**
  * @brief Alias for a 4D vector of 32-bit unsigned integers.
  */
-using Vector4Dui = Vector4D<std::uint32_t>;
+using Vector4ui = Vector4<std::uint32_t>;
 
 }  // namespace math
 

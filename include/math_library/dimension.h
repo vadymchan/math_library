@@ -563,7 +563,7 @@ auto operator*(const ScalarType&                 scalar,
  * @tparam Option The memory layout option (row-major or column-major). Default is row-major.
  */
 template <std::size_t Size, Options Option = Options::RowMajor>
-using DimensionNf = Dimension<float, Size, Option>;
+using DimensionXf = Dimension<float, Size, Option>;
 
 /**
  * @brief Alias for Dimension with double elements.
@@ -573,7 +573,7 @@ using DimensionNf = Dimension<float, Size, Option>;
  * @tparam Option The memory layout option (row-major or column-major). Default is row-major.
  */
 template <std::size_t Size, Options Option = Options::RowMajor>
-using DimensionNd = Dimension<double, Size, Option>;
+using DimensionXd = Dimension<double, Size, Option>;
 
 /**
  * @brief Alias for Dimension with int (std::int32_t) elements.
@@ -583,7 +583,7 @@ using DimensionNd = Dimension<double, Size, Option>;
  * @tparam Option The memory layout option (row-major or column-major). Default is row-major.
  */
 template <std::size_t Size, Options Option = Options::RowMajor>
-using DimensionNi = Dimension<std::int32_t, Size, Option>;
+using DimensionXi = Dimension<std::int32_t, Size, Option>;
 
 /**
  * @brief Alias for Dimension with unsigned int (std::uint32_t) elements.
@@ -593,7 +593,7 @@ using DimensionNi = Dimension<std::int32_t, Size, Option>;
  * @tparam Option The memory layout option (row-major or column-major). Default is row-major.
  */
 template <std::size_t Size, Options Option = Options::RowMajor>
-using DimensionNui = Dimension<std::uint32_t, Size, Option>;
+using DimensionXui = Dimension<std::uint32_t, Size, Option>;
 
 // Templated Dimension definitions for 2D, 3D, and 4D
 
@@ -605,7 +605,7 @@ using DimensionNui = Dimension<std::uint32_t, Size, Option>;
  * @tparam Option The memory layout option (row-major or column-major). Default is row-major.
  */
 template <typename T, Options Option = Options::RowMajor>
-using Dimension2D = Dimension<T, 2, Option>;
+using Dimension2 = Dimension<T, 2, Option>;
 
 /**
  * @brief Alias for a 3D Dimension with the specified type.
@@ -615,7 +615,7 @@ using Dimension2D = Dimension<T, 2, Option>;
  * @tparam Option The memory layout option (row-major or column-major). Default is row-major.
  */
 template <typename T, Options Option = Options::RowMajor>
-using Dimension3D = Dimension<T, 3, Option>;
+using Dimension3 = Dimension<T, 3, Option>;
 
 /**
  * @brief Alias for a 4D Dimension with the specified type.
@@ -632,62 +632,62 @@ using Dimension4D = Dimension<T, 4, Option>;
 /**
  * @brief Alias for a 2D Dimension with float elements.
  */
-using Dimension2Df = Dimension2D<float>;
+using Dimension2Df = Dimension2<float>;
 
 /**
  * @brief Alias for a 3D Dimension with float elements.
  */
-using Dimension3Df = Dimension3D<float>;
+using Dimension3f = Dimension3<float>;
 
 /**
  * @brief Alias for a 4D Dimension with float elements.
  */
-using Dimension4Df = Dimension4D<float>;
+using Dimension4f = Dimension4D<float>;
 
 /**
  * @brief Alias for a 2D Dimension with double elements.
  */
-using Dimension2Dd = Dimension2D<double>;
+using Dimension2d = Dimension2<double>;
 
 /**
  * @brief Alias for a 3D Dimension with double elements.
  */
-using Dimension3Dd = Dimension3D<double>;
+using Dimension3d = Dimension3<double>;
 
 /**
  * @brief Alias for a 4D Dimension with double elements.
  */
-using Dimension4Dd = Dimension4D<double>;
+using Dimension4d = Dimension4D<double>;
 
 /**
  * @brief Alias for a 2D Dimension with int (std::int32_t) elements.
  */
-using Dimension2Di = Dimension2D<std::int32_t>;
+using Dimension2i = Dimension2<std::int32_t>;
 
 /**
  * @brief Alias for a 3D Dimension with int (std::int32_t) elements.
  */
-using Dimension3Di = Dimension3D<std::int32_t>;
+using Dimension3i = Dimension3<std::int32_t>;
 
 /**
  * @brief Alias for a 4D Dimension with int (std::int32_t) elements.
  */
-using Dimension4Di = Dimension4D<std::int32_t>;
+using Dimension4i = Dimension4D<std::int32_t>;
 
 /**
  * @brief Alias for a 2D Dimension with unsigned int (std::uint32_t) elements.
  */
-using Dimension2Dui = Dimension2D<std::uint32_t>;
+using Dimension2ui = Dimension2<std::uint32_t>;
 
 /**
  * @brief Alias for a 3D Dimension with unsigned int (std::uint32_t) elements.
  */
-using Dimension3Dui = Dimension3D<std::uint32_t>;
+using Dimension3ui = Dimension3<std::uint32_t>;
 
 /**
  * @brief Alias for a 4D Dimension with unsigned int (std::uint32_t) elements.
  */
-using Dimension4Dui = Dimension4D<std::uint32_t>;
+using Dimension4ui = Dimension4D<std::uint32_t>;
 
 }  // namespace math
 

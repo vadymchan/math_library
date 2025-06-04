@@ -83,7 +83,7 @@ class Quaternion {
    * @param v The 3D vector part of the quaternion.
    * @param w The scalar part of the quaternion.
    */
-  explicit Quaternion(const Vector3D<T>& v, const T w)
+  explicit Quaternion(const Vector3<T>& v, const T w)
       : m_data_(v.x(), v.y(), v.z(), w) {}
 
   /**
@@ -91,7 +91,7 @@ class Quaternion {
    *
    * @param v The 4D vector representing the quaternion.
    */
-  explicit Quaternion(const Vector4D<T>& v)
+  explicit Quaternion(const Vector4<T>& v)
       : m_data_(v) {}
 
   /**
@@ -418,10 +418,10 @@ class Quaternion {
    * @param v The 3D vector to be rotated.
    * @return The rotated vector.
    */
-  [[nodiscard]] auto rotateVector(const Vector3D<T>& v) const -> Vector3D<T> {
+  [[nodiscard]] auto rotateVector(const Vector3<T>& v) const -> Vector3<T> {
     const Quaternion<T> p(v.x(), v.y(), v.z(), 0);
     const Quaternion<T> rotated = *this * p * conjugate();
-    return Vector3D<T>(rotated.x(), rotated.y(), rotated.z());
+    return Vector3<T>(rotated.x(), rotated.y(), rotated.z());
   }
 
   /**
@@ -556,7 +556,7 @@ class Quaternion {
    * vector).
    * @param angle Output parameter to receive the rotation angle in radians.
    */
-  void toAxisAngle(Vector3D<T>& axis, T& angle) const {
+  void toAxisAngle(Vector3<T>& axis, T& angle) const {
     auto q = this->normalized();
 
     auto q0 = q.w();
@@ -573,9 +573,9 @@ class Quaternion {
 
     if (sinHalfAngle < std::numeric_limits<T>::epsilon()) {
       // Angle is zero, so any axis will do
-      axis = Vector3D<T>(T(1), T(0), T(0));
+      axis = Vector3<T>(T(1), T(0), T(0));
     } else {
-      axis = Vector3D<T>(q1, q2, q3) / sinHalfAngle;
+      axis = Vector3<T>(q1, q2, q3) / sinHalfAngle;
     }
   }
 
@@ -697,13 +697,13 @@ class Quaternion {
    * @param angle The rotation angle in radians.
    * @return The quaternion representing the rotation.
    */
-  static auto fromAxisAngle(const Vector3D<T>& axis, const T angle)
+  static auto fromAxisAngle(const Vector3<T>& axis, const T angle)
       -> Quaternion {
     auto halfAngle    = angle / T(2);
     auto sinHalfAngle = std::sin(halfAngle);
     auto cosHalfAngle = std::cos(halfAngle);
 
-    Vector3D<T> normalizedAxis = axis.normalized();
+    Vector3<T> normalizedAxis = axis.normalized();
 
     auto q0 = cosHalfAngle;
     auto q1 = normalizedAxis.x() * sinHalfAngle;
@@ -724,15 +724,15 @@ class Quaternion {
    * @return Quaternion rotating *from* into *to*.
    */
   template <typename T>
-  static auto fromVectors(const Vector3D<T>& from, const Vector3D<T>& to)
+  static auto fromVectors(const Vector3<T>& from, const Vector3<T>& to)
       -> Quaternion {
     constexpr T kEps          = std::numeric_limits<T>::epsilon();
     constexpr T kCosAlmostOne = T(0.999999);  // around 0.002 degree threshold
 
     assert(from.magnitudeSquared() > kEps && to.magnitudeSquared() > kEps
            && "Quaternion::fromVectors: zero-length input");
-    Vector3D<T> f = from.normalized();
-    Vector3D<T> t = to.normalized();
+    Vector3<T> f = from.normalized();
+    Vector3<T> t = to.normalized();
 
     const T cosTheta = f.dot(t);
 
@@ -744,14 +744,14 @@ class Quaternion {
     // If the angle is very close to 180 degrees, find an orthogonal axis
     if (cosTheta < -kCosAlmostOne) {
       // Find an arbitrary axis orthogonal to f
-      Vector3D<T> axis;
+      Vector3<T> axis;
       if (std::abs(f.x()) < std::abs(f.y())
           && std::abs(f.x()) < std::abs(f.z())) {
-        axis = Vector3D<T>(T(1), T(0), T(0));
+        axis = Vector3<T>(T(1), T(0), T(0));
       } else if (std::abs(f.y()) < std::abs(f.z())) {
-        axis = Vector3D<T>(T(0), T(1), T(0));
+        axis = Vector3<T>(T(0), T(1), T(0));
       } else {
-        axis = Vector3D<T>(T(0), T(0), T(1));
+        axis = Vector3<T>(T(0), T(0), T(1));
       }
 
       axis = axis.cross(f).normalized();
@@ -759,7 +759,7 @@ class Quaternion {
     }
 
     // General case
-    Vector3D<T> v = f.cross(t);
+    Vector3<T> v = f.cross(t);
     Quaternion  q(v.x(), v.y(), v.z(), T(1) + cosTheta);
     return q.normalized();
   }
@@ -911,11 +911,11 @@ class Quaternion {
       return Quaternion(0, 0, 0, 1);
     }
 
-    const Vector3D<T> vec   = m_data_.template resizedCopy<3>();
+    const Vector3<T> vec   = m_data_.template resizedCopy<3>();
     auto              angle = vec.magnitude();
     auto              sinA  = std::sin(angle);
     auto              cosA  = std::cos(angle);
-    const Vector3D<T> axis  = vec.normalized();
+    const Vector3<T> axis  = vec.normalized();
     return Quaternion(axis * sinA, cosA);
   }
 
@@ -931,7 +931,7 @@ class Quaternion {
   [[nodiscard]] auto log() const -> Quaternion {
     auto              angle = std::acos(m_data_.w());
     auto              sinA  = std::sin(angle);
-    const Vector3D<T> vec   = m_data_.template resizedCopy<3>();
+    const Vector3<T> vec   = m_data_.template resizedCopy<3>();
     if (std::abs(sinA) < std::numeric_limits<T>::epsilon()) {
       return Quaternion(vec, 0);
     }
@@ -1253,7 +1253,7 @@ class Quaternion {
    *
    * @note The data is stored as a row vector internally.
    */
-  Vector4D<T> m_data_;
+  Vector4<T> m_data_;
 };
 
 /**

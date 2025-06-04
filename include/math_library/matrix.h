@@ -1386,7 +1386,7 @@ class Matrix {
    *
    * Usage example:
    * @code
-   * math::MatrixNf<2, 3, math::Options::RowMajor> m1;
+   * math::MatrixXf<2, 3, math::Options::RowMajor> m1;
    * m1 << 1, 2, 3,
    *       4, 5, 6;
    * std::cout << m1;
@@ -1465,7 +1465,7 @@ class Matrix {
    *
    * Usage example for a row-major matrix:
    * @code
-   * math::MatrixNf<2, 3, math::Options::RowMajor> m1;
+   * math::MatrixXf<2, 3, math::Options::RowMajor> m1;
    * m1 << 1, 2, 3,
    *       4, 5, 6;
    * // Output: 1 2 3
@@ -1474,7 +1474,7 @@ class Matrix {
    *
    * Usage example for a column-major matrix:
    * @code
-   * math::MatrixNf<3, 2, math::Options::ColumnMajor> m2;
+   * math::MatrixXf<3, 2, math::Options::ColumnMajor> m2;
    * m2 << 1, 4,
    *       2, 5,
    *       3, 6;
@@ -1538,7 +1538,7 @@ auto operator*(const ScalarType&                       scalar,
 template <std::size_t Rows,
           std::size_t Columns,
           Options     Option = Options::RowMajor>
-using MatrixNf = Matrix<float, Rows, Columns, Option>;
+using MatrixXf = Matrix<float, Rows, Columns, Option>;
 
 /**
  * @brief Alias for a matrix of doubles with customizable dimensions and layout.
@@ -1550,7 +1550,7 @@ using MatrixNf = Matrix<float, Rows, Columns, Option>;
 template <std::size_t Rows,
           std::size_t Columns,
           Options     Option = Options::RowMajor>
-using MatrixNd = Matrix<double, Rows, Columns, Option>;
+using MatrixXd = Matrix<double, Rows, Columns, Option>;
 
 /**
  * @brief Alias for a matrix of 32-bit integers with customizable dimensions and
@@ -1563,7 +1563,7 @@ using MatrixNd = Matrix<double, Rows, Columns, Option>;
 template <std::size_t Rows,
           std::size_t Columns,
           Options     Option = Options::RowMajor>
-using MatrixNi = Matrix<std::int32_t, Rows, Columns, Option>;
+using MatrixXi = Matrix<std::int32_t, Rows, Columns, Option>;
 
 /**
  * @brief Alias for a matrix of unsigned 32-bit integers with customizable
@@ -1576,7 +1576,7 @@ using MatrixNi = Matrix<std::int32_t, Rows, Columns, Option>;
 template <std::size_t Rows,
           std::size_t Columns,
           Options     Option = Options::RowMajor>
-using MatrixNui = Matrix<std::uint32_t, Rows, Columns, Option>;
+using MatrixXui = Matrix<std::uint32_t, Rows, Columns, Option>;
 
 /**
  * @brief Alias for a 2x2 matrix of floats.
@@ -1584,7 +1584,7 @@ using MatrixNui = Matrix<std::uint32_t, Rows, Columns, Option>;
  * @tparam Option The memory layout (row-major or column-major).
  */
 template <Options Option = Options::RowMajor>
-using Matrix2f = MatrixNf<2, 2, Option>;
+using Matrix2f = MatrixXf<2, 2, Option>;
 
 /**
  * @brief Alias for a 3x3 matrix of floats.
@@ -1592,7 +1592,7 @@ using Matrix2f = MatrixNf<2, 2, Option>;
  * @tparam Option The memory layout (row-major or column-major).
  */
 template <Options Option = Options::RowMajor>
-using Matrix3f = MatrixNf<3, 3, Option>;
+using Matrix3f = MatrixXf<3, 3, Option>;
 
 /**
  * @brief Alias for a 4x4 matrix of floats.
@@ -1600,7 +1600,7 @@ using Matrix3f = MatrixNf<3, 3, Option>;
  * @tparam Option The memory layout (row-major or column-major).
  */
 template <Options Option = Options::RowMajor>
-using Matrix4f = MatrixNf<4, 4, Option>;
+using Matrix4f = MatrixXf<4, 4, Option>;
 
 /**
  * @brief Alias for a 2x2 matrix of doubles.
@@ -1608,7 +1608,7 @@ using Matrix4f = MatrixNf<4, 4, Option>;
  * @tparam Option The memory layout (row-major or column-major).
  */
 template <Options Option = Options::RowMajor>
-using Matrix2d = MatrixNd<2, 2, Option>;
+using Matrix2d = MatrixXd<2, 2, Option>;
 
 /**
  * @brief Alias for a 3x3 matrix of doubles.
@@ -1616,7 +1616,7 @@ using Matrix2d = MatrixNd<2, 2, Option>;
  * @tparam Option The memory layout (row-major or column-major).
  */
 template <Options Option = Options::RowMajor>
-using Matrix3d = MatrixNd<3, 3, Option>;
+using Matrix3d = MatrixXd<3, 3, Option>;
 
 /**
  * @brief Alias for a 4x4 matrix of doubles.
@@ -1624,7 +1624,7 @@ using Matrix3d = MatrixNd<3, 3, Option>;
  * @tparam Option The memory layout (row-major or column-major).
  */
 template <Options Option = Options::RowMajor>
-using Matrix4d = MatrixNd<4, 4, Option>;
+using Matrix4d = MatrixXd<4, 4, Option>;
 
 /**
  * @brief Alias for a 2x2 matrix of 32-bit integers.
@@ -1632,7 +1632,7 @@ using Matrix4d = MatrixNd<4, 4, Option>;
  * @tparam Option The memory layout (row-major or column-major).
  */
 template <Options Option = Options::RowMajor>
-using Matrix2i = MatrixNi<2, 2, Option>;
+using Matrix2i = MatrixXi<2, 2, Option>;
 
 /**
  * @brief Alias for a 3x3 matrix of 32-bit integers.
@@ -1640,7 +1640,7 @@ using Matrix2i = MatrixNi<2, 2, Option>;
  * @tparam Option The memory layout (row-major or column-major).
  */
 template <Options Option = Options::RowMajor>
-using Matrix3i = MatrixNi<3, 3, Option>;
+using Matrix3i = MatrixXi<3, 3, Option>;
 
 /**
  * @brief Alias for a 4x4 matrix of 32-bit integers.
@@ -1648,7 +1648,7 @@ using Matrix3i = MatrixNi<3, 3, Option>;
  * @tparam Option The memory layout (row-major or column-major).
  */
 template <Options Option = Options::RowMajor>
-using Matrix4i = MatrixNi<4, 4, Option>;
+using Matrix4i = MatrixXi<4, 4, Option>;
 
 /**
  * @brief Alias for a 2x2 matrix of unsigned 32-bit integers.
@@ -1656,7 +1656,7 @@ using Matrix4i = MatrixNi<4, 4, Option>;
  * @tparam Option The memory layout (row-major or column-major).
  */
 template <Options Option = Options::RowMajor>
-using Matrix2ui = MatrixNui<2, 2, Option>;
+using Matrix2ui = MatrixXui<2, 2, Option>;
 
 /**
  * @brief Alias for a 3x3 matrix of unsigned 32-bit integers.
@@ -1664,7 +1664,7 @@ using Matrix2ui = MatrixNui<2, 2, Option>;
  * @tparam Option The memory layout (row-major or column-major).
  */
 template <Options Option = Options::RowMajor>
-using Matrix3ui = MatrixNui<3, 3, Option>;
+using Matrix3ui = MatrixXui<3, 3, Option>;
 
 /**
  * @brief Alias for a 4x4 matrix of unsigned 32-bit integers.
@@ -1672,7 +1672,7 @@ using Matrix3ui = MatrixNui<3, 3, Option>;
  * @tparam Option The memory layout (row-major or column-major).
  */
 template <Options Option = Options::RowMajor>
-using Matrix4ui = MatrixNui<4, 4, Option>;
+using Matrix4ui = MatrixXui<4, 4, Option>;
 
 }  // namespace math
 

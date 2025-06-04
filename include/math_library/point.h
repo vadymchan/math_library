@@ -40,7 +40,7 @@ using Point = Vector<T, Size, Option>;
  * @tparam Option The memory layout option (default: RowMajor).
  */
 template <std::size_t Size, Options Option = Options::RowMajor>
-using PointNf = Point<float, Size, Option>;
+using PointXf = Point<float, Size, Option>;
 
 /**
  * @brief Defines a point with `Size` dimensions and `double` precision.
@@ -52,7 +52,7 @@ using PointNf = Point<float, Size, Option>;
  * @tparam Option The memory layout option (default: RowMajor).
  */
 template <std::size_t Size, Options Option = Options::RowMajor>
-using PointNd = Point<double, Size, Option>;
+using PointXd = Point<double, Size, Option>;
 
 /**
  * @brief Defines a point with `Size` dimensions and `int32_t` precision.
@@ -64,7 +64,7 @@ using PointNd = Point<double, Size, Option>;
  * @tparam Option The memory layout option (default: RowMajor).
  */
 template <std::size_t Size, Options Option = Options::RowMajor>
-using PointNi = Point<std::int32_t, Size, Option>;
+using PointXi = Point<std::int32_t, Size, Option>;
 
 /**
  * @brief Defines a point with `Size` dimensions and `uint32_t` precision.
@@ -76,7 +76,7 @@ using PointNi = Point<std::int32_t, Size, Option>;
  * @tparam Option The memory layout option (default: RowMajor).
  */
 template <std::size_t Size, Options Option = Options::RowMajor>
-using PointNui = Point<std::uint32_t, Size, Option>;
+using PointXui = Point<std::uint32_t, Size, Option>;
 
 /**
  * @brief Templated 2D point with configurable data type.
@@ -88,7 +88,7 @@ using PointNui = Point<std::uint32_t, Size, Option>;
  * @tparam Option The memory layout option (default: RowMajor).
  */
 template <typename T, Options Option = Options::RowMajor>
-using Point2D = Point<T, 2, Option>;
+using Point2 = Point<T, 2, Option>;
 
 /**
  * @brief Templated 3D point with configurable data type.
@@ -100,7 +100,7 @@ using Point2D = Point<T, 2, Option>;
  * @tparam Option The memory layout option (default: RowMajor).
  */
 template <typename T, Options Option = Options::RowMajor>
-using Point3D = Point<T, 3, Option>;
+using Point3 = Point<T, 3, Option>;
 
 /**
  * @brief Templated 4D point with configurable data type.
@@ -112,69 +112,69 @@ using Point3D = Point<T, 3, Option>;
  * @tparam Option The memory layout option (default: RowMajor).
  */
 template <typename T, Options Option = Options::RowMajor>
-using Point4D = Point<T, 4, Option>;
+using Point4 = Point<T, 4, Option>;
 
 // Specific data type points
 
 /**
  * @brief 2D point of floats.
  */
-using Point2Df = Point2D<float>;
+using Point2f = Point2<float>;
 
 /**
  * @brief 3D point of floats.
  */
-using Point3Df = Point3D<float>;
+using Point3f = Point3<float>;
 
 /**
  * @brief 4D point of floats.
  */
-using Point4Df = Point4D<float>;
+using Point4f = Point4<float>;
 
 /**
  * @brief 2D point of doubles.
  */
-using Point2Dd = Point2D<double>;
+using Point2d = Point2<double>;
 
 /**
  * @brief 3D point of doubles.
  */
-using Point3Dd = Point3D<double>;
+using Point3d = Point3<double>;
 
 /**
  * @brief 4D point of doubles.
  */
-using Point4Dd = Point4D<double>;
+using Point4d = Point4<double>;
 
 /**
  * @brief 2D point of 32-bit integers.
  */
-using Point2Di = Point2D<std::int32_t>;
+using Point2i = Point2<std::int32_t>;
 
 /**
  * @brief 3D point of 32-bit integers.
  */
-using Point3Di = Point3D<std::int32_t>;
+using Point3i = Point3<std::int32_t>;
 
 /**
  * @brief 4D point of 32-bit integers.
  */
-using Point4Di = Point4D<std::int32_t>;
+using Point4i = Point4<std::int32_t>;
 
 /**
  * @brief 2D point of unsigned 32-bit integers.
  */
-using Point2Dui = Point2D<std::uint32_t>;
+using Point2ui = Point2<std::uint32_t>;
 
 /**
  * @brief 3D point of unsigned 32-bit integers.
  */
-using Point3Dui = Point3D<std::uint32_t>;
+using Point3ui = Point3<std::uint32_t>;
 
 /**
  * @brief 4D point of unsigned 32-bit integers.
  */
-using Point4Dui = Point4D<std::uint32_t>;
+using Point4ui = Point4<std::uint32_t>;
 
 
 }  // namespace math
