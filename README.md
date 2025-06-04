@@ -123,14 +123,14 @@ math_library
 │   └── generate_simd_defines.cpp
 │
 ├── include (for user)
-│    ├── math_library
-│    │   ├── all.h
-│    │   ├── dimension.h
-│    │   ├── graphics.h
-│    │   ├── matrix.h
-│    │   ├── point.h
-│    │   ├── quaternion.h
-│    │   └── vector.h
+│    └── math_library
+│        ├── all.h
+│        ├── dimension.h
+│        ├── graphics.h
+│        ├── matrix.h
+│        ├── point.h
+│        ├── quaternion.h
+│        └── vector.h
 │
 └── CMakeLists.txt
 
