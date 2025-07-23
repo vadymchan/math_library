@@ -1402,7 +1402,8 @@ Vector<T, 4, Option> g_perspectiveDivide(const Vector<T, 4, Option>& vector,
   return vector;
 }
 
-// BEGIN: frustrum (perspective projection matrix that off center) creation functions
+// BEGIN: frustrum (perspective projection matrix that off center) creation
+// functions
 // ----------------------------------------------------------------------------------
 
 /**
@@ -1666,7 +1667,8 @@ auto g_frustumLhNo(T left, T right, T bottom, T top, T nearVal, T farVal)
   return frustum;
 }
 
-// END: frustrum (perspective projection matrix that off center) creation functions
+// END: frustrum (perspective projection matrix that off center) creation
+// functions
 // --------------------------------------------------------------------------------
 
 // BEGIN: orthographic projection creation matrix
@@ -2158,7 +2160,6 @@ auto g_downVector() -> const Vector<T, Size, Option> {
   return vec;
 }
 
-
 /**
  * @brief Returns a unit vector pointing to the right along the positive X-axis.
  *
@@ -2350,8 +2351,8 @@ using Rayd = Ray<double, Option>;
  */
 template <typename T>
 struct IntersectionResult {
-  bool       hit      = false;
-  T          distance = 0;
+  bool      hit      = false;
+  T         distance = 0;
   Point3<T> point;
 
   explicit operator bool() const { return hit; }
@@ -2369,10 +2370,9 @@ struct IntersectionResult {
  * @return Intersection result with hit information
  */
 template <typename T, Options Option = Options::RowMajor>
-auto g_rayAABBintersect(const Ray<T, Option>&     ray,
+auto g_rayAABBintersect(const Ray<T, Option>&    ray,
                         const Point3<T, Option>& min,
-                        const Point3<T, Option>& max)
-    -> IntersectionResult<T> {
+                        const Point3<T, Option>& max) -> IntersectionResult<T> {
   IntersectionResult<T> result;
 
   T tmin = 0;
@@ -2421,7 +2421,7 @@ auto g_rayAABBintersect(const Ray<T, Option>&     ray,
  * @return Intersection result with hit information
  */
 template <typename T, Options Option = Options::RowMajor>
-auto g_rayTriangleintersect(const Ray<T, Option>&     ray,
+auto g_rayTriangleintersect(const Ray<T, Option>&    ray,
                             const Point3<T, Option>& v0,
                             const Point3<T, Option>& v1,
                             const Point3<T, Option>& v2)
@@ -2433,22 +2433,22 @@ auto g_rayTriangleintersect(const Ray<T, Option>&     ray,
   Vector3<T, Option> edge1 = v1 - v0;
   Vector3<T, Option> edge2 = v2 - v0;
   Vector3<T, Option> h     = ray.direction().cross(edge2);
-  T                   a     = edge1.dot(h);
+  T                  a     = edge1.dot(h);
 
   if (a > -kEpsilon && a < kEpsilon) {
     return result;  // Ray is parallel to triangle
   }
 
-  T                   f = T(1) / a;
+  T                  f = T(1) / a;
   Vector3<T, Option> s = ray.origin() - v0;
-  T                   u = f * s.dot(h);
+  T                  u = f * s.dot(h);
 
   if (u < 0 || u > 1) {
     return result;
   }
 
   Vector3<T, Option> q = s.cross(edge1);
-  T                   v = f * ray.direction().dot(q);
+  T                  v = f * ray.direction().dot(q);
 
   if (v < 0 || u + v > 1) {
     return result;
@@ -2477,15 +2477,15 @@ auto g_rayTriangleintersect(const Ray<T, Option>&     ray,
  * @return Intersection result with hit information
  */
 template <typename T, Options Option = Options::RowMajor>
-auto g_raySphereintersect(const Ray<T, Option>&     ray,
+auto g_raySphereintersect(const Ray<T, Option>&    ray,
                           const Point3<T, Option>& center,
                           T radius) -> IntersectionResult<T> {
   IntersectionResult<T> result;
 
   Vector3<T, Option> oc = ray.origin() - center;
-  T                   a  = ray.direction().dot(ray.direction());
-  T                   b  = T(2) * oc.dot(ray.direction());
-  T                   c  = oc.dot(oc) - radius * radius;
+  T                  a  = ray.direction().dot(ray.direction());
+  T                  b  = T(2) * oc.dot(ray.direction());
+  T                  c  = oc.dot(oc) - radius * radius;
 
   T discriminant = b * b - T(4) * a * c;
 
@@ -2510,51 +2510,59 @@ auto g_raySphereintersect(const Ray<T, Option>&     ray,
 }
 
 /**
- * @brief Creates a ray from screen coordinates
+ * @brief Creates a ray from screen coordinates.
  *
  * Converts screen/mouse coordinates to a ray in world space.
  * Essential for mouse picking functionality.
  *
- * @param x Screen x coordinate (0 to width)
- * @param y Screen y coordinate (0 to height)
- * @param width Screen width
- * @param height Screen height
- * @param viewMatrix View matrix
- * @param projectionMatrix Projection matrix
- * @return Ray in world space
+ * @param x                  Screen x coordinate (0 .. width).
+ * @param y                  Screen y coordinate (0 .. height).
+ * @param width              Screen width.
+ * @param height             Screen height.
+ * @param view               View matrix.
+ * @param proj               Projection matrix.
+ * @param depthZeroToOne     If true, clip/NDC depth is [0, 1] (DirectX 12 /
+ * Vulkan). If false, clip/NDC depth is [-1, 1] (OpenGL).
+ * @param reversedZ          If true, reversed-Z is used (near maps to 1, far to
+ * 0). Default is false.
+ * @return Ray in world space.
  */
 template <typename T, Options Option = Options::RowMajor>
 auto g_screenToRay(T                              x,
                    T                              y,
                    T                              width,
                    T                              height,
-                   const Matrix<T, 4, 4, Option>& viewMatrix,
-                   const Matrix<T, 4, 4, Option>& projectionMatrix)
-    -> Ray<T, Option> {
-  // Convert to normalized device coordinates (-1 to 1)
-  T ndcX = (T(2) * x) / width - T(1);
-  T ndcY = T(1) - (T(2) * y) / height;  // Flip Y
+                   const Matrix<T, 4, 4, Option>& view,
+                   const Matrix<T, 4, 4, Option>& proj,
+                   bool                           depthZeroToOne = true,
+                   bool reversedZ = false) -> Ray<T, Option> {
+  // Screen -> NDC conversion
+  const T ndcX = (T(2) * x) / width - T(1);
+  const T ndcY = T(1) - (T(2) * y) / height;
 
-  // Create points in clip space
-  Vector4<T, Option> nearPoint(ndcX, ndcY, T(-1), T(1));
-  Vector4<T, Option> farPoint(ndcX, ndcY, T(1), T(1));
+  const T zNear
+      = depthZeroToOne ? (reversedZ ? T(1) : T(0)) : (reversedZ ? T(1) : T(-1));
+  const T zFar
+      = depthZeroToOne ? (reversedZ ? T(0) : T(1)) : (reversedZ ? T(-1) : T(1));
 
-  // Transform to world space
-  auto invProjView = (projectionMatrix * viewMatrix).inverse();
+  Vector4<T, Option> nearPoint(ndcX, ndcY, zNear, T(1));
+  Vector4<T, Option> farPoint(ndcX, ndcY, zFar, T(1));
 
-  Vector4<T, Option> worldNear  = nearPoint;
-  worldNear                     *= invProjView;
-  worldNear                      = g_perspectiveDivide(worldNear);
+  const auto invProj = proj.inverse();
+  const auto invView = view.inverse();
 
-  Vector4<T, Option> worldFar  = farPoint;
-  worldFar                     *= invProjView;
-  worldFar                      = g_perspectiveDivide(worldFar);
+  auto ndcToWorld = [&](Vector4<T, Option> v) {
+    v     *= invProj;
+    v      = g_perspectiveDivide(v);
+    v *= invView;
+    return v;
+  };
 
-  // Create ray
-  Point3<T, Option>  origin    = worldNear.template resizedCopy<3>();
-  Vector3<T, Option> direction = (worldFar.template resizedCopy<3>()
-                                   - worldNear.template resizedCopy<3>())
-                                      .normalized();
+  const auto worldNear = ndcToWorld(nearPoint);
+  const auto worldFar  = ndcToWorld(farPoint);
+
+  auto origin    = worldNear.template resizedCopy<3>();
+  auto direction = (worldFar.template resizedCopy<3>() - origin).normalized();
 
   return Ray<T, Option>(origin, direction);
 }

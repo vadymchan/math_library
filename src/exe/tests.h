@@ -6181,7 +6181,7 @@ TEST(OrthoTest, OrthoRhNoWithWidthHeightFloat) {
 
 // intersection
 
-// --------- Rayï¿½AABB ----------------------------------------------------
+// --------- Ray–AABB ----------------------------------------------------
 
 TEST(IntersectionsTest, RayAABB_Hit) {
   math::Rayf<>  ray({-1.0f, 0.5f, 0.5f}, {1.0f, 0.0f, 0.0f});
@@ -6215,11 +6215,11 @@ TEST(IntersectionsTest, RayAABB_InsideBox) {
   auto result = math::g_rayAABBintersect(ray, min, max);
 
   ASSERT_TRUE(result);
-  EXPECT_FLOAT_EQ(result.distance, 0.0f);  
+  EXPECT_FLOAT_EQ(result.distance, 0.0f);
   EXPECT_FLOAT_EQ(result.point(0), 0.5f);
 }
 
-// --------- Rayï¿½Triangle ------------------------------------------------
+// --------- Ray–Triangle ------------------------------------------------
 
 TEST(IntersectionsTest, RayTriangle_Hit) {
   math::Point3f v0(0.0f, 0.0f, 0.0f);
@@ -6249,7 +6249,7 @@ TEST(IntersectionsTest, RayTriangle_Miss) {
   EXPECT_FALSE(result);
 }
 
-// --------- Rayï¿½Sphere --------------------------------------------------
+// --------- Ray–Sphere --------------------------------------------------
 
 TEST(IntersectionsTest, RaySphere_HitOutside) {
   math::Rayf<>  ray({0.0f, 0.0f, -3.0f}, {0.0f, 0.0f, 1.0f});
@@ -6286,23 +6286,328 @@ TEST(IntersectionsTest, RaySphere_Miss) {
 
 // --------- Screen -> Ray ------------------------------------------------
 
-TEST(IntersectionsTest, ScreenToRay_IdentityMatrices) {
-  const float width = 2.0f, height = 2.0f;
-  float       x = 1.0f, y = 1.0f;  
+TEST(ScreenToRayTest, CenterOfScreen) {
+  const float width  = 800.0f;
+  const float height = 600.0f;
 
   math::Matrix4f<> view = math::Matrix4f<>::Identity();
-  math::Matrix4f<> proj = math::Matrix4f<>::Identity();
+  math::Matrix4f<> proj = math::g_perspectiveRhZo(
+      math::g_degreeToRadian(45.0f), width / height, 0.1f, 100.0f);
 
-  auto ray = math::g_screenToRay(x, y, width, height, view, proj);
+  float x = width / 2.0f;
+  float y = height / 2.0f;
 
-  // we should get (0,0,-1) -> (0,0,1)
-  EXPECT_FLOAT_EQ(ray.origin()(0), 0.0f);
-  EXPECT_FLOAT_EQ(ray.origin()(1), 0.0f);
-  EXPECT_FLOAT_EQ(ray.origin()(2), -1.0f);
+  auto ray = math::g_screenToRay(x, y, width, height, view, proj, true, false);
 
-  EXPECT_FLOAT_EQ(ray.direction()(0), 0.0f);
-  EXPECT_FLOAT_EQ(ray.direction()(1), 0.0f);
-  EXPECT_FLOAT_EQ(ray.direction()(2), 1.0f);
+  EXPECT_NEAR(ray.origin().x(), 0.0f, 1e-5f);
+  EXPECT_NEAR(ray.origin().y(), 0.0f, 1e-5f);
+  EXPECT_NEAR(ray.direction().x(), 0.0f, 1e-5f);
+  EXPECT_NEAR(ray.direction().y(), 0.0f, 1e-5f);
+  EXPECT_NEAR(ray.direction().z(), -1.0f, 1e-5f);
+}
+
+TEST(ScreenToRayTest, CornerOfScreen) {
+  const float width  = 800.0f;
+  const float height = 600.0f;
+
+  math::Matrix4f<> view = math::Matrix4f<>::Identity();
+  math::Matrix4f<> proj = math::g_perspectiveRhZo(
+      math::g_degreeToRadian(45.0f), width / height, 0.1f, 100.0f);
+
+  float x = 0.0f;
+  float y = 0.0f;
+
+  auto ray = math::g_screenToRay(x, y, width, height, view, proj, true, false);
+
+  EXPECT_LT(ray.direction().x(), 0.0f);
+  EXPECT_GT(ray.direction().y(), 0.0f);
+  EXPECT_LT(ray.direction().z(), 0.0f);
+
+  EXPECT_NEAR(ray.direction().magnitude(), 1.0f, 1e-5f);
+}
+
+TEST(ScreenToRayTest, BottomRightCorner) {
+  const float width  = 800.0f;
+  const float height = 600.0f;
+
+  math::Matrix4f<> view = math::Matrix4f<>::Identity();
+  math::Matrix4f<> proj = math::g_perspectiveRhZo(
+      math::g_degreeToRadian(45.0f), width / height, 0.1f, 100.0f);
+
+  float x = width;
+  float y = height;
+
+  auto ray = math::g_screenToRay(x, y, width, height, view, proj, true, false);
+
+  EXPECT_GT(ray.direction().x(), 0.0f);
+  EXPECT_LT(ray.direction().y(), 0.0f);
+  EXPECT_LT(ray.direction().z(), 0.0f);
+
+  EXPECT_NEAR(ray.direction().magnitude(), 1.0f, 1e-5f);
+}
+
+TEST(ScreenToRayTest, DifferentDepthRanges) {
+  const float width  = 800.0f;
+  const float height = 600.0f;
+
+  math::Matrix4f<> view = math::Matrix4f<>::Identity();
+  math::Matrix4f<> proj = math::g_perspectiveRhZo(
+      math::g_degreeToRadian(45.0f), width / height, 0.1f, 100.0f);
+
+  float x = width / 2.0f;
+  float y = height / 2.0f;
+
+  auto rayZO
+      = math::g_screenToRay(x, y, width, height, view, proj, true, false);
+
+  auto rayNO
+      = math::g_screenToRay(x, y, width, height, view, proj, false, false);
+
+  EXPECT_NEAR(rayZO.direction().x(), rayNO.direction().x(), 1e-5f);
+  EXPECT_NEAR(rayZO.direction().y(), rayNO.direction().y(), 1e-5f);
+  EXPECT_NEAR(rayZO.direction().z(), rayNO.direction().z(), 1e-5f);
+}
+
+TEST(ScreenToRayTest, ReversedZ) {
+  const float width  = 800.0f;
+  const float height = 600.0f;
+
+  math::Matrix4f<> view = math::Matrix4f<>::Identity();
+  math::Matrix4f<> proj = math::g_perspectiveRhZo(
+      math::g_degreeToRadian(45.0f), width / height, 0.1f, 100.0f);
+
+  float x = width / 2.0f;
+  float y = height / 2.0f;
+
+  auto rayNormal
+      = math::g_screenToRay(x, y, width, height, view, proj, true, false);
+
+  auto rayReversed
+      = math::g_screenToRay(x, y, width, height, view, proj, true, true);
+
+  float dot = rayNormal.direction().dot(rayReversed.direction());
+  EXPECT_NEAR(std::fabs(dot), 1.0f, 1e-5f);
+}
+
+TEST(ScreenToRayTest, WithViewTransformation) {
+  const float width  = 800.0f;
+  const float height = 600.0f;
+
+  math::Vector3f eye(0.0f, 0.0f, 5.0f);
+  math::Vector3f target(0.0f, 0.0f, 0.0f);
+  math::Vector3f up(0.0f, 1.0f, 0.0f);
+
+  math::Matrix4f<> view  = math::g_lookAtRh(eye, target, up);
+  const float      nearZ = 0.1f;
+  math::Matrix4f<> proj  = math::g_perspectiveRhZo(
+      math::g_degreeToRadian(45.0f), width / height, nearZ, 100.0f);
+
+  float x = width * 0.5f;
+  float y = height * 0.5f;
+
+  auto ray = math::g_screenToRay(x, y, width, height, view, proj, true, false);
+
+  math::Vector3f forward        = (target - eye).normalized();
+  math::Vector3f expectedOrigin = eye + forward * nearZ;
+
+  EXPECT_NEAR(ray.origin().x(), expectedOrigin.x(), 1e-4f);
+  EXPECT_NEAR(ray.origin().y(), expectedOrigin.y(), 1e-4f);
+  EXPECT_NEAR(ray.origin().z(), expectedOrigin.z(), 1e-4f);
+
+  math::Vector3f expectedDir = forward;
+  EXPECT_NEAR(ray.direction().dot(expectedDir), 1.0f, 1e-4f);
+}
+
+TEST(ScreenToRayTest, ColumnMajorMatrices) {
+  const float width  = 800.0f;
+  const float height = 600.0f;
+
+  math::Matrix<float, 4, 4, math::Options::ColumnMajor> view
+      = math::Matrix<float, 4, 4, math::Options::ColumnMajor>::Identity();
+  math::Matrix<float, 4, 4, math::Options::ColumnMajor> proj
+      = math::g_perspectiveRhZo<float, math::Options::ColumnMajor>(
+          math::g_degreeToRadian(45.0f), width / height, 0.1f, 100.0f);
+
+  float x = width / 2.0f;
+  float y = height / 2.0f;
+
+  auto ray = math::g_screenToRay<float, math::Options::ColumnMajor>(
+      x, y, width, height, view, proj, true, false);
+
+  EXPECT_NEAR(ray.origin().x(), 0.0f, 1e-5f);
+  EXPECT_NEAR(ray.origin().y(), 0.0f, 1e-5f);
+  EXPECT_NEAR(ray.direction().x(), 0.0f, 1e-5f);
+  EXPECT_NEAR(ray.direction().y(), 0.0f, 1e-5f);
+  EXPECT_NEAR(ray.direction().z(), -1.0f, 1e-5f);
+}
+
+TEST(ScreenToRayTest, OrthographicProjection) {
+  const float width  = 800.0f;
+  const float height = 600.0f;
+
+  math::Matrix4f<> view = math::Matrix4f<>::Identity();
+  math::Matrix4f<> proj
+      = math::g_orthoRhZo(-4.0f, 4.0f, -3.0f, 3.0f, 0.1f, 100.0f);
+
+  float x = width / 2.0f;
+  float y = height / 2.0f;
+
+  auto ray = math::g_screenToRay(x, y, width, height, view, proj, true, false);
+
+  EXPECT_NEAR(ray.direction().x(), 0.0f, 1e-5f);
+  EXPECT_NEAR(ray.direction().y(), 0.0f, 1e-5f);
+  EXPECT_NEAR(ray.direction().z(), -1.0f, 1e-5f);
+
+  auto rayCorner
+      = math::g_screenToRay(0.0f, 0.0f, width, height, view, proj, true, false);
+  EXPECT_NEAR(ray.direction().x(), rayCorner.direction().x(), 1e-5f);
+  EXPECT_NEAR(ray.direction().y(), rayCorner.direction().y(), 1e-5f);
+  EXPECT_NEAR(ray.direction().z(), rayCorner.direction().z(), 1e-5f);
+}
+
+TEST(ScreenToRayTest, EdgeCases) {
+  const float width  = 800.0f;
+  const float height = 600.0f;
+
+  math::Matrix4f<> view = math::Matrix4f<>::Identity();
+  math::Matrix4f<> proj = math::g_perspectiveRhZo(
+      math::g_degreeToRadian(45.0f), width / height, 0.1f, 100.0f);
+
+  auto rayNegative = math::g_screenToRay(
+      -100.0f, -100.0f, width, height, view, proj, true, false);
+  EXPECT_NEAR(rayNegative.direction().magnitude(), 1.0f, 1e-5f);
+
+  auto rayBeyond = math::g_screenToRay(
+      width + 100.0f, height + 100.0f, width, height, view, proj, true, false);
+  EXPECT_NEAR(rayBeyond.direction().magnitude(), 1.0f, 1e-5f);
+}
+
+TEST(ScreenToRayTest, ConsistencyCheck) {
+  const float width  = 800.0f;
+  const float height = 600.0f;
+
+  math::Matrix4f<> view = math::Matrix4f<>::Identity();
+  math::Matrix4f<> proj = math::g_perspectiveRhZo(
+      math::g_degreeToRadian(45.0f), width / height, 0.1f, 100.0f);
+
+  std::vector<std::pair<float, float>> testPoints = {
+    {width * 0.25f, height * 0.25f},
+    {width * 0.75f, height * 0.25f},
+    {width * 0.25f, height * 0.75f},
+    {width * 0.75f, height * 0.75f}
+  };
+
+  for (const auto& point : testPoints) {
+    auto ray = math::g_screenToRay(
+        point.first, point.second, width, height, view, proj, true, false);
+
+    EXPECT_NEAR(ray.direction().magnitude(), 1.0f, 1e-5f);
+
+    EXPECT_LT(ray.direction().z(), 0.0f);
+  }
+}
+
+TEST(ScreenToRayTest, DoublePrecision) {
+  const double width  = 800.0;
+  const double height = 600.0;
+
+  math::Matrix<double, 4, 4> view = math::Matrix<double, 4, 4>::Identity();
+  math::Matrix<double, 4, 4> proj = math::g_perspectiveRhZo<double>(
+      math::g_degreeToRadian(45.0), width / height, 0.1, 100.0);
+
+  double x = width / 2.0;
+  double y = height / 2.0;
+
+  auto ray = math::g_screenToRay<double>(
+      x, y, width, height, view, proj, true, false);
+
+  EXPECT_NEAR(ray.origin().x(), 0.0, 1e-10);
+  EXPECT_NEAR(ray.origin().y(), 0.0, 1e-10);
+  EXPECT_NEAR(ray.direction().x(), 0.0, 1e-10);
+  EXPECT_NEAR(ray.direction().y(), 0.0, 1e-10);
+  EXPECT_NEAR(ray.direction().z(), -1.0, 1e-10);
+}
+
+TEST(ScreenToRayTest, LeftHandedCoordinateSystem) {
+  const float width  = 800.0f;
+  const float height = 600.0f;
+
+  math::Matrix4f<> view = math::Matrix4f<>::Identity();
+  math::Matrix4f<> proj = math::g_perspectiveLhZo(
+      math::g_degreeToRadian(45.0f), width / height, 0.1f, 100.0f);
+
+  float x = width / 2.0f;
+  float y = height / 2.0f;
+
+  auto ray = math::g_screenToRay(x, y, width, height, view, proj, true, false);
+
+  EXPECT_NEAR(ray.origin().x(), 0.0f, 1e-5f);
+  EXPECT_NEAR(ray.origin().y(), 0.0f, 1e-5f);
+  EXPECT_NEAR(ray.direction().x(), 0.0f, 1e-5f);
+  EXPECT_NEAR(ray.direction().y(), 0.0f, 1e-5f);
+  EXPECT_NEAR(ray.direction().z(), 1.0f, 1e-5f);
+}
+
+TEST(ScreenToRayTest, MousePickingSimulation) {
+  const float width  = 1920.0f;
+  const float height = 1080.0f;
+
+  math::Vector3f eye(10.0f, 5.0f, 10.0f);
+  math::Vector3f target(0.0f, 0.0f, 0.0f);
+  math::Vector3f up(0.0f, 1.0f, 0.0f);
+
+  math::Matrix4f<> view  = math::g_lookAtRh(eye, target, up);
+  const float      nearZ = 0.1f;
+  math::Matrix4f<> proj  = math::g_perspectiveRhZo(
+      math::g_degreeToRadian(60.0f), width / height, nearZ, 1000.0f);
+
+  float mouseX = width * 2.0f / 4.0f;
+  float mouseY = height / 2.0f;
+
+  auto ray = math::g_screenToRay(
+      mouseX, mouseY, width, height, view, proj, true, false);
+
+  math::Vector3f forward        = (target - eye).normalized();
+  math::Vector3f expectedOrigin = eye + forward * nearZ;
+
+  EXPECT_NEAR(ray.origin().x(), expectedOrigin.x(), 1e-4f);
+  EXPECT_NEAR(ray.origin().y(), expectedOrigin.y(), 1e-4f);
+  EXPECT_NEAR(ray.origin().z(), expectedOrigin.z(), 1e-4f);
+
+  EXPECT_NEAR(ray.direction().magnitude(), 1.0f, 1e-5f);
+  float dotProduct = ray.direction().dot(forward);
+  EXPECT_GT(dotProduct, 0.9f);
+}
+
+TEST(ScreenToRayTest, SymmetryTest) {
+  const float width  = 800.0f;
+  const float height = 600.0f;
+
+  math::Matrix4f<> view = math::Matrix4f<>::Identity();
+  math::Matrix4f<> proj = math::g_perspectiveRhZo(
+      math::g_degreeToRadian(45.0f), width / height, 0.1f, 100.0f);
+
+  float centerX = width / 2.0f;
+  float centerY = height / 2.0f;
+  float offset  = 100.0f;
+
+  auto rayLeft = math::g_screenToRay(
+      centerX - offset, centerY, width, height, view, proj, true, false);
+  auto rayRight = math::g_screenToRay(
+      centerX + offset, centerY, width, height, view, proj, true, false);
+
+  EXPECT_NEAR(rayLeft.direction().x(), -rayRight.direction().x(), 1e-5f);
+  EXPECT_NEAR(rayLeft.direction().y(), rayRight.direction().y(), 1e-5f);
+  EXPECT_NEAR(rayLeft.direction().z(), rayRight.direction().z(), 1e-5f);
+
+  auto rayTop = math::g_screenToRay(
+      centerX, centerY - offset, width, height, view, proj, true, false);
+  auto rayBottom = math::g_screenToRay(
+      centerX, centerY + offset, width, height, view, proj, true, false);
+
+  EXPECT_NEAR(rayTop.direction().x(), rayBottom.direction().x(), 1e-5f);
+  EXPECT_NEAR(rayTop.direction().y(), -rayBottom.direction().y(), 1e-5f);
+  EXPECT_NEAR(rayTop.direction().z(), rayBottom.direction().z(), 1e-5f);
 }
 
 // ========================== VECTOR: FLOAT ==============================
@@ -6725,8 +7030,7 @@ TEST(VectorComparisonTest, GreaterThanOrEqualToOperatorUnsignedInt) {
 }
 
 TEST(VectorComparisonTest, LessThanOperatorUnsignedIntLargeValues) {
-  math::Vector3<unsigned int> vec1(
-      0xFF'FF'FF'FF, 0xFF'FF'FF'FF, 0xFF'FF'FF'FF);
+  math::Vector3<unsigned int> vec1(0xFF'FF'FF'FF, 0xFF'FF'FF'FF, 0xFF'FF'FF'FF);
   math::Vector3<unsigned int> vec2(0, 0, 0);
 
   EXPECT_FALSE(vec1 < vec2);
@@ -6734,8 +7038,7 @@ TEST(VectorComparisonTest, LessThanOperatorUnsignedIntLargeValues) {
 }
 
 TEST(VectorComparisonTest, GreaterThanOperatorUnsignedIntLargeValues) {
-  math::Vector3<unsigned int> vec1(
-      0xFF'FF'FF'FF, 0xFF'FF'FF'FF, 0xFF'FF'FF'FF);
+  math::Vector3<unsigned int> vec1(0xFF'FF'FF'FF, 0xFF'FF'FF'FF, 0xFF'FF'FF'FF);
   math::Vector3<unsigned int> vec2(0, 0, 0);
 
   EXPECT_TRUE(vec1 > vec2);
@@ -6743,8 +7046,7 @@ TEST(VectorComparisonTest, GreaterThanOperatorUnsignedIntLargeValues) {
 }
 
 TEST(VectorComparisonTest, LessThanOrEqualToOperatorUnsignedIntLargeValues) {
-  math::Vector3<unsigned int> vec1(
-      0xFF'FF'FF'FF, 0xFF'FF'FF'FF, 0xFF'FF'FF'FF);
+  math::Vector3<unsigned int> vec1(0xFF'FF'FF'FF, 0xFF'FF'FF'FF, 0xFF'FF'FF'FF);
   math::Vector3<unsigned int> vec2(0, 0, 0);
 
   EXPECT_FALSE(vec1 <= vec2);
@@ -6752,8 +7054,7 @@ TEST(VectorComparisonTest, LessThanOrEqualToOperatorUnsignedIntLargeValues) {
 }
 
 TEST(VectorComparisonTest, GreaterThanOrEqualToOperatorUnsignedIntLargeValues) {
-  math::Vector3<unsigned int> vec1(
-      0xFF'FF'FF'FF, 0xFF'FF'FF'FF, 0xFF'FF'FF'FF);
+  math::Vector3<unsigned int> vec1(0xFF'FF'FF'FF, 0xFF'FF'FF'FF, 0xFF'FF'FF'FF);
   math::Vector3<unsigned int> vec2(0, 0, 0);
 
   EXPECT_FALSE(vec2 >= vec1);
@@ -7010,7 +7311,7 @@ TEST(QuaternionTest, Inverse) {
 }
 
 TEST(QuaternionTest, RotateVector) {
-  math::Vector3f   v(1.0f, 0.0f, 0.0f);
+  math::Vector3f    v(1.0f, 0.0f, 0.0f);
   math::Quaternionf q(0.707107f, 0.0f, 0.0f, 0.707107f);
 
   math::Vector3f result = q.rotateVector(v);
@@ -7133,7 +7434,7 @@ TEST(QuaternionTest, FromVectorsNonNormalized) {
 
   EXPECT_NEAR(q.norm(), 1.0f, 1e-6f);
 
-  // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+  // ñðàâíèâàåì íàïðàâëåíèÿ
   math::Vector3f rotatedDir = q.rotateVector(from).normalized();
   math::Vector3f toDir      = to.normalized();
 
@@ -7339,8 +7640,8 @@ TEST(QuaternionTest, InverseDouble) {
 
 TEST(QuaternionTest, RotateVectorDouble) {
   math::Quaterniond q(0.7071067811865476, 0.0, 0.0, 0.7071067811865476);
-  math::Vector3d   v(1.0, 0.0, 0.0);
-  math::Vector3d   result = q.rotateVector(v);
+  math::Vector3d    v(1.0, 0.0, 0.0);
+  math::Vector3d    result = q.rotateVector(v);
   EXPECT_NEAR(result.x(), 1.0, 1e-15);
   EXPECT_NEAR(result.y(), 0.0, 1e-15);
   EXPECT_NEAR(result.z(), 0.0, 1e-15);
@@ -7408,7 +7709,7 @@ TEST(QuaternionTest, LogDouble) {
 
 TEST(QuaternionTest, FromAxisAngle) {
   math::Vector3d axis(1.0, 0.0, 0.0);
-  double          angle = math::g_kPi / 2;
+  double         angle = math::g_kPi / 2;
 
   math::Quaterniond q = math::Quaterniond::fromAxisAngle(axis, angle);
 
@@ -7424,12 +7725,12 @@ TEST(QuaternionTest, FromAxisAngle) {
 
 TEST(QuaternionTest, ToAxisAngle) {
   math::Vector3d axis(0.0, 1.0, 0.0);
-  double          angle = math::g_kPi;
+  double         angle = math::g_kPi;
 
   math::Quaterniond q = math::Quaterniond::fromAxisAngle(axis, angle);
 
   math::Vector3d extractedAxis;
-  double          extractedAngle;
+  double         extractedAngle;
   q.toAxisAngle(extractedAxis, extractedAngle);
 
   EXPECT_NEAR(extractedAxis.x(), axis.x(), 1e-6);
@@ -7440,12 +7741,12 @@ TEST(QuaternionTest, ToAxisAngle) {
 
 TEST(QuaternionTest, AxisAngleIdentity) {
   math::Vector3d axis(1.0, 0.0, 0.0);
-  double          angle = 0.0;
+  double         angle = 0.0;
 
   math::Quaterniond q = math::Quaterniond::fromAxisAngle(axis, angle);
 
   math::Vector3d extractedAxis;
-  double          extractedAngle;
+  double         extractedAngle;
   q.toAxisAngle(extractedAxis, extractedAngle);
 
   EXPECT_NEAR(extractedAxis.x(), 1.0, 1e-6);
@@ -7456,7 +7757,7 @@ TEST(QuaternionTest, AxisAngleIdentity) {
 
 TEST(QuaternionTest, FromAxisAngleZeroAngle) {
   math::Vector3d axis(1.0, 0.0, 0.0);
-  double          angle = 0.0;
+  double         angle = 0.0;
 
   math::Quaterniond q = math::Quaterniond::fromAxisAngle(axis, angle);
 
@@ -7468,7 +7769,7 @@ TEST(QuaternionTest, FromAxisAngleZeroAngle) {
 
 TEST(QuaternionTest, FromAxisAngleNonNormalizedAxis) {
   math::Vector3d axis(2.0, 0.0, 0.0);
-  double          angle = math::g_kPi / 2;
+  double         angle = math::g_kPi / 2;
 
   math::Quaterniond q = math::Quaterniond::fromAxisAngle(axis, angle);
 
@@ -7482,7 +7783,7 @@ TEST(QuaternionTest, ToAxisAngleIdentityQuaternion) {
   math::Quaterniond q(0.0, 0.0, 0.0, 1.0);
 
   math::Vector3d axis;
-  double          angle;
+  double         angle;
   q.toAxisAngle(axis, angle);
 
   EXPECT_NEAR(angle, 0.0, 1e-6);
