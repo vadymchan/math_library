@@ -598,30 +598,30 @@ auto g_lookAtRh(const Vector3<T, Option>& eye,
                 const Vector3<T, Option>& target,
                 const Vector3<T, Option>& worldUp) -> Matrix<T, 4, 4, Option> {
   auto f = (target - eye).normalized();
-  auto r = worldUp.cross(f).normalized();
-  auto u = f.cross(r);
+  auto r = f.cross(worldUp).normalized();
+  auto u = r.cross(f);
 
-  Matrix<T, 4, 4, Option> viewMatrix;
+  Matrix<T, 4, 4, Option> view;
 
   if constexpr (Option == Options::RowMajor) {
     // clang-format off
-    viewMatrix <<
+    view <<
        r.x(),        u.x(),       -f.x(),       T(),
        r.y(),        u.y(),       -f.y(),       T(),
        r.z(),        u.z(),       -f.z(),       T(),
-      -eye.dot(r),  -eye.dot(u),  -eye.dot(f),  T(1);
+      -eye.dot(r),  -eye.dot(u),  eye.dot(f),   T(1);
     // clang-format on
   } else if constexpr (Option == Options::ColumnMajor) {
     // clang-format off
-    viewMatrix <<
+    view <<
        r.x(),   r.y(),   r.z(),  -eye.dot(r),
        u.x(),   u.y(),   u.z(),  -eye.dot(u),
-      -f.x(),  -f.y(),  -f.z(),  -eye.dot(f),
+      -f.x(),  -f.y(),  -f.z(),   eye.dot(f),
        T(),     T(),     T(),     T(1);
     // clang-format on
   }
 
-  return viewMatrix;
+  return view;
 }
 
 /**
@@ -647,11 +647,11 @@ auto g_lookAtLh(const Vector3<T, Option>& eye,
   auto r = worldUp.cross(f).normalized();
   auto u = f.cross(r);
 
-  Matrix<T, 4, 4, Option> viewMatrix;
+  Matrix<T, 4, 4, Option> view;
 
   if constexpr (Option == Options::RowMajor) {
     // clang-format off
-    viewMatrix <<
+    view <<
        r.x(),        u.x(),        f.x(),       T(),
        r.y(),        u.y(),        f.y(),       T(),
        r.z(),        u.z(),        f.z(),       T(),
@@ -659,7 +659,7 @@ auto g_lookAtLh(const Vector3<T, Option>& eye,
     // clang-format on
   } else if constexpr (Option == Options::ColumnMajor) {
     // clang-format off
-    viewMatrix <<
+    view <<
       r.x(),  r.y(),  r.z(),  -eye.dot(r),
       u.x(),  u.y(),  u.z(),  -eye.dot(u),
       f.x(),  f.y(),  f.z(),  -eye.dot(f),
@@ -667,7 +667,7 @@ auto g_lookAtLh(const Vector3<T, Option>& eye,
     // clang-format on
   }
 
-  return viewMatrix;
+  return view;
 }
 
 /**
@@ -690,30 +690,30 @@ auto g_lookToRh(const Vector3<T, Option>& eye,
                 const Vector3<T, Option>& direction,
                 const Vector3<T, Option>& worldUp) -> Matrix<T, 4, 4, Option> {
   auto f = direction.normalized();
-  auto r = worldUp.cross(f).normalized();
-  auto u = f.cross(r);
+  auto r = f.cross(worldUp).normalized();
+  auto u = r.cross(f);
 
-  Matrix<T, 4, 4, Option> viewMatrix;
+  Matrix<T, 4, 4, Option> view;
 
   if constexpr (Option == Options::RowMajor) {
     // clang-format off
-    viewMatrix <<
+    view <<
        r.x(),        u.x(),       -f.x(),       T(),
        r.y(),        u.y(),       -f.y(),       T(),
        r.z(),        u.z(),       -f.z(),       T(),
-      -eye.dot(r),  -eye.dot(u),  -eye.dot(f),  T(1);
+      -eye.dot(r),  -eye.dot(u),   eye.dot(f),  T(1);
     // clang-format on
   } else if constexpr (Option == Options::ColumnMajor) {
     // clang-format off
-    viewMatrix <<
+    view <<
        r.x(),   r.y(),   r.z(),  -eye.dot(r),
        u.x(),   u.y(),   u.z(),  -eye.dot(u),
-      -f.x(),  -f.y(),  -f.z(),  -eye.dot(f),
+      -f.x(),  -f.y(),  -f.z(),   eye.dot(f),
        T(),     T(),     T(),     T(1);
     // clang-format on
   }
 
-  return viewMatrix;
+  return view;
 }
 
 /**
@@ -739,11 +739,11 @@ auto g_lookToLh(const Vector3<T, Option>& eye,
   auto r = worldUp.cross(f).normalized();
   auto u = f.cross(r);
 
-  Matrix<T, 4, 4, Option> viewMatrix;
+  Matrix<T, 4, 4, Option> view;
 
   if constexpr (Option == Options::RowMajor) {
     // clang-format off
-    viewMatrix <<
+    view <<
        r.x(),        u.x(),        f.x(),       T(),
        r.y(),        u.y(),        f.y(),       T(),
        r.z(),        u.z(),        f.z(),       T(),
@@ -751,7 +751,7 @@ auto g_lookToLh(const Vector3<T, Option>& eye,
     // clang-format on
   } else if constexpr (Option == Options::ColumnMajor) {
     // clang-format off
-    viewMatrix <<
+    view <<
       r.x(),  r.y(),  r.z(),  -eye.dot(r),
       u.x(),  u.y(),  u.z(),  -eye.dot(u),
       f.x(),  f.y(),  f.z(),  -eye.dot(f),
@@ -759,7 +759,7 @@ auto g_lookToLh(const Vector3<T, Option>& eye,
     // clang-format on
   }
 
-  return viewMatrix;
+  return view;
 }
 
 // END: view matrix creation functions

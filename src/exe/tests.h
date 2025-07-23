@@ -1894,7 +1894,7 @@ TEST(DimensionTest, ComparisonOperators) {
 
 // Test case for dimension resizing with different target sizes
 TEST(DimensionTest, Resizing) {
-  math::Dimension3f dim(1.0f, 2.0f, 3.0f);
+  math::Dimension3f  dim(1.0f, 2.0f, 3.0f);
   math::Dimension2Df resizedDim = dim.resizedCopy<2>();
 
   EXPECT_FLOAT_EQ(resizedDim.width(), 1.0f);
@@ -4937,10 +4937,10 @@ TEST(GraphicsTest, LookAtRh) {
 
   math::Matrix4f<> matrix = math::g_lookAtRh(eye, target, up);
 
-  EXPECT_FLOAT_EQ(matrix(0, 0), -1.0f);
+  EXPECT_FLOAT_EQ(matrix(0, 0), 1.0f);
   EXPECT_FLOAT_EQ(matrix(1, 1), 1.0f);
   EXPECT_FLOAT_EQ(matrix(2, 2), 1.0f);
-  EXPECT_FLOAT_EQ(matrix(3, 2), 5.0f);
+  EXPECT_FLOAT_EQ(matrix(3, 2), -5.0f);
 }
 
 // Test case for g_lookToRh function with different eye, direction, and up
@@ -4952,15 +4952,15 @@ TEST(GraphicsTest, LookToRh) {
 
   math::Matrix4f<> matrix = math::g_lookToRh(eye, direction, up);
 
-  EXPECT_FLOAT_EQ(matrix(0, 0), -1.0f);
+  EXPECT_FLOAT_EQ(matrix(0, 0), 1.0f);
   EXPECT_FLOAT_EQ(matrix(1, 1), 1.0f);
   EXPECT_FLOAT_EQ(matrix(2, 2), 1.0f);
-  EXPECT_FLOAT_EQ(matrix(3, 2), 5.0f);
+  EXPECT_FLOAT_EQ(matrix(3, 2), -5.0f);
 }
 
 // Test case for g_transformPoint function
 TEST(GraphicsTest, TransformPoint) {
-  math::Point3f   point(1.0f, 2.0f, 3.0f);
+  math::Point3f    point(1.0f, 2.0f, 3.0f);
   math::Matrix4f<> matrix(1.0f,
                           0.0f,
                           0.0f,
@@ -4987,7 +4987,7 @@ TEST(GraphicsTest, TransformPoint) {
 
 // Test case for g_transformPoint function with perspective division
 TEST(GraphicsTest, TransformPointWithPerspectiveDivision) {
-  math::Point3f   point(1.0f, 2.0f, 3.0f);
+  math::Point3f    point(1.0f, 2.0f, 3.0f);
   math::Matrix4f<> matrix(1.0f,
                           0.0f,
                           0.0f,
@@ -5014,7 +5014,7 @@ TEST(GraphicsTest, TransformPointWithPerspectiveDivision) {
 
 // Test case for g_transformVector function
 TEST(GraphicsTest, TransformVector) {
-  math::Vector3f  vector(1.0f, 2.0f, 3.0f);
+  math::Vector3f   vector(1.0f, 2.0f, 3.0f);
   math::Matrix4f<> matrix(2.0f,
                           0.0f,
                           0.0f,
@@ -5043,10 +5043,10 @@ TEST(ViewMatrixTest, LookAtRhRowMajor) {
   math::Vector3<float> eye{0.0f, 0.0f, 1.0f};
   math::Vector3<float> target{0.0f, 0.0f, 0.0f};
   math::Vector3<float> up{0.0f, 1.0f, 0.0f};
-  auto                  viewMatrix = g_lookAtRh(eye, target, up);
+  auto                 viewMatrix = g_lookAtRh(eye, target, up);
 
   // Check the right vector
-  EXPECT_FLOAT_EQ(viewMatrix(0, 0), -1.0f);
+  EXPECT_FLOAT_EQ(viewMatrix(0, 0), 1.0f);
   EXPECT_FLOAT_EQ(viewMatrix(0, 1), 0.0f);
   EXPECT_FLOAT_EQ(viewMatrix(0, 2), 0.0f);
 
@@ -5063,7 +5063,7 @@ TEST(ViewMatrixTest, LookAtRhRowMajor) {
   // Check the translation
   EXPECT_FLOAT_EQ(viewMatrix(3, 0), 0.0f);
   EXPECT_FLOAT_EQ(viewMatrix(3, 1), 0.0f);
-  EXPECT_FLOAT_EQ(viewMatrix(3, 2), 1.0f);
+  EXPECT_FLOAT_EQ(viewMatrix(3, 2), -1.0f);
 
   // Check the homogenous part of the matrix
   EXPECT_FLOAT_EQ(viewMatrix(0, 3), 0.0f);
@@ -5079,7 +5079,7 @@ TEST(ViewMatrixTest, LookAtRhColumnMajor) {
   auto viewMatrix = g_lookAtRh(eye, target, up);
 
   // Check the right vector
-  EXPECT_FLOAT_EQ(viewMatrix(0, 0), -1.0f);
+  EXPECT_FLOAT_EQ(viewMatrix(0, 0), 1.0f);
   EXPECT_FLOAT_EQ(viewMatrix(1, 0), 0.0f);
   EXPECT_FLOAT_EQ(viewMatrix(2, 0), 0.0f);
 
@@ -5096,7 +5096,7 @@ TEST(ViewMatrixTest, LookAtRhColumnMajor) {
   // Check the translation
   EXPECT_FLOAT_EQ(viewMatrix(0, 3), 0.0f);
   EXPECT_FLOAT_EQ(viewMatrix(1, 3), 0.0f);
-  EXPECT_FLOAT_EQ(viewMatrix(2, 3), 1.0f);
+  EXPECT_FLOAT_EQ(viewMatrix(2, 3), -1.0f);
 
   // Check the homogenous part of the matrix
   EXPECT_FLOAT_EQ(viewMatrix(3, 0), 0.0f);
@@ -5109,10 +5109,10 @@ TEST(ViewMatrixTest, LookToRhRowMajor) {
   math::Vector3<float> eye{0.0f, 0.0f, 1.0f};
   math::Vector3<float> direction{0.0f, 0.0f, -1.0f};
   math::Vector3<float> up{0.0f, 1.0f, 0.0f};
-  auto                  viewMatrix = g_lookToRh(eye, direction, up);
+  auto                 viewMatrix = g_lookToRh(eye, direction, up);
 
   // Check the right vector
-  EXPECT_FLOAT_EQ(viewMatrix(0, 0), -1.0f);
+  EXPECT_FLOAT_EQ(viewMatrix(0, 0), 1.0f);
   EXPECT_FLOAT_EQ(viewMatrix(0, 1), 0.0f);
   EXPECT_FLOAT_EQ(viewMatrix(0, 2), 0.0f);
 
@@ -5129,7 +5129,7 @@ TEST(ViewMatrixTest, LookToRhRowMajor) {
   // Check the translation
   EXPECT_FLOAT_EQ(viewMatrix(3, 0), 0.0f);
   EXPECT_FLOAT_EQ(viewMatrix(3, 1), 0.0f);
-  EXPECT_FLOAT_EQ(viewMatrix(3, 2), 1.0f);
+  EXPECT_FLOAT_EQ(viewMatrix(3, 2), -1.0f);
 
   // Check the homogenous part of the matrix
   EXPECT_FLOAT_EQ(viewMatrix(0, 3), 0.0f);
@@ -5140,13 +5140,12 @@ TEST(ViewMatrixTest, LookToRhRowMajor) {
 
 TEST(ViewMatrixTest, LookToRhColumnMajor) {
   math::Vector3<float, math::Options::ColumnMajor> eye{0.0f, 0.0f, 1.0f};
-  math::Vector3<float, math::Options::ColumnMajor> direction{
-    0.0f, 0.0f, -1.0f};
+  math::Vector3<float, math::Options::ColumnMajor> direction{0.0f, 0.0f, -1.0f};
   math::Vector3<float, math::Options::ColumnMajor> up{0.0f, 1.0f, 0.0f};
   auto viewMatrix = g_lookToRh(eye, direction, up);
 
   // Check the right vector
-  EXPECT_FLOAT_EQ(viewMatrix(0, 0), -1.0f);
+  EXPECT_FLOAT_EQ(viewMatrix(0, 0), 1.0f);
   EXPECT_FLOAT_EQ(viewMatrix(1, 0), 0.0f);
   EXPECT_FLOAT_EQ(viewMatrix(2, 0), 0.0f);
 
@@ -5163,7 +5162,7 @@ TEST(ViewMatrixTest, LookToRhColumnMajor) {
   // Check the translation
   EXPECT_FLOAT_EQ(viewMatrix(0, 3), 0.0f);
   EXPECT_FLOAT_EQ(viewMatrix(1, 3), 0.0f);
-  EXPECT_FLOAT_EQ(viewMatrix(2, 3), 1.0f);
+  EXPECT_FLOAT_EQ(viewMatrix(2, 3), -1.0f);
 
   // Check the homogenous part of the matrix
   EXPECT_FLOAT_EQ(viewMatrix(3, 0), 0.0f);
@@ -5176,7 +5175,7 @@ TEST(ViewMatrixTest, LookAtLhRowMajor) {
   math::Vector3<float> eye{0.0f, 0.0f, 1.0f};
   math::Vector3<float> target{0.0f, 0.0f, 0.0f};
   math::Vector3<float> up{0.0f, 1.0f, 0.0f};
-  auto                  viewMatrix = g_lookAtLh(eye, target, up);
+  auto                 viewMatrix = g_lookAtLh(eye, target, up);
 
   // Check the right vector
   EXPECT_FLOAT_EQ(viewMatrix(0, 0), -1.0f);
@@ -5242,7 +5241,7 @@ TEST(ViewMatrixTest, LookToLhRowMajor) {
   math::Vector3<float> eye{0.0f, 0.0f, 1.0f};
   math::Vector3<float> direction{0.0f, 0.0f, -1.0f};
   math::Vector3<float> up{0.0f, 1.0f, 0.0f};
-  auto                  viewMatrix = g_lookToLh(eye, direction, up);
+  auto                 viewMatrix = g_lookToLh(eye, direction, up);
 
   // Check the right vector
   EXPECT_FLOAT_EQ(viewMatrix(0, 0), -1.0f);
@@ -5273,8 +5272,7 @@ TEST(ViewMatrixTest, LookToLhRowMajor) {
 
 TEST(ViewMatrixTest, LookToLhColumnMajor) {
   math::Vector3<float, math::Options::ColumnMajor> eye{0.0f, 0.0f, 1.0f};
-  math::Vector3<float, math::Options::ColumnMajor> direction{
-    0.0f, 0.0f, -1.0f};
+  math::Vector3<float, math::Options::ColumnMajor> direction{0.0f, 0.0f, -1.0f};
   math::Vector3<float, math::Options::ColumnMajor> up{0.0f, 1.0f, 0.0f};
   auto viewMatrix = g_lookToLh(eye, direction, up);
 
@@ -5307,12 +5305,12 @@ TEST(ViewMatrixTest, LookToLhColumnMajor) {
 
 // Test case for lookAtRh
 TEST(LookAtTest, LookAtRhFloat) {
-  math::Vector3f  eye(0.0f, 0.0f, 5.0f);
-  math::Vector3f  target(0.0f, 0.0f, 0.0f);
-  math::Vector3f  up(0.0f, 1.0f, 0.0f);
+  math::Vector3f   eye(0.0f, 0.0f, 5.0f);
+  math::Vector3f   target(0.0f, 0.0f, 0.0f);
+  math::Vector3f   up(0.0f, 1.0f, 0.0f);
   math::Matrix4f<> viewMatrix = math::g_lookAtRh(eye, target, up);
 
-  EXPECT_FLOAT_EQ(viewMatrix(0, 0), -1.0f);
+  EXPECT_FLOAT_EQ(viewMatrix(0, 0), 1.0f);
   EXPECT_FLOAT_EQ(viewMatrix(0, 1), 0.0f);
   EXPECT_FLOAT_EQ(viewMatrix(0, 2), 0.0f);
   EXPECT_FLOAT_EQ(viewMatrix(0, 3), 0.0f);
@@ -5326,15 +5324,15 @@ TEST(LookAtTest, LookAtRhFloat) {
   EXPECT_FLOAT_EQ(viewMatrix(2, 3), 0.0f);
   EXPECT_FLOAT_EQ(viewMatrix(3, 0), 0.0f);
   EXPECT_FLOAT_EQ(viewMatrix(3, 1), 0.0f);
-  EXPECT_FLOAT_EQ(viewMatrix(3, 2), 5.0f);
+  EXPECT_FLOAT_EQ(viewMatrix(3, 2), -5.0f);
   EXPECT_FLOAT_EQ(viewMatrix(3, 3), 1.0f);
 }
 
 // Test case for lookAtLh
 TEST(LookAtTest, LookAtLhFloat) {
-  math::Vector3f  eye(0.0f, 0.0f, 5.0f);
-  math::Vector3f  target(0.0f, 0.0f, 0.0f);
-  math::Vector3f  up(0.0f, 1.0f, 0.0f);
+  math::Vector3f   eye(0.0f, 0.0f, 5.0f);
+  math::Vector3f   target(0.0f, 0.0f, 0.0f);
+  math::Vector3f   up(0.0f, 1.0f, 0.0f);
   math::Matrix4f<> viewMatrix = math::g_lookAtLh(eye, target, up);
 
   EXPECT_FLOAT_EQ(viewMatrix(0, 0), -1.0f);
@@ -5357,12 +5355,12 @@ TEST(LookAtTest, LookAtLhFloat) {
 
 // Test case for lookToRh
 TEST(LookAtTest, LookToRhFloat) {
-  math::Vector3f  eye(0.0f, 0.0f, 5.0f);
-  math::Vector3f  direction(0.0f, 0.0f, -1.0f);
-  math::Vector3f  up(0.0f, 1.0f, 0.0f);
+  math::Vector3f   eye(0.0f, 0.0f, 5.0f);
+  math::Vector3f   direction(0.0f, 0.0f, -1.0f);
+  math::Vector3f   up(0.0f, 1.0f, 0.0f);
   math::Matrix4f<> viewMatrix = math::g_lookToRh(eye, direction, up);
 
-  EXPECT_FLOAT_EQ(viewMatrix(0, 0), -1.0f);
+  EXPECT_FLOAT_EQ(viewMatrix(0, 0), 1.0f);
   EXPECT_FLOAT_EQ(viewMatrix(0, 1), 0.0f);
   EXPECT_FLOAT_EQ(viewMatrix(0, 2), 0.0f);
   EXPECT_FLOAT_EQ(viewMatrix(0, 3), 0.0f);
@@ -5376,15 +5374,15 @@ TEST(LookAtTest, LookToRhFloat) {
   EXPECT_FLOAT_EQ(viewMatrix(2, 3), 0.0f);
   EXPECT_FLOAT_EQ(viewMatrix(3, 0), 0.0f);
   EXPECT_FLOAT_EQ(viewMatrix(3, 1), 0.0f);
-  EXPECT_FLOAT_EQ(viewMatrix(3, 2), 5.0f);
+  EXPECT_FLOAT_EQ(viewMatrix(3, 2), -5.0f);
   EXPECT_FLOAT_EQ(viewMatrix(3, 3), 1.0f);
 }
 
 // Test case for lookToLh
 TEST(LookAtTest, LookToLhFloat) {
-  math::Vector3f  eye(0.0f, 0.0f, 5.0f);
-  math::Vector3f  direction(0.0f, 0.0f, -1.0f);
-  math::Vector3f  up(0.0f, 1.0f, 0.0f);
+  math::Vector3f   eye(0.0f, 0.0f, 5.0f);
+  math::Vector3f   direction(0.0f, 0.0f, -1.0f);
+  math::Vector3f   up(0.0f, 1.0f, 0.0f);
   math::Matrix4f<> viewMatrix = math::g_lookToLh(eye, direction, up);
 
   EXPECT_FLOAT_EQ(viewMatrix(0, 0), -1.0f);
@@ -6183,7 +6181,7 @@ TEST(OrthoTest, OrthoRhNoWithWidthHeightFloat) {
 
 // intersection
 
-// --------- Ray–AABB ----------------------------------------------------
+// --------- Rayï¿½AABB ----------------------------------------------------
 
 TEST(IntersectionsTest, RayAABB_Hit) {
   math::Rayf<>  ray({-1.0f, 0.5f, 0.5f}, {1.0f, 0.0f, 0.0f});
@@ -6221,7 +6219,7 @@ TEST(IntersectionsTest, RayAABB_InsideBox) {
   EXPECT_FLOAT_EQ(result.point(0), 0.5f);
 }
 
-// --------- Ray–Triangle ------------------------------------------------
+// --------- Rayï¿½Triangle ------------------------------------------------
 
 TEST(IntersectionsTest, RayTriangle_Hit) {
   math::Point3f v0(0.0f, 0.0f, 0.0f);
@@ -6251,7 +6249,7 @@ TEST(IntersectionsTest, RayTriangle_Miss) {
   EXPECT_FALSE(result);
 }
 
-// --------- Ray–Sphere --------------------------------------------------
+// --------- Rayï¿½Sphere --------------------------------------------------
 
 TEST(IntersectionsTest, RaySphere_HitOutside) {
   math::Rayf<>  ray({0.0f, 0.0f, -3.0f}, {0.0f, 0.0f, 1.0f});
@@ -7135,7 +7133,7 @@ TEST(QuaternionTest, FromVectorsNonNormalized) {
 
   EXPECT_NEAR(q.norm(), 1.0f, 1e-6f);
 
-  // ñðàâíèâàåì íàïðàâëåíèÿ
+  // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
   math::Vector3f rotatedDir = q.rotateVector(from).normalized();
   math::Vector3f toDir      = to.normalized();
 
