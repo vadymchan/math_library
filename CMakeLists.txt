@@ -79,6 +79,7 @@ include(CMakeDependentOption)
 cmake_dependent_option(MATH_LIBRARY_INCLUDE_G_TEST "Include the G_TEST library" ON "MATH_LIBRARY_BUILD_TESTS" ON)
 cmake_dependent_option(MATH_LIBRARY_INCLUDE_SPDLOG "Include the SPDLOG library" OFF "MATH_LIBRARY_BUILD_TESTS" ON)
 cmake_dependent_option(MATH_LIBRARY_INCLUDE_G_BENCHMARK "Include the G_BENCHMARK library" ON "MATH_LIBRARY_BUILD_TESTS" ON)
+cmake_dependent_option(MATH_LIBRARY_RUN_BENCHMARKS "Run benchmarks along with tests" ON "MATH_LIBRARY_INCLUDE_G_BENCHMARK" OFF)
 
 if(MATH_LIBRARY_BUILD_TESTS)
     
@@ -125,6 +126,7 @@ if(MATH_LIBRARY_BUILD_TESTS)
         get_target_property(BENCHMARK_INCLUDE_DIRS benchmark::benchmark INTERFACE_INCLUDE_DIRECTORIES)
         target_include_directories(math_library_exe SYSTEM PRIVATE ${BENCHMARK_INCLUDE_DIRS})
         target_link_libraries(math_library_exe benchmark::benchmark)
+        target_compile_definitions(math_library_exe PRIVATE MATH_LIBRARY_INCLUDE_G_BENCHMARK)
     endif()
 
     # Startup project for VS 
