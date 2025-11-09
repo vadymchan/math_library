@@ -1,0 +1,2 @@
+# This file ensures that the precompiled directory is tracked by Git
+# It will be deleted when simd_defines.h is generated during build

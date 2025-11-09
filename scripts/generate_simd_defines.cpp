@@ -1,6 +1,7 @@
 #include <array>
 #include <chrono>
 #include <ctime>
+#include <filesystem>
 #include <fstream>
 #include <iomanip>
 #include <iostream>
@@ -45,6 +46,15 @@ auto g_getCurrentDateTime() -> std::string {
 
 auto main() -> int {
   const std::string   defines_file_path = "src/lib/simd/precompiled/simd_defines.h";
+
+  // Create directory if it doesn't exist
+  std::filesystem::path file_path(defines_file_path);
+  std::filesystem::path dir_path = file_path.parent_path();
+  if (!std::filesystem::exists(dir_path)) {
+    std::filesystem::create_directories(dir_path);
+    std::cout << "Created directory: " << dir_path << "\n";
+  }
+
   std::ofstream defines(defines_file_path);
 
   if (!defines) {
