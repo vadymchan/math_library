@@ -67,7 +67,7 @@ class Matrix {
    * stack allocation limit, in which case memory is allocated on the heap.
    * Otherwise, stack allocation is used.
    */
-  static const bool s_kUseHeap = Rows * Columns > g_kStackAllocationLimit;
+  static constexpr bool s_kUseHeap = Rows * Columns > g_kStackAllocationLimit;
 
   private:
   /**
