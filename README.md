@@ -1,6 +1,6 @@
 # math_library
 
-header-only math library for computer graphics. Uses SIMD set instructions
+header-only math library for computer graphics. Uses SIMD set instructions.
 
 ## Requirements
 
