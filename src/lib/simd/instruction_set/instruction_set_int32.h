@@ -690,7 +690,7 @@ class InstructionSet<std::int32_t> {
                               const std::size_t   kInnerIndex,
                               const std::size_t   kCurrentColB,
                               const std::size_t   kColsB,
-                              const std::size_t   kColsARowsB) -> __m128 {
+                              const std::size_t   kColsARowsB) -> __m128i {
     if constexpr (Option == Options::ColumnMajor) {
       return _mm_loadu_si128(reinterpret_cast<const __m128i*>(
           &b[IndexB<Option>(kInnerIndex, kCurrentColB, kColsB, kColsARowsB)]));
@@ -754,9 +754,52 @@ class InstructionSet<std::int32_t> {
                      const std::size_t   kRowsA,
                      const std::size_t   kColsB,
                      const std::size_t   kColsARowsB) {
-    // downgrade to SSE 4.2 since AVX does not support direct multiplication of
-    // 32-bit integers
-    MulSse42<Option>(result, a, b, kRowsA, kColsB, kColsARowsB);
+    for (std::size_t currentRowA = 0; currentRowA < kRowsA; ++currentRowA) {
+      for (std::size_t currentColB = 0; currentColB < kColsB; ++currentColB) {
+        __m256i     sum        = _mm256_setzero_si256();
+        std::size_t innerIndex = 0;
+
+        for (; innerIndex + s_kAvxSimdWidth - 1 < kColsARowsB;
+             innerIndex += s_kAvxSimdWidth) {
+          __m256i aVec = _mm256_loadu_si256(
+              reinterpret_cast<const __m256i*>(&a[IndexA<Option>(
+                  currentRowA, innerIndex, kRowsA, kColsARowsB)]));
+          __m256i bVec = _mm256_loadu_si256(
+              reinterpret_cast<const __m256i*>(&b[IndexB<Option>(
+                  innerIndex, currentColB, kColsB, kColsARowsB)]));
+
+          __m128i aLo = _mm256_castsi256_si128(aVec);
+          __m128i aHi = _mm256_extracti128_si256(aVec, 1);
+          __m128i bLo = _mm256_castsi256_si128(bVec);
+          __m128i bHi = _mm256_extracti128_si256(bVec, 1);
+
+          __m128i mulLo = _mm_mullo_epi32(aLo, bLo);
+          __m128i mulHi = _mm_mullo_epi32(aHi, bHi);
+
+          __m256i mulResult = _mm256_castsi128_si256(mulLo);
+          mulResult         = _mm256_insertf128_si256(mulResult, mulHi, 1);
+
+          sum = _mm256_add_epi32(sum, mulResult);
+        }
+
+        std::int32_t tmp[s_kAvxSimdWidth];
+        _mm256_storeu_si256(reinterpret_cast<__m256i*>(tmp), sum);
+        std::int32_t finalSum = 0;
+        for (std::int32_t i : tmp) {
+          finalSum += i;
+        }
+
+        for (; innerIndex < kColsARowsB; ++innerIndex) {
+          finalSum
+              += a[IndexA<Option>(currentRowA, innerIndex, kRowsA, kColsARowsB)]
+               * b[IndexB<Option>(
+                   innerIndex, currentColB, kColsB, kColsARowsB)];
+        }
+
+        result[IndexResult<Option>(currentRowA, currentColB, kRowsA, kColsB)]
+            = finalSum;
+      }
+    }
   }
 
   template <Options Option>
@@ -844,10 +887,10 @@ class InstructionSet<std::int32_t> {
       for (std::size_t j = 0; j < kColsB; ++j) {
         std::int32_t sum = 0;
         for (std::size_t k = 0; k < kColsARowsB; ++k) {
-          sum += a[indexA<Option>(i, k, kRowsA, kColsARowsB)]
-               * b[indexB<Option>(k, j, kColsB, kColsARowsB)];
+          sum += a[IndexA<Option>(i, k, kRowsA, kColsARowsB)]
+               * b[IndexB<Option>(k, j, kColsB, kColsARowsB)];
         }
-        result[indexResult<Option>(i, j, kRowsA, kColsB)] = sum;
+        result[IndexResult<Option>(i, j, kRowsA, kColsB)] = sum;
       }
     }
   }
