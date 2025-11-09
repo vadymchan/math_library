@@ -7,8 +7,8 @@ on:
   workflow_dispatch:  # Дозволяє запускати вручну
 
 jobs:
-  build-and-test:
-    name: Build and Test (Debug)
+  build:
+    name: Build with Tests
     runs-on: ubuntu-latest
 
     steps:
@@ -18,9 +18,9 @@ jobs:
       - name: Set up CMake
         uses: lukka/get-cmake@latest
 
-      - name: Configure CMake for Debug
+      - name: Configure CMake
         run: |
-          cmake -B build-debug -S . \
+          cmake -B build -S . \
             -DCMAKE_BUILD_TYPE=Debug \
             -DCMAKE_CXX_FLAGS="-march=native -mavx -mavx2" \
             -DMATH_LIBRARY_BUILD_TESTS=ON \
@@ -28,22 +28,44 @@ jobs:
             -DMATH_LIBRARY_INCLUDE_SPDLOG=OFF \
             -DMATH_LIBRARY_INCLUDE_G_BENCHMARK=OFF
 
-      - name: Build project (Debug)
-        run: cmake --build build-debug --config Debug
+      - name: Build project
+        run: cmake --build build --config Debug
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-artifacts
+          path: build/
+          retention-days: 7
+
+  test:
+    name: Run Tests
+    needs: build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Download build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: build-artifacts
+          path: build/
+
+      - name: Set executable permissions
+        run: chmod +x build/math_library_exe
 
       - name: Run tests
-        run: ./build-debug/math_library_exe
+        run: ./build/math_library_exe
 
       - name: Upload test results
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: test-results
-          path: build-debug/
+          path: build/
           retention-days: 7
 
-  build-release:
-    name: Build Release
+  package:
+    name: Create Release Package
     runs-on: ubuntu-latest
 
     steps:
@@ -60,19 +82,19 @@ jobs:
             -DCMAKE_CXX_FLAGS="-march=native -mavx -mavx2 -O3" \
             -DMATH_LIBRARY_BUILD_TESTS=OFF
 
-      - name: Build project (Release)
+      - name: Build optimized library
         run: cmake --build build-release --config Release
 
-      - name: Upload release build
+      - name: Upload package artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: release-build
+          name: release-package
           path: build-release/
           retention-days: 7
 
-  package-and-release:
-    name: Package and Release
-    needs: [build-and-test, build-release]
+  release:
+    name: Create GitHub Release
+    needs: [test, package]
     runs-on: ubuntu-latest
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
 
