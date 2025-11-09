@@ -8,7 +8,7 @@ on:
 
 jobs:
   build-and-test:
-    name: Build and Test
+    name: Build and Test (Debug)
     runs-on: ubuntu-latest
 
     steps:
@@ -18,33 +18,61 @@ jobs:
       - name: Set up CMake
         uses: lukka/get-cmake@latest
 
-      - name: Configure CMake
+      - name: Configure CMake for Debug
         run: |
-          cmake -B build -S . \
-            -DCMAKE_BUILD_TYPE=Release \
+          cmake -B build-debug -S . \
+            -DCMAKE_BUILD_TYPE=Debug \
             -DCMAKE_CXX_FLAGS="-march=native -mavx -mavx2" \
             -DMATH_LIBRARY_BUILD_TESTS=ON \
             -DMATH_LIBRARY_INCLUDE_G_TEST=ON \
             -DMATH_LIBRARY_INCLUDE_SPDLOG=OFF \
             -DMATH_LIBRARY_INCLUDE_G_BENCHMARK=OFF
 
-      - name: Build project
-        run: cmake --build build --config Release
+      - name: Build project (Debug)
+        run: cmake --build build-debug --config Debug
 
       - name: Run tests
-        run: ./build/math_library_exe
+        run: ./build-debug/math_library_exe
 
       - name: Upload test results
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: test-results
-          path: build/
+          path: build-debug/
+          retention-days: 7
+
+  build-release:
+    name: Build Release
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up CMake
+        uses: lukka/get-cmake@latest
+
+      - name: Configure CMake for Release
+        run: |
+          cmake -B build-release -S . \
+            -DCMAKE_BUILD_TYPE=Release \
+            -DCMAKE_CXX_FLAGS="-march=native -mavx -mavx2 -O3" \
+            -DMATH_LIBRARY_BUILD_TESTS=OFF
+
+      - name: Build project (Release)
+        run: cmake --build build-release --config Release
+
+      - name: Upload release build
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-build
+          path: build-release/
           retention-days: 7
 
   package-and-release:
     name: Package and Release
-    needs: build-and-test
+    needs: [build-and-test, build-release]
     runs-on: ubuntu-latest
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
 
