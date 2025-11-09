@@ -4,7 +4,7 @@ on:
   push:
     branches:
       - main
-  workflow_dispatch:  # Дозволяє запускати вручну
+  workflow_dispatch:
 
 jobs:
   build:
@@ -64,84 +64,3 @@ jobs:
           path: build/
           retention-days: 7
 
-  package:
-    name: Create Release Package
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Set up CMake
-        uses: lukka/get-cmake@latest
-
-      - name: Configure CMake for Release
-        run: |
-          cmake -B build-release -S . \
-            -DCMAKE_BUILD_TYPE=Release \
-            -DCMAKE_CXX_FLAGS="-march=native -mavx -mavx2 -O3" \
-            -DMATH_LIBRARY_BUILD_TESTS=OFF
-
-      - name: Build optimized library
-        run: cmake --build build-release --config Release
-
-      - name: Upload package artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: release-package
-          path: build-release/
-          retention-days: 7
-
-  release:
-    name: Create GitHub Release
-    needs: [test, package]
-    runs-on: ubuntu-latest
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Get current date and commit
-        id: date
-        run: |
-          echo "date=$(date +'%Y-%m-%d')" >> $GITHUB_OUTPUT
-          echo "sha_short=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
-
-      - name: Create release package
-        run: |
-          mkdir -p release_package
-          cp -r include release_package/
-          cp CMakeLists.txt release_package/
-          cp README.md release_package/
-          cp -r scripts release_package/
-          mkdir -p release_package/src
-          cp -r src/lib release_package/src/
-          cd release_package
-          tar -czf ../math_library-${{ steps.date.outputs.date }}-${{ steps.date.outputs.sha_short }}.tar.gz *
-
-      - name: Create GitHub Release
-        uses: softprops/action-gh-release@v1
-        with:
-          tag_name: build-${{ steps.date.outputs.date }}-${{ steps.date.outputs.sha_short }}
-          name: Build ${{ steps.date.outputs.date }} (${{ steps.date.outputs.sha_short }})
-          body: |
-            Automated release from CI/CD pipeline
-
-            **Commit:** ${{ github.sha }}
-            **Date:** ${{ steps.date.outputs.date }}
-
-            This release contains the header-only math library with SIMD support.
-
-            ## Installation
-            1. Download and extract the archive
-            2. Include in your CMake project using FetchContent or add_subdirectory
-
-            ## Changes
-            See commit history for details: ${{ github.event.compare }}
-          files: |
-            math_library-${{ steps.date.outputs.date }}-${{ steps.date.outputs.sha_short }}.tar.gz
-          draft: false
-          prerelease: false
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
