@@ -1,5 +1,6 @@
 #include <array>
 #include <chrono>
+#include <ctime>
 #include <fstream>
 #include <iomanip>
 #include <iostream>
@@ -25,9 +26,17 @@ auto g_getCurrentDateTime() -> std::string {
   std::tm bt{};
 
 #ifdef USE_GMT
-  gmtime_s(&bt, &itt);
+  #ifdef _MSC_VER
+    gmtime_s(&bt, &itt);
+  #else
+    gmtime_r(&itt, &bt);
+  #endif
 #else
-  localtime_s(&bt, &itt);
+  #ifdef _MSC_VER
+    localtime_s(&bt, &itt);
+  #else
+    localtime_r(&itt, &bt);
+  #endif
 #endif
 
   ss << std::put_time(&bt, "%Y-%m-%d %H:%M:%S");
