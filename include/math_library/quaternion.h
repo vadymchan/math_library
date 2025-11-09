@@ -718,12 +718,10 @@ class Quaternion {
    *        direction to another (shortest arc).
    *
    *
-   * @tparam T    Scalar type of the quaternion and vectors.
    * @param from  Starting direction.
    * @param to    Target   direction.
    * @return Quaternion rotating *from* into *to*.
    */
-  template <typename T>
   static auto fromVectors(const Vector3<T>& from, const Vector3<T>& to)
       -> Quaternion {
     constexpr T kEps          = std::numeric_limits<T>::epsilon();

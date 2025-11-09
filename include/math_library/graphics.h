@@ -157,9 +157,9 @@ template <typename T, Options Option>
 void g_setTranslate(Matrix<T, 4, 4, Option>& matrix, T dx, T dy, T dz) {
   Vector<T, 4, Option> translation(dx, dy, dz, matrix(3, 3));
   if constexpr (Option == Options::RowMajor) {
-    matrix.setRow<3>(translation);
+    matrix.template setRow<3>(translation);
   } else if constexpr (Option == Options::ColumnMajor) {
-    matrix.setColumn<3>(translation);
+    matrix.template setColumn<3>(translation);
   }
 }
 

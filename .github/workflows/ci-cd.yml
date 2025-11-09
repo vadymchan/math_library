@@ -22,6 +22,7 @@ jobs:
         run: |
           cmake -B build -S . \
             -DCMAKE_BUILD_TYPE=Release \
+            -DCMAKE_CXX_FLAGS="-march=native -mavx -mavx2" \
             -DMATH_LIBRARY_BUILD_TESTS=ON \
             -DMATH_LIBRARY_INCLUDE_G_TEST=ON \
             -DMATH_LIBRARY_INCLUDE_SPDLOG=OFF \
